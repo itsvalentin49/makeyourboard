@@ -62,7 +62,7 @@ const [canvasBg, setCanvasBg] = useState("neutral");
 
 
   useEffect(() => {
-  const handleWheel = (e: React.WheelEvent) => {
+  const handleWheel = (e: WheelEvent) => {
     if (e.ctrlKey || e.metaKey) {
       e.preventDefault();
 
