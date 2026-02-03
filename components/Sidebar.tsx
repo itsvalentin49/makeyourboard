@@ -1,0 +1,696 @@
+"use client";
+
+import React from "react";
+import {
+  ArrowLeft,
+  ChevronDown,
+  ExternalLink,
+  Minus,
+  Plus,
+  RotateCw,
+  ShoppingCart,
+  Square,
+  Trash2,
+  Weight,
+  Zap,
+} from "lucide-react";
+
+import SidebarLogo from "@/components/SidebarLogo";
+
+type AnyRow = Record<string, any>;
+
+type Props = {
+  // Data
+  pedalsLibrary: AnyRow[];
+  boardsLibrary: AnyRow[];
+
+  // UI state
+  showPedalResults: boolean;
+  setShowPedalResults: (v: boolean) => void;
+  showBoardResults: boolean;
+  setShowBoardResults: (v: boolean) => void;
+
+  pedalSearch: string;
+  setPedalSearch: (v: string) => void;
+  boardSearch: string;
+  setBoardSearch: (v: string) => void;
+
+  // Selection
+  selectedPedal: AnyRow | undefined;
+  selectedBoardDetails: AnyRow | undefined;
+  selectedInstanceId: number | null;
+  selectedBoardInstanceId: number | null;
+  setSelectedInstanceId: (v: number | null) => void;
+  setSelectedBoardInstanceId: (v: number | null) => void;
+
+  // Custom item
+  customType: "pedal" | "board";
+  setCustomType: (v: "pedal" | "board") => void;
+  customName: string;
+  setCustomName: (v: string) => void;
+  customWidth: string;
+  setCustomWidth: (v: string) => void;
+  customDepth: string;
+  setCustomDepth: (v: string) => void;
+  customColor: string;
+  setCustomColor: (v: string) => void;
+
+  // Actions (callbacks from page)
+  addPedal: (p: AnyRow) => void;
+  selectBoard: (b: AnyRow) => void;
+  addCustomItem: () => void;
+  resetCanvas: () => void;
+  rotatePedal: (id: number) => void;
+  deletePedal: (id: number) => void;
+
+};
+
+export default function Sidebar({
+  pedalsLibrary,
+  boardsLibrary,
+  showPedalResults,
+  setShowPedalResults,
+  showBoardResults,
+  setShowBoardResults,
+  pedalSearch,
+  setPedalSearch,
+  boardSearch,
+  setBoardSearch,
+  selectedPedal,
+  selectedBoardDetails,
+  selectedInstanceId,
+  selectedBoardInstanceId,
+  setSelectedInstanceId,
+  setSelectedBoardInstanceId,
+  customType,
+  setCustomType,
+  customName,
+  setCustomName,
+  customWidth,
+  setCustomWidth,
+  customDepth,
+  setCustomDepth,
+  customColor,
+  setCustomColor,
+  addPedal,
+  selectBoard,
+  addCustomItem,
+  resetCanvas,
+  rotatePedal,
+  deletePedal,
+}: Props) {
+
+  const groupItems = (items: AnyRow[], filter: string) => {
+  return items.reduce((acc: Record<string, AnyRow[]>, item) => {
+    if (
+      filter &&
+      !item.name?.toLowerCase().includes(filter.toLowerCase())
+    ) {
+      return acc;
+    }
+
+    const key = item.brand || "Other";
+
+    if (!acc[key]) acc[key] = [];
+    acc[key].push(item);
+
+    return acc;
+  }, {});
+};
+
+  return (
+    <div
+      className="w-80 border-r border-zinc-800 p-4 flex flex-col gap-6 bg-zinc-950 z-20 overflow-y-auto no-scrollbar"
+    >
+      <SidebarLogo />
+
+      {/* PEDAL DETAILS */}
+      {selectedPedal ? (
+        <div className="flex flex-col gap-6 animate-in slide-in-from-left duration-300">
+          <button
+            onClick={() => setSelectedInstanceId(null)}
+            className="flex items-center gap-2 text-zinc-500 hover:text-white transition-colors text-[10px] font-black uppercase tracking-widest"
+          >
+            <ArrowLeft className="size-4" /> Back to Library
+          </button>
+
+          <div className="space-y-1">
+            <p className="text-blue-500 text-[12px] font-black uppercase tracking-[0.2em]">
+              {selectedPedal.brand}
+            </p>
+            <h2 className="text-l font-black text-[16px] leading-tight">
+              {selectedPedal.name}
+            </h2>
+            <p className="text-zinc-500 text-[10px] font-medium">
+              {selectedPedal.year || "No date"}
+            </p>
+            <div className="py-2 border-zinc-900">
+              <p className="text-[12px] text-zinc-400 font-medium">
+                {selectedPedal.overview}
+              </p>
+            </div>
+          </div>
+
+          {/* ACTIONS */}
+          <div className="flex gap-2">
+            <div className="flex gap-2 pointer-events-auto w-full">
+              {/* ROTATE */}
+              <button
+              onClick={() => {
+  if (selectedInstanceId !== null) {
+    rotatePedal(selectedInstanceId);
+  }
+}}
+
+  className="group pointer-events-auto flex-1 flex items-center justify-center px-4 py-3 rounded-xl
+  bg-zinc-600/10 border border-zinc-500/20
+  hover:bg-blue-500/10 hover:border-blue-400/70
+  hover:ring-2 hover:ring-blue-500/30
+  hover:shadow-lg
+  active:scale-[0.99]
+  transition-all duration-200"
+>
+  <div className="flex items-center gap-3">
+    <RotateCw
+      size={16}
+      className="text-zinc-300 group-hover:text-white
+      group-active:rotate-90 transition-transform duration-200"
+    />
+    <span className="text-[10px] font-black uppercase tracking-widest text-zinc-300 group-hover:text-white">
+      Rotate
+    </span>
+  </div>
+</button>
+
+
+              {/* DELETE */}
+              <button
+  onClick={() => {
+  if (selectedInstanceId !== null) {
+    deletePedal(selectedInstanceId);
+  }
+}}
+
+  className="group pointer-events-auto flex-1 flex items-center justify-center px-4 py-3 rounded-xl
+  bg-zinc-600/10 border border-zinc-500/20
+  hover:bg-red-500/10 hover:border-red-400/80
+  hover:ring-2 hover:ring-red-500/30
+  hover:shadow-lg
+  active:scale-[0.99]
+  transition-all duration-200"
+>
+  <div className="flex items-center gap-3">
+    <Trash2 size={16} className="text-zinc-400 group-hover:text-white transition-colors" />
+    <span className="text-[10px] font-black uppercase tracking-widest text-zinc-300 group-hover:text-white">
+      Delete
+    </span>
+  </div>
+</button>
+
+            </div>
+          </div>
+
+          {/* PEDAL INFO */}
+          <div className="space-y-0.2 border-zinc-900">
+            <div className="flex justify-between items-center py-2 border-b border-t border-zinc-900">
+              <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
+                Status
+              </span>
+              <span
+                className={`text-[9px] px-2 py-0.5 rounded-full font-black uppercase ${
+                  (selectedPedal.status || "").toLowerCase().includes("active")
+                    ? "bg-green-500/10 text-green-500"
+                    : "bg-red-500/10 text-red-500"
+                }`}
+              >
+                {selectedPedal.status || "N/A"}
+              </span>
+            </div>
+
+            <div className="flex justify-between items-center py-2 border-b border-zinc-900">
+              <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
+                Type
+              </span>
+              <span className="text-[11px] font-bold font-mono text-zinc-300">
+                {selectedPedal.type || "N/A"}
+              </span>
+            </div>
+
+            <div className="flex justify-between items-center py-2 border-b border-zinc-900">
+              <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
+                Circuit
+              </span>
+              <span className="text-[11px] font-bold font-mono text-zinc-300">
+                {selectedPedal.circuit || "N/A"}
+              </span>
+            </div>
+
+            <div className="flex justify-between items-center py-2 border-b border-zinc-900">
+              <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
+                Bypass
+              </span>
+              <span className="text-[11px] font-bold font-mono text-zinc-300">
+                {selectedPedal.bypass || "N/A"}
+              </span>
+            </div>
+
+            <div className="flex justify-between items-center py-2 border-b border-zinc-900">
+              <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
+                Power
+              </span>
+              <span className="text-[11px] font-bold font-mono text-zinc-300">
+                {selectedPedal.power || "N/A"}
+              </span>
+            </div>
+
+            <div className="flex justify-between items-center py-2 border-b border-zinc-900">
+              <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
+                Draw
+              </span>
+              <span className="text-[11px] font-bold font-mono">
+                {selectedPedal.draw || 0} mA
+              </span>
+            </div>
+
+            <div className="flex justify-between items-center py-2 border-b border-zinc-900">
+              <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
+                Dimensions
+              </span>
+              <span className="text-[11px] font-bold font-mono">
+                {selectedPedal.width} x {selectedPedal.depth || 0} mm
+              </span>
+            </div>
+
+            <div className="flex justify-between items-center py-2 border-b border-zinc-900">
+              <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
+                Weight
+              </span>
+              <span className="text-[11px] font-bold font-mono">
+                {selectedPedal.weight || 0} g
+              </span>
+            </div>
+
+            <div className="flex justify-between items-center py-2 border-b border-zinc-900">
+              <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
+                Origin
+              </span>
+              <span className="text-[11px] font-bold text-zinc-300">
+                {selectedPedal.origin || "N/A"}
+              </span>
+            </div>
+
+            <div className="flex justify-between items-center py-2 border-b border-zinc-900">
+              <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
+                Manual
+              </span>
+              {selectedPedal.manual ? (
+                <a
+                  href={selectedPedal.manual}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[11px] font-bold text-blue-400 hover:text-blue-300 transition-colors flex items-center gap-1"
+                >
+                  PDF <ExternalLink size={10} />
+                </a>
+              ) : (
+                <span className="text-[11px] font-bold text-zinc-600">N/A</span>
+              )}
+            </div>
+
+            <div className="pt-5 space-y-4">
+              <span className="text-[10px] uppercase font-black tracking-wider">
+                Buy Online
+              </span>
+
+              <a
+                href={
+                  (selectedPedal.status || "").toLowerCase().includes("discontinued")
+                    ? `https://reverb.com/marketplace?query=${encodeURIComponent(
+                        selectedPedal.brand + " " + selectedPedal.name
+                      )}`
+                    : selectedPedal.thomann
+                }
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-between w-full px-4 py-3 mt-3 bg-blue-600/10 border border-blue-500/20 rounded-xl hover:bg-blue-600 transition-all group"
+              >
+                <div className="flex items-center gap-3">
+                  <ShoppingCart size={16} className="text-blue-400 group-hover:text-white" />
+                  <span className="text-[11px] font-black uppercase tracking-widest group-hover:text-white text-blue-400">
+                    Shop
+                  </span>
+                </div>
+                <ExternalLink size={14} className="text-blue-400/50 group-hover:text-white" />
+              </a>
+            </div>
+          </div>
+        </div>
+      ) : selectedBoardDetails ? (
+        // BOARD DETAILS
+        <div className="flex flex-col gap-6 animate-in slide-in-from-left duration-300">
+          <button
+            onClick={() => setSelectedBoardInstanceId(null)}
+            className="flex items-center gap-2 text-zinc-500 hover:text-white transition-colors text-[10px] font-black uppercase tracking-widest"
+          >
+            <ArrowLeft className="size-4" /> Back to Library
+          </button>
+
+          <div className="space-y-1">
+            <p className="text-blue-500 text-[12px] font-black uppercase tracking-[0.2em]">
+              {selectedBoardDetails.brand}
+            </p>
+            <h2 className="text-l font-black leading-tight">{selectedBoardDetails.name}</h2>
+            <p className="text-zinc-500 text-[10px] font-medium">
+              {selectedBoardDetails.year || "No date"}
+            </p>
+          </div>
+
+          <div className="space-y-0.5 border-zinc-900 pt-4">
+            <div className="flex justify-between items-center py-2 border-b border-t border-zinc-900">
+              <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
+                Status
+              </span>
+              <span
+                className={`text-[9px] px-2 py-0.5 rounded-full font-black uppercase ${
+                  (selectedBoardDetails.status || "").toLowerCase().includes("active")
+                    ? "bg-green-500/10 text-green-500"
+                    : "bg-red-500/10 text-red-500"
+                }`}
+              >
+                {selectedBoardDetails.status || "N/A"}
+              </span>
+            </div>
+
+            <div className="flex justify-between items-center py-2.5 border-b border-zinc-900">
+              <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
+                Material
+              </span>
+              <span className="text-[11px] font-bold font-mono">
+                {selectedBoardDetails.material || 0}
+              </span>
+            </div>
+
+            <div className="flex justify-between items-center py-2.5 border-b border-zinc-900">
+              <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
+                Profile
+              </span>
+              <span className="text-[11px] font-bold font-mono">
+                {selectedBoardDetails.profile || 0}
+              </span>
+            </div>
+
+            <div className="flex justify-between items-center py-2.5 border-b border-zinc-900">
+              <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
+                Dimensions
+              </span>
+              <span className="text-[11px] font-bold font-mono">
+                {selectedBoardDetails.width} x {selectedBoardDetails.depth || 0} mm
+              </span>
+            </div>
+
+            <div className="flex justify-between items-center py-2.5 border-b border-zinc-900">
+              <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
+                Weight
+              </span>
+              <span className="text-[11px] font-bold font-mono">
+                {selectedBoardDetails.weight || 0} g
+              </span>
+            </div>
+
+            <div className="flex justify-between items-center py-2.5 border-b border-zinc-900">
+              <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
+                Origin
+              </span>
+              <span className="text-[11px] font-bold font-mono">
+                {selectedBoardDetails.origin || 0}
+              </span>
+            </div>
+
+            <div className="pt-5 space-y-3">
+              <span className="text-[10px] text-zinc-500 uppercase font-black tracking-wider">
+                Buy Online
+              </span>
+
+              <a
+                href={
+                  (selectedBoardDetails.status || "").toLowerCase().includes("discontinued")
+                    ? `https://reverb.com/marketplace?query=${encodeURIComponent(
+                        selectedBoardDetails.brand + " " + selectedBoardDetails.name
+                      )}`
+                    : selectedBoardDetails.thomann
+                }
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-between w-full px-4 py-3 bg-blue-600/10 border border-blue-500/20 rounded-xl hover:bg-blue-600 transition-all group"
+              >
+                <div className="flex items-center gap-3">
+                  <ShoppingCart size={16} className="text-blue-400 group-hover:text-white" />
+                  <span className="text-[11px] font-black uppercase tracking-widest group-hover:text-white text-blue-400">
+                    Shop
+                  </span>
+                </div>
+                <ExternalLink size={14} className="text-blue-400/50 group-hover:text-white" />
+              </a>
+            </div>
+          </div>
+        </div>
+      ) : (
+        // LIBRARY (default view)
+        <>
+          {/* ADD A PEDAL */}
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-2 px-1">
+              <div className="w-[2px] h-3 bg-blue-500 rounded-full"></div>
+              <span className="text-[10px] font-black uppercase tracking-widest">
+                Add a pedal
+              </span>
+            </div>
+
+            <div className="relative" style={{ zIndex: showPedalResults ? 60 : 10 }}>
+              <div className="relative flex items-center">
+                <input
+                  type="text"
+                  placeholder="Search for a pedal..."
+                  className={`w-full bg-zinc-900 border rounded-lg py-2 pl-4 pr-10 text-[11px] outline-none transition-all ${
+                    showPedalResults
+                      ? "border-blue-500 ring-1 ring-blue-500"
+                      : "border-zinc-800"
+                  }`}
+                  value={pedalSearch}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowBoardResults(false);
+                    setShowPedalResults(true);
+                  }}
+                  onChange={(e) => {
+                    setPedalSearch(e.target.value);
+                    setShowPedalResults(true);
+                  }}
+                />
+                <ChevronDown
+                  className={`absolute right-3 size-3 text-zinc-600 transition-transform pointer-events-none ${
+                    showPedalResults ? "rotate-180 text-blue-500" : ""
+                  }`}
+                />
+              </div>
+
+              {showPedalResults && (
+                <div className="absolute top-10 left-0 right-0 bg-zinc-900 border border-zinc-800 rounded-xl shadow-2xl z-50 max-h-80 overflow-y-auto">
+                  {Object.keys(groupItems(pedalsLibrary, pedalSearch)).length > 0 ? (
+                    Object.keys(groupItems(pedalsLibrary, pedalSearch)).map((brand) => (
+                      <div key={brand} className="flex flex-col border-b border-zinc-800/50">
+                        <div className="px-4 py-1 text-[10px] font-black text-blue-400 bg-zinc-950/50 uppercase tracking-widest">
+                          {brand}
+                        </div>
+                        {groupItems(pedalsLibrary, pedalSearch)[brand].map((p) => (
+                          <button
+                            key={p.id}
+                            onClick={() => addPedal(p)}
+                            className="w-full px-5 py-2 text-left hover:bg-zinc-800 text-zinc-300 text-[12px]"
+                          >
+                            <span className="font-bold opacity-50 mr-2">{brand}</span>
+                            {p.name}
+                          </button>
+                        ))}
+                      </div>
+                    ))
+                  ) : (
+                    <div className="p-4 text-center text-[10px] text-zinc-600 uppercase font-bold tracking-widest">
+                      No pedals found
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* ADD A BOARD */}
+          <div className="flex flex-col gap-1 mt-2">
+            <div className="flex items-center gap-2 px-1">
+              <div className="w-[2px] h-3 bg-blue-500 rounded-full"></div>
+              <span className="text-[10px] font-black uppercase tracking-widest">
+                Add a board
+              </span>
+            </div>
+
+            <div className="relative" style={{ zIndex: showBoardResults ? 60 : 5 }}>
+              <div className="relative flex items-center">
+                <input
+                  type="text"
+                  placeholder="Search for a board..."
+                  className={`w-full bg-zinc-900 border rounded-lg py-2 pl-4 pr-10 text-[11px] outline-none transition-all ${
+                    showBoardResults
+                      ? "border-blue-500 ring-1 ring-blue-500"
+                      : "border-zinc-800"
+                  }`}
+                  value={boardSearch}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowPedalResults(false);
+                    setShowBoardResults(true);
+                  }}
+                  onChange={(e) => {
+                    setBoardSearch(e.target.value);
+                    setShowBoardResults(true);
+                  }}
+                />
+                <ChevronDown
+                  className={`absolute right-3 size-3 text-zinc-600 transition-transform pointer-events-none ${
+                    showBoardResults ? "rotate-180 text-blue-500" : ""
+                  }`}
+                />
+              </div>
+
+              {showBoardResults && (
+                <div className="absolute top-10 left-0 right-0 bg-zinc-900 border border-zinc-800 rounded-xl shadow-2xl z-50 max-h-80 overflow-y-auto">
+                  {Object.keys(groupItems(boardsLibrary, boardSearch)).length > 0 ? (
+                    Object.keys(groupItems(boardsLibrary, boardSearch)).map((brand) => (
+                      <div key={brand} className="flex flex-col border-b border-zinc-800/50">
+                        <div className="px-4 py-1 text-[10px] font-black text-blue-400 bg-zinc-950/50 uppercase tracking-widest">
+                          {brand}
+                        </div>
+                        {groupItems(boardsLibrary, boardSearch)[brand].map((b) => (
+                          <button
+                            key={b.id}
+                            onClick={() => selectBoard(b)}
+                            className="w-full px-5 py-2 text-left hover:bg-zinc-800 text-zinc-300 text-[12px]"
+                          >
+                            <span className="font-bold opacity-50 mr-2">{brand}</span>
+                            {b.name}
+                          </button>
+                        ))}
+                      </div>
+                    ))
+                  ) : (
+                    <div className="p-4 text-center text-[10px] text-zinc-600 uppercase font-bold tracking-widest">
+                      No boards found
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* MAKE YOUR OWN */}
+          <div className="flex flex-col gap-1 mt-2">
+            <div className="flex items-center gap-2 px-1">
+              <div className="w-[2px] h-3 bg-blue-500 rounded-full"></div>
+              <span className="text-[10px] font-black uppercase tracking-widest">
+                Make Your Own
+              </span>
+            </div>
+
+            <div className="p-4 bg-zinc-900/50 border border-zinc-800 rounded-xl space-y-4">
+              <div className="flex bg-zinc-950 p-1 rounded-lg">
+                <button
+                  onClick={() => setCustomType("pedal")}
+                  className={`flex-1 py-1.5 text-[10px] font-black uppercase rounded-md transition-all ${
+                    customType === "pedal"
+                      ? "bg-zinc-800 text-white"
+                      : "text-zinc-600 hover:text-zinc-400"
+                  }`}
+                >
+                  Pedal
+                </button>
+                <button
+                  onClick={() => setCustomType("board")}
+                  className={`flex-1 py-1.5 text-[10px] font-black uppercase rounded-md transition-all ${
+                    customType === "board"
+                      ? "bg-zinc-800 text-white"
+                      : "text-zinc-600 hover:text-zinc-400"
+                  }`}
+                >
+                  Board
+                </button>
+              </div>
+
+              <input
+                type="text"
+                placeholder="Name (optional)"
+                value={customName}
+                onChange={(e) => setCustomName(e.target.value)}
+                className="w-full bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-[11px] outline-none"
+              />
+
+              <div className="grid grid-cols-2 gap-2">
+                <input
+                  type="number"
+                  placeholder="Width (mm)"
+                  value={customWidth}
+                  onChange={(e) => setCustomWidth(e.target.value)}
+                  className="w-full bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-[11px] outline-none"
+                />
+                <input
+                  type="number"
+                  placeholder="Depth (mm)"
+                  value={customDepth}
+                  onChange={(e) => setCustomDepth(e.target.value)}
+                  className="w-full bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-[11px] outline-none"
+                />
+              </div>
+
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  <div
+                    className="relative size-6 rounded-full border border-zinc-700 overflow-hidden"
+                    style={{ backgroundColor: customColor }}
+                  >
+                    <input
+                      type="color"
+                      value={customColor}
+                      onChange={(e) => setCustomColor(e.target.value)}
+                      className="absolute inset-0 opacity-0 cursor-pointer"
+                    />
+                  </div>
+                  <span className="text-[10px] font-mono text-zinc-400 uppercase">
+                    {customColor}
+                  </span>
+                </div>
+
+                <button
+                  onClick={addCustomItem}
+                  className="flex-1 bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-black uppercase py-2 rounded-lg transition-all flex items-center justify-center gap-2"
+                >
+                  <Plus size={14} /> Add Custom
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* RESET */}
+          <div className="mt-2 flex justify-center">
+            <button
+              onClick={resetCanvas}
+              className="flex items-center gap-2 text-red-600 hover:text-red-400 transition-all duration-200 group py-2"
+            >
+              <Trash2 className="size-4 group-hover:drop-shadow-[0_0_8px_rgba(239,68,68,0.5)]" />
+              <span className="text-[10px] font-black uppercase tracking-widest">
+                Reset
+              </span>
+            </button>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
