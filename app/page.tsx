@@ -18,7 +18,7 @@ type BoardItem = AnyRow & {
 
 type Project = {
   id: number;
-  name?: string;
+  name: string;
   zoom: number;
   boardPedals: BoardItem[];
   selectedBoards: BoardItem[];
