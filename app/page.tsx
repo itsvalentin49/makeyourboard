@@ -367,7 +367,7 @@ export default function PedalBoardApp() {
       >
         <TopBarTabs
           projects={projects}
-          setProjects={setProjects}
+          setProjects={(v: Project[]) => setProjects(v)}
           activeProjectId={activeProjectId}
           setActiveProjectId={setActiveProjectId}
           editingProjectId={editingProjectId}
