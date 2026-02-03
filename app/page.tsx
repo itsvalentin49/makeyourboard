@@ -10,8 +10,6 @@ import TopBarTabs from "@/components/TopBarTabs";
 import BoardCanvas from "@/components/BoardCanvas";
 
 
-
-
 const ZOOM_FACTOR = 1.5;
 const MAX_PROJECTS = 8;
 const STORAGE_KEY = "guitar-sandbox-data";
@@ -59,7 +57,7 @@ const [canvasBg, setCanvasBg] = useState("neutral");
 
 
   useEffect(() => {
-    const handleWheel = (e) => {
+    const handleWheel = (e: React.WheelEvent) => {
       if (e.ctrlKey || e.metaKey) {
         e.preventDefault();
         const activeProject = projects.find(p => p.id === activeProjectId) || workingBoard;
