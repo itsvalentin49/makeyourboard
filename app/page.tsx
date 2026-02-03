@@ -9,6 +9,11 @@ import { useLibrary } from "@/hooks/useLibrary";
 import TopBarTabs from "@/components/TopBarTabs";
 import BoardCanvas from "@/components/BoardCanvas";
 
+type Project = {
+  id: string;
+  zoom: number;
+};
+
 
 const ZOOM_FACTOR = 1.5;
 const MAX_PROJECTS = 8;
@@ -17,7 +22,7 @@ const STORAGE_KEY = "guitar-sandbox-data";
 
 export default function PedalBoardApp() {
   const { pedalsLibrary, boardsLibrary, loadingLibrary, libraryError } = useLibrary();
-  const [projects, setProjects] = useState([]);
+  const [projects, setProjects] = useState<Project[]>([]);
   const [activeProjectId, setActiveProjectId] = useState(null);
   const [workingBoard, setWorkingBoard] = useState({ boardPedals: [], selectedBoards: [], zoom: 100 });
   const [editingProjectId, setEditingProjectId] = useState(null);
@@ -57,19 +62,27 @@ const [canvasBg, setCanvasBg] = useState("neutral");
 
 
   useEffect(() => {
-    const handleWheel = (e: React.WheelEvent) => {
-      if (e.ctrlKey || e.metaKey) {
-        e.preventDefault();
-        const activeProject = projects.find(p => p.id === activeProjectId) || workingBoard;
-        const currentZoom = activeProject.zoom || 100;
-        const delta = e.deltaY > 0 ? -5 : 5;
-        const newZoom = Math.min(Math.max(currentZoom + delta, 25), 200);
-        updateActiveProject({ zoom: newZoom });
-      }
-    };
-    window.addEventListener('wheel', handleWheel, { passive: false });
-    return () => window.removeEventListener('wheel', handleWheel);
-  }, [activeProjectId, projects, workingBoard]);
+  const handleWheel = (e: React.WheelEvent) => {
+    if (e.ctrlKey || e.metaKey) {
+      e.preventDefault();
+
+      const activeProject =
+        projects.find(p => p.id === activeProjectId) ?? workingBoard;
+
+      if (!activeProject) return;
+
+      const currentZoom = activeProject.zoom ?? 100;
+      const delta = e.deltaY > 0 ? -5 : 5;
+      const newZoom = Math.min(Math.max(currentZoom + delta, 25), 200);
+
+      updateActiveProject({ zoom: newZoom });
+    }
+  };
+
+  window.addEventListener('wheel', handleWheel, { passive: false });
+  return () => window.removeEventListener('wheel', handleWheel);
+}, [projects, activeProjectId, workingBoard]);
+
 
   useEffect(() => {
     const updateSize = () => setDimensions({ width: window.innerWidth, height: window.innerHeight });
