@@ -1,11 +1,16 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
+
 import Sidebar from "@/components/Sidebar";
 import TopBarTabs from "@/components/TopBarTabs";
 import BoardCanvas from "@/components/BoardCanvas";
 import { useLibrary } from "@/hooks/useLibrary";
 
+/**
+ * Types locaux (pour arrêter l’hémorragie TypeScript dans Vercel)
+ * On ne change pas ton fonctionnement : on rend juste le modèle cohérent.
+ */
 type AnyRow = Record<string, any>;
 
 type BoardItem = AnyRow & {
@@ -17,7 +22,7 @@ type BoardItem = AnyRow & {
 
 type Project = {
   id: number;
-  name: string; // ✅ IMPORTANT : obligatoire (TopBarTabs l’exige)
+  name: string;
   zoom: number;
   boardPedals: BoardItem[];
   selectedBoards: BoardItem[];
@@ -26,70 +31,76 @@ type Project = {
 const MAX_PROJECTS = 8;
 const STORAGE_KEY = "guitar-sandbox-data";
 
+const DEFAULT_WORKING_BOARD: Project = {
+  id: -1,
+  name: "WORKING",
+  zoom: 100,
+  boardPedals: [],
+  selectedBoards: [],
+};
+
 export default function PedalBoardApp() {
   const { pedalsLibrary, boardsLibrary } = useLibrary();
 
   const [projects, setProjects] = useState<Project[]>([]);
   const [activeProjectId, setActiveProjectId] = useState<number | null>(null);
 
-  const [workingBoard, setWorkingBoard] = useState<Project>({
-    id: -1,
-    name: "WORKING",
-    zoom: 100,
-    boardPedals: [],
-    selectedBoards: [],
-  });
+  const [workingBoard, setWorkingBoard] = useState<Project>(DEFAULT_WORKING_BOARD);
 
   const [editingProjectId, setEditingProjectId] = useState<number | null>(null);
-  const [tempName, setTempName] = useState("");
+  const [tempName, setTempName] = useState<string>("");
 
   const [selectedInstanceId, setSelectedInstanceId] = useState<number | null>(null);
   const [selectedBoardInstanceId, setSelectedBoardInstanceId] = useState<number | null>(null);
 
-  const [pedalSearch, setPedalSearch] = useState("");
-  const [boardSearch, setBoardSearch] = useState("");
-  const [showPedalResults, setShowPedalResults] = useState(false);
-  const [showBoardResults, setShowBoardResults] = useState(false);
+  const [pedalSearch, setPedalSearch] = useState<string>("");
+  const [boardSearch, setBoardSearch] = useState<string>("");
 
-  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+  const [dimensions, setDimensions] = useState<{ width: number; height: number }>({
+    width: 0,
+    height: 0,
+  });
+
+  const [showPedalResults, setShowPedalResults] = useState<boolean>(false);
+  const [showBoardResults, setShowBoardResults] = useState<boolean>(false);
+
   const [displaySizes, setDisplaySizes] = useState<Record<number, { w: number; h: number }>>({});
-  const [hydrated, setHydrated] = useState(false);
+  const [hydrated, setHydrated] = useState<boolean>(false);
 
+  // Backgrounds (neutral par défaut)
+  const BACKGROUNDS = [
+    { id: "neutral", label: "Neutral", type: "css" as const },
+    { id: "wood", label: "Wood", type: "image" as const, src: "/backgrounds/wood.webp" },
+    { id: "marble", label: "Marble", type: "image" as const, src: "/backgrounds/marble.webp" },
+  ];
+  const [canvasBg, setCanvasBg] = useState<string>("neutral");
+
+  // Custom item (inchangé)
   const [customType, setCustomType] = useState<"pedal" | "board">("pedal");
-  const [customName, setCustomName] = useState("");
-  const [customWidth, setCustomWidth] = useState("");
-  const [customDepth, setCustomDepth] = useState("");
-  const [customColor, setCustomColor] = useState("#3b82f6");
+  const [customName, setCustomName] = useState<string>("");
+  const [customWidth, setCustomWidth] = useState<string>("");
+  const [customDepth, setCustomDepth] = useState<string>("");
+  const [customColor, setCustomColor] = useState<string>("#3b82f6");
 
-  // présents dans ton ancien code (même si pas utilisés ici, je ne touche pas)
+  // refs (si tu les utilises plus tard)
   const pedalSearchRef = useRef<HTMLInputElement | null>(null);
   const boardSearchRef = useRef<HTMLInputElement | null>(null);
 
-  const BACKGROUNDS = [
-    { id: "neutral", label: "Neutral", type: "css" },
-    { id: "wood", label: "Wood", type: "image", src: "/backgrounds/wood.webp" },
-    { id: "marble", label: "Marble", type: "image", src: "/backgrounds/marble.webp" },
-  ];
+  /**
+   * Active project (toujours un Project valide)
+   */
+  const activeProject: Project =
+    projects.find((p) => p.id === activeProjectId) ?? workingBoard;
 
-  const [canvasBg, setCanvasBg] = useState("neutral");
-
+  /**
+   * Helpers
+   */
   const closeSearchMenus = () => {
     setShowPedalResults(false);
     setShowBoardResults(false);
     setPedalSearch("");
     setBoardSearch("");
   };
-
-  const activeProject: Project =
-    projects.find((p) => p.id === activeProjectId) ?? workingBoard;
-
-  const selectedPedal: AnyRow | undefined = activeProject.boardPedals.find(
-    (p) => p.instanceId === selectedInstanceId
-  );
-
-  const selectedBoardDetails: AnyRow | undefined = activeProject.selectedBoards.find(
-    (b) => b.instanceId === selectedBoardInstanceId
-  );
 
   const updateActiveProject = (updates: Partial<Project>) => {
     if (activeProjectId !== null) {
@@ -101,84 +112,114 @@ export default function PedalBoardApp() {
     }
   };
 
-  const handleSizeUpdate = (id: number, w: number, h: number) => {
-    setDisplaySizes((prev) => {
-      if (prev[id]?.w === w && prev[id]?.h === h) return prev;
-      return { ...prev, [id]: { w, h } };
-    });
-  };
-
-  // ===== Load + resize =====
-  useEffect(() => {
-    const updateSize = () => setDimensions({ width: window.innerWidth, height: window.innerHeight });
-    window.addEventListener("resize", updateSize);
-    updateSize();
-
-    const savedData = localStorage.getItem(STORAGE_KEY);
-    if (savedData) {
-      const parsed = JSON.parse(savedData) as {
-        projects?: Partial<Project>[];
-        activeProjectId?: number | null;
-        workingBoard?: Partial<Project>;
-      };
-
-      // ✅ Important : on “répare” les vieux projets qui n’ont pas name
-      const loadedProjects: Project[] = (parsed.projects ?? []).map((p, i) => ({
-        id: typeof p.id === "number" ? p.id : Date.now() + i,
-        name: typeof p.name === "string" && p.name.trim() ? p.name : `BOARD ${i + 1}`,
-        zoom: typeof p.zoom === "number" ? p.zoom : 100,
-        boardPedals: Array.isArray(p.boardPedals) ? (p.boardPedals as BoardItem[]) : [],
-        selectedBoards: Array.isArray(p.selectedBoards) ? (p.selectedBoards as BoardItem[]) : [],
-      }));
-
-      setProjects(loadedProjects);
-      setActiveProjectId(parsed.activeProjectId ?? null);
-
-      const wb = parsed.workingBoard;
-      setWorkingBoard({
-        id: -1,
-        name:
-          wb && typeof wb.name === "string" && wb.name.trim()
-            ? wb.name
-            : "WORKING",
-        zoom: wb && typeof wb.zoom === "number" ? wb.zoom : 100,
-        boardPedals: wb && Array.isArray(wb.boardPedals) ? (wb.boardPedals as BoardItem[]) : [],
-        selectedBoards: wb && Array.isArray(wb.selectedBoards) ? (wb.selectedBoards as BoardItem[]) : [],
-      });
-    }
-
-    setHydrated(true);
-    return () => window.removeEventListener("resize", updateSize);
-  }, []);
-
-  // ===== Save =====
-  useEffect(() => {
-    if (!hydrated) return;
-    if (dimensions.width === 0) return;
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify({ projects, activeProjectId, workingBoard })
-    );
-  }, [hydrated, projects, activeProjectId, workingBoard, dimensions.width]);
-
-  // ===== Zoom Ctrl/Cmd+Wheel (window listener => WheelEvent) =====
+  /**
+   * Wheel zoom (Ctrl / Cmd + molette)
+   */
   useEffect(() => {
     const handleWheel = (e: WheelEvent) => {
-      if (!e.ctrlKey && !e.metaKey) return;
-      e.preventDefault();
-
-      const currentZoom = activeProject.zoom ?? 100;
-      const delta = e.deltaY > 0 ? -5 : 5;
-      const newZoom = Math.min(Math.max(currentZoom + delta, 25), 200);
-
-      updateActiveProject({ zoom: newZoom });
+      if (e.ctrlKey || e.metaKey) {
+        e.preventDefault();
+        const currentZoom = activeProject.zoom ?? 100;
+        const delta = e.deltaY > 0 ? -5 : 5;
+        const newZoom = Math.min(Math.max(currentZoom + delta, 25), 200);
+        updateActiveProject({ zoom: newZoom });
+      }
     };
 
     window.addEventListener("wheel", handleWheel, { passive: false });
     return () => window.removeEventListener("wheel", handleWheel);
-  }, [activeProject.zoom, activeProjectId, projects, workingBoard]);
+    // on dépend volontairement d’activeProject.zoom via activeProject
+  }, [activeProjectId, activeProject.zoom]);
 
-  // ===== Actions (identiques à ta logique) =====
+  /**
+   * Hydratation + resize + load localStorage (safe)
+   */
+  useEffect(() => {
+    const updateSize = () =>
+      setDimensions({ width: window.innerWidth, height: window.innerHeight });
+
+    window.addEventListener("resize", updateSize);
+    updateSize();
+
+    // Load safe
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+
+        const parsedProjects = (parsed.projects ?? []) as any[];
+        const safeProjects: Project[] = parsedProjects.map((p: any, i: number) => ({
+          id: typeof p.id === "number" ? p.id : Date.now() + i,
+          name: typeof p.name === "string" ? p.name : `BOARD ${i + 1}`,
+          zoom: typeof p.zoom === "number" ? p.zoom : 100,
+          boardPedals: Array.isArray(p.boardPedals) ? p.boardPedals : [],
+          selectedBoards: Array.isArray(p.selectedBoards) ? p.selectedBoards : [],
+        }));
+
+        setProjects(safeProjects);
+
+        const ap = parsed.activeProjectId;
+        setActiveProjectId(typeof ap === "number" ? ap : null);
+
+        const wb = parsed.workingBoard ?? {};
+        setWorkingBoard({
+          ...DEFAULT_WORKING_BOARD,
+          ...wb,
+          name: typeof wb.name === "string" ? wb.name : DEFAULT_WORKING_BOARD.name,
+          zoom: typeof wb.zoom === "number" ? wb.zoom : DEFAULT_WORKING_BOARD.zoom,
+          boardPedals: Array.isArray(wb.boardPedals) ? wb.boardPedals : [],
+          selectedBoards: Array.isArray(wb.selectedBoards) ? wb.selectedBoards : [],
+        });
+      }
+    } catch {
+      // si JSON corrompu, on ignore et on part sur défaut
+      setProjects([]);
+      setActiveProjectId(null);
+      setWorkingBoard(DEFAULT_WORKING_BOARD);
+    }
+
+    setHydrated(true);
+
+    return () => {
+      window.removeEventListener("resize", updateSize);
+    };
+  }, []);
+
+  /**
+   * Save localStorage (safe)
+   */
+  useEffect(() => {
+    if (!hydrated) return;
+    if (dimensions.width === 0) return;
+
+    const dataToSave = JSON.stringify({ projects, activeProjectId, workingBoard });
+    localStorage.setItem(STORAGE_KEY, dataToSave);
+  }, [hydrated, projects, activeProjectId, workingBoard, dimensions.width]);
+
+  /**
+   * Sélections (safe)
+   */
+  const selectedPedal = activeProject.boardPedals.find(
+    (p) => p.instanceId === selectedInstanceId
+  );
+  const selectedBoardDetails = activeProject.selectedBoards.find(
+    (b) => b.instanceId === selectedBoardInstanceId
+  );
+
+  /**
+   * Sizing callback (IMPORTANT : doit exister sinon runtime error)
+   */
+  const handleSizeUpdate = (id: number, w: number, h: number) => {
+    setDisplaySizes((prev) => {
+      const existing = prev[id];
+      if (existing && existing.w === w && existing.h === h) return prev;
+      return { ...prev, [id]: { w, h } };
+    });
+  };
+
+  /**
+   * Actions (inchangées)
+   */
   const resetCanvas = () => {
     if (window.confirm("Are you sure you want to clear the entire board?")) {
       updateActiveProject({ boardPedals: [], selectedBoards: [] });
@@ -189,29 +230,36 @@ export default function PedalBoardApp() {
 
   const createNewProject = () => {
     if (projects.length >= MAX_PROJECTS) return;
+
     const newId = Date.now();
     const newProject: Project = {
       id: newId,
       name: `BOARD ${projects.length + 1}`,
+      zoom: 100,
       boardPedals: [],
       selectedBoards: [],
-      zoom: 100,
     };
-    setProjects([...projects, newProject]);
+
+    setProjects((prev) => [...prev, newProject]);
     setActiveProjectId(newId);
   };
 
   const deleteProject = (id: number, e: React.MouseEvent<HTMLElement>) => {
     e.stopPropagation();
-    const newProjects = projects.filter((p) => p.id !== id);
-    setProjects(newProjects);
 
-    if (newProjects.length === 0) {
-      setActiveProjectId(null);
-      setWorkingBoard({ id: -1, name: "WORKING", boardPedals: [], selectedBoards: [], zoom: 100 });
-    } else if (activeProjectId === id) {
-      setActiveProjectId(newProjects[0].id);
-    }
+    setProjects((prev) => {
+      const next = prev.filter((p) => p.id !== id);
+
+      // si plus de projets, on repasse sur workingBoard
+      if (next.length === 0) {
+        setActiveProjectId(null);
+        setWorkingBoard(DEFAULT_WORKING_BOARD);
+      } else if (activeProjectId === id) {
+        setActiveProjectId(next[0].id);
+      }
+
+      return next;
+    });
   };
 
   const startEditing = (project: Project, e: React.MouseEvent<HTMLElement>) => {
@@ -250,7 +298,9 @@ export default function PedalBoardApp() {
       y: (dimensions.height - 56) / 2,
       rotation: 0,
     };
-    updateActiveProject({ selectedBoards: [...activeProject.selectedBoards, newBoard] });
+    updateActiveProject({
+      selectedBoards: [...activeProject.selectedBoards, newBoard],
+    });
     closeSearchMenus();
   };
 
@@ -297,9 +347,25 @@ export default function PedalBoardApp() {
     setSelectedInstanceId(null);
   };
 
-  // ===== BoardCanvas helper (tel que tu l'avais) =====
-  const currentZoom = activeProject.zoom ?? 100;
+  // (Si tu gères aussi rotation/suppression de boards, garde ces fonctions)
+  const rotateBoard = (id: number) => {
+    updateActiveProject({
+      selectedBoards: activeProject.selectedBoards.map((b) =>
+        b.instanceId === id ? { ...b, rotation: (b.rotation + 90) % 360 } : b
+      ),
+    });
+  };
 
+  const deleteBoard = (id: number) => {
+    updateActiveProject({
+      selectedBoards: activeProject.selectedBoards.filter((b) => b.instanceId !== id),
+    });
+    setSelectedBoardInstanceId(null);
+  };
+
+  /**
+   * Drag bounds (inchangé)
+   */
   const getDragBounds = (
     id: number,
     rotation: number,
@@ -307,11 +373,16 @@ export default function PedalBoardApp() {
   ) => {
     const size = displaySizes[id];
     if (!size) return pos;
+
+    const currentZoom = activeProject.zoom || 100;
     const isVertical = (rotation / 90) % 2 !== 0;
+
     const w = (isVertical ? size.h : size.w) * (currentZoom / 100);
     const h = (isVertical ? size.w : size.h) * (currentZoom / 100);
+
     const stageW = dimensions.width - 320;
     const stageH = dimensions.height - 56;
+
     return {
       x: Math.max(w / 2, Math.min(stageW - w / 2, pos.x)),
       y: Math.max(h / 2, Math.min(stageH - h / 2, pos.y)),
@@ -325,9 +396,10 @@ export default function PedalBoardApp() {
       className="flex h-screen w-full bg-zinc-950 text-white overflow-hidden font-sans fixed inset-0 select-none"
       onClick={closeSearchMenus}
     >
+      {/* SIDEBAR */}
       <Sidebar
-        pedalsLibrary={pedalsLibrary as AnyRow[]}
-        boardsLibrary={boardsLibrary as AnyRow[]}
+        pedalsLibrary={pedalsLibrary}
+        boardsLibrary={boardsLibrary}
         showPedalResults={showPedalResults}
         setShowPedalResults={setShowPedalResults}
         showBoardResults={showBoardResults}
@@ -360,14 +432,11 @@ export default function PedalBoardApp() {
         deletePedal={deletePedal}
       />
 
-      {/* Board area + neutral background */}
-      <div
-        className="flex-1 relative bg-[#2c2c2e] bg-[linear-gradient(135deg,rgba(255,255,255,0.05)_0%,transparent_50%,rgba(0,0,0,0.1)_100%)] flex flex-col"
-        style={canvasBg === "neutral" ? { backgroundColor: "#2c2c2e" } : {}}
-      >
+      {/* BOARD AREA + neutral background intact */}
+      <div className="flex-1 relative bg-[#2c2c2e] bg-[linear-gradient(135deg,rgba(255,255,255,0.05)_0%,transparent_50%,rgba(0,0,0,0.1)_100%)] flex flex-col">
         <TopBarTabs
           projects={projects}
-          setProjects={(v: Project[]) => setProjects(v)}
+          setProjects={setProjects}
           activeProjectId={activeProjectId}
           setActiveProjectId={setActiveProjectId}
           editingProjectId={editingProjectId}
@@ -394,6 +463,7 @@ export default function PedalBoardApp() {
           BACKGROUNDS={BACKGROUNDS}
           canvasBg={canvasBg}
           setCanvasBg={setCanvasBg}
+          // si BoardCanvas utilise rotateBoard/deleteBoard etc, ajoute-les là-bas, mais je ne les invente pas
         />
       </div>
     </div>
