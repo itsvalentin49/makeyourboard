@@ -374,8 +374,6 @@ export default function PedalBoardApp() {
     };
   };
 
-  if (dimensions.width === 0) return null;
-
   return (
     <div
       className="flex h-screen w-full bg-zinc-950 text-white overflow-hidden font-sans fixed inset-0 select-none"
