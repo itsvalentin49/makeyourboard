@@ -46,3 +46,4 @@ out/
 .env
 .env.*
 !.env.example
+*.zip
