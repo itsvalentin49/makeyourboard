@@ -8,7 +8,7 @@ import BoardCanvas from "@/components/BoardCanvas";
 import { useLibrary } from "@/hooks/useLibrary";
 import type { AnyRow, BoardItem, Project } from "@/types/project";
 
-const MAX_PROJECTS = 8;
+const MAX_PROJECTS = 5;
 const STORAGE_KEY = "guitar-sandbox-data";
 
 const DEFAULT_WORKING_BOARD: Project = {
@@ -25,6 +25,15 @@ type ActiveProjectUpdates = Partial<{
   boardPedals: AnyRow[];
   selectedBoards: AnyRow[];
 }>;
+
+const createEmptyProject = (index: number): Project => ({
+  id: Date.now() + index,
+  name: `Board ${index}`,
+  zoom: 100,
+  boardPedals: [],
+  selectedBoards: [],
+});
+
 
 export default function PedalBoardApp() {
   const { pedalsLibrary, boardsLibrary } = useLibrary();
@@ -53,6 +62,22 @@ export default function PedalBoardApp() {
 
   const [displaySizes, setDisplaySizes] = useState<Record<number, { w: number; h: number }>>({});
   const [hydrated, setHydrated] = useState<boolean>(false);
+
+  useEffect(() => {
+  if (projects.length === 0) {
+    const firstProject: Project = {
+      id: Date.now(),
+      name: "Board 1",
+      zoom: 100,
+      boardPedals: [],
+      selectedBoards: [],
+    };
+
+    setProjects([firstProject]);
+    setActiveProjectId(firstProject.id);
+  }
+}, [projects]);
+
 
   // Backgrounds (neutral par défaut)
   const BACKGROUNDS = [
