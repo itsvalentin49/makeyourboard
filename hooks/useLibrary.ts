@@ -1,73 +1,111 @@
+// hooks/useLibrary.ts
 "use client";
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import type { AnyRow } from "@/types/project";
 
-type AnyRow = Record<string, any>;
+type NormalizedErr = {
+  message: string;
+  meta?: Record<string, unknown>;
+};
 
-async function fetchAllRows(tableName: string) {
-  const pageSize = 1000;
-  let from = 0;
-  let all: AnyRow[] = [];
-
-  while (true) {
-    const { data, error } = await supabase
-      .from(tableName)
-      .select("*")
-      .order("brand", { ascending: true })
-      .order("name", { ascending: true })
-      .range(from, from + pageSize - 1);
-
-    if (error) throw error;
-
-    all = all.concat(data || []);
-    if (!data || data.length < pageSize) break;
-
-    from += pageSize;
+function normalizeSupabaseError(err: unknown): NormalizedErr {
+  // Error classique (TypeError, Error, etc.)
+  if (err instanceof Error) {
+    return {
+      message: err.message || "Unknown error",
+      meta: { name: err.name, stack: err.stack },
+    };
   }
 
-  return all;
+  // string
+  if (typeof err === "string") return { message: err };
+
+  // objets (PostgrestError, AuthError, etc.)
+  if (err && typeof err === "object") {
+    const e = err as any;
+    const message =
+      e.message ??
+      e.error_description ??
+      e.msg ??
+      "Unknown error (object)";
+
+    return {
+      message: String(message),
+      meta: {
+        code: e.code,
+        details: e.details,
+        hint: e.hint,
+        status: e.status,
+      },
+    };
+  }
+
+  return { message: "Unknown error" };
+}
+
+async function fetchTable(table: string, orderCols: string[] = []) {
+  let q = supabase.from(table).select("*");
+
+  for (const col of orderCols) {
+    q = q.order(col, { ascending: true });
+  }
+
+  const { data, error } = await q;
+
+  if (!error) return (data ?? []) as AnyRow[];
+
+  // Si l'erreur vient d'un tri sur colonne inexistante, on retente sans order()
+  const msg = String((error as any)?.message ?? "").toLowerCase();
+  if (msg.includes("column") && msg.includes("does not exist")) {
+    const retry = await supabase.from(table).select("*");
+    if (retry.error) throw retry.error;
+    return (retry.data ?? []) as AnyRow[];
+  }
+
+  throw error;
 }
 
 export function useLibrary() {
   const [pedalsLibrary, setPedalsLibrary] = useState<AnyRow[]>([]);
   const [boardsLibrary, setBoardsLibrary] = useState<AnyRow[]>([]);
-  const [loadingLibrary, setLoadingLibrary] = useState(true);
   const [libraryError, setLibraryError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     let cancelled = false;
 
-    async function fetchData() {
+    (async () => {
       try {
-        setLoadingLibrary(true);
+        setLoading(true);
         setLibraryError(null);
 
-        const [pData, bData] = await Promise.all([
-          fetchAllRows("pedals"),
-          fetchAllRows("boards"),
+        // ✅ adapte les noms de tables si besoin
+        const [pedals, boards] = await Promise.all([
+          fetchTable("pedals", ["brand", "name"]),
+          fetchTable("boards", ["brand", "name"]),
         ]);
 
         if (cancelled) return;
-
-        setPedalsLibrary(pData || []);
-        setBoardsLibrary(bData || []);
-      } catch (err: any) {
+        setPedalsLibrary(pedals);
+        setBoardsLibrary(boards);
+      } catch (err) {
         if (cancelled) return;
-        console.error("Supabase Error:", err);
-        setLibraryError(err?.message || "Failed to load library");
+
+        const n = normalizeSupabaseError(err);
+        console.error("[Supabase] useLibrary failed:", n.message, n.meta, err);
+        setLibraryError(n.message || "Failed to load library");
       } finally {
         if (cancelled) return;
-        setLoadingLibrary(false);
+        setLoading(false);
       }
-    }
-
-    fetchData();
+    })();
 
     return () => {
       cancelled = true;
     };
   }, []);
 
-  return { pedalsLibrary, boardsLibrary, loadingLibrary, libraryError };
+  return { pedalsLibrary, boardsLibrary, libraryError, loading };
 }

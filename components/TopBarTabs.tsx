@@ -1,33 +1,27 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, type Dispatch, type SetStateAction } from "react";
 import { Plus } from "lucide-react";
-import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, DragOverlay } from "@dnd-kit/core";
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragOverlay,
+  type DragStartEvent,
+  type DragEndEvent,
+  type DragCancelEvent,
+  type UniqueIdentifier,
+} from "@dnd-kit/core";
 import { SortableContext, horizontalListSortingStrategy, arrayMove } from "@dnd-kit/sortable";
 
 import SortableTab from "@/components/SortableTab";
-
-type Project = {
-  id: number;
-  name: string;
-<<<<<<< HEAD
-};
+import type { Project } from "@/types/project";
 
 type Props = {
   projects: Project[];
-  setProjects: (v: Project[] | ((prev: Project[]) => Project[])) => void;
-=======
-  zoom: number;
-  boardPedals: any[];
-  selectedBoards: any[];
-};
-
-type TabProject = Pick<Project, "id" | "name">;
-
-type Props = {
-  projects: TabProject[];
-  setProjects: (v: TabProject[] | ((prev: TabProject[]) => TabProject[])) => void;
->>>>>>> 0dd5b53 (init)
+  setProjects: Dispatch<SetStateAction<Project[]>>;
 
   activeProjectId: number | null;
   setActiveProjectId: (id: number | null) => void;
@@ -36,16 +30,16 @@ type Props = {
   tempName: string;
   setTempName: (v: string) => void;
 
-<<<<<<< HEAD
-  startEditing: (project: Project, e: any) => void;
-=======
-  startEditing: (project: TabProject, e: any) => void;
->>>>>>> 0dd5b53 (init)
+  startEditing: (project: Project, e: React.MouseEvent<HTMLElement>) => void;
   saveName: () => void;
-  deleteProject: (id: number, e: any) => void;
+  deleteProject: (id: number, e: React.MouseEvent<HTMLElement>) => void;
 
   createNewProject: () => void;
 };
+
+function toNumberId(id: UniqueIdentifier): number {
+  return typeof id === "number" ? id : Number(id);
+}
 
 export default function TopBarTabs({
   projects,
@@ -68,32 +62,31 @@ export default function TopBarTabs({
     })
   );
 
-  const draggingProject = projects.find((p) => p.id === activeTabId) || null;
+  const draggingProject = projects.find((p) => p.id === activeTabId) ?? null;
 
-  const handleTabsDragStart = (event: any) => {
-    setActiveTabId(event.active.id);
+  const handleTabsDragStart = (event: DragStartEvent) => {
+    setActiveTabId(toNumberId(event.active.id));
   };
 
-  const handleTabsDragEnd = (event: any) => {
+  const handleTabsDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
 
     setActiveTabId(null);
-
     if (!over) return;
     if (active.id === over.id) return;
 
-<<<<<<< HEAD
-    setProjects((prev: Project[]) => {
-=======
-    setProjects((prev: TabProject[]) => {
->>>>>>> 0dd5b53 (init)
-      const oldIndex = prev.findIndex((p) => p.id === active.id);
-      const newIndex = prev.findIndex((p) => p.id === over.id);
+    const activeId = toNumberId(active.id);
+    const overId = toNumberId(over.id);
+
+    setProjects((prev) => {
+      const oldIndex = prev.findIndex((p) => p.id === activeId);
+      const newIndex = prev.findIndex((p) => p.id === overId);
+      if (oldIndex < 0 || newIndex < 0) return prev;
       return arrayMove(prev, oldIndex, newIndex);
     });
   };
 
-  const handleTabsDragCancel = () => {
+  const handleTabsDragCancel = (_event: DragCancelEvent) => {
     setActiveTabId(null);
   };
 
@@ -112,7 +105,7 @@ export default function TopBarTabs({
               key={project.id}
               project={project}
               activeProjectId={activeProjectId}
-              setActiveProjectId={(id: number) => setActiveProjectId(id)}
+              setActiveProjectId={setActiveProjectId}
               startEditing={startEditing}
               deleteProject={deleteProject}
               editingProjectId={editingProjectId}
@@ -136,7 +129,12 @@ export default function TopBarTabs({
 
       {projects.length < 8 && (
         <div className="h-8 self-end border-b border-zinc-900 flex items-center shrink-0">
-          <button onClick={createNewProject} className="p-2 text-zinc-400 hover:text-white transition-colors">
+          <button
+            type="button"
+            onClick={createNewProject}
+            className="p-2 text-zinc-400 hover:text-white transition-colors"
+            aria-label="Create project"
+          >
             <Plus className="size-5" />
           </button>
         </div>

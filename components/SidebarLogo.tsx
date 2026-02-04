@@ -8,7 +8,7 @@ export default function SidebarLogo() {
         {/* TEXTE */}
         <div className="flex flex-col leading-none">
           <div
-            className="uppercase font-bold text-zinc-100 tracking-[0.32em]"
+            className="uppercase font-bold text-zinc-100"
             style={{
               fontSize: 28,
               textShadow: "0 0 12px rgba(80,150,255,.25)",
@@ -31,11 +31,11 @@ export default function SidebarLogo() {
         </div>
 
         {/* LOGO À DROITE */}
-        <div className="flex items-end gap-[6px] mt-3 opacity-90">
-          <span className="w-[5px] h-12 bg-zinc-100 rounded-full" />
-          <span className="w-[5px] h-7 bg-zinc-100 rounded-full" />
-          <span className="w-[5px] h-7 bg-zinc-100 rounded-full" />
-          <span className="w-[5px] h-12 bg-zinc-100 rounded-full" />
+        <div className="flex items-end gap-[9px] mt-2 opacity-90">
+          <span className="w-[8px] h-16 bg-zinc-100 rounded-full" />
+          <span className="w-[8px] h-8 bg-zinc-100 rounded-full" />
+          <span className="w-[8px] h-8 bg-zinc-100 rounded-full" />
+          <span className="w-[8px] h-16 bg-zinc-100 rounded-full" />
         </div>
 
       </div>

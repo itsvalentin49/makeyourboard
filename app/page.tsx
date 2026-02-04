@@ -1,32 +1,12 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import Sidebar from "@/components/Sidebar";
 import TopBarTabs from "@/components/TopBarTabs";
 import BoardCanvas from "@/components/BoardCanvas";
 import { useLibrary } from "@/hooks/useLibrary";
-
-/**
- * Types locaux (pour arrêter l’hémorragie TypeScript dans Vercel)
- * On ne change pas ton fonctionnement : on rend juste le modèle cohérent.
- */
-type AnyRow = Record<string, any>;
-
-type BoardItem = AnyRow & {
-  instanceId: number;
-  x: number;
-  y: number;
-  rotation: number;
-};
-
-type Project = {
-  id: number;
-  name: string;
-  zoom: number;
-  boardPedals: BoardItem[];
-  selectedBoards: BoardItem[];
-};
+import type { AnyRow, BoardItem, Project } from "@/types/project";
 
 const MAX_PROJECTS = 8;
 const STORAGE_KEY = "guitar-sandbox-data";
@@ -38,6 +18,13 @@ const DEFAULT_WORKING_BOARD: Project = {
   boardPedals: [],
   selectedBoards: [],
 };
+
+// 👉 updates “compatibles BoardCanvas”
+type ActiveProjectUpdates = Partial<{
+  zoom: number;
+  boardPedals: AnyRow[];
+  selectedBoards: AnyRow[];
+}>;
 
 export default function PedalBoardApp() {
   const { pedalsLibrary, boardsLibrary } = useLibrary();
@@ -75,22 +62,17 @@ export default function PedalBoardApp() {
   ];
   const [canvasBg, setCanvasBg] = useState<string>("neutral");
 
-  // Custom item (inchangé)
+  // Custom item
   const [customType, setCustomType] = useState<"pedal" | "board">("pedal");
   const [customName, setCustomName] = useState<string>("");
   const [customWidth, setCustomWidth] = useState<string>("");
   const [customDepth, setCustomDepth] = useState<string>("");
   const [customColor, setCustomColor] = useState<string>("#3b82f6");
 
-  // refs (si tu les utilises plus tard)
-  const pedalSearchRef = useRef<HTMLInputElement | null>(null);
-  const boardSearchRef = useRef<HTMLInputElement | null>(null);
-
   /**
    * Active project (toujours un Project valide)
    */
-  const activeProject: Project =
-    projects.find((p) => p.id === activeProjectId) ?? workingBoard;
+  const activeProject: Project = projects.find((p) => p.id === activeProjectId) ?? workingBoard;
 
   /**
    * Helpers
@@ -102,13 +84,22 @@ export default function PedalBoardApp() {
     setBoardSearch("");
   };
 
-  const updateActiveProject = (updates: Partial<Project>) => {
+  /**
+   * ✅ Fix TS: accepte AnyRow[] (BoardCanvas) puis normalise en BoardItem[] (state)
+   */
+  const updateActiveProject = (updates: ActiveProjectUpdates) => {
+    const normalized: Partial<Pick<Project, "zoom" | "boardPedals" | "selectedBoards">> = {
+      ...(typeof updates.zoom === "number" ? { zoom: updates.zoom } : {}),
+      ...(updates.boardPedals ? { boardPedals: updates.boardPedals as BoardItem[] } : {}),
+      ...(updates.selectedBoards ? { selectedBoards: updates.selectedBoards as BoardItem[] } : {}),
+    };
+
     if (activeProjectId !== null) {
       setProjects((prev) =>
-        prev.map((p) => (p.id === activeProjectId ? { ...p, ...updates } : p))
+        prev.map((p) => (p.id === activeProjectId ? { ...p, ...normalized } : p))
       );
     } else {
-      setWorkingBoard((prev) => ({ ...prev, ...updates }));
+      setWorkingBoard((prev) => ({ ...prev, ...normalized }));
     }
   };
 
@@ -128,20 +119,17 @@ export default function PedalBoardApp() {
 
     window.addEventListener("wheel", handleWheel, { passive: false });
     return () => window.removeEventListener("wheel", handleWheel);
-    // on dépend volontairement d’activeProject.zoom via activeProject
   }, [activeProjectId, activeProject.zoom]);
 
   /**
    * Hydratation + resize + load localStorage (safe)
    */
   useEffect(() => {
-    const updateSize = () =>
-      setDimensions({ width: window.innerWidth, height: window.innerHeight });
+    const updateSize = () => setDimensions({ width: window.innerWidth, height: window.innerHeight });
 
     window.addEventListener("resize", updateSize);
     updateSize();
 
-    // Load safe
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
@@ -172,7 +160,6 @@ export default function PedalBoardApp() {
         });
       }
     } catch {
-      // si JSON corrompu, on ignore et on part sur défaut
       setProjects([]);
       setActiveProjectId(null);
       setWorkingBoard(DEFAULT_WORKING_BOARD);
@@ -199,15 +186,13 @@ export default function PedalBoardApp() {
   /**
    * Sélections (safe)
    */
-  const selectedPedal = activeProject.boardPedals.find(
-    (p) => p.instanceId === selectedInstanceId
-  );
+  const selectedPedal = activeProject.boardPedals.find((p) => p.instanceId === selectedInstanceId);
   const selectedBoardDetails = activeProject.selectedBoards.find(
     (b) => b.instanceId === selectedBoardInstanceId
   );
 
   /**
-   * Sizing callback (IMPORTANT : doit exister sinon runtime error)
+   * Sizing callback
    */
   const handleSizeUpdate = (id: number, w: number, h: number) => {
     setDisplaySizes((prev) => {
@@ -218,7 +203,7 @@ export default function PedalBoardApp() {
   };
 
   /**
-   * Actions (inchangées)
+   * Actions
    */
   const resetCanvas = () => {
     if (window.confirm("Are you sure you want to clear the entire board?")) {
@@ -250,7 +235,6 @@ export default function PedalBoardApp() {
     setProjects((prev) => {
       const next = prev.filter((p) => p.id !== id);
 
-      // si plus de projets, on repasse sur workingBoard
       if (next.length === 0) {
         setActiveProjectId(null);
         setWorkingBoard(DEFAULT_WORKING_BOARD);
@@ -271,9 +255,7 @@ export default function PedalBoardApp() {
   const saveName = () => {
     if (editingProjectId === null) return;
     setProjects((prev) =>
-      prev.map((p) =>
-        p.id === editingProjectId ? { ...p, name: tempName.toUpperCase() } : p
-      )
+      prev.map((p) => (p.id === editingProjectId ? { ...p, name: tempName.toUpperCase() } : p))
     );
     setEditingProjectId(null);
   };
@@ -298,9 +280,7 @@ export default function PedalBoardApp() {
       y: (dimensions.height - 56) / 2,
       rotation: 0,
     };
-    updateActiveProject({
-      selectedBoards: [...activeProject.selectedBoards, newBoard],
-    });
+    updateActiveProject({ selectedBoards: [...activeProject.selectedBoards, newBoard] });
     closeSearchMenus();
   };
 
@@ -347,30 +327,10 @@ export default function PedalBoardApp() {
     setSelectedInstanceId(null);
   };
 
-  // (Si tu gères aussi rotation/suppression de boards, garde ces fonctions)
-  const rotateBoard = (id: number) => {
-    updateActiveProject({
-      selectedBoards: activeProject.selectedBoards.map((b) =>
-        b.instanceId === id ? { ...b, rotation: (b.rotation + 90) % 360 } : b
-      ),
-    });
-  };
-
-  const deleteBoard = (id: number) => {
-    updateActiveProject({
-      selectedBoards: activeProject.selectedBoards.filter((b) => b.instanceId !== id),
-    });
-    setSelectedBoardInstanceId(null);
-  };
-
   /**
-   * Drag bounds (inchangé)
+   * Drag bounds
    */
-  const getDragBounds = (
-    id: number,
-    rotation: number,
-    pos: { x: number; y: number }
-  ) => {
+  const getDragBounds = (id: number, rotation: number, pos: { x: number; y: number }) => {
     const size = displaySizes[id];
     if (!size) return pos;
 
@@ -396,7 +356,6 @@ export default function PedalBoardApp() {
       className="flex h-screen w-full bg-zinc-950 text-white overflow-hidden font-sans fixed inset-0 select-none"
       onClick={closeSearchMenus}
     >
-      {/* SIDEBAR */}
       <Sidebar
         pedalsLibrary={pedalsLibrary}
         boardsLibrary={boardsLibrary}
@@ -432,7 +391,6 @@ export default function PedalBoardApp() {
         deletePedal={deletePedal}
       />
 
-      {/* BOARD AREA + neutral background intact */}
       <div className="flex-1 relative bg-[#2c2c2e] bg-[linear-gradient(135deg,rgba(255,255,255,0.05)_0%,transparent_50%,rgba(0,0,0,0.1)_100%)] flex flex-col">
         <TopBarTabs
           projects={projects}
@@ -463,7 +421,6 @@ export default function PedalBoardApp() {
           BACKGROUNDS={BACKGROUNDS}
           canvasBg={canvasBg}
           setCanvasBg={setCanvasBg}
-          // si BoardCanvas utilise rotateBoard/deleteBoard etc, ajoute-les là-bas, mais je ne les invente pas
         />
       </div>
     </div>

@@ -1,16 +1,19 @@
-import { createClient } from '@supabase/supabase-js';
+// lib/supabase.ts
+import { createClient } from "@supabase/supabase-js";
 
-// On récupère les clés depuis le fichier .env.local
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-// Sécurité : on vérifie que les clés sont bien présentes
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.error("ERREUR: Les variables d'environnement Supabase sont manquantes !");
+function mustEnv(name: string, v: string | undefined): string {
+  if (!v || !v.trim()) {
+    throw new Error(
+      `[Supabase] Missing ${name}. Add it to .env.local then restart: npm run dev`
+    );
+  }
+  return v;
 }
 
-// On crée et on exporte le client unique
-export const supabase = createClient(
-  supabaseUrl || '',
-  supabaseAnonKey || ''
+const supabaseUrl = mustEnv("NEXT_PUBLIC_SUPABASE_URL", process.env.NEXT_PUBLIC_SUPABASE_URL);
+const supabaseAnonKey = mustEnv(
+  "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 );
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
