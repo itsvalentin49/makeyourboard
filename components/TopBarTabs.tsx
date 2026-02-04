@@ -10,11 +10,24 @@ import SortableTab from "@/components/SortableTab";
 type Project = {
   id: number;
   name: string;
+<<<<<<< HEAD
 };
 
 type Props = {
   projects: Project[];
   setProjects: (v: Project[] | ((prev: Project[]) => Project[])) => void;
+=======
+  zoom: number;
+  boardPedals: any[];
+  selectedBoards: any[];
+};
+
+type TabProject = Pick<Project, "id" | "name">;
+
+type Props = {
+  projects: TabProject[];
+  setProjects: (v: TabProject[] | ((prev: TabProject[]) => TabProject[])) => void;
+>>>>>>> 0dd5b53 (init)
 
   activeProjectId: number | null;
   setActiveProjectId: (id: number | null) => void;
@@ -23,7 +36,11 @@ type Props = {
   tempName: string;
   setTempName: (v: string) => void;
 
+<<<<<<< HEAD
   startEditing: (project: Project, e: any) => void;
+=======
+  startEditing: (project: TabProject, e: any) => void;
+>>>>>>> 0dd5b53 (init)
   saveName: () => void;
   deleteProject: (id: number, e: any) => void;
 
@@ -65,7 +82,11 @@ export default function TopBarTabs({
     if (!over) return;
     if (active.id === over.id) return;
 
+<<<<<<< HEAD
     setProjects((prev: Project[]) => {
+=======
+    setProjects((prev: TabProject[]) => {
+>>>>>>> 0dd5b53 (init)
       const oldIndex = prev.findIndex((p) => p.id === active.id);
       const newIndex = prev.findIndex((p) => p.id === over.id);
       return arrayMove(prev, oldIndex, newIndex);
