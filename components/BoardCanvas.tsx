@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useRef, useLayoutEffect, useState } from "react";
 import { Stage, Layer, Group, Rect } from "react-konva";
 import { Zap, Weight, Minus, Plus, Square } from "lucide-react";
 import PedalImage from "@/components/PedalImage";
@@ -77,12 +77,39 @@ export default function BoardCanvas({
     }
   };
 
-  // Ton zoom-factor “fallback” côté page quand displaySizes n’est pas prêt
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [stageSize, setStageSize] = useState({ width: 0, height: 0 });
+
+  useLayoutEffect(() => {
+  if (!containerRef.current) return;
+
+  const measure = () => {
+  const el = containerRef.current;
+  if (!el) return;
+
+  const rect = el.getBoundingClientRect();
+  setStageSize({
+    width: rect.width,
+    height: rect.height,
+  });
+};
+
+
+  measure(); // mesure au chargement
+  window.addEventListener("resize", measure);
+
+  return () => {
+    window.removeEventListener("resize", measure);
+  };
+}, []);
+
+
   const ZOOM_FACTOR = 1.5;
 
   return (
     <div
-      className="flex-1 relative overflow-hidden"
+      ref={containerRef}
+      className="flex-1 relative overflow-hidden pb-20"
       style={
         canvasBg === "neutral"
           ? undefined
@@ -176,13 +203,14 @@ export default function BoardCanvas({
         </div>
       </div>
 
-      <Stage
-        width={dimensions.width - 320}
-        height={dimensions.height - 56}
-        onClick={handleStageClick}
-        scaleX={currentZoom / 100}
-        scaleY={currentZoom / 100}
-      >
+      {stageSize.width > 0 && stageSize.height > 0 && (
+  <Stage
+    width={stageSize.width}
+    height={stageSize.height}
+    scaleX={currentZoom / 100}
+    scaleY={currentZoom / 100}
+    onClick={handleStageClick}
+  >
         <Layer>
           {(activeProject.selectedBoards || []).map((b: AnyRow) => (
             <Group
