@@ -10,34 +10,13 @@ export default function SidebarLogo() {
           <div
             className="uppercase font-bold text-zinc-100"
             style={{
-              fontSize: 28,
-              textShadow: "0 0 12px rgba(80,150,255,.25)",
+              fontSize: 30,
+              textShadow: "0 0 10px rgba(80,150,255,.35), 0 0 24px rgba(80,150,255,.15)",
             }}
           >
-            MAKE YOUR
-          </div>
-
-          <div
-            className="uppercase font-black text-zinc-100 mt-1"
-            style={{
-              fontSize: 44,
-              letterSpacing: "0.04em",
-              textShadow:
-                "0 0 20px rgba(80,150,255,.6), 0 0 60px rgba(80,150,255,.35)",
-            }}
-          >
-            BOARD
+            MAKE YOUR BOARD
           </div>
         </div>
-
-        {/* LOGO À DROITE */}
-        <div className="flex items-end gap-[9px] mt-2 opacity-90">
-          <span className="w-[8px] h-16 bg-zinc-100 rounded-full" />
-          <span className="w-[8px] h-8 bg-zinc-100 rounded-full" />
-          <span className="w-[8px] h-8 bg-zinc-100 rounded-full" />
-          <span className="w-[8px] h-16 bg-zinc-100 rounded-full" />
-        </div>
-
       </div>
     </div>
   );
