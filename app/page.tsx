@@ -376,7 +376,8 @@ export default function PedalBoardApp() {
 
   return (
     <div
-      className="flex h-screen w-full bg-zinc-950 text-white overflow-hidden font-sans fixed inset-0 select-none"
+      className="flex w-full bg-zinc-950 text-white overflow-hidden font-sans fixed inset-0 select-none"
+      style={{ height: "100dvh" }}
       onClick={closeSearchMenus}
     >
       <Sidebar
