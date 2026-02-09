@@ -1,0 +1,69 @@
+{
+  "sidebar": {
+    "searchPedal": "Cerca un pedale",
+    "searchBoard": "Cerca una pedaliera",
+    "buyOnline": "Acquista online",
+    "shop": "Negozio",
+    "addPedal": "Aggiungi un pedale",
+    "addBoard": "Aggiungi una pedaliera",
+    "back": "Torna alla libreria",
+    "rotate": "Ruota",
+    "delete": "Elimina"
+  },
+
+  "pedal": {
+    "status": "Stato",
+    "type": "Tipo",
+    "circuit": "Circuito",
+    "bypass": "Bypass",
+    "power": "Alimentazione",
+    "draw": "Assorbimento",
+    "dimensions": "Dimensioni",
+    "weight": "Peso",
+    "origin": "Origine",
+    "manual": "Manuale"
+  },
+
+  "board": {
+    "status": "Stato",
+    "material": "Materiale",
+    "profile": "Profilo",
+    "dimensions": "Dimensioni",
+    "weight": "Peso",
+    "origin": "Origine"
+  },
+
+  "custom": {
+    "title": "Crea il tuo",
+    "name": "Nome (opzionale)",
+    "width": "Larghezza",
+    "depth": "Profondità",
+    "add": "Aggiungi"
+  },
+
+  "settings": {
+    "title": "Impostazioni",
+    "background": "Sfondo",
+    "language": "Lingua",
+    "units": "Unità"
+  },
+
+  "backgrounds": {
+    "neutral": "Neutro",
+    "wood": "Legno",
+    "marble": "Marmo"
+  },
+
+  "language": {
+    "en": "Inglese",
+    "fr": "Francese",
+    "es": "Spagnolo",
+    "de": "Tedesco",
+    "it": "Italiano"
+  },
+
+  "canvas": {
+    "totalDraw": "Assorbimento totale",
+    "totalWeight": "Peso totale"
+  }
+}

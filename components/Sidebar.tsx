@@ -66,8 +66,8 @@ type Props = {
   canvasBg: string;
   setCanvasBg: (v: string) => void;
 
-  language: "en" | "fr" | "es";
-  setLanguage: (v: "en" | "fr" | "es") => void;
+  language: "en" | "fr" | "es" | "de" | "it";
+  setLanguage: (v: "en" | "fr" | "es" | "de" | "it") => void;
 
   units: "metric" | "imperial";
   setUnits: (v: "metric" | "imperial") => void;
@@ -115,7 +115,7 @@ export default function Sidebar({
 }: Props) {
 
   const t = getTranslator(language);
-
+  
   const [bgOpen, setBgOpen] = React.useState(false);
   const bgRef = React.useRef<HTMLDivElement>(null);
   const [langOpen, setLangOpen] = React.useState(false);
@@ -867,7 +867,7 @@ export default function Sidebar({
 
                   {langOpen && (
                     <div className="absolute z-50 mt-1 w-full bg-zinc-950 border border-zinc-800 rounded-lg overflow-hidden">
-                      {["en", "fr", "es"].map((l) => (
+                      {["en", "fr", "es", "de", "it"].map((l) => (
                         <button
                           key={l}
                           onClick={() => {

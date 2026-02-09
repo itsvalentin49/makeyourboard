@@ -1,0 +1,69 @@
+{
+  "sidebar": {
+    "searchPedal": "Pedal suchen",
+    "searchBoard": "Board suchen",
+    "buyOnline": "Online kaufen",
+    "shop": "Shop",
+    "addPedal": "Pedal hinzufügen",
+    "addBoard": "Board hinzufügen",
+    "back": "Zurück zur Bibliothek",
+    "rotate": "Drehen",
+    "delete": "Löschen"
+  },
+
+  "pedal": {
+    "status": "Status",
+    "type": "Typ",
+    "circuit": "Schaltung",
+    "bypass": "Bypass",
+    "power": "Stromversorgung",
+    "draw": "Stromaufnahme",
+    "dimensions": "Abmessungen",
+    "weight": "Gewicht",
+    "origin": "Herkunft",
+    "manual": "Handbuch"
+  },
+
+  "board": {
+    "status": "Status",
+    "material": "Material",
+    "profile": "Profil",
+    "dimensions": "Abmessungen",
+    "weight": "Gewicht",
+    "origin": "Herkunft"
+  },
+
+  "custom": {
+    "title": "Eigenes erstellen",
+    "name": "Name (optional)",
+    "width": "Breite",
+    "depth": "Tiefe",
+    "add": "Hinzufügen"
+  },
+
+  "settings": {
+    "title": "Einstellungen",
+    "background": "Hintergrund",
+    "language": "Sprache",
+    "units": "Einheiten"
+  },
+
+  "backgrounds": {
+    "neutral": "Neutral",
+    "wood": "Holz",
+    "marble": "Marmor"
+  },
+
+  "language": {
+    "en": "Englisch",
+    "fr": "Französisch",
+    "es": "Spanisch",
+    "de": "Deutsch",
+    "it": "Italienisch"
+  },
+
+  "canvas": {
+    "totalDraw": "Gesamtstrom",
+    "totalWeight": "Gesamtgewicht"
+  }
+}

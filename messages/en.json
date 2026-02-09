@@ -5,7 +5,10 @@
     "buyOnline": "Buy online",
     "shop": "Shop",
     "addPedal": "Add a pedal",
-    "addBoard": "Add a board"
+    "addBoard": "Add a board",
+    "back": "Back to library",
+    "rotate": "Rotate",
+    "delete": "Delete"
   },
 
   "pedal": {
@@ -22,9 +25,13 @@
   },
 
   "board": {
+    "status": "Status",
     "material": "Material",
-    "profile": "Profile"
-  },
+    "profile": "Profile",
+    "dimensions": "Dimensions",
+    "weight": "Weight",
+    "origin": "Origin"
+    },
 
   "custom": {
     "title": "Make your own",
@@ -50,11 +57,14 @@
   "language": {
     "en": "English",
     "fr": "French",
-    "es": "Spanish"
+    "es": "Spanish",
+    "de": "German",
+    "it": "Italian"
   },
 
   "canvas": {
     "totalDraw": "Total draw",
     "totalWeight": "Total weight"
   }
+  
 }
