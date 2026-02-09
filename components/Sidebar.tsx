@@ -14,7 +14,7 @@ import {
 
 import SidebarLogo from "@/components/SidebarLogo";
 import { mmToIn, formatWeight } from "@/utils/units";
-
+import { getTranslator } from "@/utils/i18n";
 
 
 type AnyRow = Record<string, any>;
@@ -114,6 +114,8 @@ export default function Sidebar({
   setUnits,
 }: Props) {
 
+  const t = getTranslator(language);
+
   const [bgOpen, setBgOpen] = React.useState(false);
   const bgRef = React.useRef<HTMLDivElement>(null);
   const [langOpen, setLangOpen] = React.useState(false);
@@ -185,7 +187,7 @@ export default function Sidebar({
             onClick={() => setSelectedInstanceId(null)}
             className="flex items-center gap-2 text-zinc-500 hover:text-white transition-colors text-[10px] font-black uppercase tracking-widest"
           >
-            <ArrowLeft className="size-4" /> Back to Library
+            <ArrowLeft className="size-4" /> {t("details.back")}
           </button>
 
           <div className="space-y-1">
@@ -198,22 +200,20 @@ export default function Sidebar({
             <p className="text-zinc-500 text-[10px] font-medium">
               {selectedPedal.year || "No date"}
             </p>
+{/*
             <div className="py-2 border-zinc-900">
               <p className="text-[12px] text-zinc-400 font-medium">
                 {selectedPedal.overview}
               </p>
             </div>
+*/}
           </div>
 
           {/* ACTIONS */}
           <div className="flex gap-2">
             <div className="flex gap-2 pointer-events-auto w-full">
               {/* ROTATE */}
-              <button
-              onClick={() => {
-  if (selectedInstanceId !== null) {
-    rotatePedal(selectedInstanceId);
-  }
+              <button onClick={() => {if (selectedInstanceId !== null) {rotatePedal(selectedInstanceId);}
 }}
 
   className="group pointer-events-auto flex-1 flex items-center justify-center px-4 py-3 rounded-xl
@@ -231,7 +231,7 @@ export default function Sidebar({
       group-active:rotate-90 transition-transform duration-200"
     />
     <span className="text-[10px] font-black uppercase tracking-widest text-zinc-300 group-hover:text-white">
-      Rotate
+      {t("details.rotate")}
     </span>
   </div>
 </button>
@@ -239,10 +239,7 @@ export default function Sidebar({
 
               {/* DELETE */}
               <button
-  onClick={() => {
-  if (selectedInstanceId !== null) {
-    deletePedal(selectedInstanceId);
-  }
+  onClick={() => {if (selectedInstanceId !== null) {deletePedal(selectedInstanceId);}
 }}
 
   className="group pointer-events-auto flex-1 flex items-center justify-center px-4 py-3 rounded-xl
@@ -256,7 +253,7 @@ export default function Sidebar({
   <div className="flex items-center gap-3">
     <Trash2 size={16} className="text-zinc-400 group-hover:text-white transition-colors" />
     <span className="text-[10px] font-black uppercase tracking-widest text-zinc-300 group-hover:text-white">
-      Delete
+      {t("details.delete")}
     </span>
   </div>
 </button>
@@ -268,7 +265,7 @@ export default function Sidebar({
           <div className="space-y-0.2 border-zinc-900">
             <div className="flex justify-between items-center py-2 border-b border-t border-zinc-900">
               <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
-                Status
+                {t("pedal.status")}
               </span>
               <span
                 className={`text-[9px] px-2 py-0.5 rounded-full font-black uppercase ${
@@ -283,7 +280,7 @@ export default function Sidebar({
 
             <div className="flex justify-between items-center py-2 border-b border-zinc-900">
               <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
-                Type
+                {t("pedal.type")}
               </span>
               <span className="text-[11px] font-bold font-mono text-zinc-300">
                 {selectedPedal.type || "N/A"}
@@ -292,7 +289,7 @@ export default function Sidebar({
 
             <div className="flex justify-between items-center py-2 border-b border-zinc-900">
               <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
-                Circuit
+                {t("pedal.circuit")}
               </span>
               <span className="text-[11px] font-bold font-mono text-zinc-300">
                 {selectedPedal.circuit || "N/A"}
@@ -301,7 +298,7 @@ export default function Sidebar({
 
             <div className="flex justify-between items-center py-2 border-b border-zinc-900">
               <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
-                Bypass
+                {t("pedal.bypass")}
               </span>
               <span className="text-[11px] font-bold font-mono text-zinc-300">
                 {selectedPedal.bypass || "N/A"}
@@ -310,7 +307,7 @@ export default function Sidebar({
 
             <div className="flex justify-between items-center py-2 border-b border-zinc-900">
               <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
-                Power
+                {t("pedal.power")}
               </span>
               <span className="text-[11px] font-bold font-mono text-zinc-300">
                 {selectedPedal.power || "N/A"}
@@ -319,7 +316,7 @@ export default function Sidebar({
 
             <div className="flex justify-between items-center py-2 border-b border-zinc-900">
               <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
-                Draw
+                {t("pedal.draw")}
               </span>
               <span className="text-[11px] font-bold font-mono">
                 {selectedPedal.draw || 0} mA
@@ -328,7 +325,7 @@ export default function Sidebar({
 
             <div className="flex justify-between items-center py-2 border-b border-zinc-900">
             <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
-              Dimensions
+              {t("pedal.dimensions")}
             </span>
             <span className="text-[11px] font-bold font-mono">
               {units === "metric"
@@ -341,7 +338,7 @@ export default function Sidebar({
 
             <div className="flex justify-between items-center py-2 border-b border-zinc-900">
             <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
-              Weight
+              {t("pedal.weight")}
             </span>
             <span className="text-[11px] font-bold font-mono">
               {formatWeight(selectedPedal.weight || 0, units)}
@@ -350,7 +347,7 @@ export default function Sidebar({
 
             <div className="flex justify-between items-center py-2 border-b border-zinc-900">
               <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
-                Origin
+               {t("pedal.origin")}
               </span>
               <span className="text-[11px] font-bold text-zinc-300">
                 {selectedPedal.origin || "N/A"}
@@ -359,7 +356,7 @@ export default function Sidebar({
 
             <div className="flex justify-between items-center py-2 border-b border-zinc-900">
               <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
-                Manual
+                {t("pedal.manual")}
               </span>
               {selectedPedal.manual ? (
                 <a
@@ -377,7 +374,7 @@ export default function Sidebar({
 
             <div className="pt-5 space-y-4">
               <span className="text-[10px] uppercase font-black tracking-wider">
-                Buy Online
+                {t("sidebar.buyOnline")}
               </span>
 
               <a
@@ -395,7 +392,7 @@ export default function Sidebar({
                 <div className="flex items-center gap-3">
                   <ShoppingCart size={16} className="text-blue-400 group-hover:text-white" />
                   <span className="text-[11px] font-black uppercase tracking-widest group-hover:text-white text-blue-400">
-                    Shop
+                    {t("sidebar.shop")}
                   </span>
                 </div>
                 <ExternalLink size={14} className="text-blue-400/50 group-hover:text-white" />
@@ -465,7 +462,7 @@ export default function Sidebar({
       <div className="flex items-center gap-3">
         <Trash2 size={16} />
         <span className="text-[10px] font-black uppercase tracking-widest">
-          Delete
+          {t("details.delete")}
         </span>
       </div>
     </button>
@@ -578,7 +575,7 @@ export default function Sidebar({
             <div className="flex items-center gap-2 px-1">
               <div className="w-[2px] h-3 bg-blue-500 rounded-full"></div>
               <span className="text-[10px] font-black uppercase tracking-widest">
-                Add a pedal
+                {t("sidebar.addPedal")}
               </span>
             </div>
 
@@ -586,7 +583,7 @@ export default function Sidebar({
               <div className="relative flex items-center">
                 <input
                   type="text"
-                  placeholder="Search for a pedal..."
+                  placeholder={`${t("sidebar.searchPedal")}...`}
                   className={`w-full bg-zinc-900 border rounded-lg py-2 pl-4 pr-10 text-[11px] outline-none transition-all ${
                     showPedalResults
                       ? "border-blue-500 ring-1 ring-blue-500"
@@ -645,7 +642,7 @@ export default function Sidebar({
             <div className="flex items-center gap-2 px-1">
               <div className="w-[2px] h-3 bg-blue-500 rounded-full"></div>
               <span className="text-[10px] font-black uppercase tracking-widest">
-                Add a board
+                {t("sidebar.addBoard")}
               </span>
             </div>
 
@@ -653,7 +650,7 @@ export default function Sidebar({
               <div className="relative flex items-center">
                 <input
                   type="text"
-                  placeholder="Search for a board..."
+                  placeholder={`${t("sidebar.searchBoard")}...`}
                   className={`w-full bg-zinc-900 border rounded-lg py-2 pl-4 pr-10 text-[11px] outline-none transition-all ${
                     showBoardResults
                       ? "border-blue-500 ring-1 ring-blue-500"
@@ -712,7 +709,7 @@ export default function Sidebar({
             <div className="flex items-center gap-2 px-1">
               <div className="w-[2px] h-3 bg-blue-500 rounded-full"></div>
               <span className="text-[10px] font-black uppercase tracking-widest">
-                Make Your Own
+                {t("custom.title")}
               </span>
             </div>
 
@@ -720,7 +717,7 @@ export default function Sidebar({
 
               <input
                 type="text"
-                placeholder="Name (optional)"
+                placeholder={t("custom.name")}
                 value={customName}
                 onChange={(e) => setCustomName(e.target.value)}
                 className="w-full bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-[11px] outline-none"
@@ -730,7 +727,7 @@ export default function Sidebar({
                 <input
                   key={`width-${units}`}
                   type="number"
-                  placeholder={`Width (${units === "metric" ? "mm" : "in"})`}
+                  placeholder={`${t("custom.width")} (${units === "metric" ? "mm" : "in"})`}
                   value={customWidth}
                   onChange={(e) => setCustomWidth(e.target.value)}
                   className="w-full bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-[11px] outline-none"
@@ -738,7 +735,7 @@ export default function Sidebar({
                 <input
                   key={`depth-${units}`}
                   type="number"
-                  placeholder={`Depth (${units === "metric" ? "mm" : "in"})`}
+                  placeholder={`${t("custom.depth")} (${units === "metric" ? "mm" : "in"})`}
                   value={customDepth}
                   onChange={(e) => setCustomDepth(e.target.value)}
                   className="w-full bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-[11px] outline-none"
@@ -767,7 +764,7 @@ export default function Sidebar({
                   onClick={addCustomItem}
                   className="flex-1 bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-black uppercase py-2 rounded-lg transition-all flex items-center justify-center gap-2"
                 >
-                  <Plus size={14} /> Add Custom
+                  <Plus size={14} /> {t("custom.add")}
                 </button>
               </div>
             </div>
@@ -782,7 +779,7 @@ export default function Sidebar({
   <div className="flex items-center gap-2">
     <Settings className="size-3 text-zinc-400" />
     <span className="text-[10px] font-black uppercase tracking-widest">
-      Settings
+      {t("settings.title")}
     </span>
   </div>
 
@@ -800,7 +797,7 @@ export default function Sidebar({
               {/* BACKGROUND */}
               <div className="flex items-center gap-4">
                 <span className="w-24 text-[9px] text-zinc-500 uppercase font-black tracking-widest">
-                  Background
+                  {t("settings.background")}
                 </span>
 
                 <div ref={bgRef} className="relative flex-1">
@@ -813,12 +810,9 @@ export default function Sidebar({
                           hover:border-zinc-600 transition-colors"
                           >
                             <span>
-                              {canvasBg === "neutral"
-                                ? "Neutral"
-                                : canvasBg === "wood"
-                                ? "Wood"
-                                : "Marble"}
-                            </span>
+                            {t(`backgrounds.${canvasBg}`)}
+                             </span>
+
 
                             <ChevronDown
                               className={`size-3 text-zinc-500 transition-transform ${
@@ -838,7 +832,7 @@ export default function Sidebar({
                           }}
                           className="w-full px-4 py-2 text-left text-[11px] hover:bg-zinc-800"
                         >
-                          {bg[0].toUpperCase() + bg.slice(1)}
+                          {t(`backgrounds.${bg}`)}
                         </button>
                       ))}
                     </div>
@@ -849,7 +843,7 @@ export default function Sidebar({
               {/* LANGUAGE */}
               <div className="flex items-center gap-4">
                 <span className="w-24 text-[9px] text-zinc-500 uppercase font-black tracking-widest">
-                  Language
+                  {t("settings.language")}
                 </span>
 
                 <div ref={langRef} className="relative flex-1">
@@ -861,11 +855,8 @@ export default function Sidebar({
                             flex items-center justify-between
                             hover:border-zinc-600 transition-colors"
                 >
-                  {language === "en"
-                    ? "English"
-                    : language === "fr"
-                    ? "French"
-                    : "Spanish"}
+                  {t(`language.${language}`)}
+
 
                   <ChevronDown
                     className={`size-3 text-zinc-500 transition-transform ${
@@ -885,11 +876,8 @@ export default function Sidebar({
                           }}
                           className="w-full px-4 py-2 text-left text-[11px] hover:bg-zinc-800"
                         >
-                          {l === "en"
-                            ? "English"
-                            : l === "fr"
-                            ? "French"
-                            : "Spanish"}
+                          {t(`language.${l}`)}
+
                         </button>
                       ))}
                     </div>
@@ -900,7 +888,7 @@ export default function Sidebar({
               {/* UNITS */}
               <div className="flex items-center gap-4">
                 <span className="w-24 text-[9px] text-zinc-500 uppercase font-black tracking-widest">
-                  Units
+                   {t("settings.units")}
                 </span>
 
                 <div className="flex-1">
@@ -915,7 +903,8 @@ export default function Sidebar({
                             : "text-zinc-600"
                         }`}
                       >
-                        {u}
+                        {u === "metric" ? "Metric" : "Imperial"}
+
                       </button>
                     ))}
                   </div>

@@ -1,0 +1,68 @@
+{
+  "sidebar": {
+    "searchPedal": "Recherchez une pédale",
+    "searchBoard": "Recherchez un board",
+    "buyOnline": "Acheter en ligne",
+    "shop": "Boutique",
+    "addPedal": "Ajoutez une pédale",
+    "addBoard": "Ajoutez un board"
+  },
+
+  "pedal": {
+    "status": "Statut",
+    "type": "Type",
+    "circuit": "Circuit",
+    "bypass": "Bypass",
+    "power": "Alimentation",
+    "draw": "Consommation",
+    "dimensions": "Dimensions",
+    "weight": "Poids",
+    "origin": "Origine",
+    "manual": "Manuel"
+  },
+
+  "board": {
+    "material": "Matériau",
+    "profile": "Profil"
+  },
+
+  "custom": {
+    "title": "Créer le vôtre",
+    "name": "Nom (optionnel)",
+    "width": "Largeur",
+    "depth": "Profondeur",
+    "add": "Ajouter"
+  },
+
+  "settings": {
+    "title": "Paramètres",
+    "background": "Fond d’écran",
+    "language": "Langue",
+    "units": "Unités"
+  },
+
+  "backgrounds": {
+    "neutral": "Neutre",
+    "wood": "Bois",
+    "marble": "Marbre"
+  },
+
+  "language": {
+    "en": "Anglais",
+    "fr": "Français",
+    "es": "Espagnol"
+  },
+
+  "canvas": {
+    "totalDraw": "Conso. totale",
+    "totalWeight": "Poids total"
+  },
+
+  "details": {
+    "back": "Retour au menu principal",
+    "rotate": "Rotation",
+    "delete": "Suppression",
+    "buyOnline": "Achetez en ligne",
+    "shop": "Boutique"
+  }
+}

@@ -5,6 +5,7 @@ import { Stage, Layer, Group, Rect } from "react-konva";
 import { Zap, Weight, Minus, Plus, Square } from "lucide-react";
 import PedalImage from "@/components/PedalImage";
 import { formatWeight } from "@/utils/units";
+import { getTranslator } from "@/utils/i18n";
 
 type AnyRow = Record<string, any>;
 
@@ -28,6 +29,8 @@ type Props = {
 
   // units
   units: "metric" | "imperial";
+  language: "en" | "fr" | "es";
+
 
   // selection
   selectedInstanceId: number | null;
@@ -54,6 +57,7 @@ export default function BoardCanvas({
   dimensions,
   activeProject,
   units,
+  language,
   selectedInstanceId,
   setSelectedInstanceId,
   selectedBoardInstanceId,
@@ -67,6 +71,8 @@ export default function BoardCanvas({
   canvasBg,
   setCanvasBg,
 }: Props) {
+
+  const t = getTranslator(language);
   const currentZoom = activeProject.zoom || 100;
 
   const totalDraw = activeProject.boardPedals.reduce((sum, p) => sum + (Number(p.draw) || 0), 0);
@@ -160,7 +166,7 @@ export default function BoardCanvas({
           </div>
           <div>
             <p className="text-[10px] text-zinc-500 uppercase font-black tracking-widest leading-none mb-1">
-              Total Draw
+              {t("canvas.totalDraw")}
             </p>
             <p className="text-lg font-black font-mono leading-none">
               {totalDraw} <span className="text-[10px] text-zinc-500">mA</span>
@@ -174,7 +180,7 @@ export default function BoardCanvas({
           </div>
           <div>
             <p className="text-[10px] text-zinc-500 uppercase font-black tracking-widest leading-none mb-1">
-              Total Weight
+              {t("canvas.totalWeight")}
             </p>
             <p className="text-lg font-black font-mono leading-none">
   {units === "metric"

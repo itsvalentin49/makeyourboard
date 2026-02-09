@@ -1,0 +1,60 @@
+{
+  "sidebar": {
+    "searchPedal": "Search for a pedal",
+    "searchBoard": "Search for a board",
+    "buyOnline": "Buy online",
+    "shop": "Shop",
+    "addPedal": "Add a pedal",
+    "addBoard": "Add a board"
+  },
+
+  "pedal": {
+    "status": "Status",
+    "type": "Type",
+    "circuit": "Circuit",
+    "bypass": "Bypass",
+    "power": "Power",
+    "draw": "Current draw",
+    "dimensions": "Dimensions",
+    "weight": "Weight",
+    "origin": "Origin",
+    "manual": "Manual"
+  },
+
+  "board": {
+    "material": "Material",
+    "profile": "Profile"
+  },
+
+  "custom": {
+    "title": "Make your own",
+    "name": "Name (optional)",
+    "width": "Width",
+    "depth": "Depth",
+    "add": "Add custom"
+  },
+
+  "settings": {
+    "title": "Settings",
+    "background": "Background",
+    "language": "Language",
+    "units": "Units"
+  },
+
+  "backgrounds": {
+    "neutral": "Neutral",
+    "wood": "Wood",
+    "marble": "Marble"
+  },
+
+  "language": {
+    "en": "English",
+    "fr": "French",
+    "es": "Spanish"
+  },
+
+  "canvas": {
+    "totalDraw": "Total draw",
+    "totalWeight": "Total weight"
+  }
+}

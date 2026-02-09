@@ -7,9 +7,15 @@ import TopBarTabs from "@/components/TopBarTabs";
 import BoardCanvas from "@/components/BoardCanvas";
 import { useLibrary } from "@/hooks/useLibrary";
 import type { AnyRow, BoardItem, Project } from "@/types/project";
+import { getTranslator, type Language } from "@/utils/i18n";
 
-type Language = "en" | "fr" | "es";
 type Units = "metric" | "imperial";
+const LANGUAGE_TO_LOCALE: Record<string, "en" | "fr" | "es"> = {
+  English: "en",
+  French: "fr",
+  Spanish: "es",
+};
+
 
 const MAX_PROJECTS = 5;
 const STORAGE_KEY = "guitar-sandbox-data";
@@ -75,6 +81,8 @@ const BACKGROUNDS = [
 
   const [canvasBg, setCanvasBg] = useState<string>("neutral");
   const [language, setLanguage] = useState<Language>("en");
+  const t = getTranslator(language);
+
   const [units, setUnits] = useState<Units>("metric");
 
   useEffect(() => {
@@ -85,7 +93,17 @@ const BACKGROUNDS = [
     const parsed = JSON.parse(saved);
 
     if (parsed.canvasBg) setCanvasBg(parsed.canvasBg);
-    if (parsed.language) setLanguage(parsed.language);
+    if (parsed.language) {
+  const cleanLang =
+    parsed.language === "en" ||
+    parsed.language === "fr" ||
+    parsed.language === "es"
+      ? parsed.language
+      : "en";
+
+  setLanguage(cleanLang);
+}
+
     if (parsed.units) setUnits(parsed.units);
   } catch {
     // storage corrompu → on ignore
@@ -134,6 +152,7 @@ useEffect(() => {
     setActiveProjectId(firstProject.id);
   }
 }, [projects]);
+
 
   // Custom item
   const [customType] = useState<"pedal">("pedal");
@@ -332,6 +351,8 @@ useEffect(() => {
       x: (dimensions.width - 320) / 2,
       y: (dimensions.height - 56) / 2,
       rotation: 0,
+      draw: Number(pedal.draw) || 0,
+      weight: Number(pedal.weight) || 0,
     };
     updateActiveProject({ boardPedals: [...activeProject.boardPedals, newPedal] });
     closeSearchMenus();
@@ -489,8 +510,9 @@ const deleteBoard = (id: number) => {
         deleteBoard={deleteBoard}
         canvasBg={canvasBg}
         setCanvasBg={setCanvasBg}
+      
         language={language}
-        setLanguage={setLanguage}
+        setLanguage={(lang) => {setLanguage(lang);}}
         units={units}
         setUnits={setUnits}
       />
@@ -518,6 +540,7 @@ const deleteBoard = (id: number) => {
           dimensions={dimensions}
           activeProject={activeProject}
           units={units}
+          language={language}
           selectedInstanceId={selectedInstanceId}
           setSelectedInstanceId={setSelectedInstanceId}
           selectedBoardInstanceId={selectedBoardInstanceId}

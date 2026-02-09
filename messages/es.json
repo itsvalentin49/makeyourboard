@@ -1,0 +1,60 @@
+{
+  "sidebar": {
+    "searchPedal": "Buscar un pedal",
+    "searchBoard": "Buscar una pedalera",
+    "buyOnline": "Comprar en línea",
+    "shop": "Tienda",
+    "addPedal": "Añadir un pedal",
+    "addBoard": "Añadir una pedalera"
+  },
+
+  "pedal": {
+    "status": "Estado",
+    "type": "Tipo",
+    "circuit": "Circuito",
+    "bypass": "Bypass",
+    "power": "Alimentación",
+    "draw": "Consumo",
+    "dimensions": "Dimensiones",
+    "weight": "Peso",
+    "origin": "Origen",
+    "manual": "Manual"
+  },
+
+  "board": {
+    "material": "Material",
+    "profile": "Perfil"
+  },
+
+  "custom": {
+    "title": "Crear el suyo",
+    "name": "Nombre (opcional)",
+    "width": "Ancho",
+    "depth": "Profundidad",
+    "add": "Añadir"
+  },
+
+  "settings": {
+    "title": "Ajustes",
+    "background": "Fondo",
+    "language": "Idioma",
+    "units": "Unidades"
+  },
+
+  "backgrounds": {
+    "neutral": "Neutro",
+    "wood": "Madera",
+    "marble": "Mármol"
+  },
+
+  "language": {
+    "en": "Inglés",
+    "fr": "Francés",
+    "es": "Español"
+  },
+
+  "canvas": {
+    "totalDraw": "Consumo total",
+    "totalWeight": "Peso total"
+  }
+}

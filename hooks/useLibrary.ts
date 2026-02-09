@@ -46,26 +46,55 @@ function normalizeSupabaseError(err: unknown): NormalizedErr {
 }
 
 async function fetchTable(table: string, orderCols: string[] = []) {
-  let q = supabase.from(table).select("*");
+  const PAGE_SIZE = 100;
+  let allRows: AnyRow[] = [];
+  let from = 0;
 
-  for (const col of orderCols) {
-    q = q.order(col, { ascending: true });
+  while (true) {
+    let q = supabase
+      .from(table)
+      .select("*")
+      .range(from, from + PAGE_SIZE - 1);
+
+    for (const col of orderCols) {
+      q = q.order(col, { ascending: true });
+    }
+
+    const { data, error } = await q;
+
+    if (error) {
+      const msg = String((error as any)?.message ?? "").toLowerCase();
+      if (msg.includes("column") && msg.includes("does not exist")) {
+        const retry = await supabase
+          .from(table)
+          .select("*")
+          .range(from, from + PAGE_SIZE - 1);
+
+        if (retry.error) throw retry.error;
+        if (!retry.data || retry.data.length === 0) break;
+
+        allRows.push(...retry.data);
+        if (retry.data.length < PAGE_SIZE) break;
+
+        from += PAGE_SIZE;
+        continue;
+      }
+
+      throw error;
+    }
+
+    if (!data || data.length === 0) break;
+
+    allRows.push(...data);
+
+    if (data.length < PAGE_SIZE) break;
+
+    from += PAGE_SIZE;
   }
 
-  const { data, error } = await q;
-
-  if (!error) return (data ?? []) as AnyRow[];
-
-  // Si l'erreur vient d'un tri sur colonne inexistante, on retente sans order()
-  const msg = String((error as any)?.message ?? "").toLowerCase();
-  if (msg.includes("column") && msg.includes("does not exist")) {
-    const retry = await supabase.from(table).select("*");
-    if (retry.error) throw retry.error;
-    return (retry.data ?? []) as AnyRow[];
-  }
-
-  throw error;
+  return allRows;
 }
+
 
 export function useLibrary() {
   const [pedalsLibrary, setPedalsLibrary] = useState<AnyRow[]>([]);
