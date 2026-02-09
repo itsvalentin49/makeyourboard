@@ -187,7 +187,7 @@ export default function Sidebar({
             onClick={() => setSelectedInstanceId(null)}
             className="flex items-center gap-2 text-zinc-500 hover:text-white transition-colors text-[10px] font-black uppercase tracking-widest"
           >
-            <ArrowLeft className="size-4" /> {t("details.back")}
+            <ArrowLeft className="size-4" /> {t("sidebar.back")}
           </button>
 
           <div className="space-y-1">
@@ -231,7 +231,7 @@ export default function Sidebar({
       group-active:rotate-90 transition-transform duration-200"
     />
     <span className="text-[10px] font-black uppercase tracking-widest text-zinc-300 group-hover:text-white">
-      {t("details.rotate")}
+      {t("sidebar.rotate")}
     </span>
   </div>
 </button>
@@ -253,7 +253,7 @@ export default function Sidebar({
   <div className="flex items-center gap-3">
     <Trash2 size={16} className="text-zinc-400 group-hover:text-white transition-colors" />
     <span className="text-[10px] font-black uppercase tracking-widest text-zinc-300 group-hover:text-white">
-      {t("details.delete")}
+      {t("sidebar.delete")}
     </span>
   </div>
 </button>
@@ -407,7 +407,7 @@ export default function Sidebar({
             onClick={() => setSelectedBoardInstanceId(null)}
             className="flex items-center gap-2 text-zinc-500 hover:text-white transition-colors text-[10px] font-black uppercase tracking-widest"
           >
-            <ArrowLeft className="size-4" /> Back to Library
+            <ArrowLeft className="size-4" /> {t("sidebar.back")}
           </button>
 
           <div className="space-y-1">
@@ -440,7 +440,7 @@ export default function Sidebar({
       <div className="flex items-center gap-3">
         <RotateCw size={16} />
         <span className="text-[10px] font-black uppercase tracking-widest">
-          Rotate
+          {t("sidebar.rotate")}
         </span>
       </div>
     </button>
@@ -462,7 +462,7 @@ export default function Sidebar({
       <div className="flex items-center gap-3">
         <Trash2 size={16} />
         <span className="text-[10px] font-black uppercase tracking-widest">
-          {t("details.delete")}
+          {t("sidebar.delete")}
         </span>
       </div>
     </button>
@@ -473,7 +473,7 @@ export default function Sidebar({
           <div className="space-y-0.5 border-zinc-900 pt-4">
             <div className="flex justify-between items-center py-2 border-b border-t border-zinc-900">
               <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
-                Status
+                {t("board.status")}
               </span>
               <span
                 className={`text-[9px] px-2 py-0.5 rounded-full font-black uppercase ${
@@ -488,7 +488,7 @@ export default function Sidebar({
 
             <div className="flex justify-between items-center py-2.5 border-b border-zinc-900">
               <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
-                Material
+                {t("board.material")}
               </span>
               <span className="text-[11px] font-bold font-mono">
                 {selectedBoardDetails.material || 0}
@@ -497,7 +497,7 @@ export default function Sidebar({
 
             <div className="flex justify-between items-center py-2.5 border-b border-zinc-900">
               <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
-                Profile
+                {t("board.profile")}
               </span>
               <span className="text-[11px] font-bold font-mono">
                 {selectedBoardDetails.profile || 0}
@@ -506,7 +506,7 @@ export default function Sidebar({
 
             <div className="flex justify-between items-center py-2.5 border-b border-zinc-900">
             <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
-              Dimensions
+              {t("board.dimensions")}
             </span>
             <span className="text-[11px] font-bold font-mono">
               {units === "metric"
@@ -522,7 +522,7 @@ export default function Sidebar({
 
             <div className="flex justify-between items-center py-2.5 border-b border-zinc-900">
             <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
-              Weight
+              {t("board.weight")}
             </span>
             <span className="text-[11px] font-bold font-mono">
               {formatWeight(selectedBoardDetails.weight || 0, units)}
@@ -532,16 +532,16 @@ export default function Sidebar({
 
             <div className="flex justify-between items-center py-2.5 border-b border-zinc-900">
               <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
-                Origin
+                {t("board.origin")}
               </span>
               <span className="text-[11px] font-bold font-mono">
                 {selectedBoardDetails.origin || 0}
               </span>
             </div>
 
-            <div className="pt-5 space-y-3">
-              <span className="text-[10px] text-zinc-500 uppercase font-black tracking-wider">
-                Buy Online
+            <div className="pt-5 space-y-4">
+              <span className="text-[10px] uppercase font-black tracking-wider">
+                {t("sidebar.buyOnline")}
               </span>
 
               <a
@@ -554,12 +554,12 @@ export default function Sidebar({
                 }
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-between w-full px-4 py-3 bg-blue-600/10 border border-blue-500/20 rounded-xl hover:bg-blue-600 transition-all group"
+                className="flex items-center justify-between w-full px-4 py-3 mt-3 bg-blue-600/10 border border-blue-500/20 rounded-xl hover:bg-blue-600 transition-all group"
               >
                 <div className="flex items-center gap-3">
                   <ShoppingCart size={16} className="text-blue-400 group-hover:text-white" />
                   <span className="text-[11px] font-black uppercase tracking-widest group-hover:text-white text-blue-400">
-                    Shop
+                    {t("sidebar.shop")}
                   </span>
                 </div>
                 <ExternalLink size={14} className="text-blue-400/50 group-hover:text-white" />

@@ -5,7 +5,10 @@
     "buyOnline": "Comprar en línea",
     "shop": "Tienda",
     "addPedal": "Añadir un pedal",
-    "addBoard": "Añadir una pedalera"
+    "addBoard": "Añadir una pedalera",
+    "back": "Volver a la biblioteca",
+    "rotate": "Rotar",
+    "delete": "Eliminar"
   },
 
   "pedal": {
@@ -22,8 +25,12 @@
   },
 
   "board": {
+    "status": "Estado",
     "material": "Material",
-    "profile": "Perfil"
+    "profile": "Perfil",
+    "dimensions": "Dimensiones",
+    "weight": "Peso",
+    "origin": "Origen"
   },
 
   "custom": {
@@ -57,4 +64,5 @@
     "totalDraw": "Consumo total",
     "totalWeight": "Peso total"
   }
+
 }

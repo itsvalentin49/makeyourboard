@@ -5,7 +5,10 @@
     "buyOnline": "Acheter en ligne",
     "shop": "Boutique",
     "addPedal": "Ajoutez une pédale",
-    "addBoard": "Ajoutez un board"
+    "addBoard": "Ajoutez un board",
+    "back": "Retour au menu principal",
+    "rotate": "Rotation",
+    "delete": "Suppression"
   },
 
   "pedal": {
@@ -22,9 +25,13 @@
   },
 
   "board": {
+    "status": "Statut",
     "material": "Matériau",
-    "profile": "Profil"
-  },
+    "profile": "Profil",
+    "dimensions": "Dimensions",
+    "weight": "Poids",
+    "origin": "Origine"
+    },
 
   "custom": {
     "title": "Créer le vôtre",
@@ -56,13 +63,6 @@
   "canvas": {
     "totalDraw": "Conso. totale",
     "totalWeight": "Poids total"
-  },
-
-  "details": {
-    "back": "Retour au menu principal",
-    "rotate": "Rotation",
-    "delete": "Suppression",
-    "buyOnline": "Achetez en ligne",
-    "shop": "Boutique"
   }
+
 }
