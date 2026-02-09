@@ -5,17 +5,17 @@ import {
   ArrowLeft,
   ChevronDown,
   ExternalLink,
-  Minus,
   Plus,
   RotateCw,
   ShoppingCart,
-  Square,
+  Settings,
   Trash2,
-  Weight,
-  Zap,
 } from "lucide-react";
 
 import SidebarLogo from "@/components/SidebarLogo";
+import { mmToIn, formatWeight } from "@/utils/units";
+
+
 
 type AnyRow = Record<string, any>;
 
@@ -44,8 +44,6 @@ type Props = {
   setSelectedBoardInstanceId: (v: number | null) => void;
 
   // Custom item
-  customType: "pedal" | "board";
-  setCustomType: (v: "pedal" | "board") => void;
   customName: string;
   setCustomName: (v: string) => void;
   customWidth: string;
@@ -59,9 +57,20 @@ type Props = {
   addPedal: (p: AnyRow) => void;
   selectBoard: (b: AnyRow) => void;
   addCustomItem: () => void;
-  resetCanvas: () => void;
   rotatePedal: (id: number) => void;
   deletePedal: (id: number) => void;
+  rotateBoard: (id: number) => void;
+  deleteBoard: (id: number) => void;
+
+  // Settings
+  canvasBg: string;
+  setCanvasBg: (v: string) => void;
+
+  language: "en" | "fr" | "es";
+  setLanguage: (v: "en" | "fr" | "es") => void;
+
+  units: "metric" | "imperial";
+  setUnits: (v: "metric" | "imperial") => void;
 
 };
 
@@ -82,8 +91,6 @@ export default function Sidebar({
   selectedBoardInstanceId,
   setSelectedInstanceId,
   setSelectedBoardInstanceId,
-  customType,
-  setCustomType,
   customName,
   setCustomName,
   customWidth,
@@ -95,19 +102,65 @@ export default function Sidebar({
   addPedal,
   selectBoard,
   addCustomItem,
-  resetCanvas,
   rotatePedal,
   deletePedal,
+  rotateBoard,
+  deleteBoard,
+  canvasBg,
+  setCanvasBg,
+  language,
+  setLanguage,
+  units,
+  setUnits,
 }: Props) {
+
+  const [bgOpen, setBgOpen] = React.useState(false);
+  const bgRef = React.useRef<HTMLDivElement>(null);
+  const [langOpen, setLangOpen] = React.useState(false);
+  const langRef = React.useRef<HTMLDivElement>(null);
+  const [settingsOpen, setSettingsOpen] = React.useState(false);
+
+
+  React.useEffect(() => {
+  const handleClickOutside = (e: MouseEvent) => {
+    const target = e.target as Node;
+
+    if (bgRef.current && !bgRef.current.contains(target)) {
+      setBgOpen(false);
+    }
+
+    if (langRef.current && !langRef.current.contains(target)) {
+      setLangOpen(false);
+    }
+  };
+
+  document.addEventListener("mousedown", handleClickOutside);
+  return () => {
+    document.removeEventListener("mousedown", handleClickOutside);
+  };
+}, []);
+
+
+
 
   const groupItems = (items: AnyRow[], filter: string) => {
   return items.reduce((acc: Record<string, AnyRow[]>, item) => {
-    if (
-      filter &&
-      !item.name?.toLowerCase().includes(filter.toLowerCase())
-    ) {
-      return acc;
-    }
+    if (filter) {
+  const terms = filter
+    .toLowerCase()
+    .split(" ")
+    .filter(Boolean);
+
+  const haystack = `${item.brand ?? ""} ${item.name ?? ""}`.toLowerCase();
+
+  const matchesAll = terms.every((t) => haystack.includes(t));
+
+  if (!matchesAll) {
+    return acc;
+  }
+}
+
+
 
     const key = item.brand || "Other";
 
@@ -115,13 +168,14 @@ export default function Sidebar({
     acc[key].push(item);
 
     return acc;
-  }, {});
-};
+    }, {});
+  };
 
   return (
-    <div
-      className="w-80 border-r border-zinc-800 p-4 flex flex-col gap-6 bg-zinc-950 z-20 overflow-y-auto no-scrollbar"
-    >
+  <div
+    className="w-80 border-r border-zinc-800 p-4 flex flex-col gap-6 bg-zinc-950 z-20 overflow-y-auto no-scrollbar"
+    onClick={(e) => e.stopPropagation()}
+  >
       <SidebarLogo />
 
       {/* PEDAL DETAILS */}
@@ -273,21 +327,25 @@ export default function Sidebar({
             </div>
 
             <div className="flex justify-between items-center py-2 border-b border-zinc-900">
-              <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
-                Dimensions
-              </span>
-              <span className="text-[11px] font-bold font-mono">
-                {selectedPedal.width} x {selectedPedal.depth || 0} mm
-              </span>
+            <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
+              Dimensions
+            </span>
+            <span className="text-[11px] font-bold font-mono">
+              {units === "metric"
+                ? `${selectedPedal.width} x ${selectedPedal.depth || 0} mm`
+                : `${mmToIn(selectedPedal.width).toFixed(2)} x ${mmToIn(
+                    selectedPedal.depth || 0
+                  ).toFixed(2)} in`}
+            </span>
             </div>
 
             <div className="flex justify-between items-center py-2 border-b border-zinc-900">
-              <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
-                Weight
-              </span>
-              <span className="text-[11px] font-bold font-mono">
-                {selectedPedal.weight || 0} g
-              </span>
+            <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
+              Weight
+            </span>
+            <span className="text-[11px] font-bold font-mono">
+              {formatWeight(selectedPedal.weight || 0, units)}
+            </span>
             </div>
 
             <div className="flex justify-between items-center py-2 border-b border-zinc-900">
@@ -365,6 +423,56 @@ export default function Sidebar({
             </p>
           </div>
 
+          {/* ACTIONS */}
+<div className="flex gap-2">
+  <div className="flex gap-2 pointer-events-auto w-full">
+    {/* ROTATE */}
+    <button
+      onClick={() => {
+        if (selectedBoardInstanceId !== null) {
+          rotateBoard(selectedBoardInstanceId);
+        }
+      }}
+      className="group flex-1 flex items-center justify-center px-4 py-3 rounded-xl
+      bg-zinc-600/10 border border-zinc-500/20
+      hover:bg-blue-500/10 hover:border-blue-400/70
+      hover:ring-2 hover:ring-blue-500/30
+      active:scale-[0.99]
+      transition-all duration-200"
+    >
+      <div className="flex items-center gap-3">
+        <RotateCw size={16} />
+        <span className="text-[10px] font-black uppercase tracking-widest">
+          Rotate
+        </span>
+      </div>
+    </button>
+
+    {/* DELETE */}
+    <button
+      onClick={() => {
+        if (selectedBoardInstanceId !== null) {
+          deleteBoard(selectedBoardInstanceId);
+        }
+      }}
+      className="group flex-1 flex items-center justify-center px-4 py-3 rounded-xl
+      bg-zinc-600/10 border border-zinc-500/20
+      hover:bg-red-500/10 hover:border-red-400/80
+      hover:ring-2 hover:ring-red-500/30
+      active:scale-[0.99]
+      transition-all duration-200"
+    >
+      <div className="flex items-center gap-3">
+        <Trash2 size={16} />
+        <span className="text-[10px] font-black uppercase tracking-widest">
+          Delete
+        </span>
+      </div>
+    </button>
+  </div>
+</div>
+
+
           <div className="space-y-0.5 border-zinc-900 pt-4">
             <div className="flex justify-between items-center py-2 border-b border-t border-zinc-900">
               <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
@@ -400,22 +508,30 @@ export default function Sidebar({
             </div>
 
             <div className="flex justify-between items-center py-2.5 border-b border-zinc-900">
-              <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
-                Dimensions
-              </span>
-              <span className="text-[11px] font-bold font-mono">
-                {selectedBoardDetails.width} x {selectedBoardDetails.depth || 0} mm
-              </span>
+            <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
+              Dimensions
+            </span>
+            <span className="text-[11px] font-bold font-mono">
+              {units === "metric"
+                ? `${selectedBoardDetails.width} x ${
+                    selectedBoardDetails.depth || 0
+                  } mm`
+                : `${mmToIn(selectedBoardDetails.width).toFixed(2)} x ${mmToIn(
+                    selectedBoardDetails.depth || 0
+                  ).toFixed(2)} in`}
+            </span>
             </div>
 
+
             <div className="flex justify-between items-center py-2.5 border-b border-zinc-900">
-              <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
-                Weight
-              </span>
-              <span className="text-[11px] font-bold font-mono">
-                {selectedBoardDetails.weight || 0} g
-              </span>
+            <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
+              Weight
+            </span>
+            <span className="text-[11px] font-bold font-mono">
+              {formatWeight(selectedBoardDetails.weight || 0, units)}
+            </span>
             </div>
+
 
             <div className="flex justify-between items-center py-2.5 border-b border-zinc-900">
               <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
@@ -601,28 +717,6 @@ export default function Sidebar({
             </div>
 
             <div className="p-4 bg-zinc-900/50 border border-zinc-800 rounded-xl space-y-4">
-              <div className="flex bg-zinc-950 p-1 rounded-lg">
-                <button
-                  onClick={() => setCustomType("pedal")}
-                  className={`flex-1 py-1.5 text-[10px] font-black uppercase rounded-md transition-all ${
-                    customType === "pedal"
-                      ? "bg-zinc-800 text-white"
-                      : "text-zinc-600 hover:text-zinc-400"
-                  }`}
-                >
-                  Pedal
-                </button>
-                <button
-                  onClick={() => setCustomType("board")}
-                  className={`flex-1 py-1.5 text-[10px] font-black uppercase rounded-md transition-all ${
-                    customType === "board"
-                      ? "bg-zinc-800 text-white"
-                      : "text-zinc-600 hover:text-zinc-400"
-                  }`}
-                >
-                  Board
-                </button>
-              </div>
 
               <input
                 type="text"
@@ -634,15 +728,17 @@ export default function Sidebar({
 
               <div className="grid grid-cols-2 gap-2">
                 <input
+                  key={`width-${units}`}
                   type="number"
-                  placeholder="Width (mm)"
+                  placeholder={`Width (${units === "metric" ? "mm" : "in"})`}
                   value={customWidth}
                   onChange={(e) => setCustomWidth(e.target.value)}
                   className="w-full bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-[11px] outline-none"
                 />
                 <input
+                  key={`depth-${units}`}
                   type="number"
-                  placeholder="Depth (mm)"
+                  placeholder={`Depth (${units === "metric" ? "mm" : "in"})`}
                   value={customDepth}
                   onChange={(e) => setCustomDepth(e.target.value)}
                   className="w-full bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-[11px] outline-none"
@@ -677,17 +773,156 @@ export default function Sidebar({
             </div>
           </div>
 
-          {/* RESET */}
-          <div className="mt-2 flex justify-center">
+          {/* SETTINGS */}
+          <div className="flex flex-col gap-1 mt-4">
             <button
-              onClick={resetCanvas}
-              className="flex items-center gap-2 text-red-600 hover:text-red-400 transition-all duration-200 group py-2"
-            >
-              <Trash2 className="size-4 group-hover:drop-shadow-[0_0_8px_rgba(239,68,68,0.5)]" />
-              <span className="text-[10px] font-black uppercase tracking-widest">
-                Reset
-              </span>
-            </button>
+  onClick={() => setSettingsOpen((v) => !v)}
+  className="flex items-center justify-between gap-2 px-1 w-full group"
+>
+  <div className="flex items-center gap-2">
+    <Settings className="size-3 text-zinc-400" />
+    <span className="text-[10px] font-black uppercase tracking-widest">
+      Settings
+    </span>
+  </div>
+
+  <ChevronDown
+    className={`size-3 text-zinc-500 transition-transform duration-200 ${
+      settingsOpen ? "rotate-180" : ""
+    }`}
+  />
+</button>
+
+
+  {settingsOpen && (
+  <div className="p-4 bg-zinc-900/50 border border-zinc-800 rounded-xl space-y-4">
+
+              {/* BACKGROUND */}
+              <div className="flex items-center gap-4">
+                <span className="w-24 text-[9px] text-zinc-500 uppercase font-black tracking-widest">
+                  Background
+                </span>
+
+                <div ref={bgRef} className="relative flex-1">
+                  <button
+                type="button"
+                onClick={() => setBgOpen((v) => !v)}
+                className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2
+                          text-[11px] text-left text-white
+                          flex items-center justify-between
+                          hover:border-zinc-600 transition-colors"
+                          >
+                            <span>
+                              {canvasBg === "neutral"
+                                ? "Neutral"
+                                : canvasBg === "wood"
+                                ? "Wood"
+                                : "Marble"}
+                            </span>
+
+                            <ChevronDown
+                              className={`size-3 text-zinc-500 transition-transform ${
+                                bgOpen ? "rotate-180" : ""
+                              }`}
+                            />
+                          </button>
+
+                  {bgOpen && (
+                    <div className="absolute z-50 mt-1 w-full bg-zinc-950 border border-zinc-800 rounded-lg overflow-hidden">
+                      {["neutral", "wood", "marble"].map((bg) => (
+                        <button
+                          key={bg}
+                          onClick={() => {
+                            setCanvasBg(bg);
+                            setBgOpen(false);
+                          }}
+                          className="w-full px-4 py-2 text-left text-[11px] hover:bg-zinc-800"
+                        >
+                          {bg[0].toUpperCase() + bg.slice(1)}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* LANGUAGE */}
+              <div className="flex items-center gap-4">
+                <span className="w-24 text-[9px] text-zinc-500 uppercase font-black tracking-widest">
+                  Language
+                </span>
+
+                <div ref={langRef} className="relative flex-1">
+                  <button
+                  type="button"
+                  onClick={() => setLangOpen((v) => !v)}
+                  className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2
+                            text-[11px] text-left text-white
+                            flex items-center justify-between
+                            hover:border-zinc-600 transition-colors"
+                >
+                  {language === "en"
+                    ? "English"
+                    : language === "fr"
+                    ? "French"
+                    : "Spanish"}
+
+                  <ChevronDown
+                    className={`size-3 text-zinc-500 transition-transform ${
+                      langOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+
+                  {langOpen && (
+                    <div className="absolute z-50 mt-1 w-full bg-zinc-950 border border-zinc-800 rounded-lg overflow-hidden">
+                      {["en", "fr", "es"].map((l) => (
+                        <button
+                          key={l}
+                          onClick={() => {
+                            setLanguage(l as any);
+                            setLangOpen(false);
+                          }}
+                          className="w-full px-4 py-2 text-left text-[11px] hover:bg-zinc-800"
+                        >
+                          {l === "en"
+                            ? "English"
+                            : l === "fr"
+                            ? "French"
+                            : "Spanish"}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* UNITS */}
+              <div className="flex items-center gap-4">
+                <span className="w-24 text-[9px] text-zinc-500 uppercase font-black tracking-widest">
+                  Units
+                </span>
+
+                <div className="flex-1">
+                  <div className="flex bg-zinc-950 p-1 rounded-lg border border-zinc-800">
+                    {["metric", "imperial"].map((u) => (
+                      <button
+                        key={u}
+                        onClick={() => setUnits(u as any)}
+                        className={`flex-1 py-1.5 text-[10px] font-black uppercase rounded-md ${
+                          units === u
+                            ? "bg-zinc-800 text-white"
+                            : "text-zinc-600"
+                        }`}
+                      >
+                        {u}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+            )}
           </div>
         </>
       )}

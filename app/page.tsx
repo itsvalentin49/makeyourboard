@@ -8,8 +8,13 @@ import BoardCanvas from "@/components/BoardCanvas";
 import { useLibrary } from "@/hooks/useLibrary";
 import type { AnyRow, BoardItem, Project } from "@/types/project";
 
+type Language = "en" | "fr" | "es";
+type Units = "metric" | "imperial";
+
 const MAX_PROJECTS = 5;
 const STORAGE_KEY = "guitar-sandbox-data";
+const SETTINGS_STORAGE_KEY = "myb_settings";
+
 
 const DEFAULT_WORKING_BOARD: Project = {
   id: -1,
@@ -38,6 +43,28 @@ const createEmptyProject = (index: number): Project => ({
 export default function PedalBoardApp() {
   const { pedalsLibrary, boardsLibrary } = useLibrary();
 
+const BACKGROUNDS = [
+  {
+    id: "neutral",
+    label: "Neutral",
+    type: "css" as const,
+  },
+  {
+    id: "wood",
+    label: "Wood",
+    type: "image" as const,
+    src: "/backgrounds/wood.webp",
+  },
+  {
+    id: "marble",
+    label: "Marble",
+    type: "image" as const,
+    src: "/backgrounds/marble.webp",
+  },
+];
+
+
+
   const [projects, setProjects] = useState<Project[]>([]);
   const [activeProjectId, setActiveProjectId] = useState<number | null>(null);
 
@@ -45,6 +72,36 @@ export default function PedalBoardApp() {
 
   const [editingProjectId, setEditingProjectId] = useState<number | null>(null);
   const [tempName, setTempName] = useState<string>("");
+
+  const [canvasBg, setCanvasBg] = useState<string>("neutral");
+  const [language, setLanguage] = useState<Language>("en");
+  const [units, setUnits] = useState<Units>("metric");
+
+  useEffect(() => {
+  try {
+    const saved = localStorage.getItem(SETTINGS_STORAGE_KEY);
+    if (!saved) return;
+
+    const parsed = JSON.parse(saved);
+
+    if (parsed.canvasBg) setCanvasBg(parsed.canvasBg);
+    if (parsed.language) setLanguage(parsed.language);
+    if (parsed.units) setUnits(parsed.units);
+  } catch {
+    // storage corrompu → on ignore
+  }
+}, []);
+useEffect(() => {
+  const data = {
+    canvasBg,
+    language,
+    units,
+  };
+
+  localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(data));
+}, [canvasBg, language, units]);
+
+
 
   const [selectedInstanceId, setSelectedInstanceId] = useState<number | null>(null);
   const [selectedBoardInstanceId, setSelectedBoardInstanceId] = useState<number | null>(null);
@@ -78,17 +135,8 @@ export default function PedalBoardApp() {
   }
 }, [projects]);
 
-
-  // Backgrounds (neutral par défaut)
-  const BACKGROUNDS = [
-    { id: "neutral", label: "Neutral", type: "css" as const },
-    { id: "wood", label: "Wood", type: "image" as const, src: "/backgrounds/wood.webp" },
-    { id: "marble", label: "Marble", type: "image" as const, src: "/backgrounds/marble.webp" },
-  ];
-  const [canvasBg, setCanvasBg] = useState<string>("neutral");
-
   // Custom item
-  const [customType, setCustomType] = useState<"pedal" | "board">("pedal");
+  const [customType] = useState<"pedal">("pedal");
   const [customName, setCustomName] = useState<string>("");
   const [customWidth, setCustomWidth] = useState<string>("");
   const [customDepth, setCustomDepth] = useState<string>("");
@@ -105,8 +153,6 @@ export default function PedalBoardApp() {
   const closeSearchMenus = () => {
     setShowPedalResults(false);
     setShowBoardResults(false);
-    setPedalSearch("");
-    setBoardSearch("");
   };
 
   /**
@@ -128,9 +174,6 @@ export default function PedalBoardApp() {
     }
   };
 
-  /**
-   * Wheel zoom (Ctrl / Cmd + molette)
-   */
   useEffect(() => {
     const handleWheel = (e: WheelEvent) => {
       if (e.ctrlKey || e.metaKey) {
@@ -145,10 +188,7 @@ export default function PedalBoardApp() {
     window.addEventListener("wheel", handleWheel, { passive: false });
     return () => window.removeEventListener("wheel", handleWheel);
   }, [activeProjectId, activeProject.zoom]);
-
-  /**
-   * Hydratation + resize + load localStorage (safe)
-   */
+  
   useEffect(() => {
     const updateSize = () => setDimensions({ width: window.innerWidth, height: window.innerHeight });
 
@@ -310,32 +350,47 @@ export default function PedalBoardApp() {
   };
 
   const addCustomItem = () => {
-    if (!customWidth || !customDepth) return;
+  if (!customWidth || !customDepth) return;
 
-    const item: BoardItem = {
-      instanceId: Date.now(),
-      name: customName || `Custom ${customType}`,
-      brand: "Custom",
-      width: parseFloat(customWidth),
-      depth: parseFloat(customDepth),
-      color: customColor,
-      x: (dimensions.width - 320) / 2,
-      y: (dimensions.height - 56) / 2,
-      rotation: 0,
-      draw: 0,
-      weight: 0,
-    };
+  const widthMm =
+    units === "metric"
+      ? parseFloat(customWidth)
+      : parseFloat(customWidth) * 25.4;
 
-    if (customType === "pedal") {
-      updateActiveProject({ boardPedals: [...activeProject.boardPedals, item] });
-    } else {
-      updateActiveProject({ selectedBoards: [...activeProject.selectedBoards, item] });
-    }
+  const depthMm =
+    units === "metric"
+      ? parseFloat(customDepth)
+      : parseFloat(customDepth) * 25.4;
 
-    setCustomWidth("");
-    setCustomDepth("");
-    setCustomName("");
+  const item: BoardItem = {
+    instanceId: Date.now(),
+    name: customName || `Custom ${customType}`,
+    brand: "Custom",
+    width: widthMm,
+    depth: depthMm,
+    color: customColor,
+    x: (dimensions.width - 320) / 2,
+    y: (dimensions.height - 56) / 2,
+    rotation: 0,
+    draw: 0,
+    weight: 0,
   };
+
+  if (customType === "pedal") {
+    updateActiveProject({
+      boardPedals: [...activeProject.boardPedals, item],
+    });
+  } else {
+    updateActiveProject({
+      selectedBoards: [...activeProject.selectedBoards, item],
+    });
+  }
+
+  setCustomWidth("");
+  setCustomDepth("");
+  setCustomName("");
+};
+
 
   const rotatePedal = (id: number) => {
     updateActiveProject({
@@ -351,6 +406,26 @@ export default function PedalBoardApp() {
     });
     setSelectedInstanceId(null);
   };
+
+  const rotateBoard = (id: number) => {
+  updateActiveProject({
+    selectedBoards: (activeProject.selectedBoards || []).map((b) =>
+      b.instanceId === id
+        ? { ...b, rotation: ((b.rotation || 0) + 90) % 360 }
+        : b
+    ),
+  });
+};
+
+const deleteBoard = (id: number) => {
+  updateActiveProject({
+    selectedBoards: (activeProject.selectedBoards || []).filter(
+      (b) => b.instanceId !== id
+    ),
+  });
+  setSelectedBoardInstanceId(null);
+};
+
 
   /**
    * Drag bounds
@@ -397,8 +472,6 @@ export default function PedalBoardApp() {
         selectedBoardInstanceId={selectedBoardInstanceId}
         setSelectedInstanceId={setSelectedInstanceId}
         setSelectedBoardInstanceId={setSelectedBoardInstanceId}
-        customType={customType}
-        setCustomType={setCustomType}
         customName={customName}
         setCustomName={setCustomName}
         customWidth={customWidth}
@@ -410,9 +483,16 @@ export default function PedalBoardApp() {
         addPedal={addPedal}
         selectBoard={selectBoard}
         addCustomItem={addCustomItem}
-        resetCanvas={resetCanvas}
         rotatePedal={rotatePedal}
         deletePedal={deletePedal}
+        rotateBoard={rotateBoard}
+        deleteBoard={deleteBoard}
+        canvasBg={canvasBg}
+        setCanvasBg={setCanvasBg}
+        language={language}
+        setLanguage={setLanguage}
+        units={units}
+        setUnits={setUnits}
       />
 
       <div className="flex-1 relative bg-[#2c2c2e] bg-[linear-gradient(135deg,rgba(255,255,255,0.05)_0%,transparent_50%,rgba(0,0,0,0.1)_100%)] flex flex-col">
@@ -428,11 +508,16 @@ export default function PedalBoardApp() {
           saveName={saveName}
           deleteProject={deleteProject}
           createNewProject={createNewProject}
+          BACKGROUNDS={BACKGROUNDS}
+          canvasBg={canvasBg}
+          setCanvasBg={setCanvasBg}
         />
+
 
         <BoardCanvas
           dimensions={dimensions}
           activeProject={activeProject}
+          units={units}
           selectedInstanceId={selectedInstanceId}
           setSelectedInstanceId={setSelectedInstanceId}
           selectedBoardInstanceId={selectedBoardInstanceId}

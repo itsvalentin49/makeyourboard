@@ -4,6 +4,7 @@ import React, { useRef, useLayoutEffect, useState } from "react";
 import { Stage, Layer, Group, Rect } from "react-konva";
 import { Zap, Weight, Minus, Plus, Square } from "lucide-react";
 import PedalImage from "@/components/PedalImage";
+import { formatWeight } from "@/utils/units";
 
 type AnyRow = Record<string, any>;
 
@@ -24,6 +25,9 @@ type Props = {
     selectedBoards?: AnyRow[];
     zoom?: number;
   };
+
+  // units
+  units: "metric" | "imperial";
 
   // selection
   selectedInstanceId: number | null;
@@ -49,6 +53,7 @@ type Props = {
 export default function BoardCanvas({
   dimensions,
   activeProject,
+  units,
   selectedInstanceId,
   setSelectedInstanceId,
   selectedBoardInstanceId,
@@ -121,32 +126,7 @@ export default function BoardCanvas({
             }
       }
     >
-      {/* Sélecteur de fond */}
-      <div className="absolute top-10 right-6 z-50 pointer-events-auto">
-        <div className="bg-zinc-950/80 backdrop-blur-md border border-zinc-800 rounded-2xl px-5 py-3 flex items-center gap-3 shadow-2xl">
-          <div className="p-2 bg-red-500/10 rounded-lg">
-            <Square className="size-4 text-red-500" />
-          </div>
-
-          <div className="min-w-[140px]">
-            <p className="text-[10px] text-zinc-500 uppercase font-black tracking-widest leading-none mb-2">
-              Background
-            </p>
-
-            <select
-              value={canvasBg}
-              onChange={(e) => setCanvasBg(e.target.value)}
-              className="w-full bg-zinc-900/70 border border-zinc-700 rounded-lg px-3 py-2 text-[11px] text-white outline-none hover:border-zinc-500 transition-colors"
-            >
-              {BACKGROUNDS.map((bg) => (
-                <option key={bg.id} value={bg.id}>
-                  {bg.label}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-      </div>
+      
 
       {/* ZOOM CONTROLS */}
       <div className="absolute bottom-6 left-6 flex items-center bg-zinc-950/80 backdrop-blur-md border border-zinc-800 rounded-2xl p-1.5 shadow-2xl z-50">
@@ -197,8 +177,21 @@ export default function BoardCanvas({
               Total Weight
             </p>
             <p className="text-lg font-black font-mono leading-none">
-              {(totalWeight / 1000).toFixed(2)} <span className="text-[10px] text-zinc-500">kg</span>
-            </p>
+  {units === "metric"
+    ? (totalWeight / 1000).toFixed(2)
+    : totalWeight / 453.592 < 1
+    ? (totalWeight / 28.3495).toFixed(1)
+    : (totalWeight / 453.592).toFixed(1)}
+  <span className="text-[10px] text-zinc-500 ml-1">
+    {units === "metric"
+      ? "kg"
+      : totalWeight / 453.592 < 1
+      ? "oz"
+      : "lb"}
+  </span>
+</p>
+
+
           </div>
         </div>
       </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, type Dispatch, type SetStateAction } from "react";
-import { Plus } from "lucide-react";
+import { Plus, } from "lucide-react";
 import {
   DndContext,
   closestCenter,
@@ -35,6 +35,11 @@ type Props = {
   deleteProject: (id: number, e: React.MouseEvent<HTMLElement>) => void;
 
   createNewProject: () => void;
+
+  BACKGROUNDS: { id: string; label: string }[];
+  canvasBg: string;
+  setCanvasBg: (v: string) => void;
+
 };
 
 function toNumberId(id: UniqueIdentifier): number {
@@ -53,8 +58,14 @@ export default function TopBarTabs({
   saveName,
   deleteProject,
   createNewProject,
+  BACKGROUNDS = [],
+  canvasBg,
+  setCanvasBg,
 }: Props) {
+
   const [activeTabId, setActiveTabId] = useState<number | null>(null);
+  const [showSettings, setShowSettings] = useState(false);
+
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
