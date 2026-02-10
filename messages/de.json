@@ -1,16 +1,15 @@
 {
   "sidebar": {
     "searchPedal": "Pedal suchen",
-    "searchBoard": "Board suchen",
+    "searchBoard": "Pedalboard suchen",
     "buyOnline": "Online kaufen",
     "shop": "Shop",
     "addPedal": "Pedal hinzufügen",
-    "addBoard": "Board hinzufügen",
+    "addBoard": "Pedalboard hinzufügen",
     "back": "Zurück zur Bibliothek",
     "rotate": "Drehen",
     "delete": "Löschen"
   },
-
   "pedal": {
     "status": "Status",
     "type": "Typ",
@@ -23,7 +22,6 @@
     "origin": "Herkunft",
     "manual": "Handbuch"
   },
-
   "board": {
     "status": "Status",
     "material": "Material",
@@ -32,7 +30,6 @@
     "weight": "Gewicht",
     "origin": "Herkunft"
   },
-
   "custom": {
     "title": "Eigenes erstellen",
     "name": "Name (optional)",
@@ -40,20 +37,17 @@
     "depth": "Tiefe",
     "add": "Hinzufügen"
   },
-
   "settings": {
     "title": "Einstellungen",
     "background": "Hintergrund",
     "language": "Sprache",
     "units": "Einheiten"
   },
-
   "backgrounds": {
     "neutral": "Neutral",
     "wood": "Holz",
     "marble": "Marmor"
   },
-
   "language": {
     "en": "Englisch",
     "fr": "Französisch",
@@ -61,9 +55,12 @@
     "de": "Deutsch",
     "it": "Italienisch"
   },
-
   "canvas": {
     "totalDraw": "Gesamtstrom",
     "totalWeight": "Gesamtgewicht"
+  },
+  "footer": {
+    "feedback": "Feedback",
+    "donate": "Projekt unterstützen"
   }
 }

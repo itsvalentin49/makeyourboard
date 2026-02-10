@@ -10,10 +10,12 @@ import type { AnyRow, BoardItem, Project } from "@/types/project";
 import { getTranslator, type Language } from "@/utils/i18n";
 
 type Units = "metric" | "imperial";
-const LANGUAGE_TO_LOCALE: Record<string, "en" | "fr" | "es"> = {
+const LANGUAGE_TO_LOCALE: Record<string, "en" | "fr" | "es" | "de" | "it"> = {
   English: "en",
   French: "fr",
   Spanish: "es",
+  German: "de",
+  Italian: "it",
 };
 
 

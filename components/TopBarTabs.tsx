@@ -102,7 +102,7 @@ export default function TopBarTabs({
   };
 
   return (
-    <div className="h-13 bg-zinc-950 flex items-center px-6 shrink-0 overflow-x-auto relative">
+    <div className="h-14 bg-zinc-950 flex items-center px-6 shrink-0 overflow-x-auto overflow-y-hidden relative">
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}

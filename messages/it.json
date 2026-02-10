@@ -4,13 +4,12 @@
     "searchBoard": "Cerca una pedaliera",
     "buyOnline": "Acquista online",
     "shop": "Negozio",
-    "addPedal": "Aggiungi un pedale",
-    "addBoard": "Aggiungi una pedaliera",
+    "addPedal": "Aggiungi pedale",
+    "addBoard": "Aggiungi pedaliera",
     "back": "Torna alla libreria",
     "rotate": "Ruota",
     "delete": "Elimina"
   },
-
   "pedal": {
     "status": "Stato",
     "type": "Tipo",
@@ -23,7 +22,6 @@
     "origin": "Origine",
     "manual": "Manuale"
   },
-
   "board": {
     "status": "Stato",
     "material": "Materiale",
@@ -32,7 +30,6 @@
     "weight": "Peso",
     "origin": "Origine"
   },
-
   "custom": {
     "title": "Crea il tuo",
     "name": "Nome (opzionale)",
@@ -40,20 +37,17 @@
     "depth": "Profondità",
     "add": "Aggiungi"
   },
-
   "settings": {
     "title": "Impostazioni",
     "background": "Sfondo",
     "language": "Lingua",
     "units": "Unità"
   },
-
   "backgrounds": {
     "neutral": "Neutro",
     "wood": "Legno",
     "marble": "Marmo"
   },
-
   "language": {
     "en": "Inglese",
     "fr": "Francese",
@@ -61,9 +55,12 @@
     "de": "Tedesco",
     "it": "Italiano"
   },
-
   "canvas": {
     "totalDraw": "Assorbimento totale",
     "totalWeight": "Peso totale"
+  },
+  "footer": {
+    "feedback": "Feedback",
+    "donate": "Supporta il progetto"
   }
 }

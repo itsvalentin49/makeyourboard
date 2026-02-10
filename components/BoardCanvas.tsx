@@ -29,7 +29,7 @@ type Props = {
 
   // units
   units: "metric" | "imperial";
-  language: "en" | "fr" | "es";
+  language: "en" | "fr" | "es" | "de" | "it";
 
 
   // selection
@@ -120,7 +120,7 @@ export default function BoardCanvas({
   return (
     <div
       ref={containerRef}
-      className="flex-1 relative overflow-hidden pb-20"
+      className="flex-1 relative overflow-x-visible overflow-y-hidden pb-20"
       style={
         canvasBg === "neutral"
           ? undefined
@@ -159,7 +159,7 @@ export default function BoardCanvas({
       </div>
 
       {/* INDICATORS */}
-      <div className="absolute bottom-6 right-6 flex gap-4 pointer-events-none z-50">
+      <div className="fixed bottom-6 right-6 flex gap-4 pointer-events-none z-50">
         <div className="bg-zinc-950/80 backdrop-blur-md border border-zinc-800 rounded-2xl px-5 py-3 flex items-center gap-3 shadow-2xl">
           <div className="p-2 bg-yellow-500/10 rounded-lg">
             <Zap className="size-4 text-yellow-500" />

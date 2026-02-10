@@ -1,16 +1,15 @@
 {
   "sidebar": {
-    "searchPedal": "Recherchez une pédale",
-    "searchBoard": "Recherchez un board",
+    "searchPedal": "Rechercher une pédale",
+    "searchBoard": "Rechercher un pedalboard",
     "buyOnline": "Acheter en ligne",
     "shop": "Boutique",
-    "addPedal": "Ajoutez une pédale",
-    "addBoard": "Ajoutez un board",
-    "back": "Retour au menu principal",
-    "rotate": "Rotation",
-    "delete": "Suppression"
+    "addPedal": "Ajouter une pédale",
+    "addBoard": "Ajouter un pedalboard",
+    "back": "Retour à la bibliothèque",
+    "rotate": "Pivoter",
+    "delete": "Supprimer"
   },
-
   "pedal": {
     "status": "Statut",
     "type": "Type",
@@ -23,7 +22,6 @@
     "origin": "Origine",
     "manual": "Manuel"
   },
-
   "board": {
     "status": "Statut",
     "material": "Matériau",
@@ -31,8 +29,7 @@
     "dimensions": "Dimensions",
     "weight": "Poids",
     "origin": "Origine"
-    },
-
+  },
   "custom": {
     "title": "Créer le vôtre",
     "name": "Nom (optionnel)",
@@ -40,29 +37,30 @@
     "depth": "Profondeur",
     "add": "Ajouter"
   },
-
   "settings": {
     "title": "Paramètres",
-    "background": "Fond d’écran",
-    "language": "Langue",
+    "background": "Arrière-plan",
+    "language": "Langues",
     "units": "Unités"
   },
-
   "backgrounds": {
     "neutral": "Neutre",
     "wood": "Bois",
     "marble": "Marbre"
   },
-
   "language": {
     "en": "Anglais",
     "fr": "Français",
-    "es": "Espagnol"
+    "es": "Espagnol",
+    "de": "Allemand",
+    "it": "Italien"
   },
-
   "canvas": {
     "totalDraw": "Conso. totale",
     "totalWeight": "Poids total"
+  },
+  "footer": {
+    "feedback": "Avis",
+    "donate": "Soutenir le projet"
   }
-
 }

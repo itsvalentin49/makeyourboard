@@ -175,7 +175,7 @@ export default function Sidebar({
 
   return (
   <div
-    className="w-80 border-r border-zinc-800 p-4 flex flex-col gap-6 bg-zinc-950 z-20 overflow-y-auto no-scrollbar"
+    className="w-80 min-w-[320px] shrink-0 border-r border-zinc-800 p-4 flex flex-col gap-6 bg-zinc-950 z-20 overflow-y-auto no-scrollbar"
     onClick={(e) => e.stopPropagation()}
   >
       <SidebarLogo />
@@ -913,6 +913,46 @@ export default function Sidebar({
             </div>
             )}
           </div>
+
+          {/* PUSH TO BOTTOM */}
+<div className="mt-auto" />
+
+{/* FEEDBACK + DONATE */}
+<div className="flex items-center justify-between mt-4 px-1">
+
+  {/* FEEDBACK */}
+  <a
+    onClick={() =>
+      (window.location.href =
+        "mailto:contact@makeyourboard.com" +
+        "?subject=Make Your Board – Feedback" +
+        "&body=Hi,%0D%0A%0D%0AI'd like to share the following feedback:%0D%0A")
+    }
+    className="flex items-center gap-2 group"
+  >
+    <span className="text-[12px]">💬</span>
+    <span className="text-[10px] font-black uppercase tracking-widest group-hover:text-white transition-colors">
+      {t("footer.feedback")}
+    </span>
+  </a>
+
+  {/* DONATE */}
+<a
+  href="https://buy.stripe.com/14A8wPeGZ8uQ0tQ96I8Zq00"
+  target="_blank"
+  rel="noopener noreferrer"
+  className="flex items-center gap-2 group"
+>
+  <span className="text-[12px]">❤️</span>
+  <span className="text-[10px] font-black uppercase tracking-widest group-hover:text-white transition-colors">
+    {t("footer.donate")}
+  </span>
+</a>
+
+
+</div>
+
+
         </>
       )}
     </div>

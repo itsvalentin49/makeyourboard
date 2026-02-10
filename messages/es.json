@@ -4,13 +4,12 @@
     "searchBoard": "Buscar una pedalera",
     "buyOnline": "Comprar en línea",
     "shop": "Tienda",
-    "addPedal": "Añadir un pedal",
-    "addBoard": "Añadir una pedalera",
+    "addPedal": "Añadir pedal",
+    "addBoard": "Añadir pedalera",
     "back": "Volver a la biblioteca",
-    "rotate": "Rotar",
+    "rotate": "Girar",
     "delete": "Eliminar"
   },
-
   "pedal": {
     "status": "Estado",
     "type": "Tipo",
@@ -23,7 +22,6 @@
     "origin": "Origen",
     "manual": "Manual"
   },
-
   "board": {
     "status": "Estado",
     "material": "Material",
@@ -32,37 +30,37 @@
     "weight": "Peso",
     "origin": "Origen"
   },
-
   "custom": {
-    "title": "Crear el suyo",
+    "title": "Crea el tuyo",
     "name": "Nombre (opcional)",
     "width": "Ancho",
     "depth": "Profundidad",
     "add": "Añadir"
   },
-
   "settings": {
-    "title": "Ajustes",
+    "title": "Configuración",
     "background": "Fondo",
     "language": "Idioma",
     "units": "Unidades"
   },
-
   "backgrounds": {
     "neutral": "Neutro",
     "wood": "Madera",
     "marble": "Mármol"
   },
-
   "language": {
     "en": "Inglés",
     "fr": "Francés",
-    "es": "Español"
+    "es": "Español",
+    "de": "Alemán",
+    "it": "Italiano"
   },
-
   "canvas": {
     "totalDraw": "Consumo total",
     "totalWeight": "Peso total"
+  },
+  "footer": {
+    "feedback": "Opinión",
+    "donate": "Apoyar el proyecto"
   }
-
 }
