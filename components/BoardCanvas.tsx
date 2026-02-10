@@ -217,6 +217,7 @@ export default function BoardCanvas({
               x={b.x}
               y={b.y}
               draggable
+              rotation={b.rotation || 0}
               onClick={(e: any) => {
                 e.cancelBubble = true;
                 setSelectedBoardInstanceId(b.instanceId);
@@ -238,7 +239,7 @@ export default function BoardCanvas({
                 depth={b.depth}
                 color={b.color}
                 isBoard
-                rotation={b.rotation || 0}
+                rotation={0}
                 onSizeReady={(w, h) => handleSizeUpdate(b.instanceId, w, h)}
               />
 

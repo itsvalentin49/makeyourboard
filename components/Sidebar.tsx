@@ -925,8 +925,11 @@ export default function Sidebar({
     onClick={() =>
       (window.location.href =
         "mailto:contact@makeyourboard.com" +
-        "?subject=Make Your Board – Feedback" +
-        "&body=Hi,%0D%0A%0D%0AI'd like to share the following feedback:%0D%0A")
+        "?subject=Feedback" +
+        "&body=Hi,%0D%0A%0D%0A" +
+      "(feel free to delete this — you can suggest pedals or boards to add,%0D%0A" +
+      "share ideas for improvements, or write in any language you like)%0D%0A%0D%0A" +
+      "Thanks for using MakeYourBoard 🙂")
     }
     className="flex items-center gap-2 group"
   >
