@@ -251,6 +251,14 @@ const buildThomannUrl = (slug: string) => {
   >
       <SidebarLogo />
 
+      <button
+  onClick={() => setMobileOpen(true)}
+  className="md:hidden fixed bottom-6 right-6 z-50 bg-blue-600 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-xl"
+>
+  <Plus size={24} />
+</button>
+
+
       {/* PEDAL DETAILS */}
       {selectedPedal ? (
         <div className="flex flex-col gap-6 animate-in slide-in-from-left duration-300">
@@ -1129,7 +1137,7 @@ return (
     className="flex items-center gap-2 group cursor-pointer"
   >
     <span className="text-[12px]">💬</span>
-    <span className="text-[10px] font-black uppercase tracking-widest group-hover:text-blue-400 transition-colors duration-200">
+    <span className="text-[10px] font-black uppercase tracking-light text-zinc-500 group-hover:text-white transition-colors duration-200">
       {t("footer.feedback")}
     </span>
   </a>
@@ -1142,7 +1150,7 @@ return (
   className="flex items-center gap-2 group cursor-pointer"
 >
   <span className="text-[12px]">❤️</span>
-  <span className="text-[10px] font-black uppercase tracking-widest group-hover:text-blue-400 transition-colors duration-200">
+  <span className="text-[10px] font-black uppercase tracking-light text-zinc-500 group-hover:text-white transition-colors duration-200">
     {t("footer.donate")}
   </span>
 </a>
