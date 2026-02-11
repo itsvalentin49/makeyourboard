@@ -115,12 +115,79 @@ export default function Sidebar({
 }: Props) {
 
   const t = getTranslator(language);
+  const [country, setCountry] = React.useState<string>("DE");
+
+React.useEffect(() => {
+  let cancelled = false;
+
+  fetch("https://ipapi.co/json/")
+    .then((res) => res.json())
+    .then((data) => {
+      if (!cancelled && data?.country) {
+        setCountry(data.country);
+      }
+    })
+    .catch(() => {
+      setCountry("DE");
+    });
+
+  return () => {
+    cancelled = true;
+  };
+}, []);
+
   
   const [bgOpen, setBgOpen] = React.useState(false);
   const bgRef = React.useRef<HTMLDivElement>(null);
   const [langOpen, setLangOpen] = React.useState(false);
   const langRef = React.useRef<HTMLDivElement>(null);
   const [settingsOpen, setSettingsOpen] = React.useState(false);
+  const [shopOpen, setShopOpen] = React.useState(false);
+  const shopRef = React.useRef<HTMLDivElement>(null);
+  const [mobileOpen, setMobileOpen] = React.useState(false);
+
+
+  const getStoresForCountry = () => {
+  const c = country.toUpperCase();
+
+  const americas = ["US", "CA", "MX", "BR", "AR", "CL", "CO", "PE"];
+  if (americas.includes(c)) {
+    return ["sweetwater"];
+  }
+
+  if (c === "FR") {
+    return ["woodbrass", "thomann"];
+  }
+
+  if (c === "NL") return ["thomann_nl"];
+  if (c === "DE") return ["thomann_de"];
+  if (c === "ES") return ["thomann_es"];
+  if (c === "IT") return ["thomann_it"];
+
+  return ["thomann_de"];
+};
+
+const isDiscontinued =
+  (selectedPedal?.status || "")
+    .toLowerCase()
+    .includes("discontinued");
+
+
+const buildThomannUrl = (slug: string) => {
+  const map: Record<string, string> = {
+    FR: "thomann.fr",
+    NL: "thomann.nl",
+    DE: "thomann.de",
+    ES: "thomann.es",
+    IT: "thomann.it",
+  };
+
+
+  const domain = map[country.toUpperCase()] || "thomann.de";
+
+  return `https://www.${domain}/${slug}`;
+};
+
 
 
   React.useEffect(() => {
@@ -133,6 +200,10 @@ export default function Sidebar({
 
     if (langRef.current && !langRef.current.contains(target)) {
       setLangOpen(false);
+    }
+
+    if (shopRef.current && !shopRef.current.contains(target)) {
+      setShopOpen(false);
     }
   };
 
@@ -175,7 +246,7 @@ export default function Sidebar({
 
   return (
   <div
-    className="w-80 min-w-[320px] shrink-0 border-r border-zinc-800 p-4 flex flex-col gap-6 bg-zinc-950 z-20 overflow-y-auto no-scrollbar"
+    className={`fixed inset-y-0 left-0 z-40 w-80 bg-zinc-950 border-r border-zinc-800 p-4 flex flex-col gap-6 overflow-y-auto no-scrollbar transform transition-transform duration-300 md:relative md:translate-x-0 `}
     onClick={(e) => e.stopPropagation()}
   >
       <SidebarLogo />
@@ -377,26 +448,84 @@ export default function Sidebar({
                 {t("sidebar.buyOnline")}
               </span>
 
-              <a
-                href={
-                  (selectedPedal.status || "").toLowerCase().includes("discontinued")
-                    ? `https://reverb.com/marketplace?query=${encodeURIComponent(
-                        selectedPedal.brand + " " + selectedPedal.name
-                      )}`
-                    : selectedPedal.thomann
-                }
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-between w-full px-4 py-3 mt-3 bg-blue-600/10 border border-blue-500/20 rounded-xl hover:bg-blue-600 transition-all group"
-              >
-                <div className="flex items-center gap-3">
-                  <ShoppingCart size={16} className="text-blue-400 group-hover:text-white" />
-                  <span className="text-[11px] font-black uppercase tracking-widest group-hover:text-white text-blue-400">
-                    {t("sidebar.shop")}
-                  </span>
-                </div>
-                <ExternalLink size={14} className="text-blue-400/50 group-hover:text-white" />
-              </a>
+              <div className="relative mt-3" ref={shopRef}>
+  <button
+    onClick={() => setShopOpen((v) => !v)}
+    className="flex items-center justify-between w-full px-4 py-3 bg-blue-600/10 border border-blue-500/20 rounded-xl hover:bg-blue-600 transition-all group"
+  >
+    <div className="flex items-center gap-3">
+      <ShoppingCart size={16} className="text-blue-400 group-hover:text-white" />
+      <span className="text-[11px] font-black uppercase tracking-widest text-blue-400 group-hover:text-white">
+        {t("sidebar.shop")}
+      </span>
+    </div>
+    <ChevronDown
+      size={14}
+      className={`text-blue-400 transition-transform ${
+        shopOpen ? "rotate-180" : ""
+      }`}
+    />
+  </button>
+
+  {shopOpen && (
+    <div className="absolute left-0 right-0 mt-2 bg-zinc-900 border border-zinc-800 rounded-xl shadow-xl z-50 overflow-hidden">
+      {(isDiscontinued ? ["reverb"] : getStoresForCountry()).map((store) => {
+        let url = "";
+
+        if (store === "reverb") {
+          url = `https://reverb.com/marketplace?query=${encodeURIComponent(
+            selectedPedal.brand + " " + selectedPedal.name
+          )}`;
+        }
+
+        if (store === "sweetwater") {
+          url = selectedPedal.sweetwater;
+        }
+
+        if (store === "woodbrass") {
+          url = selectedPedal.woodbrass;
+        }
+
+        if (store.includes("thomann")) {
+          url = buildThomannUrl(selectedPedal.thomann);
+        }
+
+        if (!url) return null;
+
+        const storeData = {
+  sweetwater: { label: "Sweetwater", logo: "/logos/sweetwater.png" },
+  woodbrass: { label: "Woodbrass", logo: "/logos/woodbrass.png" },
+  reverb: { label: "Reverb", logo: "/logos/reverb.png" },
+  thomann: { label: "Thomann", logo: "/logos/thomann.png" },
+};
+
+const key =
+  store.includes("thomann") ? "thomann" : store;
+
+const data = storeData[key as keyof typeof storeData];
+
+return (
+  <a
+    key={store}
+    href={url}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="flex items-center gap-3 px-4 py-3 hover:bg-zinc-800 text-[11px] font-bold"
+  >
+    <img
+      src={data.logo}
+      alt={data.label}
+      className="w-4 h-4 object-contain"
+    />
+    {data.label}
+  </a>
+);
+
+      })}
+    </div>
+  )}
+</div>
+
             </div>
           </div>
         </div>
@@ -544,26 +673,87 @@ export default function Sidebar({
                 {t("sidebar.buyOnline")}
               </span>
 
-              <a
-                href={
-                  (selectedBoardDetails.status || "").toLowerCase().includes("discontinued")
-                    ? `https://reverb.com/marketplace?query=${encodeURIComponent(
-                        selectedBoardDetails.brand + " " + selectedBoardDetails.name
-                      )}`
-                    : selectedBoardDetails.thomann
-                }
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-between w-full px-4 py-3 mt-3 bg-blue-600/10 border border-blue-500/20 rounded-xl hover:bg-blue-600 transition-all group"
-              >
-                <div className="flex items-center gap-3">
-                  <ShoppingCart size={16} className="text-blue-400 group-hover:text-white" />
-                  <span className="text-[11px] font-black uppercase tracking-widest group-hover:text-white text-blue-400">
-                    {t("sidebar.shop")}
-                  </span>
-                </div>
-                <ExternalLink size={14} className="text-blue-400/50 group-hover:text-white" />
-              </a>
+              <div className="relative mt-3" ref={shopRef}>
+  <button
+    onClick={() => setShopOpen((v) => !v)}
+    className="flex items-center justify-between w-full px-4 py-3 bg-blue-600/10 border border-blue-500/20 rounded-xl hover:bg-blue-600 transition-all group"
+  >
+    <div className="flex items-center gap-3">
+      <ShoppingCart size={16} className="text-blue-400 group-hover:text-white" />
+      <span className="text-[11px] font-black uppercase tracking-widest text-blue-400 group-hover:text-white">
+        {t("sidebar.shop")}
+      </span>
+    </div>
+    <ChevronDown
+      size={14}
+      className={`text-blue-400 transition-transform ${
+        shopOpen ? "rotate-180" : ""
+      }`}
+    />
+  </button>
+
+  {shopOpen && (
+    <div className="absolute left-0 right-0 mt-2 bg-zinc-900 border border-zinc-800 rounded-xl shadow-xl z-50 overflow-hidden">
+
+      {((selectedBoardDetails.status || "").toLowerCase().includes("discontinued")
+        ? ["reverb"]
+        : getStoresForCountry()
+      ).map((store) => {
+
+        let url = "";
+
+        if (store === "reverb") {
+          url = `https://reverb.com/marketplace?query=${encodeURIComponent(
+            selectedBoardDetails.brand + " " + selectedBoardDetails.name
+          )}`;
+        }
+
+        if (store === "sweetwater") {
+          url = selectedBoardDetails.sweetwater;
+        }
+
+        if (store === "woodbrass") {
+          url = selectedBoardDetails.woodbrass;
+        }
+
+        if (store.includes("thomann")) {
+          url = buildThomannUrl(selectedBoardDetails.thomann);
+        }
+
+        if (!url) return null;
+
+        return (
+          <a
+            key={store}
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-3 px-4 py-3 hover:bg-zinc-800 text-[11px] font-bold"
+          >
+            {store === "reverb" && (
+              <img src="/logos/reverb.png" className="w-5 h-5 object-contain" />
+            )}
+            {store === "sweetwater" && (
+              <img src="/logos/sweetwater.png" className="w-5 h-5 object-contain" />
+            )}
+            {store === "woodbrass" && (
+              <img src="/logos/woodbrass.png" className="w-5 h-5 object-contain" />
+            )}
+            {store.includes("thomann") && (
+              <img src="/logos/thomann.png" className="w-5 h-5 object-contain" />
+            )}
+
+            {store === "reverb" && "Reverb"}
+            {store === "sweetwater" && "Sweetwater"}
+            {store === "woodbrass" && "Woodbrass"}
+            {store.includes("thomann") && "Thomann"}
+          </a>
+        );
+      })}
+    </div>
+  )}
+</div>
+
             </div>
           </div>
         </div>
@@ -914,7 +1104,12 @@ export default function Sidebar({
             )}
           </div>
 
-          {/* PUSH TO BOTTOM */}
+
+
+
+        </>
+      )}
+                {/* PUSH TO BOTTOM */}
 <div className="mt-auto" />
 
 {/* FEEDBACK + DONATE */}
@@ -931,10 +1126,10 @@ export default function Sidebar({
       "share ideas for improvements, or write in any language you like)%0D%0A%0D%0A" +
       "Thanks for using MakeYourBoard 🙂")
     }
-    className="flex items-center gap-2 group"
+    className="flex items-center gap-2 group cursor-pointer"
   >
     <span className="text-[12px]">💬</span>
-    <span className="text-[10px] font-black uppercase tracking-widest group-hover:text-white transition-colors">
+    <span className="text-[10px] font-black uppercase tracking-widest group-hover:text-blue-400 transition-colors duration-200">
       {t("footer.feedback")}
     </span>
   </a>
@@ -944,10 +1139,10 @@ export default function Sidebar({
   href="https://buy.stripe.com/14A8wPeGZ8uQ0tQ96I8Zq00"
   target="_blank"
   rel="noopener noreferrer"
-  className="flex items-center gap-2 group"
+  className="flex items-center gap-2 group cursor-pointer"
 >
   <span className="text-[12px]">❤️</span>
-  <span className="text-[10px] font-black uppercase tracking-widest group-hover:text-white transition-colors">
+  <span className="text-[10px] font-black uppercase tracking-widest group-hover:text-blue-400 transition-colors duration-200">
     {t("footer.donate")}
   </span>
 </a>
@@ -955,9 +1150,6 @@ export default function Sidebar({
 
 </div>
 
-
-        </>
-      )}
     </div>
   );
 }
