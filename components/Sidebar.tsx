@@ -115,7 +115,7 @@ export default function Sidebar({
 }: Props) {
 
   const t = getTranslator(language);
-  const [country, setCountry] = React.useState<string>("DE");
+  const [country, setCountry] = React.useState<string>("FR");
 
 React.useEffect(() => {
   let cancelled = false;
@@ -1149,7 +1149,7 @@ return (
   rel="noopener noreferrer"
   className="flex items-center gap-2 group cursor-pointer"
 >
-  <span className="text-[12px]">❤️</span>
+  <span className="text-[12px]">☕️</span>
   <span className="text-[10px] font-black uppercase tracking-light text-zinc-500 group-hover:text-white transition-colors duration-200">
     {t("footer.donate")}
   </span>
