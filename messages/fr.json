@@ -31,7 +31,7 @@
     "origin": "Origine"
   },
   "custom": {
-    "title": "Créer le vôtre",
+    "title": "Créer la vôtre",
     "name": "Nom (optionnel)",
     "width": "Largeur",
     "depth": "Profondeur",
@@ -61,6 +61,6 @@
   },
   "footer": {
     "feedback": "Avis",
-    "donate": "Soutenir le projet"
+    "donate": "Offrez-moi un café"
   }
 }

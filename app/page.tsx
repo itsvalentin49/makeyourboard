@@ -347,32 +347,47 @@ useEffect(() => {
   };
 
   const addPedal = (pedal: AnyRow) => {
-    const newPedal: BoardItem = {
-      ...pedal,
-      instanceId: Date.now(),
-      x: (dimensions.width - 320) / 2,
-      y: (dimensions.height - 56) / 2,
-      rotation: 0,
-      draw: Number(pedal.draw) || 0,
-      weight: Number(pedal.weight) || 0,
-    };
-    updateActiveProject({ boardPedals: [...activeProject.boardPedals, newPedal] });
-    closeSearchMenus();
+  const isMobile = dimensions.width < 768;
+  const sidebarWidth = isMobile ? 0 : 320;
+
+  const newPedal: BoardItem = {
+    ...pedal,
+    instanceId: Date.now(),
+    x: (dimensions.width - sidebarWidth) / 2,
+    y: (dimensions.height - 56) / 2,
+    rotation: 0,
+    draw: Number(pedal.draw) || 0,
+    weight: Number(pedal.weight) || 0,
   };
+
+  updateActiveProject({
+    boardPedals: [...activeProject.boardPedals, newPedal],
+  });
+
+  closeSearchMenus();
+};
+
 
   const selectBoard = (board: AnyRow) => {
-    const newBoard: BoardItem = {
-      ...board,
-      instanceId: Date.now(),
-      x: (dimensions.width - 320) / 2,
-      y: (dimensions.height - 56) / 2,
-      rotation: 0,
-    };
-    updateActiveProject({ selectedBoards: [...activeProject.selectedBoards, newBoard] });
-    closeSearchMenus();
+  const isMobile = dimensions.width < 768;
+  const sidebarWidth = isMobile ? 0 : 320;
+
+  const newBoard: BoardItem = {
+    ...board,
+    instanceId: Date.now(),
+    x: (dimensions.width - sidebarWidth) / 2,
+    y: (dimensions.height - 56) / 2,
+    rotation: 0,
   };
 
-  const addCustomItem = () => {
+  updateActiveProject({
+    selectedBoards: [...activeProject.selectedBoards, newBoard],
+  });
+
+  closeSearchMenus();
+};
+
+const addCustomItem = () => {
   if (!customWidth || !customDepth) return;
 
   const widthMm =
@@ -385,34 +400,32 @@ useEffect(() => {
       ? parseFloat(customDepth)
       : parseFloat(customDepth) * 25.4;
 
+  const isMobile = dimensions.width < 768;
+  const sidebarWidth = isMobile ? 0 : 320;
+
   const item: BoardItem = {
     instanceId: Date.now(),
-    name: customName || `Custom ${customType}`,
+    name: customName || `Custom item`,
     brand: "Custom",
     width: widthMm,
     depth: depthMm,
     color: customColor,
-    x: (dimensions.width - 320) / 2,
+    x: (dimensions.width - sidebarWidth) / 2,
     y: (dimensions.height - 56) / 2,
     rotation: 0,
     draw: 0,
     weight: 0,
   };
 
-  if (customType === "pedal") {
-    updateActiveProject({
-      boardPedals: [...activeProject.boardPedals, item],
-    });
-  } else {
-    updateActiveProject({
-      selectedBoards: [...activeProject.selectedBoards, item],
-    });
-  }
+  updateActiveProject({
+    boardPedals: [...activeProject.boardPedals, item],
+  });
 
   setCustomWidth("");
   setCustomDepth("");
   setCustomName("");
 };
+
 
 
   const rotatePedal = (id: number) => {
@@ -463,8 +476,13 @@ const deleteBoard = (id: number) => {
     const w = (isVertical ? size.h : size.w) * (currentZoom / 100);
     const h = (isVertical ? size.w : size.h) * (currentZoom / 100);
 
-    const stageW = dimensions.width - 320;
-    const stageH = dimensions.height - 56;
+    const isMobile = dimensions.width < 768;
+    const sidebarWidth = isMobile ? 0 : 320;
+    const topbarHeight = 56;
+
+    const stageW = dimensions.width - sidebarWidth;
+    const stageH = dimensions.height - topbarHeight;
+
 
     return {
       x: Math.max(w / 2, Math.min(stageW - w / 2, pos.x)),
@@ -474,10 +492,11 @@ const deleteBoard = (id: number) => {
 
   return (
     <div
-      className="flex w-full bg-zinc-950 text-white overflow-hidden font-sans fixed inset-0 select-none"
-      style={{ height: "100dvh" }}
-      onClick={closeSearchMenus}
-    >
+  className="flex flex-col md:flex-row w-full bg-zinc-950 text-white overflow-hidden font-sans fixed inset-0 select-none"
+  style={{ height: "100dvh" }}
+  onClick={closeSearchMenus}
+>
+
       <Sidebar
         pedalsLibrary={pedalsLibrary}
         boardsLibrary={boardsLibrary}
