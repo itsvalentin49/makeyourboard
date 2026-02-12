@@ -492,7 +492,7 @@ const deleteBoard = (id: number) => {
 
   return (
     <div
-  className="flex flex-col md:flex-row w-full bg-zinc-950 text-white overflow-hidden font-sans fixed inset-0 select-none"
+  className="flex w-full bg-zinc-950 text-white overflow-hidden font-sans fixed inset-0 select-none"
   style={{ height: "100dvh" }}
   onClick={closeSearchMenus}
 >
