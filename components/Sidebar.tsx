@@ -142,6 +142,17 @@ export default function Sidebar({
   const minMm = customType === "pedal" ? 30 : 100;
   const maxMm = customType === "pedal" ? 300 : 1000;
 
+  // Convert for display (rounded to 1 decimal in inches)
+  const displayMin =
+    units === "metric"
+      ? minMm
+      : Math.round(mmToIn(minMm) * 10) / 10;
+
+  const displayMax =
+    units === "metric"
+      ? maxMm
+      : Math.round(mmToIn(maxMm) * 10) / 10;
+
   const minValue =
   units === "metric" ? minMm : mmToIn(minMm);
   const maxValue =
@@ -1066,13 +1077,18 @@ return (
 
     {/* PEDAL FLOW */}
     {customType === "pedal" && (
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-0.5">
+  <span className="text-[9px] text-white uppercase font-black tracking-widest leading-tight">
+    {t("custom.enterDimensions")}
+  </span>
 
-        <span className="text-[9px] text-white uppercase font-black tracking-widest">
-          {t("custom.enterDimensions")}
-        </span>
+  <span className="text-[9px] text-zinc-500 font-mono leading-tight">
+    min: {displayMin} {unitLabel} / max: {displayMax} {unitLabel}
+  </span>
+</div>
 
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-2 mt-2">
 
           <input
             type="number"
@@ -1101,7 +1117,7 @@ return (
         <button
   onClick={addCustomItem}
   disabled={!isPedalValid}
-  className={`w-full text-[10px] font-black uppercase py-2 rounded-md transition-all ${
+  className={`w-full text-[10px] mt-2 font-black uppercase py-2 rounded-md transition-all ${
     !isPedalValid
       ? "bg-zinc-800 text-zinc-500 cursor-not-allowed"
       : "bg-blue-600 hover:bg-blue-500 text-white"
@@ -1114,53 +1130,59 @@ return (
     )}
 
     {/* BOARD FLOW */}
-    {customType === "board" && (
-      <div className="flex flex-col gap-3">
+{customType === "board" && (
+  <div className="flex flex-col gap-1">
 
-        <span className="text-[9px] text-white uppercase font-black tracking-widest">
-          {t("custom.enterDimensions")}
-        </span>
+    <div className="flex flex-col gap-0.5">
+      <span className="text-[9px] text-white uppercase font-black tracking-widest leading-tight">
+        {t("custom.enterDimensions")}
+      </span>
 
-        <div className="grid grid-cols-2 gap-2">
+      <span className="text-[9px] text-zinc-500 font-mono leading-tight">
+        min: {displayMin} {unitLabel} / max: {displayMax} {unitLabel}
+      </span>
+    </div>
 
-          <input
-            type="number"
-            min={minValue}
-            max={maxValue}
-            step={units === "metric" ? 1 : 0.1}
-            placeholder={withUnit(t("custom.width"))}
-            value={customWidth}
-            onChange={(e) => setCustomWidth(e.target.value)}
-            className="w-full bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-[11px] outline-none focus:border-blue-500"
-          />
+    <div className="grid grid-cols-2 gap-2 mt-2">
 
-          <input
-            type="number"
-            min={minValue}
-            max={maxValue}
-            step={units === "metric" ? 1 : 0.1}
-            placeholder={withUnit(t("custom.depth"))}
-            value={customDepth}
-            onChange={(e) => setCustomDepth(e.target.value)}
-            className="w-full bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-[11px] outline-none focus:border-blue-500"
-          />
+      <input
+        type="number"
+        min={minValue}
+        max={maxValue}
+        step={units === "metric" ? 1 : 0.1}
+        placeholder={withUnit(t("custom.width"))}
+        value={customWidth}
+        onChange={(e) => setCustomWidth(e.target.value)}
+        className="w-full bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-[11px] outline-none focus:border-blue-500"
+      />
 
-        </div>
+      <input
+        type="number"
+        min={minValue}
+        max={maxValue}
+        step={units === "metric" ? 1 : 0.1}
+        placeholder={withUnit(t("custom.depth"))}
+        value={customDepth}
+        onChange={(e) => setCustomDepth(e.target.value)}
+        className="w-full bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-[11px] outline-none focus:border-blue-500"
+      />
 
-        <button
-  onClick={addCustomItem}
-  disabled={!isBoardValid}
-  className={`w-full text-[10px] font-black uppercase py-2 rounded-md transition-all ${
-    !isBoardValid
-      ? "bg-zinc-800 text-zinc-500 cursor-not-allowed"
-      : "bg-blue-600 hover:bg-blue-500 text-white"
-  }`}
->
-  {t("custom.addBoard")}
-</button>
+    </div>
 
-      </div>
-    )}
+    <button
+      onClick={addCustomItem}
+      disabled={!isBoardValid}
+      className={`w-full mt-2 text-[10px] font-black uppercase py-2 rounded-md transition-all ${
+        !isBoardValid
+          ? "bg-zinc-800 text-zinc-500 cursor-not-allowed"
+          : "bg-blue-600 hover:bg-blue-500 text-white"
+      }`}
+    >
+      {t("custom.addBoard")}
+    </button>
+
+  </div>
+)}
 
   </div>
 </div>
