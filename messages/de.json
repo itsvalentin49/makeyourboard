@@ -30,24 +30,32 @@
     "weight": "Gewicht",
     "origin": "Herkunft"
   },
+
   "custom": {
-    "title": "Eigenes erstellen",
-    "name": "Name (optional)",
+    "title": "Benutzerdefiniertes Pedal oder Board hinzufügen",
+    "selectType": "Pedal oder Board auswählen",
+    "pedal": "Pedal",
+    "board": "Board",
+    "enterDimensions": "Abmessungen eingeben",
     "width": "Breite",
     "depth": "Tiefe",
-    "add": "Hinzufügen"
+    "addPedal": "Benutzerdefiniertes Pedal hinzufügen",
+    "addBoard": "Benutzerdefiniertes Board hinzufügen"
   },
+
   "settings": {
     "title": "Einstellungen",
     "background": "Hintergrund",
     "language": "Sprache",
     "units": "Einheiten"
   },
+
   "backgrounds": {
     "neutral": "Neutral",
     "wood": "Holz",
     "marble": "Marmor"
   },
+
   "language": {
     "en": "Englisch",
     "fr": "Französisch",
@@ -56,10 +64,12 @@
     "it": "Italienisch",
     "pt": "Portugiesisch"
   },
+
   "canvas": {
     "totalDraw": "Gesamtstrom",
     "totalWeight": "Gesamtgewicht"
   },
+
   "footer": {
     "feedback": "Kontakt",
     "donate": "Lad mich auf einen Kaffee ein"
@@ -69,6 +79,6 @@
   "confirmDelete": "Möchten Sie dieses Projekt wirklich löschen?",
   "yes": "Ja",
   "cancel": "Abbrechen"
-}
+  }
 
 }

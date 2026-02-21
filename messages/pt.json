@@ -34,11 +34,15 @@
   },
 
   "custom": {
-    "title": "Crie o seu",
-    "name": "Nome (opcional)",
+    "title": "Adicionar pedal ou pedalboard personalizado",
+    "selectType": "Selecionar pedal ou pedalboard",
+    "pedal": "Pedal",
+    "board": "Board",
+    "enterDimensions": "Inserir dimensões",
     "width": "Largura",
     "depth": "Profundidade",
-    "add": "Adicionar personalizado"
+    "addPedal": "Adicionar pedal personalizado",
+    "addBoard": "Adicionar pedalboard personalizado"
   },
 
   "settings": {

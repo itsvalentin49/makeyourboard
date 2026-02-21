@@ -138,6 +138,41 @@ export default function Sidebar({
 }: Props) {
 
   const t = getTranslator(language);
+  const mmToIn = (mm: number) => mm / 25.4;
+  const minMm = customType === "pedal" ? 30 : 100;
+  const maxMm = customType === "pedal" ? 300 : 1000;
+
+  const minValue =
+  units === "metric" ? minMm : mmToIn(minMm);
+  const maxValue =
+  units === "metric" ? maxMm : mmToIn(maxMm);
+
+  // Convert UI values to mm for validation
+  const widthMm =
+    units === "metric"
+      ? Number(customWidth)
+      : Number(customWidth) * 25.4;
+
+  const depthMm =
+    units === "metric"
+      ? Number(customDepth)
+      : Number(customDepth) * 25.4;
+
+  const isPedalValid =
+    widthMm >= 30 &&
+    widthMm <= 300 &&
+    depthMm >= 30 &&
+    depthMm <= 300;
+
+  const isBoardValid =
+    widthMm >= 100 &&
+    widthMm <= 1000 &&
+    depthMm >= 100 &&
+    depthMm <= 1000;
+
+  const unitLabel = units === "metric" ? "mm" : "in";
+  const withUnit = (label: string) =>
+    `${label} (${unitLabel})`;
   const isCustomPedal = selectedPedal?.brand === "Custom";
   const isCustomBoard = selectedBoardDetails?.brand === "Custom";
   const [country, setCountry] = React.useState<string>("FR");
@@ -984,7 +1019,7 @@ return (
   <div className="flex items-center gap-2 px-1">
     <div className="w-[2px] h-3 bg-blue-500 rounded-full"></div>
     <span className="text-[10px] font-black uppercase tracking-widest">
-      Add a Custom Pedal or Board
+      {t("custom.title")}
     </span>
   </div>
 
@@ -994,7 +1029,7 @@ return (
     {/* SELECT TYPE */}
     <div className="flex flex-col gap-2">
       <span className="text-[9px] text-white uppercase font-black tracking-widest">
-        Select pedal or board
+        {t("custom.selectType")}
       </span>
 
       <div className="grid grid-cols-2 gap-2">
@@ -1022,7 +1057,7 @@ return (
                 }
               `}
             >
-              {option}
+              {t(`custom.${option}`)}
             </button>
           );
         })}
@@ -1034,16 +1069,17 @@ return (
       <div className="flex flex-col gap-3">
 
         <span className="text-[9px] text-white uppercase font-black tracking-widest">
-          Enter dimensions (30–300 mm)
+          {t("custom.enterDimensions")}
         </span>
 
         <div className="grid grid-cols-2 gap-2">
 
           <input
             type="number"
-            min="30"
-            max="300"
-            placeholder="Width (mm)"
+            min={minValue}
+            max={maxValue}
+            step={units === "metric" ? 1 : 0.1}
+            placeholder={withUnit(t("custom.width"))}
             value={customWidth}
             onChange={(e) => setCustomWidth(e.target.value)}
             className="w-full bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-[11px] outline-none focus:border-blue-500"
@@ -1051,9 +1087,10 @@ return (
 
           <input
             type="number"
-            min="30"
-            max="300"
-            placeholder="Depth (mm)"
+            min={minValue}
+            max={maxValue}
+            step={units === "metric" ? 1 : 0.1}
+            placeholder={withUnit(t("custom.depth"))}
             value={customDepth}
             onChange={(e) => setCustomDepth(e.target.value)}
             className="w-full bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-[11px] outline-none focus:border-blue-500"
@@ -1062,28 +1099,16 @@ return (
         </div>
 
         <button
-          onClick={addCustomItem}
-          disabled={
-            !customWidth ||
-            !customDepth ||
-            Number(customWidth) < 30 ||
-            Number(customWidth) > 300 ||
-            Number(customDepth) < 30 ||
-            Number(customDepth) > 300
-          }
-          className={`w-full text-[10px] font-black uppercase py-2 rounded-md transition-all ${
-            !customWidth ||
-            !customDepth ||
-            Number(customWidth) < 30 ||
-            Number(customWidth) > 300 ||
-            Number(customDepth) < 30 ||
-            Number(customDepth) > 300
-              ? "bg-zinc-800 text-zinc-500 cursor-not-allowed"
-              : "bg-blue-600 hover:bg-blue-500 text-white"
-          }`}
-        >
-          Add Custom Pedal
-        </button>
+  onClick={addCustomItem}
+  disabled={!isPedalValid}
+  className={`w-full text-[10px] font-black uppercase py-2 rounded-md transition-all ${
+    !isPedalValid
+      ? "bg-zinc-800 text-zinc-500 cursor-not-allowed"
+      : "bg-blue-600 hover:bg-blue-500 text-white"
+  }`}
+>
+  {t("custom.addPedal")}
+</button>
 
       </div>
     )}
@@ -1093,16 +1118,17 @@ return (
       <div className="flex flex-col gap-3">
 
         <span className="text-[9px] text-white uppercase font-black tracking-widest">
-          Enter dimensions (100–1000 mm)
+          {t("custom.enterDimensions")}
         </span>
 
         <div className="grid grid-cols-2 gap-2">
 
           <input
             type="number"
-            min="100"
-            max="1000"
-            placeholder="Width (mm)"
+            min={minValue}
+            max={maxValue}
+            step={units === "metric" ? 1 : 0.1}
+            placeholder={withUnit(t("custom.width"))}
             value={customWidth}
             onChange={(e) => setCustomWidth(e.target.value)}
             className="w-full bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-[11px] outline-none focus:border-blue-500"
@@ -1110,9 +1136,10 @@ return (
 
           <input
             type="number"
-            min="100"
-            max="1000"
-            placeholder="Depth (mm)"
+            min={minValue}
+            max={maxValue}
+            step={units === "metric" ? 1 : 0.1}
+            placeholder={withUnit(t("custom.depth"))}
             value={customDepth}
             onChange={(e) => setCustomDepth(e.target.value)}
             className="w-full bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-[11px] outline-none focus:border-blue-500"
@@ -1121,28 +1148,16 @@ return (
         </div>
 
         <button
-          onClick={addCustomItem}
-          disabled={
-            !customWidth ||
-            !customDepth ||
-            Number(customWidth) < 100 ||
-            Number(customWidth) > 1000 ||
-            Number(customDepth) < 100 ||
-            Number(customDepth) > 1000
-          }
-          className={`w-full text-[10px] font-black uppercase py-2 rounded-md transition-all ${
-            !customWidth ||
-            !customDepth ||
-            Number(customWidth) < 100 ||
-            Number(customWidth) > 1000 ||
-            Number(customDepth) < 100 ||
-            Number(customDepth) > 1000
-              ? "bg-zinc-800 text-zinc-500 cursor-not-allowed"
-              : "bg-blue-600 hover:bg-blue-500 text-white"
-          }`}
-        >
-          Add Custom Board
-        </button>
+  onClick={addCustomItem}
+  disabled={!isBoardValid}
+  className={`w-full text-[10px] font-black uppercase py-2 rounded-md transition-all ${
+    !isBoardValid
+      ? "bg-zinc-800 text-zinc-500 cursor-not-allowed"
+      : "bg-blue-600 hover:bg-blue-500 text-white"
+  }`}
+>
+  {t("custom.addBoard")}
+</button>
 
       </div>
     )}

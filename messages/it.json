@@ -31,12 +31,16 @@
     "origin": "Origine"
   },
   "custom": {
-    "title": "Crea il tuo",
-    "name": "Nome (opzionale)",
+    "title": "Aggiungi pedale o pedalboard personalizzato",
+    "selectType": "Seleziona pedale o pedalboard",
+    "pedal": "Pedale",
+    "board": "Board",
+    "enterDimensions": "Inserisci dimensioni",
     "width": "Larghezza",
     "depth": "Profondità",
-    "add": "Aggiungi"
-  },
+    "addPedal": "Aggiungi pedale personalizzato",
+    "addBoard": "Aggiungi pedalboard personalizzato"
+    },
   "settings": {
     "title": "Impostazioni",
     "background": "Sfondo",

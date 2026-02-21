@@ -399,8 +399,15 @@ const addCustomItem = () => {
   const isMobile = dimensions.width < 768;
   const sidebarWidth = isMobile ? 0 : 320;
 
-  const widthMm = Number(customWidth);
-  const depthMm = Number(customDepth);
+  const widthMm =
+  units === "metric"
+    ? Number(customWidth)
+    : Number(customWidth) * 25.4;
+
+  const depthMm =
+    units === "metric"
+      ? Number(customDepth)
+      : Number(customDepth) * 25.4;
 
   // 🎛 PEDAL (30–300)
   if (customType === "pedal") {

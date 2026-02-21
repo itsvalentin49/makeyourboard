@@ -30,13 +30,19 @@
     "weight": "Peso",
     "origin": "Origen"
   },
+
   "custom": {
-    "title": "Crea el suyo",
-    "name": "Nombre (opcional)",
+    "title": "Añadir pedal o pedalboard personalizado",
+    "selectType": "Seleccionar pedal o pedalboard",
+    "pedal": "Pedal",
+    "board": "Board",
+    "enterDimensions": "Introducir dimensiones",
     "width": "Ancho",
     "depth": "Profundidad",
-    "add": "Añadir"
+    "addPedal": "Añadir pedal personalizado",
+    "addBoard": "Añadir pedalboard personalizado"
   },
+
   "settings": {
     "title": "Configuración",
     "background": "Fondo",

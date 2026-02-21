@@ -31,11 +31,16 @@
     "origin": "Origine"
   },
   "custom": {
-    "title": "Créer la vôtre",
-    "name": "Nom (optionnel)",
+    "title": "Ajouter une pédale ou un board custom",
+    "selectType": "Sélectionner pédale ou board",
+    "pedal": "Pédale",
+    "board": "Board",
+    "enterDimensions": "Entrer les dimensions",
     "width": "Largeur",
     "depth": "Profondeur",
-    "add": "Ajouter"
+    "addPedal": "Ajouter la pédale custom",
+    "addBoard": "Ajouter le board custom"
+
   },
   "settings": {
     "title": "Paramètres",

@@ -34,11 +34,15 @@
   },
 
   "custom": {
-    "title": "Make your own",
-    "name": "Name (optional)",
+    "title": "Add a Custom Pedal or Board",
+    "selectType": "Select Pedal or Board",
+    "pedal": "Pedal",
+    "board": "Board",
+    "enterDimensions": "Enter Dimensions",
     "width": "Width",
     "depth": "Depth",
-    "add": "Add custom"
+    "addPedal": "Add Custom Pedal",
+    "addBoard": "Add Custom Board"
   },
 
   "settings": {
