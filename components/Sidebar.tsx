@@ -16,6 +16,18 @@ import SidebarLogo from "@/components/SidebarLogo";
 import { mmToIn, formatWeight } from "@/utils/units";
 import { getTranslator } from "@/utils/i18n";
 
+const HAMMOND_RATIOS: Record<
+  "1590LB" | "1590A" | "1590B" | "125B" | "1590BB" | "1590XX" | "1590DD",
+  number
+> = {
+  "1590LB": 51 / 51,
+  "1590A": 93 / 39,
+  "1590B": 112 / 60,
+  "125B": 121 / 66,
+  "1590BB": 119 / 94,
+  "1590XX": 114 / 114,
+  "1590DD": 130 / 171,
+};
 
 type AnyRow = Record<string, any>;
 
@@ -52,6 +64,13 @@ type Props = {
   setCustomDepth: (v: string) => void;
   customColor: string;
   setCustomColor: (v: string) => void;
+  customType: "pedal" | "board" | null;
+  setCustomType: (v: "pedal" | "board" | null) => void;
+  makeOpen: boolean;
+  setMakeOpen: (v: boolean) => void;
+
+
+
 
   // Actions (callbacks from page)
   addPedal: (p: AnyRow) => void;
@@ -66,8 +85,8 @@ type Props = {
   canvasBg: string;
   setCanvasBg: (v: string) => void;
 
-  language: "en" | "fr" | "es" | "de" | "it";
-  setLanguage: (v: "en" | "fr" | "es" | "de" | "it") => void;
+  language: "en" | "fr" | "es" | "de" | "it"| "pt";
+  setLanguage: (v: "en" | "fr" | "es" | "de" | "it" | "pt") => void;
 
   units: "metric" | "imperial";
   setUnits: (v: "metric" | "imperial") => void;
@@ -99,6 +118,8 @@ export default function Sidebar({
   setCustomDepth,
   customColor,
   setCustomColor,
+  customType,
+  setCustomType,
   addPedal,
   selectBoard,
   addCustomItem,
@@ -112,9 +133,13 @@ export default function Sidebar({
   setLanguage,
   units,
   setUnits,
+  makeOpen,
+  setMakeOpen,
 }: Props) {
 
   const t = getTranslator(language);
+  const isCustomPedal = selectedPedal?.brand === "Custom";
+  const isCustomBoard = selectedBoardDetails?.brand === "Custom";
   const [country, setCountry] = React.useState<string>("FR");
 
 React.useEffect(() => {
@@ -145,6 +170,7 @@ React.useEffect(() => {
   const [shopOpen, setShopOpen] = React.useState(false);
   const shopRef = React.useRef<HTMLDivElement>(null);
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [formatOpen, setFormatOpen] = React.useState(false);
 
 
   const getStoresForCountry = () => {
@@ -163,6 +189,7 @@ React.useEffect(() => {
   if (c === "DE") return ["thomann_de"];
   if (c === "ES") return ["thomann_es"];
   if (c === "IT") return ["thomann_it"];
+  if (c === "PT") return ["thomann_pt"];
 
   return ["thomann_de"];
 };
@@ -180,6 +207,7 @@ const buildThomannUrl = (slug: string) => {
     DE: "thomann.de",
     ES: "thomann.es",
     IT: "thomann.it",
+    PT: "thomann.pt",
   };
 
 
@@ -224,7 +252,8 @@ const buildThomannUrl = (slug: string) => {
     .split(" ")
     .filter(Boolean);
 
-  const haystack = `${item.brand ?? ""} ${item.name ?? ""}`.toLowerCase();
+  const haystack = `${item.brand ?? ""} ${item.name ?? ""} ${item.type ?? ""}`.toLowerCase();
+
 
   const matchesAll = terms.every((t) => haystack.includes(t));
 
@@ -264,7 +293,11 @@ const buildThomannUrl = (slug: string) => {
         ${mobileOpen ? "translate-x-0" : "-translate-x-full"}
         md:relative md:translate-x-0
       `}
-      onClick={(e) => e.stopPropagation()}
+      onClick={(e) => {
+  e.stopPropagation();
+  setShowPedalResults(false);
+  setShowBoardResults(false);
+}}
     >
 
       <SidebarLogo />
@@ -287,16 +320,23 @@ const buildThomannUrl = (slug: string) => {
             <ArrowLeft className="size-4" /> {t("sidebar.back")}
           </button>
 
-          <div className="space-y-1">
+
+          <div className={`${isCustomPedal ? "hidden" : "space-y-1"}`}>
+            {!isCustomPedal && (
             <p className="text-blue-500 text-[12px] font-black uppercase tracking-[0.2em]">
               {selectedPedal.brand}
-            </p>
+            </p>)}
+
+            {!isCustomPedal && (
             <h2 className="text-l font-black text-[16px] leading-tight">
               {selectedPedal.name}
-            </h2>
+            </h2>)}
+
+            {!isCustomPedal && (
             <p className="text-zinc-500 text-[10px] font-medium">
               {selectedPedal.year || "No date"}
             </p>
+          )}
 {/*
             <div className="py-2 border-zinc-900">
               <p className="text-[12px] text-zinc-400 font-medium">
@@ -324,10 +364,10 @@ const buildThomannUrl = (slug: string) => {
   <div className="flex items-center gap-3">
     <RotateCw
       size={16}
-      className="text-zinc-300 group-hover:text-white
+      className="text-white group-hover:text-white
       group-active:rotate-90 transition-transform duration-200"
     />
-    <span className="text-[10px] font-black uppercase tracking-widest text-zinc-300 group-hover:text-white">
+    <span className="text-[10px] font-black uppercase tracking-widest text-white group-hover:text-white">
       {t("sidebar.rotate")}
     </span>
   </div>
@@ -348,8 +388,8 @@ const buildThomannUrl = (slug: string) => {
   transition-all duration-200"
 >
   <div className="flex items-center gap-3">
-    <Trash2 size={16} className="text-zinc-400 group-hover:text-white transition-colors" />
-    <span className="text-[10px] font-black uppercase tracking-widest text-zinc-300 group-hover:text-white">
+    <Trash2 size={16} className="text-white group-hover:text-white transition-colors" />
+    <span className="text-[10px] font-black uppercase tracking-widest text-white group-hover:text-white">
       {t("sidebar.delete")}
     </span>
   </div>
@@ -359,7 +399,7 @@ const buildThomannUrl = (slug: string) => {
           </div>
 
           {/* PEDAL INFO */}
-          <div className="space-y-0.2 border-zinc-900">
+          <div className="space-y-0.5 border-zinc-900">
             <div className="flex justify-between items-center py-2 border-b border-t border-zinc-900">
               <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
                 {t("pedal.status")}
@@ -375,6 +415,7 @@ const buildThomannUrl = (slug: string) => {
               </span>
             </div>
 
+{!isCustomPedal && (
             <div className="flex justify-between items-center py-2 border-b border-zinc-900">
               <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
                 {t("pedal.type")}
@@ -382,8 +423,9 @@ const buildThomannUrl = (slug: string) => {
               <span className="text-[11px] font-bold font-mono text-zinc-300">
                 {selectedPedal.type || "N/A"}
               </span>
-            </div>
+            </div>)}
 
+            {!isCustomPedal && (
             <div className="flex justify-between items-center py-2 border-b border-zinc-900">
               <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
                 {t("pedal.circuit")}
@@ -391,8 +433,9 @@ const buildThomannUrl = (slug: string) => {
               <span className="text-[11px] font-bold font-mono text-zinc-300">
                 {selectedPedal.circuit || "N/A"}
               </span>
-            </div>
+            </div>)}
 
+            {!isCustomPedal && (
             <div className="flex justify-between items-center py-2 border-b border-zinc-900">
               <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
                 {t("pedal.bypass")}
@@ -400,8 +443,9 @@ const buildThomannUrl = (slug: string) => {
               <span className="text-[11px] font-bold font-mono text-zinc-300">
                 {selectedPedal.bypass || "N/A"}
               </span>
-            </div>
+            </div>)}
 
+            {!isCustomPedal && (
             <div className="flex justify-between items-center py-2 border-b border-zinc-900">
               <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
                 {t("pedal.power")}
@@ -409,8 +453,9 @@ const buildThomannUrl = (slug: string) => {
               <span className="text-[11px] font-bold font-mono text-zinc-300">
                 {selectedPedal.power || "N/A"}
               </span>
-            </div>
+            </div>)}
 
+            {!isCustomPedal && (
             <div className="flex justify-between items-center py-2 border-b border-zinc-900">
               <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
                 {t("pedal.draw")}
@@ -418,7 +463,7 @@ const buildThomannUrl = (slug: string) => {
               <span className="text-[11px] font-bold font-mono">
                 {selectedPedal.draw || 0} mA
               </span>
-            </div>
+            </div>)}
 
             <div className="flex justify-between items-center py-2 border-b border-zinc-900">
             <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
@@ -433,6 +478,7 @@ const buildThomannUrl = (slug: string) => {
             </span>
             </div>
 
+            {!isCustomPedal && (
             <div className="flex justify-between items-center py-2 border-b border-zinc-900">
             <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
               {t("pedal.weight")}
@@ -440,8 +486,9 @@ const buildThomannUrl = (slug: string) => {
             <span className="text-[11px] font-bold font-mono">
               {formatWeight(selectedPedal.weight || 0, units)}
             </span>
-            </div>
+            </div>)}
 
+            {!isCustomPedal && (
             <div className="flex justify-between items-center py-2 border-b border-zinc-900">
               <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
                {t("pedal.origin")}
@@ -449,8 +496,9 @@ const buildThomannUrl = (slug: string) => {
               <span className="text-[11px] font-bold text-zinc-300">
                 {selectedPedal.origin || "N/A"}
               </span>
-            </div>
+            </div>)}
 
+            {!isCustomPedal && (
             <div className="flex justify-between items-center py-2 border-b border-zinc-900">
               <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
                 {t("pedal.manual")}
@@ -467,9 +515,10 @@ const buildThomannUrl = (slug: string) => {
               ) : (
                 <span className="text-[11px] font-bold text-zinc-600">N/A</span>
               )}
-            </div>
+            </div>)}
 
-            <div className="pt-5 space-y-4">
+
+            <div className={`pt-5 space-y-4 ${isCustomPedal ? "hidden" : ""}`}>
               <span className="text-[10px] uppercase font-black tracking-wider">
                 {t("sidebar.buyOnline")}
               </span>
@@ -565,6 +614,7 @@ return (
             <ArrowLeft className="size-4" /> {t("sidebar.back")}
           </button>
 
+          {!isCustomBoard && (
           <div className="space-y-1">
             <p className="text-blue-500 text-[12px] font-black uppercase tracking-[0.2em]">
               {selectedBoardDetails.brand}
@@ -574,6 +624,7 @@ return (
               {selectedBoardDetails.year || "No date"}
             </p>
           </div>
+          )}
 
           {/* ACTIONS */}
 <div className="flex gap-2">
@@ -616,7 +667,7 @@ return (
     >
       <div className="flex items-center gap-3">
         <Trash2 size={16} />
-        <span className="text-[10px] font-black uppercase tracking-widest">
+        <span className="text-[10px] font-black uppercase tracking-widest text-white">
           {t("sidebar.delete")}
         </span>
       </div>
@@ -625,7 +676,7 @@ return (
 </div>
 
 
-          <div className="space-y-0.5 border-zinc-900 pt-4">
+          <div className="space-y-0.5 border-zinc-900">
             <div className="flex justify-between items-center py-2 border-b border-t border-zinc-900">
               <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
                 {t("board.status")}
@@ -641,7 +692,8 @@ return (
               </span>
             </div>
 
-            <div className="flex justify-between items-center py-2.5 border-b border-zinc-900">
+            {!isCustomBoard && (
+            <div className="flex justify-between items-center py-2 border-b border-zinc-900">
               <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
                 {t("board.material")}
               </span>
@@ -649,8 +701,10 @@ return (
                 {selectedBoardDetails.material || 0}
               </span>
             </div>
+            )}
 
-            <div className="flex justify-between items-center py-2.5 border-b border-zinc-900">
+            {!isCustomBoard && (
+            <div className="flex justify-between items-center py-2 border-b border-zinc-900">
               <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
                 {t("board.profile")}
               </span>
@@ -658,8 +712,9 @@ return (
                 {selectedBoardDetails.profile || 0}
               </span>
             </div>
+            )}
 
-            <div className="flex justify-between items-center py-2.5 border-b border-zinc-900">
+            <div className="flex justify-between items-center py-2 border-b border-zinc-900">
             <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
               {t("board.dimensions")}
             </span>
@@ -674,8 +729,8 @@ return (
             </span>
             </div>
 
-
-            <div className="flex justify-between items-center py-2.5 border-b border-zinc-900">
+            {!isCustomBoard && (
+            <div className="flex justify-between items-center py-2 border-b border-zinc-900">
             <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
               {t("board.weight")}
             </span>
@@ -683,9 +738,10 @@ return (
               {formatWeight(selectedBoardDetails.weight || 0, units)}
             </span>
             </div>
+            )}
 
-
-            <div className="flex justify-between items-center py-2.5 border-b border-zinc-900">
+            {!isCustomBoard && (
+            <div className="flex justify-between items-center py-2 border-b border-zinc-900">
               <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
                 {t("board.origin")}
               </span>
@@ -693,8 +749,9 @@ return (
                 {selectedBoardDetails.origin || 0}
               </span>
             </div>
+            )}
 
-            <div className="pt-5 space-y-4">
+            <div className={`pt-5 space-y-4 ${isCustomBoard ? "hidden" : ""}`}>
               <span className="text-[10px] uppercase font-black tracking-wider">
                 {t("sidebar.buyOnline")}
               </span>
@@ -920,71 +977,180 @@ return (
             </div>
           </div>
 
-          {/* MAKE YOUR OWN */}
-          <div className="flex flex-col gap-1 mt-2">
-            <div className="flex items-center gap-2 px-1">
-              <div className="w-[2px] h-3 bg-blue-500 rounded-full"></div>
-              <span className="text-[10px] font-black uppercase tracking-widest">
-                {t("custom.title")}
-              </span>
-            </div>
+         {/* MAKE YOUR OWN */}
+<div className="flex flex-col gap-4 mt-4">
 
-            <div className="p-4 bg-zinc-900/50 border border-zinc-800 rounded-xl space-y-4">
+  {/* HEADER */}
+  <div className="flex items-center gap-2 px-1">
+    <div className="w-[2px] h-3 bg-blue-500 rounded-full"></div>
+    <span className="text-[10px] font-black uppercase tracking-widest">
+      Add a Custom Pedal or Board
+    </span>
+  </div>
 
-              <input
-                type="text"
-                placeholder={t("custom.name")}
-                value={customName}
-                onChange={(e) => setCustomName(e.target.value)}
-                className="w-full bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-[11px] outline-none"
-              />
+  {/* GREY CONTAINER */}
+  <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 flex flex-col gap-4">
 
-              <div className="grid grid-cols-2 gap-2">
-                <input
-                  key={`width-${units}`}
-                  type="number"
-                  placeholder={`${t("custom.width")} (${units === "metric" ? "mm" : "in"})`}
-                  value={customWidth}
-                  onChange={(e) => setCustomWidth(e.target.value)}
-                  className="w-full bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-[11px] outline-none"
-                />
-                <input
-                  key={`depth-${units}`}
-                  type="number"
-                  placeholder={`${t("custom.depth")} (${units === "metric" ? "mm" : "in"})`}
-                  value={customDepth}
-                  onChange={(e) => setCustomDepth(e.target.value)}
-                  className="w-full bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-[11px] outline-none"
-                />
-              </div>
+    {/* SELECT TYPE */}
+    <div className="flex flex-col gap-2">
+      <span className="text-[9px] text-white uppercase font-black tracking-widest">
+        Select pedal or board
+      </span>
 
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2">
-                  <div
-                    className="relative size-6 rounded-full border border-zinc-700 overflow-hidden"
-                    style={{ backgroundColor: customColor }}
-                  >
-                    <input
-                      type="color"
-                      value={customColor}
-                      onChange={(e) => setCustomColor(e.target.value)}
-                      className="absolute inset-0 opacity-0 cursor-pointer"
-                    />
-                  </div>
-                  <span className="text-[10px] font-mono text-zinc-400 uppercase">
-                    {customColor}
-                  </span>
-                </div>
+      <div className="grid grid-cols-2 gap-2">
+        {["pedal", "board"].map((option) => {
+          const selected = customType === option;
 
-                <button
-                  onClick={addCustomItem}
-                  className="flex-1 bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-black uppercase py-2 rounded-lg transition-all flex items-center justify-center gap-2"
-                >
-                  <Plus size={14} /> {t("custom.add")}
-                </button>
-              </div>
-            </div>
-          </div>
+          return (
+            <button
+              key={option}
+              onClick={() => {
+                if (selected) {
+                  setCustomType(null);
+                } else {
+                  setCustomType(option as any);
+                }
+                setCustomWidth("");
+                setCustomDepth("");
+              }}
+              className={`py-2 text-[10px] font-black uppercase rounded-md border transition-all
+                bg-zinc-950
+                ${
+                  selected
+                    ? "border-blue-500 text-white"
+                    : "border-zinc-800 text-zinc-500 hover:border-zinc-600"
+                }
+              `}
+            >
+              {option}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+
+    {/* PEDAL FLOW */}
+    {customType === "pedal" && (
+      <div className="flex flex-col gap-3">
+
+        <span className="text-[9px] text-white uppercase font-black tracking-widest">
+          Enter dimensions (30–300 mm)
+        </span>
+
+        <div className="grid grid-cols-2 gap-2">
+
+          <input
+            type="number"
+            min="30"
+            max="300"
+            placeholder="Width (mm)"
+            value={customWidth}
+            onChange={(e) => setCustomWidth(e.target.value)}
+            className="w-full bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-[11px] outline-none focus:border-blue-500"
+          />
+
+          <input
+            type="number"
+            min="30"
+            max="300"
+            placeholder="Depth (mm)"
+            value={customDepth}
+            onChange={(e) => setCustomDepth(e.target.value)}
+            className="w-full bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-[11px] outline-none focus:border-blue-500"
+          />
+
+        </div>
+
+        <button
+          onClick={addCustomItem}
+          disabled={
+            !customWidth ||
+            !customDepth ||
+            Number(customWidth) < 30 ||
+            Number(customWidth) > 300 ||
+            Number(customDepth) < 30 ||
+            Number(customDepth) > 300
+          }
+          className={`w-full text-[10px] font-black uppercase py-2 rounded-md transition-all ${
+            !customWidth ||
+            !customDepth ||
+            Number(customWidth) < 30 ||
+            Number(customWidth) > 300 ||
+            Number(customDepth) < 30 ||
+            Number(customDepth) > 300
+              ? "bg-zinc-800 text-zinc-500 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-500 text-white"
+          }`}
+        >
+          Add Custom Pedal
+        </button>
+
+      </div>
+    )}
+
+    {/* BOARD FLOW */}
+    {customType === "board" && (
+      <div className="flex flex-col gap-3">
+
+        <span className="text-[9px] text-white uppercase font-black tracking-widest">
+          Enter dimensions (100–1000 mm)
+        </span>
+
+        <div className="grid grid-cols-2 gap-2">
+
+          <input
+            type="number"
+            min="100"
+            max="1000"
+            placeholder="Width (mm)"
+            value={customWidth}
+            onChange={(e) => setCustomWidth(e.target.value)}
+            className="w-full bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-[11px] outline-none focus:border-blue-500"
+          />
+
+          <input
+            type="number"
+            min="100"
+            max="1000"
+            placeholder="Depth (mm)"
+            value={customDepth}
+            onChange={(e) => setCustomDepth(e.target.value)}
+            className="w-full bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-[11px] outline-none focus:border-blue-500"
+          />
+
+        </div>
+
+        <button
+          onClick={addCustomItem}
+          disabled={
+            !customWidth ||
+            !customDepth ||
+            Number(customWidth) < 100 ||
+            Number(customWidth) > 1000 ||
+            Number(customDepth) < 100 ||
+            Number(customDepth) > 1000
+          }
+          className={`w-full text-[10px] font-black uppercase py-2 rounded-md transition-all ${
+            !customWidth ||
+            !customDepth ||
+            Number(customWidth) < 100 ||
+            Number(customWidth) > 1000 ||
+            Number(customDepth) < 100 ||
+            Number(customDepth) > 1000
+              ? "bg-zinc-800 text-zinc-500 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-500 text-white"
+          }`}
+        >
+          Add Custom Board
+        </button>
+
+      </div>
+    )}
+
+  </div>
+</div>
+
+
 
           {/* SETTINGS */}
           <div className="flex flex-col gap-1 mt-4">
@@ -1083,7 +1249,7 @@ return (
 
                   {langOpen && (
                     <div className="absolute z-50 mt-1 w-full bg-zinc-950 border border-zinc-800 rounded-lg overflow-hidden">
-                      {["en", "fr", "es", "de", "it"].map((l) => (
+                      {["en", "fr", "es", "de", "it", "pt"].map((l) => (
                         <button
                           key={l}
                           onClick={() => {

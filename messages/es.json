@@ -31,7 +31,7 @@
     "origin": "Origen"
   },
   "custom": {
-    "title": "Crea el tuyo",
+    "title": "Crea el suyo",
     "name": "Nombre (opcional)",
     "width": "Ancho",
     "depth": "Profundidad",
@@ -53,14 +53,22 @@
     "fr": "Francés",
     "es": "Español",
     "de": "Alemán",
-    "it": "Italiano"
+    "it": "Italiano",
+    "pt": "Portugués"
   },
   "canvas": {
     "totalDraw": "Consumo total",
     "totalWeight": "Peso total"
   },
   "footer": {
-    "feedback": "Opinión",
+    "feedback": "Contacto",
     "donate": "Invítame a un café"
-  }
+  },
+
+  "tabs": {
+  "confirmDelete": "¿Estás seguro de que quieres eliminar este proyecto?",
+  "yes": "Sí",
+  "cancel": "Cancelar"
+}
+
 }

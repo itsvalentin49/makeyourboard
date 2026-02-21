@@ -5,6 +5,8 @@ import { Edit2, X } from "lucide-react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import type { Project } from "@/types/project";
+import { getTranslator } from "@/utils/i18n";
+
 
 type Props = {
   project: Project;
@@ -19,6 +21,10 @@ type Props = {
   tempName: string;
   setTempName: (v: string) => void;
   saveName: () => void;
+
+  t: (key: string) => string;
+  
+
 };
 
 export default function SortableTab({
@@ -31,6 +37,7 @@ export default function SortableTab({
   tempName,
   setTempName,
   saveName,
+  t,
 }: Props) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
     useSortable({ id: project.id });
@@ -40,6 +47,8 @@ export default function SortableTab({
     transition,
     touchAction: "none",
     zIndex: isDragging ? 50 : "auto",
+
+
   };
 
   return (
@@ -90,16 +99,24 @@ export default function SortableTab({
         </button>
 
         <button
-          type="button"
-          aria-label="Delete project"
-          className="p-1 hover:text-red-500 transition-colors"
-          onClick={(e) => {
-            e.stopPropagation();
-            deleteProject(project.id, e);
-          }}
-        >
-          <X className="size-3" />
-        </button>
+            type="button"
+            aria-label="Delete project"
+            className="p-1 hover:text-red-500 transition-colors"
+            onClick={(e) => {
+              e.stopPropagation();
+
+              const confirmed = window.confirm(
+                t("tabs.confirmDelete")
+              );
+
+              if (confirmed) {
+                deleteProject(project.id, e);
+              }
+            }}
+          >
+            <X className="size-3" />
+          </button>
+
       </div>
     </div>
   );

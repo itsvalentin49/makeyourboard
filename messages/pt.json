@@ -1,0 +1,82 @@
+{
+  "sidebar": {
+    "searchPedal": "Pesquisar pedal",
+    "searchBoard": "Pesquisar pedalboard",
+    "buyOnline": "Comprar online",
+    "shop": "Loja",
+    "addPedal": "Adicionar um pedal",
+    "addBoard": "Adicionar um pedalboard",
+    "back": "Voltar para a biblioteca",
+    "rotate": "Girar",
+    "delete": "Excluir"
+  },
+
+  "pedal": {
+    "status": "Status",
+    "type": "Tipo",
+    "circuit": "Circuito",
+    "bypass": "Bypass",
+    "power": "Alimentação",
+    "draw": "Consumo",
+    "dimensions": "Dimensões",
+    "weight": "Peso",
+    "origin": "Origem",
+    "manual": "Manual"
+  },
+
+  "board": {
+    "status": "Status",
+    "material": "Material",
+    "profile": "Perfil",
+    "dimensions": "Dimensões",
+    "weight": "Peso",
+    "origin": "Origem"
+  },
+
+  "custom": {
+    "title": "Crie o seu",
+    "name": "Nome (opcional)",
+    "width": "Largura",
+    "depth": "Profundidade",
+    "add": "Adicionar personalizado"
+  },
+
+  "settings": {
+    "title": "Configurações",
+    "background": "Fundo",
+    "language": "Idioma",
+    "units": "Unidades"
+  },
+
+  "backgrounds": {
+    "neutral": "Neutro",
+    "wood": "Madeira",
+    "marble": "Mármore"
+  },
+
+  "language": {
+    "en": "Inglês",
+    "fr": "Francês",
+    "es": "Espanhol",
+    "de": "Alemão",
+    "it": "Italiano",
+    "pt": "Português"
+  },
+
+  "canvas": {
+    "totalDraw": "Consumo total",
+    "totalWeight": "Peso total"
+  },
+
+  "footer": {
+    "feedback": "Contato",
+    "donate": "Pague-me um café"
+  },
+
+  "tabs": {
+  "confirmDelete": "Tem certeza de que deseja excluir este projeto?",
+  "yes": "Sim",
+  "cancel": "Cancelar"
+}
+
+}

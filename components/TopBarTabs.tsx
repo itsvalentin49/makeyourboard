@@ -18,6 +18,7 @@ import { SortableContext, horizontalListSortingStrategy, arrayMove } from "@dnd-
 
 import SortableTab from "@/components/SortableTab";
 import type { Project } from "@/types/project";
+import { getTranslator } from "@/utils/i18n";
 
 type Props = {
   projects: Project[];
@@ -40,6 +41,8 @@ type Props = {
   canvasBg: string;
   setCanvasBg: (v: string) => void;
 
+  language: "en" | "fr" | "es" | "de" | "it" | "pt";
+
 };
 
 function toNumberId(id: UniqueIdentifier): number {
@@ -61,10 +64,13 @@ export default function TopBarTabs({
   BACKGROUNDS = [],
   canvasBg,
   setCanvasBg,
+  language,
 }: Props) {
 
   const [activeTabId, setActiveTabId] = useState<number | null>(null);
   const [showSettings, setShowSettings] = useState(false);
+
+  const t = getTranslator(language ?? "en");
 
 
   const sensors = useSensors(
@@ -123,6 +129,7 @@ export default function TopBarTabs({
               tempName={tempName}
               setTempName={setTempName}
               saveName={saveName}
+              t={t}
             />
           ))}
         </SortableContext>

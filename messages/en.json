@@ -59,7 +59,8 @@
     "fr": "French",
     "es": "Spanish",
     "de": "German",
-    "it": "Italian"
+    "it": "Italian",
+    "pt": "Portuguese"
   },
 
   "canvas": {
@@ -68,7 +69,15 @@
   },
 
   "footer": {
-    "feedback": "Feedback",
+    "feedback": "Contact",
     "donate": "Buy me a coffee"
-  }
+  },
+  
+ "tabs": {
+  "confirmDelete": "Are you sure you want to delete this project?",
+  "yes": "Yes",
+  "cancel": "Cancel"
+}
+ 
+  
 }

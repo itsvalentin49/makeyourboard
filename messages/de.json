@@ -53,14 +53,22 @@
     "fr": "Französisch",
     "es": "Spanisch",
     "de": "Deutsch",
-    "it": "Italienisch"
+    "it": "Italienisch",
+    "pt": "Portugiesisch"
   },
   "canvas": {
     "totalDraw": "Gesamtstrom",
     "totalWeight": "Gesamtgewicht"
   },
   "footer": {
-    "feedback": "Feedback",
+    "feedback": "Kontakt",
     "donate": "Lad mich auf einen Kaffee ein"
-  }
+  },
+
+  "tabs": {
+  "confirmDelete": "Möchten Sie dieses Projekt wirklich löschen?",
+  "yes": "Ja",
+  "cancel": "Abbrechen"
+}
+
 }

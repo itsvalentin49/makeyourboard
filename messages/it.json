@@ -53,14 +53,22 @@
     "fr": "Francese",
     "es": "Spagnolo",
     "de": "Tedesco",
-    "it": "Italiano"
+    "it": "Italiano",
+    "pt": "Portoghese"
   },
   "canvas": {
     "totalDraw": "Assorbimento totale",
     "totalWeight": "Peso totale"
   },
   "footer": {
-    "feedback": "Feedback",
+    "feedback": "Contatti",
     "donate": "Offrimi un caffè"
-  }
+  },
+
+  "tabs": {
+  "confirmDelete": "Sei sicuro di voler eliminare questo progetto?",
+  "yes": "Sì",
+  "cancel": "Annulla"
+}
+
 }

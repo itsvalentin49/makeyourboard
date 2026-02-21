@@ -53,14 +53,22 @@
     "fr": "Français",
     "es": "Espagnol",
     "de": "Allemand",
-    "it": "Italien"
+    "it": "Italien",
+    "pt": "Portugais"
   },
   "canvas": {
     "totalDraw": "Conso. totale",
     "totalWeight": "Poids total"
   },
   "footer": {
-    "feedback": "Avis",
+    "feedback": "Contact",
     "donate": "Offrez-moi un café"
-  }
+  },
+  
+  "tabs": {
+  "confirmDelete": "Êtes-vous sûr de vouloir supprimer ce projet ?",
+  "yes": "Oui",
+  "cancel": "Annuler"
+}
+
 }

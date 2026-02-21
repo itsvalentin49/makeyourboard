@@ -3,8 +3,9 @@ import fr from "@/messages/fr.json";
 import es from "@/messages/es.json";
 import de from "@/messages/de.json";
 import it from "@/messages/it.json";
+import pt from "@/messages/pt.json";
 
-export type Language = "en" | "fr" | "es" | "de" | "it";
+export type Language = "en" | "fr" | "es" | "de" | "it" | "pt";
 
 type DictValue = string | { [key: string]: DictValue };
 
@@ -14,6 +15,7 @@ const DICTS: Record<Language, DictValue> = {
   es,
   de,
   it,
+  pt,
 };
 
 export function getTranslator(lang: Language) {

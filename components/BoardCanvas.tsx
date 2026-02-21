@@ -29,7 +29,7 @@ type Props = {
 
   // units
   units: "metric" | "imperial";
-  language: "en" | "fr" | "es" | "de" | "it";
+  language: "en" | "fr" | "es" | "de" | "it" | "pt";
 
 
   // selection

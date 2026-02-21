@@ -10,12 +10,13 @@ import type { AnyRow, BoardItem, Project } from "@/types/project";
 import { getTranslator, type Language } from "@/utils/i18n";
 
 type Units = "metric" | "imperial";
-const LANGUAGE_TO_LOCALE: Record<string, "en" | "fr" | "es" | "de" | "it"> = {
+const LANGUAGE_TO_LOCALE: Record<string, "en" | "fr" | "es" | "de" | "it" | "pt"> = {
   English: "en",
   French: "fr",
   Spanish: "es",
   German: "de",
   Italian: "it",
+  Portuguese: "pt",
 };
 
 
@@ -96,15 +97,14 @@ const BACKGROUNDS = [
 
     if (parsed.canvasBg) setCanvasBg(parsed.canvasBg);
     if (parsed.language) {
-  const cleanLang =
-    parsed.language === "en" ||
-    parsed.language === "fr" ||
-    parsed.language === "es"
-      ? parsed.language
-      : "en";
+  const allowed: Language[] = ["en", "fr", "es", "de", "it", "pt"];
 
-  setLanguage(cleanLang);
+  if (allowed.includes(parsed.language)) {
+    setLanguage(parsed.language);
+  }
 }
+
+
 
     if (parsed.units) setUnits(parsed.units);
   } catch {
@@ -157,11 +157,16 @@ useEffect(() => {
 
 
   // Custom item
-  const [customType] = useState<"pedal">("pedal");
-  const [customName, setCustomName] = useState<string>("");
+  const [customName, setCustomName] = useState<string>("pedal");
   const [customWidth, setCustomWidth] = useState<string>("");
   const [customDepth, setCustomDepth] = useState<string>("");
   const [customColor, setCustomColor] = useState<string>("#3b82f6");
+  const [makeOpen, setMakeOpen] = useState(true);
+
+
+  const [customType, setCustomType] = useState<"pedal" | "board" | null>(null);
+
+
 
   /**
    * Active project (toujours un Project valide)
@@ -387,46 +392,85 @@ useEffect(() => {
   closeSearchMenus();
 };
 
+
 const addCustomItem = () => {
-  if (!customWidth || !customDepth) return;
-
-  const widthMm =
-    units === "metric"
-      ? parseFloat(customWidth)
-      : parseFloat(customWidth) * 25.4;
-
-  const depthMm =
-    units === "metric"
-      ? parseFloat(customDepth)
-      : parseFloat(customDepth) * 25.4;
+  if (!customType) return;
 
   const isMobile = dimensions.width < 768;
   const sidebarWidth = isMobile ? 0 : 320;
 
-  const item: BoardItem = {
-    instanceId: Date.now(),
-    name: customName || `Custom item`,
-    brand: "Custom",
-    width: widthMm,
-    depth: depthMm,
-    color: customColor,
-    x: (dimensions.width - sidebarWidth) / 2,
-    y: (dimensions.height - 56) / 2,
-    rotation: 0,
-    draw: 0,
-    weight: 0,
-  };
+  const widthMm = Number(customWidth);
+  const depthMm = Number(customDepth);
 
-  updateActiveProject({
-    boardPedals: [...activeProject.boardPedals, item],
-  });
+  // 🎛 PEDAL (30–300)
+  if (customType === "pedal") {
+    if (
+      !widthMm ||
+      !depthMm ||
+      widthMm < 30 ||
+      widthMm > 300 ||
+      depthMm < 30 ||
+      depthMm > 300
+    ) {
+      return;
+    }
+  }
+
+  // 🪵 BOARD (100–1000)
+  if (customType === "board") {
+    if (
+      !widthMm ||
+      !depthMm ||
+      widthMm < 100 ||
+      widthMm > 1000 ||
+      depthMm < 100 ||
+      depthMm > 1000
+    ) {
+      return;
+    }
+  }
+
+const newItem: BoardItem = {
+  id: Date.now(),              // IMPORTANT
+  slug: "custom",              // IMPORTANT si utilisé
+  type: "Custom",
+  circuit: "",
+  bypass: "",
+  power: "",
+  status: "Active",
+  origin: "",
+  year: "",
+  manual: "",
+
+  instanceId: Date.now(),
+  name: "Custom",
+  brand: "Custom",
+  width: widthMm,
+  depth: depthMm,
+  image:
+  customType === "pedal"
+    ? "/images/custom-pedal.png"
+    : "/images/custom-board.png",
+  x: (dimensions.width - sidebarWidth) / 2,
+  y: (dimensions.height - 56) / 2,
+  rotation: 0,
+  draw: 0,
+  weight: 0,
+};
+
+  if (customType === "pedal") {
+    updateActiveProject({
+      boardPedals: [...activeProject.boardPedals, newItem],
+    });
+  } else {
+    updateActiveProject({
+      selectedBoards: [...activeProject.selectedBoards, newItem],
+    });
+  }
 
   setCustomWidth("");
   setCustomDepth("");
-  setCustomName("");
 };
-
-
 
   const rotatePedal = (id: number) => {
     updateActiveProject({
@@ -531,11 +575,14 @@ const deleteBoard = (id: number) => {
         deleteBoard={deleteBoard}
         canvasBg={canvasBg}
         setCanvasBg={setCanvasBg}
-      
         language={language}
         setLanguage={(lang) => {setLanguage(lang);}}
         units={units}
         setUnits={setUnits}
+        customType={customType}
+        setCustomType={setCustomType}
+        makeOpen={makeOpen}
+        setMakeOpen={setMakeOpen}
       />
 
       <div className="flex-1 relative bg-[#2c2c2e] bg-[linear-gradient(135deg,rgba(255,255,255,0.05)_0%,transparent_50%,rgba(0,0,0,0.1)_100%)] flex flex-col">
@@ -554,6 +601,7 @@ const deleteBoard = (id: number) => {
           BACKGROUNDS={BACKGROUNDS}
           canvasBg={canvasBg}
           setCanvasBg={setCanvasBg}
+          language={language}
         />
 
 
