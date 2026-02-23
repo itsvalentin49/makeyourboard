@@ -44,6 +44,7 @@ type Props = {
     pos: { x: number; y: number }
   ) => { x: number; y: number };
   closeSearchMenus: () => void;
+  setContactOpen: (v: boolean) => void;
 
   BACKGROUNDS: Background[];
   canvasBg: string;
@@ -64,6 +65,7 @@ export default function BoardCanvas({
   updateActiveProject,
   getDragBounds,
   closeSearchMenus,
+  setContactOpen,
   BACKGROUNDS,
   canvasBg,
 }: Props) {
@@ -90,6 +92,7 @@ export default function BoardCanvas({
       setSelectedInstanceId(null);
       setSelectedBoardInstanceId(null);
       closeSearchMenus();
+      setContactOpen(false);
     }
   };
 
@@ -204,12 +207,12 @@ export default function BoardCanvas({
 
       {stageSize.width > 0 && stageSize.height > 0 && (
         <Stage
-          width={stageSize.width}
-          height={stageSize.height}
-          scaleX={currentZoom / 100}
-          scaleY={currentZoom / 100}
-          onClick={handleStageClick}
-        >
+  width={stageSize.width}
+  height={stageSize.height}
+  scaleX={currentZoom / 100}
+  scaleY={currentZoom / 100}
+  onMouseDown={handleStageClick}
+>
           <Layer>
             {(activeProject.selectedBoards || []).map((b: AnyRow) => (
               <Group

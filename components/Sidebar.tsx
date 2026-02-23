@@ -68,9 +68,8 @@ type Props = {
   setCustomType: (v: "pedal" | "board" | null) => void;
   makeOpen: boolean;
   setMakeOpen: (v: boolean) => void;
-
-
-
+  contactOpen: boolean;
+  setContactOpen: (v: boolean) => void;
 
   // Actions (callbacks from page)
   addPedal: (p: AnyRow) => void;
@@ -135,6 +134,8 @@ export default function Sidebar({
   setUnits,
   makeOpen,
   setMakeOpen,
+  contactOpen,
+  setContactOpen,
 }: Props) {
 
   const t = getTranslator(language);
@@ -225,7 +226,6 @@ React.useEffect(() => {
   const shopRef = React.useRef<HTMLDivElement>(null);
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [formatOpen, setFormatOpen] = React.useState(false);
-  const [contactOpen, setContactOpen] = React.useState(false);
   const [contactEmail, setContactEmail] = React.useState("");
   const [contactType, setContactType] = React.useState("question");
   const [contactTypeOpen, setContactTypeOpen] = React.useState(false);

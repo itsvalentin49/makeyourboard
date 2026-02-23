@@ -136,6 +136,7 @@ useEffect(() => {
 
   const [showPedalResults, setShowPedalResults] = useState<boolean>(false);
   const [showBoardResults, setShowBoardResults] = useState<boolean>(false);
+  const [contactOpen, setContactOpen] = useState(false);
 
   const [displaySizes, setDisplaySizes] = useState<Record<number, { w: number; h: number }>>({});
   const [hydrated, setHydrated] = useState<boolean>(false);
@@ -590,6 +591,8 @@ const deleteBoard = (id: number) => {
         setCustomType={setCustomType}
         makeOpen={makeOpen}
         setMakeOpen={setMakeOpen}
+        contactOpen={contactOpen}
+        setContactOpen={setContactOpen}
       />
 
       <div className="flex-1 relative bg-[#2c2c2e] bg-[linear-gradient(135deg,rgba(255,255,255,0.05)_0%,transparent_50%,rgba(0,0,0,0.1)_100%)] flex flex-col">
@@ -626,6 +629,7 @@ const deleteBoard = (id: number) => {
           updateActiveProject={updateActiveProject}
           getDragBounds={getDragBounds}
           closeSearchMenus={closeSearchMenus}
+          setContactOpen={setContactOpen}
           BACKGROUNDS={BACKGROUNDS}
           canvasBg={canvasBg}
           setCanvasBg={setCanvasBg}
