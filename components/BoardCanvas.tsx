@@ -149,7 +149,7 @@ export default function BoardCanvas({
     <Minus size={14} />
   </button>
 
-  <div className="w-12 text-center text-[11px] font-black font-mono tabular-nums text-zinc-300">
+  <div className="w-12 text-center text-[12px] font-black font-mono tabular-nums text-zinc-300">
     {currentZoom}
     <span className="ml-1">%</span>
   </div>
@@ -166,23 +166,39 @@ export default function BoardCanvas({
 </div>
 
   {/* TOTAL DRAW */}
-<div className="flex items-center justify-center h-10 w-28 bg-zinc-950/80 backdrop-blur-md border border-zinc-800 rounded-2xl shadow-2xl pointer-events-none">
-  <Zap className="size-4 text-yellow-500 mr-2" />
-  <span className="text-[13px] font-black font-mono">
+<div className="relative flex items-center justify-center h-10 w-28 bg-zinc-950/80 backdrop-blur-md border border-zinc-800 rounded-2xl shadow-2xl pointer-events-none">
+
+  {/* Icône à gauche */}
+  <Zap className="absolute left-3 size-4 text-yellow-500" />
+
+  {/* Valeur centrée */}
+  <span className="text-[12px] font-black font-mono tabular-nums">
     {totalDraw}
-    <span className="text-[10px] text-zinc-500 ml-1">mA</span>
   </span>
+
+  {/* Unité à droite */}
+  <span className="absolute right-3 text-[10px] text-zinc-500">
+    mA
+  </span>
+
 </div>
 
 {/* TOTAL WEIGHT */}
-<div className="flex items-center justify-center h-10 w-28 bg-zinc-950/80 backdrop-blur-md border border-zinc-800 rounded-2xl shadow-2xl pointer-events-none">
-  <Weight className="size-4 text-blue-500 mr-2" />
-  <span className="text-[13px] font-black font-mono">
-    {formatWeight(totalWeight, units, language).replace(/ ?(kg|lb)$/, "")}
-    <span className="text-[10px] text-zinc-500 ml-1">
-      {formatWeight(totalWeight, units, language).includes("kg") ? "kg" : "lb"}
-    </span>
+<div className="relative flex items-center justify-center h-10 w-28 bg-zinc-950/80 backdrop-blur-md border border-zinc-800 rounded-2xl shadow-2xl pointer-events-none">
+
+  {/* Icône à gauche */}
+  <Weight className="absolute left-3 size-4 text-blue-500" />
+
+  {/* Valeur centrée */}
+  <span className="text-[12px] font-black font-mono tabular-nums">
+    {formatWeight(totalWeight, units, language).replace(/ ?(kg|lb|g)$/, "")}
   </span>
+
+  {/* Unité à droite */}
+  <span className="absolute right-3 text-[10px] text-zinc-500">
+    {units === "metric" ? "kg" : "lb"}
+  </span>
+
 </div>
 </div>
 
