@@ -168,5 +168,29 @@
     "confirmDelete": "Are you sure you want to delete this project?",
     "yes": "Yes",
     "cancel": "Cancel"
-  }
+  },
+
+  "contact": {
+    "title": "Contact",
+      "subtitle": "We typically respond within one business day.",
+      "email": "Your email",
+      "type": "Type",
+      "message": "Message",
+      "placeholderEmail": "you@email.com",
+      "placeholderMessage": "Write your message...",
+      "send": "Send message",
+      "sending": "Sending...",
+      "success": "Your message has been sent successfully.",
+      "thanks": "Thanks for using MakeYourBoard 🎸",
+      "errorRequired": "Please fill in all fields.",
+      "errorInvalidEmail": "Please enter a valid email address.",
+      "errorGeneric": "Something went wrong. Please try again.",
+
+    "types": {
+      "question": "Question",
+      "request": "Request",
+      "bug": "Bug",
+      "other": "Other"
+    }
+}
 }

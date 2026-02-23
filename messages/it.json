@@ -166,5 +166,29 @@
     "confirmDelete": "Sei sicuro di voler eliminare questo progetto?",
     "yes": "Sì",
     "cancel": "Annulla"
+  },
+
+  "contact": {
+    "title": "Contatto",
+      "subtitle": "Di solito rispondiamo entro un giorno lavorativo.",
+      "email": "La tua email",
+      "type": "Tipo",
+      "message": "Messaggio",
+      "placeholderEmail": "tu@email.com",
+      "placeholderMessage": "Scrivi il tuo messaggio...",
+      "send": "Invia messaggio",
+      "sending": "Invio in corso...",
+      "success": "Il tuo messaggio è stato inviato con successo.",
+      "thanks": "Grazie per utilizzare MakeYourBoard 🎸",
+      "errorRequired": "Compila tutti i campi.",
+      "errorInvalidEmail": "Inserisci un indirizzo email valido.",
+      "errorGeneric": "Si è verificato un errore. Riprova.",
+
+    "types": {
+      "question": "Domanda",
+      "request": "Richiesta",
+      "bug": "Errore",
+      "other": "Altro"
+    }
   }
 }
