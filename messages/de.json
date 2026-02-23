@@ -3,29 +3,125 @@
     "searchPedal": "Pedal suchen",
     "searchBoard": "Pedalboard suchen",
     "buyOnline": "Online kaufen",
-    "shop": "Shop",
+    "shop": "Shops",
     "addPedal": "Pedal hinzufügen",
     "addBoard": "Pedalboard hinzufügen",
-    "back": "Zurück zur Bibliothek",
+    "back": "Zurück zum Menü",
     "rotate": "Drehen",
     "delete": "Löschen"
   },
+
   "pedal": {
-    "status": "Status",
-    "type": "Typ",
-    "circuit": "Schaltung",
-    "bypass": "Bypass",
-    "power": "Stromversorgung",
+    "status": {
+      "label": "Status",
+      "active": "In Produktion",
+      "discontinued": "Eingestellt"
+    },
+
+    "type": {
+      "label": "Typ",
+      "A/B Box": "A/B-Box",
+      "Acoustic": "Akustik",
+      "Amp Simulator": "Amp-Simulator",
+      "Boost": "Boost",
+      "Buffer": "Buffer",
+      "Chorus": "Chorus",
+      "Compressor": "Kompressor",
+      "Delay": "Delay",
+      "Delay / Reverb": "Delay / Reverb",
+      "Distortion": "Distortion",
+      "Enveloppe Filter": "Envelope Filter",
+      "Equalizer": "Equalizer",
+      "Expression": "Expression-Pedal",
+      "Filter": "Filter",
+      "Flanger": "Flanger",
+      "Footswitch": "Footswitch",
+      "Fuzz": "Fuzz",
+      "Limiter": "Limiter",
+      "Lo-Fi": "Lo-Fi",
+      "Looper": "Looper",
+      "MIDI Controller": "MIDI-Controller",
+      "Multi-FX": "Multi-Effekt",
+      "Noise Gate": "Noise Gate",
+      "Octaver": "Octaver",
+      "Overdrive": "Overdrive",
+      "Phaser": "Phaser",
+      "Pitch": "Pitch",
+      "Power Supply": "Netzteil",
+      "Preamp": "Vorverstärker",
+      "Reverb": "Reverb",
+      "Reverb / Tremolo": "Reverb / Tremolo",
+      "Ring Modulator": "Ringmodulator",
+      "Rotary": "Rotary",
+      "Slicer": "Slicer",
+      "Sustainer": "Sustainer",
+      "Swell": "Swell",
+      "Synth": "Synth",
+      "Tap Tempo": "Tap Tempo",
+      "Tremolo": "Tremolo",
+      "Tuner": "Tuner",
+      "Uni-Vibe": "Uni-Vibe",
+      "Utility": "Utility",
+      "Vibrato": "Vibrato",
+      "Vocal": "Vocal",
+      "Volume": "Volume",
+      "Wah": "Wah",
+      "Whammy": "Whammy"
+    },
+
+    "circuit": {
+      "label": "Schaltung",
+      "Digital": "Digital",
+      "Analog": "Analog",
+      "N/A": "N/A"
+    },
+
+    "bypass": {
+      "label": "Bypass",
+      "True Bypass": "True Bypass",
+      "Buffered Bypass": "Buffered Bypass",
+      "Switchable": "Umschaltbar",
+      "N/A": "N/A"
+    },
+
+    "power": {
+      "label": "Stromversorgung",
+      "AC": "AC",
+      "9V DC": "9V DC",
+      "12V DC": "12V DC",
+      "18V DC": "18V DC",
+      "24V DC": "24V DC",
+      "9-18V DC": "9-18V DC",
+      "Passive": "Passiv",
+      "Battery": "9V-Batterie"
+    },
+
     "draw": "Stromaufnahme",
     "dimensions": "Abmessungen",
     "weight": "Gewicht",
     "origin": "Herkunft",
     "manual": "Handbuch"
   },
+
   "board": {
-    "status": "Status",
-    "material": "Material",
-    "profile": "Profil",
+    "status": {
+      "label": "Status",
+      "active": "In Produktion",
+      "discontinued": "Nicht mehr in Produktion"
+    },
+
+    "material": {
+      "label": "Material",
+      "Aluminium": "Aluminium",
+      "ABS": "ABS"
+    },
+
+    "profile": {
+      "label": "Profil",
+      "Flat": "Flach",
+      "Angled": "Geneigt"
+    },
+
     "dimensions": "Abmessungen",
     "weight": "Gewicht",
     "origin": "Herkunft"
@@ -46,7 +142,7 @@
   "settings": {
     "title": "Einstellungen",
     "background": "Hintergrund",
-    "language": "Sprache",
+    "language": "Sprachen",
     "units": "Einheiten"
   },
 
@@ -56,29 +152,19 @@
     "marble": "Marmor"
   },
 
-  "language": {
-    "en": "Englisch",
-    "fr": "Französisch",
-    "es": "Spanisch",
-    "de": "Deutsch",
-    "it": "Italienisch",
-    "pt": "Portugiesisch"
-  },
-
   "canvas": {
-    "totalDraw": "Gesamtstrom",
+    "totalDraw": "Gesamtverbrauch",
     "totalWeight": "Gesamtgewicht"
   },
 
   "footer": {
     "feedback": "Kontakt",
-    "donate": "Lad mich auf einen Kaffee ein"
+    "donate": "Kaffee spendieren"
   },
 
   "tabs": {
-  "confirmDelete": "Möchten Sie dieses Projekt wirklich löschen?",
-  "yes": "Ja",
-  "cancel": "Abbrechen"
+    "confirmDelete": "Möchten Sie dieses Projekt wirklich löschen?",
+    "yes": "Ja",
+    "cancel": "Abbrechen"
   }
-
 }

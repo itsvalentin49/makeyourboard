@@ -6,30 +6,129 @@
     "shop": "Magasins",
     "addPedal": "Ajouter une pédale",
     "addBoard": "Ajouter un pedalboard",
-    "back": "Retour à la bibliothèque",
+    "back": "Retour au menu",
     "rotate": "Pivoter",
     "delete": "Supprimer"
   },
+
   "pedal": {
-    "status": "Statut",
-    "type": "Type",
-    "circuit": "Circuit",
-    "bypass": "Bypass",
-    "power": "Alimentation",
+
+    "status": {
+      "label": "Statut",
+      "active": "En production",
+      "discontinued": "Arrêté"
+    },
+
+   "type": {
+      "label": "Type",
+      "A/B Box": "Boîtier A/B",
+      "Acoustic": "Acoustique",
+      "Amp Simulator": "Simulateur d’ampli",
+      "Boost": "Boost",
+      "Buffer": "Buffer",
+      "Chorus": "Chorus",
+      "Compressor": "Compresseur",
+      "Delay": "Delay",
+      "Delay / Reverb": "Delay / Réverb",
+      "Distortion": "Distorsion",
+      "Enveloppe Filter": "Enveloppe Filter",
+      "Equalizer": "Égaliseur",
+      "Expression": "Pédale d’expression",
+      "Filter": "Filtre",
+      "Flanger": "Flanger",
+      "Footswitch": "Footswitch",
+      "Fuzz": "Fuzz",
+      "Limiter": "Limiteur",
+      "Lo-Fi": "Lo-Fi",
+      "Looper": "Looper",
+      "MIDI Controller": "Contrôleur MIDI",
+      "Multi-FX": "Multi-Effets",
+      "Noise Gate": "Noise Gate",
+      "Octaver": "Octaver",
+      "Overdrive": "Overdrive",
+      "Phaser": "Phaser",
+      "Pitch": "Pitch",
+      "Power Supply": "Alimentation",
+      "Preamp": "Préampli",
+      "Reverb": "Reverb",
+      "Reverb / Tremolo": "Reverb / Tremolo",
+      "Ring Modulator": "Ring Modulator",
+      "Rotary": "Rotary",
+      "Slicer": "Slicer",
+      "Sustainer": "Sustainer",
+      "Swell": "Swell",
+      "Synth": "Synthé",
+      "Tap Tempo": "Tap Tempo",
+      "Tremolo": "Trémolo",
+      "Tuner": "Accordeur",
+      "Uni-Vibe": "Uni-Vibe",
+      "Utility": "Utilitaire",
+      "Vibrato": "Vibrato",
+      "Vocal": "Vocal",
+      "Volume": "Volume",
+      "Wah": "Wah",
+      "Whammy": "Whammy"
+    },
+
+    "circuit": {
+      "label": "Circuit",
+      "Digital": "Numérique",
+      "Analog": "Analogique",
+      "N/A": "N/A"
+    },
+
+    "bypass": {
+      "label": "Bypass",
+      "True Bypass": "True Bypass",
+      "Buffered Bypass": "Buffered Bypass",
+      "Switchable": "Commutable",
+      "N/A": "N/A"
+    },
+
+    "power": {
+      "label": "Alimentation",
+      "AC": "AC",
+      "9V DC": "9V DC",
+      "12V DC": "12V DC",
+      "18V DC": "18V DC",
+      "24V DC": "24V DC",
+      "9-18V DC": "9-18V DC",
+      "Passive": "Passive",
+      "Battery": "Pile 9V"
+    },
+
     "draw": "Consommation",
     "dimensions": "Dimensions",
     "weight": "Poids",
     "origin": "Origine",
     "manual": "Manuel"
   },
+
   "board": {
-    "status": "Statut",
-    "material": "Matériau",
-    "profile": "Profil",
+
+    "status": {
+      "label": "Statut",
+      "active": "En production",
+      "discontinued": "Hors production"
+    },
+
+    "material": {
+      "label": "Matériau",
+      "Aluminium": "Aluminium",
+      "ABS": "ABS"
+    },
+
+    "profile": {
+      "label": "Profil",
+      "Flat": "Plat",
+      "Angled": "Incliné"
+    },
+
     "dimensions": "Dimensions",
     "weight": "Poids",
     "origin": "Origine"
   },
+
   "custom": {
     "title": "Ajouter une pédale ou un board custom",
     "selectType": "Sélectionner pédale ou board",
@@ -40,40 +139,34 @@
     "depth": "Profondeur",
     "addPedal": "Ajouter la pédale custom",
     "addBoard": "Ajouter le board custom"
-
   },
+
   "settings": {
     "title": "Paramètres",
     "background": "Arrière-plan",
     "language": "Langues",
     "units": "Unités"
   },
+
   "backgrounds": {
     "neutral": "Neutre",
     "wood": "Bois",
     "marble": "Marbre"
   },
-  "language": {
-    "en": "Anglais",
-    "fr": "Français",
-    "es": "Espagnol",
-    "de": "Allemand",
-    "it": "Italien",
-    "pt": "Portugais"
-  },
+
   "canvas": {
     "totalDraw": "Conso. totale",
     "totalWeight": "Poids total"
   },
+
   "footer": {
     "feedback": "Contact",
     "donate": "Offrez-moi un café"
   },
-  
-  "tabs": {
-  "confirmDelete": "Êtes-vous sûr de vouloir supprimer ce projet ?",
-  "yes": "Oui",
-  "cancel": "Annuler"
-}
 
+  "tabs": {
+    "confirmDelete": "Êtes-vous sûr de vouloir supprimer ce projet ?",
+    "yes": "Oui",
+    "cancel": "Annuler"
+  }
 }

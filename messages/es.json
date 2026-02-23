@@ -1,80 +1,170 @@
 {
   "sidebar": {
-    "searchPedal": "Buscar un pedal",
-    "searchBoard": "Buscar una pedalera",
-    "buyOnline": "Comprar en línea",
-    "shop": "Tienda",
+    "searchPedal": "Buscar pedal",
+    "searchBoard": "Buscar pedalboard",
+    "buyOnline": "Comprar online",
+    "shop": "Tiendas",
     "addPedal": "Añadir pedal",
-    "addBoard": "Añadir pedalera",
-    "back": "Volver a la biblioteca",
-    "rotate": "Girar",
+    "addBoard": "Añadir pedalboard",
+    "back": "Volver al menú",
+    "rotate": "Rotar",
     "delete": "Eliminar"
   },
+
   "pedal": {
-    "status": "Estado",
-    "type": "Tipo",
-    "circuit": "Circuito",
-    "bypass": "Bypass",
-    "power": "Alimentación",
+    "status": {
+      "label": "Estado",
+      "active": "En producción",
+      "discontinued": "Descatalogado"
+    },
+
+    "type": {
+      "label": "Tipo",
+      "A/B Box": "Caja A/B",
+      "Acoustic": "Acústico",
+      "Amp Simulator": "Simulador de amplificador",
+      "Boost": "Boost",
+      "Buffer": "Buffer",
+      "Chorus": "Chorus",
+      "Compressor": "Compresor",
+      "Delay": "Delay",
+      "Delay / Reverb": "Delay / Reverb",
+      "Distortion": "Distorsión",
+      "Enveloppe Filter": "Envelope Filter",
+      "Equalizer": "Ecualizador",
+      "Expression": "Pedal de expresión",
+      "Filter": "Filtro",
+      "Flanger": "Flanger",
+      "Footswitch": "Footswitch",
+      "Fuzz": "Fuzz",
+      "Limiter": "Limitador",
+      "Lo-Fi": "Lo-Fi",
+      "Looper": "Looper",
+      "MIDI Controller": "Controlador MIDI",
+      "Multi-FX": "Multi-efectos",
+      "Noise Gate": "Puerta de ruido",
+      "Octaver": "Octavador",
+      "Overdrive": "Overdrive",
+      "Phaser": "Phaser",
+      "Pitch": "Pitch",
+      "Power Supply": "Fuente de alimentación",
+      "Preamp": "Preamplificador",
+      "Reverb": "Reverb",
+      "Reverb / Tremolo": "Reverb / Tremolo",
+      "Ring Modulator": "Ring Modulador",
+      "Rotary": "Rotary",
+      "Slicer": "Slicer",
+      "Sustainer": "Sustainer",
+      "Swell": "Swell",
+      "Synth": "Sintetizador",
+      "Tap Tempo": "Tap Tempo",
+      "Tremolo": "Trémolo",
+      "Tuner": "Afinador",
+      "Uni-Vibe": "Uni-Vibe",
+      "Utility": "Utilidad",
+      "Vibrato": "Vibrato",
+      "Vocal": "Vocal",
+      "Volume": "Volumen",
+      "Wah": "Wah",
+      "Whammy": "Whammy"
+    },
+
+    "circuit": {
+      "label": "Circuito",
+      "Digital": "Digital",
+      "Analog": "Analógico",
+      "N/A": "N/A"
+    },
+
+    "bypass": {
+      "label": "Bypass",
+      "True Bypass": "True Bypass",
+      "Buffered Bypass": "Buffered Bypass",
+      "Switchable": "Conmutable",
+      "N/A": "N/A"
+    },
+
+    "power": {
+      "label": "Alimentación",
+      "AC": "AC",
+      "9V DC": "9V DC",
+      "12V DC": "12V DC",
+      "18V DC": "18V DC",
+      "24V DC": "24V DC",
+      "9-18V DC": "9-18V DC",
+      "Passive": "Pasivo",
+      "Battery": "Batería 9V"
+    },
+
     "draw": "Consumo",
     "dimensions": "Dimensiones",
     "weight": "Peso",
     "origin": "Origen",
     "manual": "Manual"
   },
+
   "board": {
-    "status": "Estado",
-    "material": "Material",
-    "profile": "Perfil",
+    "status": {
+      "label": "Estado",
+      "active": "En producción",
+      "discontinued": "Descatalogado"
+    },
+
+    "material": {
+      "label": "Material",
+      "Aluminium": "Aluminio",
+      "ABS": "ABS"
+    },
+
+    "profile": {
+      "label": "Perfil",
+      "Flat": "Plano",
+      "Angled": "Inclinado"
+    },
+
     "dimensions": "Dimensiones",
     "weight": "Peso",
     "origin": "Origen"
   },
 
   "custom": {
-    "title": "Añadir pedal o pedalboard personalizado",
-    "selectType": "Seleccionar pedal o pedalboard",
+    "title": "Añadir pedal o board personalizado",
+    "selectType": "Seleccionar pedal o board",
     "pedal": "Pedal",
     "board": "Board",
     "enterDimensions": "Introducir dimensiones",
-    "width": "Ancho",
+    "width": "Anchura",
     "depth": "Profundidad",
     "addPedal": "Añadir pedal personalizado",
-    "addBoard": "Añadir pedalboard personalizado"
+    "addBoard": "Añadir board personalizado"
   },
 
   "settings": {
-    "title": "Configuración",
+    "title": "Ajustes",
     "background": "Fondo",
-    "language": "Idioma",
+    "language": "Idiomas",
     "units": "Unidades"
   },
+
   "backgrounds": {
     "neutral": "Neutro",
     "wood": "Madera",
     "marble": "Mármol"
   },
-  "language": {
-    "en": "Inglés",
-    "fr": "Francés",
-    "es": "Español",
-    "de": "Alemán",
-    "it": "Italiano",
-    "pt": "Portugués"
-  },
+
   "canvas": {
     "totalDraw": "Consumo total",
     "totalWeight": "Peso total"
   },
+
   "footer": {
     "feedback": "Contacto",
     "donate": "Invítame a un café"
   },
 
   "tabs": {
-  "confirmDelete": "¿Estás seguro de que quieres eliminar este proyecto?",
-  "yes": "Sí",
-  "cancel": "Cancelar"
-}
-
+    "confirmDelete": "¿Seguro que quieres eliminar este proyecto?",
+    "yes": "Sí",
+    "cancel": "Cancelar"
+  }
 }

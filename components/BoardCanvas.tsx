@@ -183,18 +183,7 @@ export default function BoardCanvas({
               {t("canvas.totalWeight")}
             </p>
             <p className="text-lg font-black font-mono leading-none">
-  {units === "metric"
-    ? (totalWeight / 1000).toFixed(2)
-    : totalWeight / 453.592 < 1
-    ? (totalWeight / 28.3495).toFixed(1)
-    : (totalWeight / 453.592).toFixed(1)}
-  <span className="text-[10px] text-zinc-500 ml-1">
-    {units === "metric"
-      ? "kg"
-      : totalWeight / 453.592 < 1
-      ? "oz"
-      : "lb"}
-  </span>
+  {formatWeight(totalWeight, units, language)}
 </p>
 
 

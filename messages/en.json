@@ -1,23 +1,103 @@
 {
   "sidebar": {
-    "searchPedal": "Search for a pedal",
-    "searchBoard": "Search for a board",
+    "searchPedal": "Search a pedal",
+    "searchBoard": "Search a pedalboard",
     "buyOnline": "Buy online",
-    "shop": "Shop",
+    "shop": "Stores",
     "addPedal": "Add a pedal",
-    "addBoard": "Add a board",
-    "back": "Back to library",
+    "addBoard": "Add a pedalboard",
+    "back": "Back to menu",
     "rotate": "Rotate",
     "delete": "Delete"
   },
 
   "pedal": {
-    "status": "Status",
-    "type": "Type",
-    "circuit": "Circuit",
-    "bypass": "Bypass",
-    "power": "Power",
-    "draw": "Draw",
+
+    "status": {
+      "label": "Status",
+      "active": "Active",
+      "discontinued": "Discontinued"
+    },
+
+    "type": {
+      "label": "Type",
+      "A/B Box": "A/B Box",
+      "Acoustic": "Acoustic",
+      "Amp Simulator": "Amp Simulator",
+      "Boost": "Boost",
+      "Buffer": "Buffer",
+      "Chorus": "Chorus",
+      "Compressor": "Compressor",
+      "Delay": "Delay",
+      "Delay / Reverb": "Delay / Reverb",
+      "Distortion": "Distortion",
+      "Enveloppe Filter": "Envelope Filter",
+      "Equalizer": "Equalizer",
+      "Expression": "Expression Pedal",
+      "Filter": "Filter",
+      "Flanger": "Flanger",
+      "Footswitch": "Footswitch",
+      "Fuzz": "Fuzz",
+      "Limiter": "Limiter",
+      "Lo-Fi": "Lo-Fi",
+      "Looper": "Looper",
+      "MIDI Controller": "MIDI Controller",
+      "Multi-FX": "Multi-FX",
+      "Noise Gate": "Noise Gate",
+      "Octaver": "Octaver",
+      "Overdrive": "Overdrive",
+      "Phaser": "Phaser",
+      "Pitch": "Pitch",
+      "Power Supply": "Power Supply",
+      "Preamp": "Preamp",
+      "Reverb": "Reverb",
+      "Reverb / Tremolo": "Reverb / Tremolo",
+      "Ring Modulator": "Ring Modulator",
+      "Rotary": "Rotary",
+      "Slicer": "Slicer",
+      "Sustainer": "Sustainer",
+      "Swell": "Swell",
+      "Synth": "Synth",
+      "Tap Tempo": "Tap Tempo",
+      "Tremolo": "Tremolo",
+      "Tuner": "Tuner",
+      "Uni-Vibe": "Uni-Vibe",
+      "Utility": "Utility",
+      "Vibrato": "Vibrato",
+      "Vocal": "Vocal",
+      "Volume": "Volume",
+      "Wah": "Wah",
+      "Whammy": "Whammy"
+    },
+
+    "circuit": {
+      "label": "Circuit",
+      "Digital": "Digital",
+      "Analog": "Analog",
+      "N/A": "N/A"
+    },
+
+    "bypass": {
+      "label": "Bypass",
+      "True Bypass": "True Bypass",
+      "Buffered Bypass": "Buffered Bypass",
+      "Switchable": "Switchable",
+      "N/A": "N/A"
+    },
+
+    "power": {
+      "label": "Power",
+      "AC": "AC",
+      "9V DC": "9V DC",
+      "12V DC": "12V DC",
+      "18V DC": "18V DC",
+      "24V DC": "24V DC",
+      "9-18V DC": "9-18V DC",
+      "Passive": "Passive",
+      "Battery": "9V Battery"
+    },
+
+    "draw": "Current draw",
     "dimensions": "Dimensions",
     "weight": "Weight",
     "origin": "Origin",
@@ -25,30 +105,46 @@
   },
 
   "board": {
-    "status": "Status",
-    "material": "Material",
-    "profile": "Profile",
+
+    "status": {
+      "label": "Status",
+      "active": "Active",
+      "discontinued": "Discontinued"
+    },
+
+    "material": {
+      "label": "Material",
+      "Aluminium": "Aluminium",
+      "ABS": "ABS"
+    },
+
+    "profile": {
+      "label": "Profile",
+      "Flat": "Flat",
+      "Angled": "Angled"
+    },
+
     "dimensions": "Dimensions",
     "weight": "Weight",
     "origin": "Origin"
   },
 
   "custom": {
-    "title": "Add a Custom Pedal or Board",
-    "selectType": "Select Pedal or Board",
+    "title": "Add a custom pedal or board",
+    "selectType": "Select pedal or board",
     "pedal": "Pedal",
     "board": "Board",
-    "enterDimensions": "Enter Dimensions",
+    "enterDimensions": "Enter dimensions",
     "width": "Width",
     "depth": "Depth",
-    "addPedal": "Add Custom Pedal",
-    "addBoard": "Add Custom Board"
+    "addPedal": "Add custom pedal",
+    "addBoard": "Add custom board"
   },
 
   "settings": {
     "title": "Settings",
     "background": "Background",
-    "language": "Language",
+    "language": "Languages",
     "units": "Units"
   },
 
@@ -56,15 +152,6 @@
     "neutral": "Neutral",
     "wood": "Wood",
     "marble": "Marble"
-  },
-
-  "language": {
-    "en": "English",
-    "fr": "French",
-    "es": "Spanish",
-    "de": "German",
-    "it": "Italian",
-    "pt": "Portuguese"
   },
 
   "canvas": {
@@ -76,12 +163,10 @@
     "feedback": "Contact",
     "donate": "Buy me a coffee"
   },
-  
- "tabs": {
-  "confirmDelete": "Are you sure you want to delete this project?",
-  "yes": "Yes",
-  "cancel": "Cancel"
-}
- 
-  
+
+  "tabs": {
+    "confirmDelete": "Are you sure you want to delete this project?",
+    "yes": "Yes",
+    "cancel": "Cancel"
+  }
 }

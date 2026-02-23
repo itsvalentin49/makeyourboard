@@ -138,6 +138,14 @@ export default function Sidebar({
 }: Props) {
 
   const t = getTranslator(language);
+  const LANGUAGE_LABELS: Record<string, string> = {
+    en: "English",
+    fr: "Français",
+    es: "Español",
+    de: "Deutsch",
+    it: "Italiano",
+    pt: "Português",
+  };
   const mmToIn = (mm: number) => mm / 25.4;
   const minMm = customType === "pedal" ? 30 : 100;
   const maxMm = customType === "pedal" ? 300 : 1000;
@@ -448,7 +456,7 @@ const buildThomannUrl = (slug: string) => {
           <div className="space-y-0.5 border-zinc-900">
             <div className="flex justify-between items-center py-2 border-b border-t border-zinc-900">
               <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
-                {t("pedal.status")}
+                {t("pedal.status.label")}
               </span>
               <span
                 className={`text-[9px] px-2 py-0.5 rounded-full font-black uppercase ${
@@ -457,47 +465,57 @@ const buildThomannUrl = (slug: string) => {
                     : "bg-red-500/10 text-red-500"
                 }`}
               >
-                {selectedPedal.status || "N/A"}
+                {selectedPedal.status
+  ? t(`pedal.status.${selectedPedal.status.toLowerCase()}`)
+  : "N/A"}
               </span>
             </div>
 
 {!isCustomPedal && (
             <div className="flex justify-between items-center py-2 border-b border-zinc-900">
               <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
-                {t("pedal.type")}
+                {t("pedal.type.label")}
               </span>
               <span className="text-[11px] font-bold font-mono text-zinc-300">
-                {selectedPedal.type || "N/A"}
+                {selectedPedal.type
+                ? t(`pedal.type.${selectedPedal.type}`)
+                : "N/A"}
               </span>
             </div>)}
 
             {!isCustomPedal && (
             <div className="flex justify-between items-center py-2 border-b border-zinc-900">
               <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
-                {t("pedal.circuit")}
+                {t("pedal.circuit.label")}
               </span>
               <span className="text-[11px] font-bold font-mono text-zinc-300">
-                {selectedPedal.circuit || "N/A"}
+                {selectedPedal.circuit
+                ? t(`pedal.circuit.${selectedPedal.circuit}`)
+                : "N/A"}
               </span>
             </div>)}
 
             {!isCustomPedal && (
             <div className="flex justify-between items-center py-2 border-b border-zinc-900">
               <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
-                {t("pedal.bypass")}
+                {t("pedal.bypass.label")}
               </span>
               <span className="text-[11px] font-bold font-mono text-zinc-300">
-                {selectedPedal.bypass || "N/A"}
+                {selectedPedal.bypass
+                ? t(`pedal.bypass.${selectedPedal.bypass}`)
+                : "N/A"}
               </span>
             </div>)}
 
             {!isCustomPedal && (
             <div className="flex justify-between items-center py-2 border-b border-zinc-900">
               <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
-                {t("pedal.power")}
+                {t("pedal.power.label")}
               </span>
               <span className="text-[11px] font-bold font-mono text-zinc-300">
-                {selectedPedal.power || "N/A"}
+                {selectedPedal.power
+                ? t(`pedal.power.${selectedPedal.power}`)
+                : "N/A"}
               </span>
             </div>)}
 
@@ -530,7 +548,7 @@ const buildThomannUrl = (slug: string) => {
               {t("pedal.weight")}
             </span>
             <span className="text-[11px] font-bold font-mono">
-              {formatWeight(selectedPedal.weight || 0, units)}
+              {formatWeight(selectedPedal.weight || 0, units, language)}
             </span>
             </div>)}
 
@@ -725,7 +743,7 @@ return (
           <div className="space-y-0.5 border-zinc-900">
             <div className="flex justify-between items-center py-2 border-b border-t border-zinc-900">
               <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
-                {t("board.status")}
+                {t("board.status.label")}
               </span>
               <span
                 className={`text-[9px] px-2 py-0.5 rounded-full font-black uppercase ${
@@ -734,17 +752,21 @@ return (
                     : "bg-red-500/10 text-red-500"
                 }`}
               >
-                {selectedBoardDetails.status || "N/A"}
+                {selectedBoardDetails.status
+  ? t(`board.status.${selectedBoardDetails.status.toLowerCase()}`)
+  : "N/A"}
               </span>
             </div>
 
             {!isCustomBoard && (
             <div className="flex justify-between items-center py-2 border-b border-zinc-900">
               <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
-                {t("board.material")}
+                {t("board.material.label")}
               </span>
               <span className="text-[11px] font-bold font-mono">
-                {selectedBoardDetails.material || 0}
+                {selectedBoardDetails.material
+                ? t(`board.material.${selectedBoardDetails.material}`)
+                : "N/A"}
               </span>
             </div>
             )}
@@ -752,10 +774,12 @@ return (
             {!isCustomBoard && (
             <div className="flex justify-between items-center py-2 border-b border-zinc-900">
               <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
-                {t("board.profile")}
+                {t("board.profile.label")}
               </span>
               <span className="text-[11px] font-bold font-mono">
-                {selectedBoardDetails.profile || 0}
+                {selectedBoardDetails.profile
+                ? t(`board.profile.${selectedBoardDetails.profile}`)
+                : "N/A"}
               </span>
             </div>
             )}
@@ -781,7 +805,7 @@ return (
               {t("board.weight")}
             </span>
             <span className="text-[11px] font-bold font-mono">
-              {formatWeight(selectedBoardDetails.weight || 0, units)}
+              {formatWeight(selectedBoardDetails.weight || 0, units, language)}
             </span>
             </div>
             )}
@@ -1274,7 +1298,7 @@ return (
                             flex items-center justify-between
                             hover:border-zinc-600 transition-colors"
                 >
-                  {t(`language.${language}`)}
+                  {LANGUAGE_LABELS[language]}
 
 
                   <ChevronDown
@@ -1286,7 +1310,11 @@ return (
 
                   {langOpen && (
                     <div className="absolute z-50 mt-1 w-full bg-zinc-950 border border-zinc-800 rounded-lg overflow-hidden">
-                      {["en", "fr", "es", "de", "it", "pt"].map((l) => (
+                      {Object.keys(LANGUAGE_LABELS)
+                        .sort((a, b) =>
+                          LANGUAGE_LABELS[a].localeCompare(LANGUAGE_LABELS[b])
+                        )
+                        .map((l) => (
                         <button
                           key={l}
                           onClick={() => {
@@ -1295,7 +1323,7 @@ return (
                           }}
                           className="w-full px-4 py-2 text-left text-[11px] hover:bg-zinc-800"
                         >
-                          {t(`language.${l}`)}
+                          {LANGUAGE_LABELS[l]}
 
                         </button>
                       ))}
