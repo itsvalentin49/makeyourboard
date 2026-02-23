@@ -87,6 +87,10 @@ export default function BoardCanvas({
       0
     );
 
+    const formattedWeight = formatWeight(totalWeight, units, language);
+    const weightValue = formattedWeight.replace(/ ?(kg|lb|oz|g)$/, "");
+    const weightUnit = formattedWeight.match(/(kg|lb|oz|g)$/)?.[0] ?? "";
+
   const handleStageClick = (e: any) => {
     if (e.target === e.target.getStage()) {
       setSelectedInstanceId(null);
@@ -194,12 +198,12 @@ export default function BoardCanvas({
 
   {/* Valeur centrée */}
   <span className="text-[12px] font-black font-mono tabular-nums">
-    {formatWeight(totalWeight, units, language).replace(/ ?(kg|lb|g)$/, "")}
+    {weightValue}
   </span>
 
   {/* Unité à droite */}
   <span className="absolute right-3 text-[10px] text-zinc-500">
-    {units === "metric" ? "kg" : "lb"}
+    {weightUnit}
   </span>
 
 </div>
