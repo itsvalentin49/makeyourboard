@@ -17,9 +17,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "MakeYourBoard",
   description: "Design your next pedalboard",
-  viewport: "width=1400, initial-scale=1",
 };
 
+export const viewport = {
+  width: 1400,
+};
 
 export default function RootLayout({
   children,

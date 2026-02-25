@@ -148,8 +148,10 @@
 
   "backgrounds": {
     "neutral": "Neutro",
-    "wood": "Legno",
-    "marble": "Marmo"
+    "wood": "Parquet",
+    "marble": "Marmo",
+    "rug": "Tappeto",
+    "stage": "Palco"
   },
 
   "canvas": {

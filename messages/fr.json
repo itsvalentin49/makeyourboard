@@ -150,8 +150,10 @@
 
   "backgrounds": {
     "neutral": "Neutre",
-    "wood": "Bois",
-    "marble": "Marbre"
+    "wood": "Parquet",
+    "marble": "Marbre",
+    "rug": "Tapis",
+    "stage": "Scène"
   },
 
   "canvas": {

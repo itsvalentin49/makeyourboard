@@ -70,6 +70,18 @@ const BACKGROUNDS = [
     type: "image" as const,
     src: "/backgrounds/marble.webp",
   },
+  {
+    id: "rug",
+    label: "Rug",
+    type: "image" as const,
+    src: "/backgrounds/rug.webp",
+  },
+  {
+    id: "stage",
+    label: "Stage",
+    type: "image" as const,
+    src: "/backgrounds/stage.webp",
+  },
 ];
 
 

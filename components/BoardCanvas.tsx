@@ -66,7 +66,7 @@ export default function BoardCanvas({
   getDragBounds,
   closeSearchMenus,
   setContactOpen,
-  BACKGROUNDS,
+  BACKGROUNDS = [],
   canvasBg,
 }: Props) {
   const t = getTranslator(language);
@@ -135,7 +135,7 @@ export default function BoardCanvas({
               backgroundImage: `url(${
                 BACKGROUNDS.find((b) => b.id === canvasBg)?.src
               })`,
-              backgroundSize: "cover",
+              backgroundSize: "auto 100%",
               backgroundPosition: "center",
               backgroundRepeat: "no-repeat",
             }
