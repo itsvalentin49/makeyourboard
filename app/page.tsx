@@ -140,6 +140,7 @@ useEffect(() => {
 
   const [displaySizes, setDisplaySizes] = useState<Record<number, { w: number; h: number }>>({});
   const [hydrated, setHydrated] = useState<boolean>(false);
+  const [isMobileDevice, setIsMobileDevice] = useState(false);
 
   useEffect(() => {
   if (projects.length === 0) {
@@ -264,6 +265,17 @@ useEffect(() => {
     };
   }, []);
 
+  useEffect(() => {
+  const isTouch =
+    typeof window !== "undefined" &&
+    ("ontouchstart" in window || navigator.maxTouchPoints > 0);
+
+  const isSmallScreen =
+    typeof window !== "undefined" && window.innerWidth < 768;
+
+  setIsMobileDevice(isTouch && isSmallScreen);
+}, []);
+
   /**
    * Save localStorage (safe)
    */
@@ -353,7 +365,7 @@ useEffect(() => {
   };
 
   const addPedal = (pedal: AnyRow) => {
-  const isMobile = dimensions.width < 768;
+  const isMobile = isMobileDevice;
   const sidebarWidth = isMobile ? 0 : 320;
 
   const newPedal: BoardItem = {
@@ -375,7 +387,7 @@ useEffect(() => {
 
 
   const selectBoard = (board: AnyRow) => {
-  const isMobile = dimensions.width < 768;
+  const isMobile = isMobileDevice;
   const sidebarWidth = isMobile ? 0 : 320;
 
   const newBoard: BoardItem = {
@@ -397,7 +409,7 @@ useEffect(() => {
 const addCustomItem = () => {
   if (!customType) return;
 
-  const isMobile = dimensions.width < 768;
+  const isMobile = isMobileDevice;
   const sidebarWidth = isMobile ? 0 : 320;
 
   const widthMm =
@@ -528,7 +540,7 @@ const deleteBoard = (id: number) => {
     const w = (isVertical ? size.h : size.w) * (currentZoom / 100);
     const h = (isVertical ? size.w : size.h) * (currentZoom / 100);
 
-    const isMobile = dimensions.width < 768;
+    const isMobile = isMobileDevice;
     const sidebarWidth = isMobile ? 0 : 320;
     const topbarHeight = 56;
 
@@ -549,7 +561,7 @@ const deleteBoard = (id: number) => {
   onClick={closeSearchMenus}
 >
 
-  {hydrated && dimensions.width < 768 && (
+  {hydrated && isMobileDevice && (
   <div className="absolute top-0 left-0 right-0 bg-yellow-500 text-black text-xs text-center py-1 z-50">
     Best experienced on desktop or tablet.
   </div>

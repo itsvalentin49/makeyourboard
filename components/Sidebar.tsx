@@ -363,23 +363,12 @@ const buildThomannUrl = (slug: string) => {
   return (
   <>
 
-    {/* OVERLAY MOBILE */}
-    {mobileOpen && (
-      <div
-        className="fixed inset-0 bg-black/50 z-30 md:hidden"
-        onClick={() => setMobileOpen(false)}
-      />
-    )}
-
     <div
       className={`
-        fixed inset-y-0 left-0 z-40 w-full md:w-80 md:flex-shrink-0
+        relative z-40 w-80 shrink-0
         bg-zinc-950 border-r border-zinc-800
         p-4 flex flex-col gap-6
         overflow-y-auto no-scrollbar
-        transform transition-transform duration-300
-        ${mobileOpen ? "translate-x-0" : "-translate-x-full"}
-        md:relative md:translate-x-0
       `}
       onClick={(e) => {
   e.stopPropagation();
@@ -390,12 +379,6 @@ const buildThomannUrl = (slug: string) => {
 
       <SidebarLogo />
 
-      <button
-  onClick={() => setMobileOpen(true)}
-  className="md:hidden fixed bottom-6 right-6 z-50 bg-blue-600 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-xl"
->
-  <Plus size={24} />
-</button>
 
       {contactOpen ? (
   <div className="flex flex-col gap-6 animate-in slide-in-from-left duration-300">
