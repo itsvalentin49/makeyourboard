@@ -666,6 +666,7 @@ const buildThomannUrl = (slug: string) => {
 
           {/* PEDAL INFO */}
           <div className="space-y-0.5 border-zinc-900">
+            {!isCustomPedal && (
             <div className="flex justify-between items-center py-2 border-b border-t border-zinc-900">
               <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
                 {t("pedal.status.label")}
@@ -678,12 +679,12 @@ const buildThomannUrl = (slug: string) => {
                 }`}
               >
                 {selectedPedal.status
-  ? t(`pedal.status.${selectedPedal.status.toLowerCase()}`)
-  : "N/A"}
+                ? t(`pedal.status.${selectedPedal.status.toLowerCase()}`)
+                : "N/A"}
               </span>
-            </div>
+            </div>)}
 
-{!isCustomPedal && (
+            {!isCustomPedal && (
             <div className="flex justify-between items-center py-2 border-b border-zinc-900">
               <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
                 {t("pedal.type.label")}
@@ -953,6 +954,7 @@ return (
 
 
           <div className="space-y-0.5 border-zinc-900">
+            {!isCustomBoard && (
             <div className="flex justify-between items-center py-2 border-b border-t border-zinc-900">
               <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
                 {t("board.status.label")}
@@ -965,10 +967,10 @@ return (
                 }`}
               >
                 {selectedBoardDetails.status
-  ? t(`board.status.${selectedBoardDetails.status.toLowerCase()}`)
-  : "N/A"}
+                ? t(`board.status.${selectedBoardDetails.status.toLowerCase()}`)
+                : "N/A"}
               </span>
-            </div>
+            </div>)}
 
             {!isCustomBoard && (
             <div className="flex justify-between items-center py-2 border-b border-zinc-900">

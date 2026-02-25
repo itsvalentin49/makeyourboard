@@ -42,7 +42,7 @@ type ActiveProjectUpdates = Partial<{
 
 const createEmptyProject = (index: number): Project => ({
   id: Date.now() + index,
-  name: `Board ${index}`,
+  name: `Pedalboard ${index}`,
   zoom: 100,
   boardPedals: [],
   selectedBoards: [],
@@ -145,7 +145,7 @@ useEffect(() => {
   if (projects.length === 0) {
     const firstProject: Project = {
       id: Date.now(),
-      name: "Board 1",
+      name: "Pedalboard 1",
       zoom: 100,
       boardPedals: [],
       selectedBoards: [],
@@ -230,7 +230,7 @@ useEffect(() => {
         const parsedProjects = (parsed.projects ?? []) as any[];
         const safeProjects: Project[] = parsedProjects.map((p: any, i: number) => ({
           id: typeof p.id === "number" ? p.id : Date.now() + i,
-          name: typeof p.name === "string" ? p.name : `BOARD ${i + 1}`,
+          name: typeof p.name === "string" ? p.name : `Pedalboard ${i + 1}`,
           zoom: typeof p.zoom === "number" ? p.zoom : 100,
           boardPedals: Array.isArray(p.boardPedals) ? p.boardPedals : [],
           selectedBoards: Array.isArray(p.selectedBoards) ? p.selectedBoards : [],
@@ -311,7 +311,7 @@ useEffect(() => {
     const newId = Date.now();
     const newProject: Project = {
       id: newId,
-      name: `BOARD ${projects.length + 1}`,
+      name: `Pedalboard ${projects.length + 1}`,
       zoom: 100,
       boardPedals: [],
       selectedBoards: [],
@@ -544,10 +544,16 @@ const deleteBoard = (id: number) => {
 
   return (
     <div
-  className="flex w-full bg-zinc-950 text-white overflow-hidden font-sans fixed inset-0 select-none"
+  className="flex min-w-[1400px] bg-zinc-950 text-white font-sans select-none overflow-x-auto"
   style={{ height: "100dvh" }}
   onClick={closeSearchMenus}
 >
+
+  {hydrated && dimensions.width < 768 && (
+  <div className="absolute top-0 left-0 right-0 bg-yellow-500 text-black text-xs text-center py-1 z-50">
+    Best experienced on desktop or tablet.
+  </div>
+)}
 
       <Sidebar
         pedalsLibrary={pedalsLibrary}

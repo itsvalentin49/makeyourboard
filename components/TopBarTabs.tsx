@@ -67,6 +67,8 @@ export default function TopBarTabs({
   language,
 }: Props) {
 
+  const MAX_TABS = 5;
+
   const [activeTabId, setActiveTabId] = useState<number | null>(null);
   const [showSettings, setShowSettings] = useState(false);
 
@@ -135,28 +137,38 @@ export default function TopBarTabs({
         </SortableContext>
 
         <DragOverlay>
-          {draggingProject ? (
-            <div className="flex items-center gap-2 px-4 h-8 rounded-t-lg bg-[#3a3a3c] text-white border border-zinc-700 shadow-2xl">
-              <span className="text-[10px] font-black uppercase tracking-widest truncate">
-                {draggingProject.name}
-              </span>
-            </div>
-          ) : null}
-        </DragOverlay>
+  {draggingProject ? (
+    <div
+      className="
+        flex items-center justify-center
+        min-w-[150px] px-4 h-9
+        rounded-t-xl
+        bg-zinc-900
+        border border-zinc-800
+        text-white
+        shadow-2xl
+      "
+    >
+      <span className="text-[10px] font-black uppercase tracking-widest truncate">
+        {draggingProject.name}
+      </span>
+    </div>
+  ) : null}
+</DragOverlay>
       </DndContext>
 
-      {projects.length < 8 && (
-        <div className="h-8 self-end border-b border-zinc-900 flex items-center shrink-0">
-          <button
-            type="button"
-            onClick={createNewProject}
-            className="p-2 text-zinc-400 hover:text-white transition-colors"
-            aria-label="Create project"
-          >
-            <Plus className="size-5" />
-          </button>
-        </div>
-      )}
+      {projects.length < MAX_TABS && (
+  <div className="flex items-center shrink-0 h-full">
+    <button
+      type="button"
+      onClick={createNewProject}
+      className="px-3 h-full flex items-center justify-center text-zinc-500 hover:text-white transition-colors"
+      aria-label="Create project"
+    >
+      <Plus className="size-4" />
+    </button>
+  </div>
+)}
 
       <div className="flex-1 h-8 self-end border-b border-zinc-900" />
     </div>

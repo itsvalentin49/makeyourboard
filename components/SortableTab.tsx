@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Edit2, X } from "lucide-react";
+import { X } from "lucide-react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import type { Project } from "@/types/project";
@@ -42,6 +42,8 @@ export default function SortableTab({
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
     useSortable({ id: project.id });
 
+  const [justSaved, setJustSaved] = React.useState(false); 
+
   const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition,
@@ -50,6 +52,15 @@ export default function SortableTab({
 
 
   };
+
+  const handleSave = () => {
+  saveName();          // appelle ta fonction existante
+  setJustSaved(true);  // active le feedback
+
+  setTimeout(() => {
+    setJustSaved(false);
+  }, 300);             // 300ms de feedback
+};
 
   return (
     <div
@@ -61,42 +72,42 @@ export default function SortableTab({
         if (isDragging) return;
         setActiveProjectId(project.id);
       }}
-      className={`group relative flex items-center gap-2 px-4 h-8 self-end ${
-        isDragging ? "cursor-grabbing opacity-80" : "cursor-grab"
-      } transition-all rounded-t-lg ${
-        activeProjectId === project.id
-          ? "bg-[#3a3a3c] text-white z-10 border-t border-x border-zinc-800"
-          : "bg-transparent text-zinc-400 hover:text-white border-b border-zinc-900"
-      }`}
+      onDoubleClick={(e) => {
+      e.stopPropagation();
+      startEditing(project, e);
+       }}
+      className={`
+group relative flex items-center justify-center
+w-[180px] px-4 h-9 rounded-t-xl
+border border-transparent
+transition-all duration-200
+${isDragging ? "cursor-grabbing opacity-0" : "cursor-grab"}
+${justSaved ? "ring-2 ring-white/50" : ""}
+${
+  activeProjectId === project.id
+    ? "bg-zinc-900 text-white border-zinc-800"
+    : "text-zinc-500 hover:text-white hover:bg-zinc-900"
+}
+`}
     >
       {editingProjectId === project.id ? (
         <input
           autoFocus
-          className="bg-transparent outline-none text-[10px] font-black uppercase tracking-widest w-full"
+          onClick={(e) => e.stopPropagation()}
+          className="bg-transparent outline-none text-center text-[10px] font-black uppercase tracking-widest w-full"
           value={tempName}
           onChange={(e) => setTempName(e.target.value)}
-          onBlur={saveName}
+          onBlur={handleSave}
           onKeyDown={(e) => {
-            if (e.key === "Enter") saveName();
-            if (e.key === "Escape") saveName();
+            if (e.key === "Enter") handleSave();
+            if (e.key === "Escape") handleSave();
           }}
         />
       ) : (
         <span className="text-[10px] font-black uppercase tracking-widest truncate">{project.name}</span>
       )}
 
-      <div className="flex items-center gap-1.5 ml-auto opacity-0 group-hover:opacity-100 transition-opacity">
-        <button
-          type="button"
-          aria-label="Rename project"
-          className="p-1 hover:text-blue-400 transition-colors"
-          onClick={(e) => {
-            e.stopPropagation();
-            startEditing(project, e);
-          }}
-        >
-          <Edit2 className="size-3" />
-        </button>
+      <div className="absolute right-2 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
 
         <button
             type="button"
@@ -117,7 +128,11 @@ export default function SortableTab({
             <X className="size-3" />
           </button>
 
-      </div>
+            </div>
+
+      {activeProjectId === project.id && (
+        <span className="absolute bottom-0 left-0 w-full h-[2px] bg-white" />
+      )}
     </div>
   );
 }
