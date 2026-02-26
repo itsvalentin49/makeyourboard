@@ -113,7 +113,8 @@
     "material": {
       "label": "Materiale",
       "Aluminium": "Alluminio",
-      "ABS": "ABS"
+      "ABS": "ABS",
+      "Plywood": "Compensato"
     },
 
     "profile": {
@@ -151,7 +152,8 @@
     "wood": "Parquet",
     "marble": "Marmo",
     "rug": "Tappeto",
-    "stage": "Palco"
+    "stage": "Palco",
+    "flightcase": "Flightcase"
   },
 
   "canvas": {
@@ -165,7 +167,7 @@
   },
 
   "tabs": {
-    "confirmDelete": "Sei sicuro di voler eliminare questo progetto?",
+    "confirmDelete": "Sei sicuro di voler eliminare questo pedalboard?",
     "yes": "Sì",
     "cancel": "Annulla"
   },

@@ -1463,7 +1463,7 @@ return (
 
                   {bgOpen && (
                     <div className="absolute z-50 mt-1 w-full bg-zinc-950 border border-zinc-800 rounded-lg overflow-hidden">
-                      {["neutral", "wood", "marble", "rug", "stage"].map((bg) => (
+                      {["neutral", "wood", "marble", "rug", "stage", "flightcase"].map((bg) => (
                         <button
                           key={bg}
                           onClick={() => {

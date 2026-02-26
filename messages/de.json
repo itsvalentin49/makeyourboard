@@ -113,7 +113,8 @@
     "material": {
       "label": "Material",
       "Aluminium": "Aluminium",
-      "ABS": "ABS"
+      "ABS": "ABS",
+      "Plywood": "Sperrholz"
     },
 
     "profile": {
@@ -151,7 +152,8 @@
     "wood": "Parkett",
     "marble": "Marmor",
     "rug": "Teppich",
-    "stage": "Bühne"
+    "stage": "Bühne",
+    "flightcase": "Flightcase"
   },
 
   "canvas": {

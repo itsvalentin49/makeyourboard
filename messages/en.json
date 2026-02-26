@@ -115,7 +115,8 @@
     "material": {
       "label": "Material",
       "Aluminium": "Aluminium",
-      "ABS": "ABS"
+      "ABS": "ABS",
+      "Plywood": "Plywood"
     },
 
     "profile": {
@@ -153,7 +154,8 @@
     "wood": "Parquet Floor",
     "marble": "Marble",
     "rug": "Rug",
-    "stage": "Stage"
+    "stage": "Stage",
+    "flightcase": "Flightcase"
 },
 
   "canvas": {
@@ -167,7 +169,7 @@
   },
 
   "tabs": {
-    "confirmDelete": "Are you sure you want to delete this project?",
+    "confirmDelete": "Are you sure you want to delete this pedalboard?",
     "yes": "Yes",
     "cancel": "Cancel"
   },

@@ -82,6 +82,12 @@ const BACKGROUNDS = [
     type: "image" as const,
     src: "/backgrounds/stage.webp",
   },
+  {
+    id: "flightcase",
+    label: "Flightcase",
+    type: "image" as const,
+    src: "/backgrounds/flightcase.webp",
+  },
 ];
 
 
