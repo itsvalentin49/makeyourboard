@@ -8,7 +8,9 @@
     "addBoard": "Adicionar pedalboard",
     "back": "Voltar ao menu",
     "rotate": "Rodar",
-    "delete": "Eliminar"
+    "delete": "Eliminar",
+    "subtitleLine1": "Crie seu próximo pedalboard em segundos.",
+    "subtitleLine2": "Selecione seus pedais e monte seu setup."
   },
 
   "pedal": {

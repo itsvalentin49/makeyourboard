@@ -8,7 +8,9 @@
     "addBoard": "Add a pedalboard",
     "back": "Back to menu",
     "rotate": "Rotate",
-    "delete": "Delete"
+    "delete": "Delete",
+    "subtitleLine1": "Design your next pedalboard in seconds.",
+    "subtitleLine2": "Select your pedals and build your setup."
   },
 
   "pedal": {

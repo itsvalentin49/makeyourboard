@@ -8,7 +8,9 @@
     "addBoard": "Pedalboard hinzufügen",
     "back": "Zurück zum Menü",
     "rotate": "Drehen",
-    "delete": "Löschen"
+    "delete": "Löschen",
+    "subtitleLine1": "Entwirf dein nächstes Pedalboard in Sekunden.",
+    "subtitleLine2": "Wähle deine Pedale und erstelle dein Setup."
   },
 
   "pedal": {

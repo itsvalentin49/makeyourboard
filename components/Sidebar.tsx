@@ -377,7 +377,7 @@ const buildThomannUrl = (slug: string) => {
 }}
     >
 
-      <SidebarLogo />
+      <SidebarLogo t={t} />
 
 
       {contactOpen ? (
