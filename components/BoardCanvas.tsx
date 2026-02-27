@@ -238,11 +238,19 @@ export default function BoardCanvas({
       {/* BOARDS */}
       {(activeProject.selectedBoards || []).map((b: AnyRow) => (
         <Group
-          key={b.instanceId}
-          x={b.x}
-          y={b.y}
-          draggable
-          rotation={b.rotation || 0}
+  key={b.instanceId}
+  x={b.x}
+  y={b.y}
+  draggable
+  rotation={b.rotation || 0}
+
+  onMouseDown={(e) => {
+    e.cancelBubble = true; // empêche le stage de désélectionner
+    setSelectedBoardInstanceId(b.instanceId);
+    setSelectedInstanceId(null);
+  }}
+
+          
 
           onDragMove={(e) => {
             const node = e.target;
@@ -281,6 +289,7 @@ export default function BoardCanvas({
           }}
         >
           <PedalImage
+          
             url={b.image || b.image_url || b.photo || null}
             width={b.width}
             depth={b.depth}
@@ -290,18 +299,41 @@ export default function BoardCanvas({
             onSizeReady={(w, h) =>
               handleSizeUpdate(b.instanceId, w, h)
             }
+            
           />
+          {selectedBoardInstanceId === b.instanceId &&
+  displaySizes[b.instanceId] && (
+    <Rect
+      x={-displaySizes[b.instanceId].w / 2}
+      y={-displaySizes[b.instanceId].h / 2}
+      width={displaySizes[b.instanceId].w}
+      height={displaySizes[b.instanceId].h}
+      stroke="white"
+      strokeWidth={2}
+      cornerRadius={12}
+      shadowColor="white"
+      shadowBlur={12}
+      shadowOpacity={0.9}
+      listening={false}
+    />
+)}
         </Group>
       ))}
 
       {/* PEDALS */}
       {activeProject.boardPedals.map((p: AnyRow) => (
         <Group
-          key={p.instanceId}
-          x={p.x}
-          y={p.y}
-          rotation={p.rotation || 0}
-          draggable
+  key={p.instanceId}
+  x={p.x}
+  y={p.y}
+  rotation={p.rotation || 0}
+  draggable
+
+  onMouseDown={(e) => {
+    e.cancelBubble = true; // empêche le stage click
+    setSelectedInstanceId(p.instanceId);
+    setSelectedBoardInstanceId(null);
+  }}
 
           onDragMove={(e) => {
             const node = e.target;
@@ -349,6 +381,22 @@ export default function BoardCanvas({
               handleSizeUpdate(p.instanceId, nw, nh)
             }
           />
+          {selectedInstanceId === p.instanceId && displaySizes[p.instanceId] && (
+  <Rect
+    x={-displaySizes[p.instanceId].w / 2}
+    y={-displaySizes[p.instanceId].h / 2}
+    width={displaySizes[p.instanceId].w}
+    height={displaySizes[p.instanceId].h}
+    stroke="white"
+    strokeWidth={2}
+    cornerRadius={12}
+    shadowColor="white"
+    shadowBlur={12}
+    shadowOpacity={0.9}
+    listening={false}
+  />
+)}
+          
         </Group>
       ))}
 
