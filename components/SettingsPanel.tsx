@@ -46,7 +46,7 @@ export default function SettingsPanel({
     {/* LANGUAGE */}
     <div className="flex items-center gap-4">
       <span className="w-28 text-[10px] text-white uppercase font-black tracking-widest">
-        {t("settings.language")}ƒ
+        {t("settings.language")}
       </span>
 
       <div ref={langRef} className="relative flex-1">
