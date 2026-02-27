@@ -574,11 +574,11 @@ const deleteBoard = (id: number) => {
 
   return (
   <div
-    className="bg-zinc-950 text-white font-sans select-none overflow-x-auto"
+    className="bg-zinc-950 text-white font-sans select-none overflow-hidden"
     style={{ height: "100dvh" }}
     onClick={closeSearchMenus}
   >
-    <div className="min-w-[1400px] flex h-full">
+    <div className="flex h-full w-full">
 
   {hydrated && isMobileDevice && (
   <div className="absolute top-0 left-0 right-0 bg-yellow-500 text-black text-xs text-center py-1 z-50">
