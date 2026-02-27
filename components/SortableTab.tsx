@@ -78,15 +78,14 @@ export default function SortableTab({
        }}
       className={`
 group relative flex items-center justify-center
-flex-1 min-w-0 px-2 sm:px-3 md:px-4 h-8 sm:h-9 rounded-t-xl
-border border-transparent
+shrink-0 pl-5 pr-10 h-14
+border-r border-zinc-800
 transition-all duration-200
 ${isDragging ? "cursor-grabbing opacity-0" : "cursor-grab"}
-${justSaved ? "ring-2 ring-white/50" : ""}
 ${
   activeProjectId === project.id
-    ? "bg-zinc-900 text-white border-zinc-800"
-    : "text-zinc-500 hover:text-white hover:bg-zinc-900"
+    ? "bg-zinc-900 text-white"
+    : "text-zinc-500 hover:text-white hover:bg-zinc-900/60"
 }
 `}
     >
@@ -129,10 +128,6 @@ ${
           </button>
 
             </div>
-
-      {activeProjectId === project.id && (
-        <span className="absolute bottom-0 left-0 w-full h-[2px] bg-white" />
-      )}
     </div>
   );
 }

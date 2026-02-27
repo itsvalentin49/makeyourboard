@@ -8,7 +8,6 @@ import {
   Plus,
   RotateCw,
   ShoppingCart,
-  Settings,
   Trash2,
 } from "lucide-react";
 
@@ -221,7 +220,7 @@ React.useEffect(() => {
   const bgRef = React.useRef<HTMLDivElement>(null);
   const [langOpen, setLangOpen] = React.useState(false);
   const langRef = React.useRef<HTMLDivElement>(null);
-  const [settingsOpen, setSettingsOpen] = React.useState(true);
+  const [settingsOpen, setSettingsOpen] = React.useState(false);
   const [shopOpen, setShopOpen] = React.useState(false);
   const shopRef = React.useRef<HTMLDivElement>(null);
   const [mobileOpen, setMobileOpen] = React.useState(false);
@@ -366,7 +365,7 @@ const buildThomannUrl = (slug: string) => {
     <div
   className="
     relative z-40 w-80 shrink-0
-    bg-zinc-950 border-r border-zinc-800
+    bg-zinc-950 border-r border-white
     p-4 flex flex-col gap-6
     overflow-y-auto no-scrollbar touch-pan-y
   "
@@ -1422,159 +1421,6 @@ return (
 
   </div>
 </div>
-
-
-
-          {/* SETTINGS */}
-          <div className="flex flex-col gap-1 mt-4">
-            <button
-  onClick={() => setSettingsOpen((v) => !v)}
-  className="flex items-center justify-between gap-2 px-1 w-full group"
->
-  <div className="flex items-center gap-2">
-    <Settings className="size-3 text-zinc-400" />
-    <span className="text-[10px] font-black uppercase tracking-widest">
-      {t("settings.title")}
-    </span>
-  </div>
-
-  <ChevronDown
-    className={`size-3 text-zinc-500 transition-transform duration-200 ${
-      settingsOpen ? "rotate-180" : ""
-    }`}
-  />
-</button>
-
-
-  {settingsOpen && (
-  <div className="p-4 bg-zinc-900/50 border border-zinc-800 rounded-xl space-y-4">
-
-              {/* BACKGROUND */}
-              <div className="flex items-center gap-4">
-                <span className="w-24 text-[9px] text-zinc-500 uppercase font-black tracking-widest">
-                  {t("settings.background")}
-                </span>
-
-                <div ref={bgRef} className="relative flex-1">
-                  <button
-                type="button"
-                onClick={() => setBgOpen((v) => !v)}
-                className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2
-                          text-[11px] text-left text-white
-                          flex items-center justify-between
-                          hover:border-zinc-600 transition-colors"
-                          >
-                            <span>
-                            {t(`backgrounds.${canvasBg}`)}
-                             </span>
-
-
-                            <ChevronDown
-                              className={`size-3 text-zinc-500 transition-transform ${
-                                bgOpen ? "rotate-180" : ""
-                              }`}
-                            />
-                          </button>
-
-                  {bgOpen && (
-                    <div className="absolute z-50 mt-1 w-full bg-zinc-950 border border-zinc-800 rounded-lg overflow-hidden">
-                      {["neutral", "wood", "marble", "rug", "stage", "flightcase"].map((bg) => (
-                        <button
-                          key={bg}
-                          onClick={() => {
-                            setCanvasBg(bg);
-                            setBgOpen(false);
-                          }}
-                          className="w-full px-4 py-2 text-left text-[11px] hover:bg-zinc-800"
-                        >
-                          {t(`backgrounds.${bg}`)}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* LANGUAGE */}
-              <div className="flex items-center gap-4">
-                <span className="w-24 text-[9px] text-zinc-500 uppercase font-black tracking-widest">
-                  {t("settings.language")}
-                </span>
-
-                <div ref={langRef} className="relative flex-1">
-                  <button
-                  type="button"
-                  onClick={() => setLangOpen((v) => !v)}
-                  className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2
-                            text-[11px] text-left text-white
-                            flex items-center justify-between
-                            hover:border-zinc-600 transition-colors"
-                >
-                  {LANGUAGE_LABELS[language]}
-
-
-                  <ChevronDown
-                    className={`size-3 text-zinc-500 transition-transform ${
-                      langOpen ? "rotate-180" : ""
-                    }`}
-                  />
-                </button>
-
-                  {langOpen && (
-                    <div className="absolute z-50 mt-1 w-full bg-zinc-950 border border-zinc-800 rounded-lg overflow-hidden">
-                      {Object.keys(LANGUAGE_LABELS)
-                        .sort((a, b) =>
-                          LANGUAGE_LABELS[a].localeCompare(LANGUAGE_LABELS[b])
-                        )
-                        .map((l) => (
-                        <button
-                          key={l}
-                          onClick={() => {
-                            setLanguage(l as any);
-                            setLangOpen(false);
-                          }}
-                          className="w-full px-4 py-2 text-left text-[11px] hover:bg-zinc-800"
-                        >
-                          {LANGUAGE_LABELS[l]}
-
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* UNITS */}
-              <div className="flex items-center gap-4">
-                <span className="w-24 text-[9px] text-zinc-500 uppercase font-black tracking-widest">
-                   {t("settings.units")}
-                </span>
-
-                <div className="flex-1">
-                  <div className="flex bg-zinc-950 p-1 rounded-lg border border-zinc-800">
-                    {["metric", "imperial"].map((u) => (
-                      <button
-                        key={u}
-                        onClick={() => setUnits(u as any)}
-                        className={`flex-1 py-1.5 text-[10px] font-black uppercase rounded-md ${
-                          units === u
-                            ? "bg-zinc-800 text-white"
-                            : "text-zinc-600"
-                        }`}
-                      >
-                        {u === "metric" ? "Metric" : "Imperial"}
-
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-            )}
-          </div>
-
-
-
 
         </>
       )}

@@ -537,7 +537,7 @@ const deleteBoard = (id: number) => {
     style={{ height: "100dvh" }}
     onClick={closeSearchMenus}
   >
-    <div className="flex h-full w-full">
+    <div className="flex h-full min-w-[1200px]">
 
   {hydrated && isMobileDevice && (
   <div className="absolute top-0 left-0 right-0 bg-yellow-500 text-black text-xs text-center py-1 z-50">
@@ -591,8 +591,7 @@ const deleteBoard = (id: number) => {
         setContactOpen={setContactOpen}
       />
 
-      <div className="flex-1 relative bg-[#2c2c2e] bg-[linear-gradient(135deg,rgba(255,255,255,0.05)_0%,transparent_50%,rgba(0,0,0,0.1)_100%)] flex flex-col">
-        <TopBarTabs
+        <div className="flex-1 min-w-0 relative bg-[#2c2c2e] bg-[linear-gradient(135deg,rgba(255,255,255,0.05)_0%,transparent_50%,rgba(0,0,0,0.1)_100%)] flex flex-col overflow-hidden">        <TopBarTabs
           projects={projects}
           setProjects={setProjects}
           activeProjectId={activeProjectId}
@@ -604,11 +603,13 @@ const deleteBoard = (id: number) => {
           saveName={saveName}
           deleteProject={deleteProject}
           createNewProject={createNewProject}
-          BACKGROUNDS={BACKGROUNDS}
+          language={language}
+          setLanguage={setLanguage}
           canvasBg={canvasBg}
           setCanvasBg={setCanvasBg}
-          language={language}
-        />
+          units={units}
+          setUnits={setUnits}
+          />
 
 
         <BoardCanvas

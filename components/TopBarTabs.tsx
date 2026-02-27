@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, type Dispatch, type SetStateAction } from "react";
-import { Plus, } from "lucide-react";
+import { Plus, Settings } from "lucide-react";
 import {
   DndContext,
   closestCenter,
@@ -14,11 +14,16 @@ import {
   type DragCancelEvent,
   type UniqueIdentifier,
 } from "@dnd-kit/core";
-import { SortableContext, horizontalListSortingStrategy, arrayMove } from "@dnd-kit/sortable";
+import {
+  SortableContext,
+  horizontalListSortingStrategy,
+  arrayMove,
+} from "@dnd-kit/sortable";
 
 import SortableTab from "@/components/SortableTab";
 import type { Project } from "@/types/project";
 import { getTranslator } from "@/utils/i18n";
+import SettingsPanel from "@/components/SettingsPanel";
 
 type Props = {
   projects: Project[];
@@ -37,12 +42,14 @@ type Props = {
 
   createNewProject: () => void;
 
-  BACKGROUNDS: { id: string; label: string }[];
+  language: "en" | "fr" | "es" | "de" | "it" | "pt";
+  setLanguage: (v: "en" | "fr" | "es" | "de" | "it" | "pt") => void;
+
   canvasBg: string;
   setCanvasBg: (v: string) => void;
 
-  language: "en" | "fr" | "es" | "de" | "it" | "pt";
-
+  units: "metric" | "imperial";
+  setUnits: (v: "metric" | "imperial") => void;
 };
 
 function toNumberId(id: UniqueIdentifier): number {
@@ -61,12 +68,13 @@ export default function TopBarTabs({
   saveName,
   deleteProject,
   createNewProject,
-  BACKGROUNDS = [],
+  language,
+  setLanguage,
   canvasBg,
   setCanvasBg,
-  language,
+  units,
+  setUnits,
 }: Props) {
-
   const MAX_TABS = 5;
 
   const [activeTabId, setActiveTabId] = useState<number | null>(null);
@@ -74,14 +82,14 @@ export default function TopBarTabs({
 
   const t = getTranslator(language ?? "en");
 
-
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: { distance: 6 },
     })
   );
 
-  const draggingProject = projects.find((p) => p.id === activeTabId) ?? null;
+  const draggingProject =
+    projects.find((p) => p.id === activeTabId) ?? null;
 
   const handleTabsDragStart = (event: DragStartEvent) => {
     setActiveTabId(toNumberId(event.active.id));
@@ -91,8 +99,7 @@ export default function TopBarTabs({
     const { active, over } = event;
 
     setActiveTabId(null);
-    if (!over) return;
-    if (active.id === over.id) return;
+    if (!over || active.id === over.id) return;
 
     const activeId = toNumberId(active.id);
     const overId = toNumberId(over.id);
@@ -105,74 +112,142 @@ export default function TopBarTabs({
     });
   };
 
-  const handleTabsDragCancel = (_event: DragCancelEvent) => {
+  const handleTabsDragCancel = () => {
     setActiveTabId(null);
   };
 
   return (
-    <div className="h-14 bg-zinc-950 flex items-center relative">
-      <div className="flex flex-1">
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragStart={handleTabsDragStart}
-        onDragEnd={handleTabsDragEnd}
-        onDragCancel={handleTabsDragCancel}
-      >
-        <SortableContext items={projects.map((p) => p.id)} strategy={horizontalListSortingStrategy}>
-          {projects.map((project) => (
-            <SortableTab
-              key={project.id}
-              project={project}
-              activeProjectId={activeProjectId}
-              setActiveProjectId={setActiveProjectId}
-              startEditing={startEditing}
-              deleteProject={deleteProject}
-              editingProjectId={editingProjectId}
-              tempName={tempName}
-              setTempName={setTempName}
-              saveName={saveName}
-              t={t}
-            />
-          ))}
-        </SortableContext>
+  <div className="h-14 bg-zinc-950 relative flex items-stretch">
+    
+    {/* Ligne blanche pleine largeur */}
+    <span className="absolute top-[53px] left-0 w-full h-px bg-white z-50 pointer-events-none" />
 
-        <DragOverlay>
-  {draggingProject ? (
-    <div
+    {/* ZONE SCROLLABLE (Tabs + Plus) */}
+    <div className="flex-1 min-w-0 overflow-hidden">
+      <div className="flex h-full overflow-x-auto">
+
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragStart={handleTabsDragStart}
+          onDragEnd={handleTabsDragEnd}
+          onDragCancel={handleTabsDragCancel}
+        >
+          <SortableContext
+            items={projects.map((p) => p.id)}
+            strategy={horizontalListSortingStrategy}
+          >
+            {projects.map((project) => (
+              <SortableTab
+                key={project.id}
+                project={project}
+                activeProjectId={activeProjectId}
+                setActiveProjectId={setActiveProjectId}
+                startEditing={startEditing}
+                deleteProject={deleteProject}
+                editingProjectId={editingProjectId}
+                tempName={tempName}
+                setTempName={setTempName}
+                saveName={saveName}
+                t={t}
+              />
+            ))}
+          </SortableContext>
+
+          {/* Bouton + */}
+          {projects.length < MAX_TABS && (
+  <button
+    type="button"
+    onClick={createNewProject}
+    className="px-6 h-full flex items-center justify-center shrink-0 text-white"
+    aria-label="Create project"
+  >
+    <span
       className="
         flex items-center justify-center
-        min-w-[150px] px-4 h-9
-        rounded-t-xl
-        bg-zinc-900
-        border border-zinc-800
-        text-white
-        shadow-2xl
+        transform-gpu
+        transition-transform duration-200 ease-out
+        hover:scale-110
+        hover:rotate-6
+        active:scale-95
+        will-change-transform
       "
     >
-      <span className="text-[10px] font-black uppercase tracking-widest truncate">
-        {draggingProject.name}
-      </span>
-    </div>
-  ) : null}
-</DragOverlay>
-      </DndContext>
-      </div>
-
-      {projects.length < MAX_TABS && (
-  <div className="flex items-center shrink-0 h-full">
-    <button
-      type="button"
-      onClick={createNewProject}
-      className="px-3 h-full flex items-center justify-center text-zinc-500 hover:text-white transition-colors"
-      aria-label="Create project"
-    >
       <Plus className="size-4" />
-    </button>
-  </div>
+    </span>
+  </button>
 )}
 
-      <div className="flex-1 h-8 self-end border-b border-zinc-900" />
+          <DragOverlay>
+            {draggingProject ? (
+              <div className="flex items-center justify-center min-w-[150px] px-4 h-14 bg-zinc-900 text-white shadow-2xl">
+                <span className="text-[10px] font-black uppercase tracking-widest truncate">
+                  {draggingProject.name}
+                </span>
+              </div>
+            ) : null}
+          </DragOverlay>
+        </DndContext>
+
+      </div>
     </div>
-  );
+
+    {/* BOUTON SETTINGS — TOUJOURS VISIBLE */}
+    <button
+      type="button"
+      onClick={() => setShowSettings((v) => !v)}
+      className="
+        flex shrink-0
+        px-6 h-full
+        items-center justify-center
+        text-white
+        transition-all duration-200
+        hover:scale-110
+        hover:rotate-6
+        active:scale-95
+      "
+      aria-label="Settings"
+    >
+      <Settings className="size-5 transition-transform duration-200" />
+    </button>
+
+    {/* DRAWER */}
+    {showSettings && (
+      <div className="hidden lg:flex fixed inset-0 z-[100]">
+
+        <div
+          className="flex-1 bg-black/40 backdrop-blur-[2px]"
+          onClick={() => setShowSettings(false)}
+        />
+
+        <div className="w-[380px] xl:w-[420px] bg-zinc-950 border-l border-zinc-800 p-6 shadow-2xl overflow-y-auto">
+
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-[16px] font-black uppercase tracking-wider text-white">
+              {t("settings.title")}
+            </h2>
+
+            <button
+              onClick={() => setShowSettings(false)}
+              className="text-zinc-500 hover:text-white"
+            >
+              ✕
+            </button>
+          </div>
+
+          <SettingsPanel
+            t={t}
+            canvasBg={canvasBg}
+            setCanvasBg={setCanvasBg}
+            language={language}
+            setLanguage={setLanguage}
+            units={units}
+            setUnits={setUnits}
+          />
+        </div>
+      </div>
+    )}
+
+  </div>
+);
 }
