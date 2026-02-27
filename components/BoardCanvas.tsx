@@ -230,6 +230,11 @@ export default function BoardCanvas({
                   setSelectedBoardInstanceId(b.instanceId);
                   setSelectedInstanceId(null);
                 }}
+                onTap={(e: any) => {
+                  e.cancelBubble = true;
+                  setSelectedBoardInstanceId(b.instanceId);
+                  setSelectedInstanceId(null);
+                }}
                 dragBoundFunc={(pos: any) =>
                   getDragBounds(b.instanceId, b.rotation || 0, pos)
                 }
