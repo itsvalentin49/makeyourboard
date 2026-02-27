@@ -114,7 +114,7 @@ export default function BoardCanvas({
     return () => window.removeEventListener("resize", measure);
   }, []);
 
-  const ZOOM_FACTOR = 1.5;
+  
 
   const getDragBoundsLocal = (
   id: number,
@@ -227,8 +227,8 @@ export default function BoardCanvas({
         <Stage
   width={stageSize.width}
   height={stageSize.height}
-  scaleX={1}
-  scaleY={1}
+  scaleX={currentZoom / 100}
+  scaleY={currentZoom / 100}
   onMouseDown={handleStageClick}
 >
           <Layer>
@@ -301,8 +301,8 @@ export default function BoardCanvas({
 
             {activeProject.boardPedals.map((p: AnyRow) => {
               const size = displaySizes[p.instanceId];
-              const w = size?.w ?? p.width * ZOOM_FACTOR;
-              const h = size?.h ?? p.depth * ZOOM_FACTOR;
+              const w = size?.w ?? p.width;
+              const h = size?.h ?? p.depth;
 
               return (
                 <Group
