@@ -147,11 +147,6 @@ useEffect(() => {
   const [pedalSearch, setPedalSearch] = useState<string>("");
   const [boardSearch, setBoardSearch] = useState<string>("");
 
-  const [dimensions, setDimensions] = useState<{ width: number; height: number }>({
-    width: 0,
-    height: 0,
-  });
-
   const [showPedalResults, setShowPedalResults] = useState<boolean>(false);
   const [showBoardResults, setShowBoardResults] = useState<boolean>(false);
   const [contactOpen, setContactOpen] = useState(false);
@@ -236,10 +231,6 @@ useEffect(() => {
   }, [activeProjectId, activeProject.zoom]);
   
   useEffect(() => {
-    const updateSize = () => setDimensions({ width: window.innerWidth, height: window.innerHeight });
-
-    window.addEventListener("resize", updateSize);
-    updateSize();
 
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -277,11 +268,7 @@ useEffect(() => {
     }
 
     setHydrated(true);
-
-    return () => {
-      window.removeEventListener("resize", updateSize);
-    };
-  }, []);
+    }, []);
 
   useEffect(() => {
   const isTouch =
@@ -299,11 +286,10 @@ useEffect(() => {
    */
   useEffect(() => {
     if (!hydrated) return;
-    if (dimensions.width === 0) return;
 
     const dataToSave = JSON.stringify({ projects, activeProjectId, workingBoard });
     localStorage.setItem(STORAGE_KEY, dataToSave);
-  }, [hydrated, projects, activeProjectId, workingBoard, dimensions.width]);
+  }, [hydrated, projects, activeProjectId, workingBoard,]);
 
   /**
    * Sélections (safe)
@@ -389,8 +375,8 @@ useEffect(() => {
   const newPedal: BoardItem = {
     ...pedal,
     instanceId: Date.now(),
-    x: (dimensions.width - sidebarWidth) / 2,
-    y: (dimensions.height - 56) / 2,
+    x: 400,
+    y: 300,
     rotation: 0,
     draw: Number(pedal.draw) || 0,
     weight: Number(pedal.weight) || 0,
@@ -411,8 +397,8 @@ useEffect(() => {
   const newBoard: BoardItem = {
     ...board,
     instanceId: Date.now(),
-    x: (dimensions.width - sidebarWidth) / 2,
-    y: (dimensions.height - 56) / 2,
+    x: 400,
+    y: 300,
     rotation: 0,
   };
 
@@ -489,8 +475,8 @@ const newItem: BoardItem = {
   customType === "pedal"
     ? "/images/custom-pedal.png"
     : "/images/custom-board.png",
-  x: (dimensions.width - sidebarWidth) / 2,
-  y: (dimensions.height - 56) / 2,
+  x: 400,
+  y: 300,
   rotation: 0,
   draw: 0,
   weight: 0,
@@ -626,7 +612,6 @@ const deleteBoard = (id: number) => {
 
 
         <BoardCanvas
-          dimensions={dimensions}
           activeProject={activeProject}
           units={units}
           language={language}
