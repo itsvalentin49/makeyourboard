@@ -124,13 +124,15 @@ export default function BoardCanvas({
   const size = displaySizes[id];
   if (!size) return pos;
 
+  const scale = currentZoom / 100;
+
   const isVertical = (rotation / 90) % 2 !== 0;
 
-  const w = isVertical ? size.h : size.w;
-  const h = isVertical ? size.w : size.h;
+  const w = (isVertical ? size.h : size.w);
+  const h = (isVertical ? size.w : size.h);
 
-  const stageW = stageSize.width / (currentZoom / 100);
-  const stageH = stageSize.height / (currentZoom / 100);
+  const stageW = stageSize.width / scale;
+  const stageH = stageSize.height / scale;
 
   return {
     x: Math.max(w / 2, Math.min(stageW - w / 2, pos.x)),
@@ -224,154 +226,135 @@ export default function BoardCanvas({
 </div>
 
       {stageSize.width > 0 && stageSize.height > 0 && (
-        <Stage
-  width={stageSize.width}
-  height={stageSize.height}
-  scaleX={currentZoom / 100}
-  scaleY={currentZoom / 100}
-  onMouseDown={handleStageClick}
->
-          <Layer>
-            {(activeProject.selectedBoards || []).map((b: AnyRow) => (
-              <Group
-                key={b.instanceId}
-                x={b.x}
-                y={b.y}
-                draggable
-                dragBoundFunc={(pos: any) =>
-                getDragBoundsLocal(b.instanceId, b.rotation || 0, pos)
-                }
-                rotation={b.rotation || 0}
-                onClick={(e: any) => {
-                  e.cancelBubble = true;
-                  setSelectedBoardInstanceId(b.instanceId);
-                  setSelectedInstanceId(null);
-                }}
-                onTap={(e: any) => {
-                  e.cancelBubble = true;
-                  setSelectedBoardInstanceId(b.instanceId);
-                  setSelectedInstanceId(null);
-                }}
-                onDragEnd={(e: any) => {
-                  const pos = getDragBoundsLocal(
-                    b.instanceId,
-                    b.rotation || 0,
-                    e.target.position()
-                  );
-                  updateActiveProject({
-                    selectedBoards: (activeProject.selectedBoards || []).map(
-                      (x: AnyRow) =>
-                        x.instanceId === b.instanceId
-                          ? { ...x, x: pos.x, y: pos.y }
-                          : x
-                    ),
-                  });
-                }}
-              >
-                <PedalImage
-                  url={b.image || b.image_url || b.photo || null}
-                  width={b.width}
-                  depth={b.depth}
-                  color={b.color}
-                  isBoard
-                  rotation={0}
-                  onSizeReady={(w, h) =>
-                    handleSizeUpdate(b.instanceId, w, h)
-                  }
-                />
+  <Stage
+    width={stageSize.width}
+    height={stageSize.height}
+    scaleX={currentZoom / 100}
+    scaleY={currentZoom / 100}
+    onMouseDown={handleStageClick}
+  >
+    <Layer>
 
-                {selectedBoardInstanceId === b.instanceId &&
-                  displaySizes[b.instanceId] && (
-                    <Rect
-                      x={-displaySizes[b.instanceId].w / 2}
-                      y={-displaySizes[b.instanceId].h / 2}
-                      width={displaySizes[b.instanceId].w}
-                      height={displaySizes[b.instanceId].h}
-                      stroke="white"
-                      strokeWidth={2}
-                      cornerRadius={8}
-                      shadowColor="white"
-                      shadowBlur={8}
-                      shadowOpacity={0.6}
-                      listening={false}
-                    />
-                  )}
-              </Group>
-            ))}
+      {/* BOARDS */}
+      {(activeProject.selectedBoards || []).map((b: AnyRow) => (
+        <Group
+          key={b.instanceId}
+          x={b.x}
+          y={b.y}
+          draggable
+          rotation={b.rotation || 0}
 
-            {activeProject.boardPedals.map((p: AnyRow) => {
-              const size = displaySizes[p.instanceId];
-              const w = size?.w ?? p.width;
-              const h = size?.h ?? p.depth;
+          onDragMove={(e) => {
+            const node = e.target;
+            const scale = currentZoom / 100;
 
-              return (
-                <Group
-                  key={p.instanceId}
-                  x={p.x}
-                  y={p.y}
-                  rotation={p.rotation || 0}
-                  draggable
-                  dragBoundFunc={(pos: any) =>
-                    getDragBoundsLocal(p.instanceId, p.rotation || 0, pos)
-                  }
-                  onClick={(e: any) => {
-                    e.cancelBubble = true;
-                    setSelectedInstanceId(p.instanceId);
-                    setSelectedBoardInstanceId(null);
-                  }}
-                  onTap={(e: any) => {
-                    e.cancelBubble = true;
-                    setSelectedInstanceId(p.instanceId);
-                    setSelectedBoardInstanceId(null);
-                  }}
-                  onDragEnd={(e: any) => {
-                    const pos = getDragBoundsLocal(
-                      p.instanceId,
-                      p.rotation || 0,
-                      e.target.position()
-                    );
-                    updateActiveProject({
-                      boardPedals: activeProject.boardPedals.map(
-                        (x: AnyRow) =>
-                          x.instanceId === p.instanceId
-                            ? { ...x, x: pos.x, y: pos.y }
-                            : x
-                      ),
-                    });
-                  }}
-                >
-                  <PedalImage
-                    url={p.image || p.image_url || p.photo || null}
-                    width={p.width}
-                    depth={p.depth}
-                    color={p.color}
-                    rotation={0}
-                    onSizeReady={(nw, nh) =>
-                      handleSizeUpdate(p.instanceId, nw, nh)
-                    }
-                  />
+            const stageW = stageSize.width;
+            const stageH = stageSize.height;
 
-                  {selectedInstanceId === p.instanceId && (
-                    <Rect
-                      x={-w / 2}
-                      y={-h / 2}
-                      width={w}
-                      height={h}
-                      stroke="white"
-                      strokeWidth={2}
-                      cornerRadius={8}
-                      shadowColor="white"
-                      shadowBlur={8}
-                      shadowOpacity={0.6}
-                      listening={false}
-                    />
-                  )}
-                </Group>
-              );
-            })}
-          </Layer>
-        </Stage>
-      )}
+            const box = node.getClientRect({ skipTransform: false });
+
+            const width = box.width / scale;
+            const height = box.height / scale;
+
+            let x = node.x();
+            let y = node.y();
+
+            if (x - width / 2 < 0) x = width / 2;
+            if (y - height / 2 < 0) y = height / 2;
+            if (x + width / 2 > stageW / scale)
+              x = stageW / scale - width / 2;
+            if (y + height / 2 > stageH / scale)
+              y = stageH / scale - height / 2;
+
+            node.position({ x, y });
+          }}
+
+          onDragEnd={(e) => {
+            updateActiveProject({
+              selectedBoards: (activeProject.selectedBoards || []).map(
+                (x: AnyRow) =>
+                  x.instanceId === b.instanceId
+                    ? { ...x, x: e.target.x(), y: e.target.y() }
+                    : x
+              ),
+            });
+          }}
+        >
+          <PedalImage
+            url={b.image || b.image_url || b.photo || null}
+            width={b.width}
+            depth={b.depth}
+            color={b.color}
+            isBoard
+            rotation={0}
+            onSizeReady={(w, h) =>
+              handleSizeUpdate(b.instanceId, w, h)
+            }
+          />
+        </Group>
+      ))}
+
+      {/* PEDALS */}
+      {activeProject.boardPedals.map((p: AnyRow) => (
+        <Group
+          key={p.instanceId}
+          x={p.x}
+          y={p.y}
+          rotation={p.rotation || 0}
+          draggable
+
+          onDragMove={(e) => {
+            const node = e.target;
+            const scale = currentZoom / 100;
+
+            const stageW = stageSize.width;
+            const stageH = stageSize.height;
+
+            const box = node.getClientRect({ skipTransform: false });
+
+            const width = box.width / scale;
+            const height = box.height / scale;
+
+            let x = node.x();
+            let y = node.y();
+
+            if (x - width / 2 < 0) x = width / 2;
+            if (y - height / 2 < 0) y = height / 2;
+            if (x + width / 2 > stageW / scale)
+              x = stageW / scale - width / 2;
+            if (y + height / 2 > stageH / scale)
+              y = stageH / scale - height / 2;
+
+            node.position({ x, y });
+          }}
+
+          onDragEnd={(e) => {
+            updateActiveProject({
+              boardPedals: activeProject.boardPedals.map(
+                (x: AnyRow) =>
+                  x.instanceId === p.instanceId
+                    ? { ...x, x: e.target.x(), y: e.target.y() }
+                    : x
+              ),
+            });
+          }}
+        >
+          <PedalImage
+            url={p.image || p.image_url || p.photo || null}
+            width={p.width}
+            depth={p.depth}
+            color={p.color}
+            rotation={0}
+            onSizeReady={(nw, nh) =>
+              handleSizeUpdate(p.instanceId, nw, nh)
+            }
+          />
+        </Group>
+      ))}
+
+    </Layer>
+  </Stage>
+)}
     </div>
   );
 }
