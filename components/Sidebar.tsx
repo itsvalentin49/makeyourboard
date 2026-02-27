@@ -364,17 +364,18 @@ const buildThomannUrl = (slug: string) => {
   <>
 
     <div
-      className={`
-        relative z-40 w-80 shrink-0
-        bg-zinc-950 border-r border-zinc-800
-        p-4 flex flex-col gap-6
-        overflow-y-auto no-scrollbar
-      `}
-      onClick={(e) => {
-  e.stopPropagation();
-  setShowPedalResults(false);
-  setShowBoardResults(false);
-}}
+  className="
+    relative z-40 w-80 shrink-0
+    bg-zinc-950 border-r border-zinc-800
+    p-4 flex flex-col gap-6
+    overflow-y-auto no-scrollbar touch-pan-y
+  "
+  style={{ WebkitOverflowScrolling: "touch" }}
+  onClick={(e) => {
+    e.stopPropagation();
+    setShowPedalResults(false);
+    setShowBoardResults(false);
+  }}
     >
 
       <SidebarLogo t={t} />
