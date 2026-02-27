@@ -231,7 +231,7 @@ export default function BoardCanvas({
     height={stageSize.height}
     scaleX={currentZoom / 100}
     scaleY={currentZoom / 100}
-    onMouseDown={handleStageClick}
+    onPointerDown={handleStageClick}
   >
     <Layer>
 
@@ -244,7 +244,7 @@ export default function BoardCanvas({
   draggable
   rotation={b.rotation || 0}
 
-  onMouseDown={(e) => {
+  onPointerDown={(e) => {
     e.cancelBubble = true; // empêche le stage de désélectionner
     setSelectedBoardInstanceId(b.instanceId);
     setSelectedInstanceId(null);
@@ -329,7 +329,7 @@ export default function BoardCanvas({
   rotation={p.rotation || 0}
   draggable
 
-  onMouseDown={(e) => {
+  onPointerDown={(e) => {
     e.cancelBubble = true; // empêche le stage click
     setSelectedInstanceId(p.instanceId);
     setSelectedBoardInstanceId(null);
