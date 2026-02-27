@@ -545,33 +545,6 @@ const deleteBoard = (id: number) => {
 };
 
 
-  /**
-   * Drag bounds
-   */
-  const getDragBounds = (id: number, rotation: number, pos: { x: number; y: number }) => {
-    const size = displaySizes[id];
-    if (!size) return pos;
-
-    const currentZoom = activeProject.zoom || 100;
-    const isVertical = (rotation / 90) % 2 !== 0;
-
-    const w = (isVertical ? size.h : size.w) * (currentZoom / 100);
-    const h = (isVertical ? size.w : size.h) * (currentZoom / 100);
-
-    const isMobile = isMobileDevice;
-    const sidebarWidth = isMobile ? 0 : 320;
-    const topbarHeight = 56;
-
-    const stageW = dimensions.width - sidebarWidth;
-    const stageH = dimensions.height - topbarHeight;
-
-
-    return {
-      x: Math.max(w / 2, Math.min(stageW - w / 2, pos.x)),
-      y: Math.max(h / 2, Math.min(stageH - h / 2, pos.y)),
-    };
-  };
-
   return (
   <div
     className="bg-zinc-950 text-white font-sans select-none overflow-hidden"
@@ -664,7 +637,6 @@ const deleteBoard = (id: number) => {
           displaySizes={displaySizes}
           handleSizeUpdate={handleSizeUpdate}
           updateActiveProject={updateActiveProject}
-          getDragBounds={getDragBounds}
           closeSearchMenus={closeSearchMenus}
           setContactOpen={setContactOpen}
           BACKGROUNDS={BACKGROUNDS}

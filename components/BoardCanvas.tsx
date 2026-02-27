@@ -38,11 +38,6 @@ type Props = {
   handleSizeUpdate: (id: number, w: number, h: number) => void;
 
   updateActiveProject: (updates: Partial<Props["activeProject"]>) => void;
-  getDragBounds: (
-    id: number,
-    rotation: number,
-    pos: { x: number; y: number }
-  ) => { x: number; y: number };
   closeSearchMenus: () => void;
   setContactOpen: (v: boolean) => void;
 
@@ -63,7 +58,6 @@ export default function BoardCanvas({
   displaySizes,
   handleSizeUpdate,
   updateActiveProject,
-  getDragBounds,
   closeSearchMenus,
   setContactOpen,
   BACKGROUNDS = [],
@@ -124,10 +118,32 @@ export default function BoardCanvas({
 
   const ZOOM_FACTOR = 1.5;
 
+  const getDragBoundsLocal = (
+  id: number,
+  rotation: number,
+  pos: { x: number; y: number }
+) => {
+  const size = displaySizes[id];
+  if (!size) return pos;
+
+  const isVertical = (rotation / 90) % 2 !== 0;
+
+  const w = isVertical ? size.h : size.w;
+  const h = isVertical ? size.w : size.h;
+
+  const stageW = stageSize.width;
+  const stageH = stageSize.height;
+
+  return {
+    x: Math.max(w / 2, Math.min(stageW - w / 2, pos.x)),
+    y: Math.max(h / 2, Math.min(stageH - h / 2, pos.y)),
+  };
+};
+
   return (
     <div
       ref={containerRef}
-      className="flex-1 relative overflow-x-visible overflow-y-hidden pb-20"
+      className="flex-1 relative overflow-hidden pb-20"
       style={
         canvasBg === "neutral"
           ? undefined
@@ -213,8 +229,8 @@ export default function BoardCanvas({
         <Stage
   width={stageSize.width}
   height={stageSize.height}
-  scaleX={currentZoom / 100}
-  scaleY={currentZoom / 100}
+  scaleX={1}
+  scaleY={1}
   onMouseDown={handleStageClick}
 >
           <Layer>
@@ -235,11 +251,8 @@ export default function BoardCanvas({
                   setSelectedBoardInstanceId(b.instanceId);
                   setSelectedInstanceId(null);
                 }}
-                dragBoundFunc={(pos: any) =>
-                  getDragBounds(b.instanceId, b.rotation || 0, pos)
-                }
                 onDragEnd={(e: any) => {
-                  const pos = getDragBounds(
+                  const pos = getDragBoundsLocal(
                     b.instanceId,
                     b.rotation || 0,
                     e.target.position()
@@ -307,11 +320,8 @@ export default function BoardCanvas({
                     setSelectedInstanceId(p.instanceId);
                     setSelectedBoardInstanceId(null);
                   }}
-                  dragBoundFunc={(pos: any) =>
-                    getDragBounds(p.instanceId, p.rotation || 0, pos)
-                  }
                   onDragEnd={(e: any) => {
-                    const pos = getDragBounds(
+                    const pos = getDragBoundsLocal(
                       p.instanceId,
                       p.rotation || 0,
                       e.target.position()
