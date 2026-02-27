@@ -107,7 +107,7 @@ ${
         <span className="text-[8px] sm:text-[9px] md:text-[10px] font-black uppercase tracking-widest truncate">{project.name}</span>
       )}
 
-      <div className="absolute right-2 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+      <div className="absolute right-2 flex items-center gap-1.5 opacity-60 hover:opacity-100 transition-opacity">
 
         <button
             type="button"
