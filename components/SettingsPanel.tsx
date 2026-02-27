@@ -45,7 +45,7 @@ export default function SettingsPanel({
 
     {/* LANGUAGE */}
     <div className="flex items-center gap-4">
-      <span className="w-28 text-[10px] text-white uppercase font-black tracking-widest">
+      <span className="w-28 text-[9px] text-white uppercase font-black tracking-widest">
         {t("settings.language")}
       </span>
 
@@ -80,7 +80,7 @@ export default function SettingsPanel({
 
     {/* UNITS */}
     <div className="flex items-center gap-4 pt-5 border-t border-zinc-800/60">
-      <span className="w-28 text-[10px] text-white uppercase font-black tracking-widest">
+      <span className="w-28 text-[9px] text-white uppercase font-black tracking-widest">
         {t("settings.units")}
       </span>
 
@@ -105,7 +105,7 @@ export default function SettingsPanel({
 
     {/* BACKGROUND */}
     <div className="flex items-center gap-4 pt-5 border-t border-zinc-800/60">
-      <span className="w-28 text-[10px] text-white uppercase font-black tracking-widest">
+      <span className="w-28 text-[9px] text-white uppercase font-black tracking-widest">
         {t("settings.background")}
       </span>
 

@@ -43,6 +43,7 @@ type Props = {
   BACKGROUNDS: Background[];
   canvasBg: string;
   setCanvasBg: (v: string) => void;
+  showIntro?: boolean;
 };
 
 export default function BoardCanvas({
@@ -60,7 +61,9 @@ export default function BoardCanvas({
   setContactOpen,
   BACKGROUNDS = [],
   canvasBg,
+  showIntro,
 }: Props) {
+
   const t = getTranslator(language);
   const currentZoom = activeProject.zoom || 100;
 
@@ -400,9 +403,26 @@ export default function BoardCanvas({
         </Group>
       ))}
 
-    </Layer>
+        </Layer>
   </Stage>
 )}
+
+{showIntro && (
+  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+    <div className="max-w-2xl text-center px-6">
+
+      <h2 className="text-2xl font-semibold text-white mb-6">
+        👋 {t("canvasIntro.title")}
+      </h2>
+
+      <p className="whitespace-pre-line text-sm text-zinc-300 leading-relaxed">
+        {t("canvasIntro.text")} 🎸
+      </p>
+
     </div>
-  );
+  </div>
+)}
+
+</div>
+);
 }

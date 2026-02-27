@@ -4,14 +4,19 @@
     "searchBoard": "Cerca pedalboard",
     "buyOnline": "Acquista online",
     "shop": "Negozi",
-    "addPedal": "Aggiungi pedale",
-    "addBoard": "Aggiungi pedalboard",
+    "addPedal": "Pedale",
+    "addBoard": "Pedalboard",
     "back": "Torna al menu",
     "rotate": "Ruota",
     "delete": "Elimina",
     "subtitleLine1": "Progetta la tua prossima pedalboard in pochi secondi.",
     "subtitleLine2": "Seleziona i tuoi pedali e crea il tuo setup."
   },
+
+  "canvasIntro": {
+    "title": "Benvenuto",
+    "text": "Crea la tua pedalboard in pochi clic.\n\nUsa il pannello a sinistra per aggiungere pedali e pedalboard. Cerca per nome, esplora per tipo di effetto oppure crea il tuo modello con dimensioni personalizzate.\n\nUsa le schede per creare fino a 5 pedalboard.\n\nBuild your tone"
+    },
 
   "pedal": {
     "status": {
@@ -131,7 +136,7 @@
   },
 
   "custom": {
-    "title": "Aggiungi pedale o board personalizzato",
+    "title": "Personalizzato",
     "selectType": "Seleziona pedale o board",
     "pedal": "Pedale",
     "board": "Board",

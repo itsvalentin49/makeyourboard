@@ -78,7 +78,7 @@ export default function SortableTab({
        }}
       className={`
 group relative flex items-center justify-center
-shrink-0 pl-5 pr-10 h-14
+shrink-0 pl-5 pr-10 h-full
 border-r border-zinc-800
 transition-all duration-200
 ${isDragging ? "cursor-grabbing opacity-0" : "cursor-grab"}

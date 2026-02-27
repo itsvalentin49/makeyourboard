@@ -117,10 +117,8 @@ export default function TopBarTabs({
   };
 
   return (
-  <div className="h-14 bg-zinc-950 relative flex items-stretch">
+  <div className="h-12 bg-zinc-950 flex items-stretch">
     
-    {/* Ligne blanche pleine largeur */}
-    <span className="absolute top-[53px] left-0 w-full h-px bg-white z-50 pointer-events-none" />
 
     {/* ZONE SCROLLABLE (Tabs + Plus) */}
     <div className="flex-1 min-w-0 overflow-hidden">
@@ -180,7 +178,7 @@ export default function TopBarTabs({
 
           <DragOverlay>
             {draggingProject ? (
-              <div className="flex items-center justify-center min-w-[150px] px-4 h-14 bg-zinc-900 text-white shadow-2xl">
+              <div className="flex items-center justify-center min-w-[150px] px-4 h-[47px] bg-zinc-900 text-white shadow-2xl">
                 <span className="text-[10px] font-black uppercase tracking-widest truncate">
                   {draggingProject.name}
                 </span>

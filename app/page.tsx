@@ -187,6 +187,11 @@ useEffect(() => {
    * Active project (toujours un Project valide)
    */
   const activeProject: Project = projects.find((p) => p.id === activeProjectId) ?? workingBoard;
+  const isFirstBoard = projects.findIndex(p => p.id === activeProjectId) === 0;
+
+  const isBoardEmpty =
+  activeProject?.boardPedals?.length === 0 &&
+  activeProject?.selectedBoards?.length === 0;
 
   /**
    * Helpers
@@ -613,22 +618,23 @@ const deleteBoard = (id: number) => {
 
 
         <BoardCanvas
-          activeProject={activeProject}
-          units={units}
-          language={language}
-          selectedInstanceId={selectedInstanceId}
-          setSelectedInstanceId={setSelectedInstanceId}
-          selectedBoardInstanceId={selectedBoardInstanceId}
-          setSelectedBoardInstanceId={setSelectedBoardInstanceId}
-          displaySizes={displaySizes}
-          handleSizeUpdate={handleSizeUpdate}
-          updateActiveProject={updateActiveProject}
-          closeSearchMenus={closeSearchMenus}
-          setContactOpen={setContactOpen}
-          BACKGROUNDS={BACKGROUNDS}
-          canvasBg={canvasBg}
-          setCanvasBg={setCanvasBg}
-        />
+  activeProject={activeProject}
+  units={units}
+  language={language}
+  selectedInstanceId={selectedInstanceId}
+  setSelectedInstanceId={setSelectedInstanceId}
+  selectedBoardInstanceId={selectedBoardInstanceId}
+  setSelectedBoardInstanceId={setSelectedBoardInstanceId}
+  displaySizes={displaySizes}
+  handleSizeUpdate={handleSizeUpdate}
+  updateActiveProject={updateActiveProject}
+  closeSearchMenus={closeSearchMenus}
+  setContactOpen={setContactOpen}
+  BACKGROUNDS={BACKGROUNDS}
+  canvasBg={canvasBg}
+  setCanvasBg={setCanvasBg}
+  showIntro={isFirstBoard && isBoardEmpty}
+/>
        </div>
       </div>
     </div>

@@ -364,8 +364,8 @@ const buildThomannUrl = (slug: string) => {
 
     <div
   className="
-    relative z-40 w-80 shrink-0
-    bg-zinc-950 border-r border-white
+    relative z-40 w-72 shrink-0
+    bg-zinc-950
     p-4 flex flex-col gap-6
     overflow-y-auto no-scrollbar touch-pan-y
   "
@@ -1245,7 +1245,7 @@ return (
           </div>
 
          {/* MAKE YOUR OWN */}
-<div className="flex flex-col gap-4 mt-4">
+<div className="flex flex-col gap-1 mt-2">
 
   {/* HEADER */}
   <div className="flex items-center gap-2 px-1">
@@ -1333,7 +1333,7 @@ return (
             placeholder={withUnit(t("custom.width"))}
             value={customWidth}
             onChange={(e) => setCustomWidth(e.target.value)}
-            className="w-full bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-[11px] outline-none focus:border-blue-500"
+            className="w-full bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-[10px] outline-none focus:border-blue-500"
           />
 
           <input
@@ -1344,7 +1344,7 @@ return (
             placeholder={withUnit(t("custom.depth"))}
             value={customDepth}
             onChange={(e) => setCustomDepth(e.target.value)}
-            className="w-full bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-[11px] outline-none focus:border-blue-500"
+            className="w-full bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-[10px] outline-none focus:border-blue-500"
           />
 
         </div>
