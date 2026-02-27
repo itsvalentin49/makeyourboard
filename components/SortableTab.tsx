@@ -78,7 +78,7 @@ export default function SortableTab({
        }}
       className={`
 group relative flex items-center justify-center
-w-[180px] px-4 h-9 rounded-t-xl
+w-[90px] sm:w-[110px] md:w-[140px] lg:w-[180px] px-2 sm:px-3 md:px-4 h-8 sm:h-9 rounded-t-xl
 border border-transparent
 transition-all duration-200
 ${isDragging ? "cursor-grabbing opacity-0" : "cursor-grab"}
@@ -94,7 +94,7 @@ ${
         <input
           autoFocus
           onClick={(e) => e.stopPropagation()}
-          className="bg-transparent outline-none text-center text-[10px] font-black uppercase tracking-widest w-full"
+          className="bg-transparent outline-none text-center text-[8px] sm:text-[9px] md:text-[10px] font-black uppercase tracking-widest w-full"
           value={tempName}
           onChange={(e) => setTempName(e.target.value)}
           onBlur={handleSave}
@@ -104,7 +104,7 @@ ${
           }}
         />
       ) : (
-        <span className="text-[10px] font-black uppercase tracking-widest truncate">{project.name}</span>
+        <span className="text-[8px] sm:text-[9px] md:text-[10px] font-black uppercase tracking-widest truncate">{project.name}</span>
       )}
 
       <div className="absolute right-2 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">

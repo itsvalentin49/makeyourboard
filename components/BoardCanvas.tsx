@@ -17,7 +17,6 @@ type Background = {
 };
 
 type Props = {
-  dimensions: { width: number; height: number };
 
   activeProject: {
     boardPedals: AnyRow[];
@@ -47,7 +46,6 @@ type Props = {
 };
 
 export default function BoardCanvas({
-  dimensions,
   activeProject,
   units,
   language,
@@ -131,8 +129,8 @@ export default function BoardCanvas({
   const w = isVertical ? size.h : size.w;
   const h = isVertical ? size.w : size.h;
 
-  const stageW = stageSize.width;
-  const stageH = stageSize.height;
+  const stageW = stageSize.width / (currentZoom / 100);
+  const stageH = stageSize.height / (currentZoom / 100);
 
   return {
     x: Math.max(w / 2, Math.min(stageW - w / 2, pos.x)),
@@ -240,6 +238,9 @@ export default function BoardCanvas({
                 x={b.x}
                 y={b.y}
                 draggable
+                dragBoundFunc={(pos: any) =>
+                getDragBoundsLocal(b.instanceId, b.rotation || 0, pos)
+                }
                 rotation={b.rotation || 0}
                 onClick={(e: any) => {
                   e.cancelBubble = true;
@@ -310,6 +311,9 @@ export default function BoardCanvas({
                   y={p.y}
                   rotation={p.rotation || 0}
                   draggable
+                  dragBoundFunc={(pos: any) =>
+                    getDragBoundsLocal(p.instanceId, p.rotation || 0, pos)
+                  }
                   onClick={(e: any) => {
                     e.cancelBubble = true;
                     setSelectedInstanceId(p.instanceId);
