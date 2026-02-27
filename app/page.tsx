@@ -179,7 +179,7 @@ useEffect(() => {
   const [makeOpen, setMakeOpen] = useState(true);
 
 
-  const [customType, setCustomType] = useState<"pedal" | "board" | null>(null);
+  const [customType, setCustomType] = useState<"pedal" | "board" | null>("pedal");
 
 
 

@@ -221,7 +221,7 @@ React.useEffect(() => {
   const bgRef = React.useRef<HTMLDivElement>(null);
   const [langOpen, setLangOpen] = React.useState(false);
   const langRef = React.useRef<HTMLDivElement>(null);
-  const [settingsOpen, setSettingsOpen] = React.useState(false);
+  const [settingsOpen, setSettingsOpen] = React.useState(true);
   const [shopOpen, setShopOpen] = React.useState(false);
   const shopRef = React.useRef<HTMLDivElement>(null);
   const [mobileOpen, setMobileOpen] = React.useState(false);
@@ -1265,36 +1265,50 @@ return (
         {t("custom.selectType")}
       </span>
 
-      <div className="grid grid-cols-2 gap-2">
-        {["pedal", "board"].map((option) => {
-          const selected = customType === option;
+      <div className="flex w-full bg-zinc-950 border border-zinc-800 rounded-xl overflow-hidden">
 
-          return (
-            <button
-              key={option}
-              onClick={() => {
-                if (selected) {
-                  setCustomType(null);
-                } else {
-                  setCustomType(option as any);
-                }
-                setCustomWidth("");
-                setCustomDepth("");
-              }}
-              className={`py-2 text-[10px] font-black uppercase rounded-md border transition-all
-                bg-zinc-950
-                ${
-                  selected
-                    ? "border-blue-500 text-white"
-                    : "border-zinc-800 text-zinc-500 hover:border-zinc-600"
-                }
-              `}
-            >
-              {t(`custom.${option}`)}
-            </button>
-          );
-        })}
-      </div>
+  {/* PEDAL */}
+  <button
+    onClick={() => {
+      setCustomType("pedal");
+      setCustomWidth("");
+      setCustomDepth("");
+    }}
+    className={`
+      flex-1 py-2 text-[10px] font-black uppercase tracking-widest
+      transition-all duration-200
+      ${
+        customType === "pedal"
+          ? "bg-zinc-800 text-white"
+          : "text-zinc-500 hover:text-white"
+      }
+    `}
+  >
+    {t("custom.pedal")}
+  </button>
+
+  {/* BOARD */}
+  <button
+    onClick={() => {
+      setCustomType("board");
+      setCustomWidth("");
+      setCustomDepth("");
+    }}
+    className={`
+      flex-1 py-2 text-[10px] font-black uppercase tracking-widest
+      transition-all duration-200
+      border-l border-zinc-800
+      ${
+        customType === "board"
+          ? "bg-zinc-800 text-white"
+          : "text-zinc-500 hover:text-white"
+      }
+    `}
+  >
+    {t("custom.board")}
+  </button>
+
+</div>
     </div>
 
     {/* PEDAL FLOW */}

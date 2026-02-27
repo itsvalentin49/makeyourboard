@@ -110,7 +110,8 @@ export default function TopBarTabs({
   };
 
   return (
-    <div className="h-14 bg-zinc-950 flex items-center px-6 shrink-0 overflow-x-auto overflow-y-hidden relative">
+    <div className="h-14 bg-zinc-950 flex items-center relative">
+      <div className="flex flex-1">
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
@@ -156,6 +157,7 @@ export default function TopBarTabs({
   ) : null}
 </DragOverlay>
       </DndContext>
+      </div>
 
       {projects.length < MAX_TABS && (
   <div className="flex items-center shrink-0 h-full">
