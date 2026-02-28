@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useLayoutEffect, useState } from "react";
+import React, { useRef, useLayoutEffect, useEffect, useState } from "react";
 import { Stage, Layer, Group, Rect } from "react-konva";
 import { Zap, Weight, Minus, Plus } from "lucide-react";
 import PedalImage from "@/components/PedalImage";
@@ -18,7 +18,6 @@ type Background = {
 };
 
 type Props = {
-
   activeProject: {
     boardPedals: AnyRow[];
     selectedBoards?: AnyRow[];
@@ -52,7 +51,6 @@ type Props = {
   isMobile?: boolean;
 
   onStageSizeChange?: (size: { width: number; height: number }) => void;
-  
 };
 
 export default function BoardCanvas({
@@ -97,9 +95,9 @@ export default function BoardCanvas({
       0
     );
 
-    const formattedWeight = formatWeight(totalWeight, units, language);
-    const weightValue = formattedWeight.replace(/ ?(kg|lb|oz|g)$/, "");
-    const weightUnit = formattedWeight.match(/(kg|lb|oz|g)$/)?.[0] ?? "";
+  const formattedWeight = formatWeight(totalWeight, units, language);
+  const weightValue = formattedWeight.replace(/ ?(kg|lb|oz|g)$/, "");
+  const weightUnit = formattedWeight.match(/(kg|lb|oz|g)$/)?.[0] ?? "";
 
   const handleStageClick = (e: any) => {
     if (e.target === e.target.getStage()) {
@@ -113,28 +111,42 @@ export default function BoardCanvas({
   const containerRef = useRef<HTMLDivElement>(null);
   const [stageSize, setStageSize] = useState({ width: 0, height: 0 });
 
+  /* ================= MEASURE STAGE ================= */
   useLayoutEffect(() => {
-  if (!containerRef.current) return;
+    if (!containerRef.current) return;
 
-  const measure = () => {
-    const el = containerRef.current;
-    if (!el) return;
+    const measure = () => {
+      if (!containerRef.current) return;
 
-    const rect = el.getBoundingClientRect();
+      const rect = containerRef.current.getBoundingClientRect();
 
-    const newWidth = rect.width;
-    const newHeight = rect.height;
+      setStageSize({
+        width: rect.width,
+        height: rect.height,
+      });
 
-    setStageSize({
-      width: newWidth,
-      height: newHeight,
-    });
+      if (onStageSizeChange) {
+        onStageSizeChange({
+          width: rect.width,
+          height: rect.height,
+        });
+      }
+    };
+
+    measure();
+    window.addEventListener("resize", measure);
+
+    return () => window.removeEventListener("resize", measure);
+  }, []);
+
+  /* ================= PROPORTIONAL RECALC ================= */
+  useEffect(() => {
+    if (!stageSize.width || !stageSize.height) return;
 
     const scale = currentZoom / 100;
-    const stageWidth = newWidth / scale;
-    const stageHeight = newHeight / scale;
+    const stageWidth = stageSize.width / scale;
+    const stageHeight = stageSize.height / scale;
 
-    // 🔥 Recalcul proportionnel
     updateActiveProject({
       boardPedals: activeProject.boardPedals.map((p: AnyRow) =>
         p.xRatio !== undefined
@@ -155,40 +167,30 @@ export default function BoardCanvas({
           : b
       ),
     });
-  };
-
-  measure();
-
-  window.addEventListener("resize", measure);
-  return () => window.removeEventListener("resize", measure);
-
-}, [currentZoom]);
-
-  
+  }, [stageSize.width, stageSize.height, currentZoom]);
 
   const getDragBoundsLocal = (
-  id: number,
-  rotation: number,
-  pos: { x: number; y: number }
-) => {
-  const size = displaySizes[id];
-  if (!size) return pos;
+    id: number,
+    rotation: number,
+    pos: { x: number; y: number }
+  ) => {
+    const size = displaySizes[id];
+    if (!size) return pos;
 
-  const scale = currentZoom / 100;
+    const scale = currentZoom / 100;
+    const isVertical = (rotation / 90) % 2 !== 0;
 
-  const isVertical = (rotation / 90) % 2 !== 0;
+    const w = isVertical ? size.h : size.w;
+    const h = isVertical ? size.w : size.h;
 
-  const w = (isVertical ? size.h : size.w);
-  const h = (isVertical ? size.w : size.h);
+    const stageW = stageSize.width / scale;
+    const stageH = stageSize.height / scale;
 
-  const stageW = stageSize.width / scale;
-  const stageH = stageSize.height / scale;
-
-  return {
-    x: Math.max(w / 2, Math.min(stageW - w / 2, pos.x)),
-    y: Math.max(h / 2, Math.min(stageH - h / 2, pos.y)),
+    return {
+      x: Math.max(w / 2, Math.min(stageW - w / 2, pos.x)),
+      y: Math.max(h / 2, Math.min(stageH - h / 2, pos.y)),
+    };
   };
-};
 
   return (
     <div
