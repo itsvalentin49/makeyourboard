@@ -554,8 +554,7 @@ const deleteBoard = (id: number) => {
 
   return (
   <div
-    className="bg-zinc-950 text-white font-sans select-none overflow-hidden"
-    style={{ height: "100dvh" }}
+    className="bg-zinc-950 text-white font-sans select-none overflow-hidden h-screen"
     onClick={closeSearchMenus}
   >
     <div className="h-full w-full">
@@ -657,10 +656,16 @@ const deleteBoard = (id: number) => {
 
 
 {/* ================= MOBILE <1024 ================= */}
-<div className="flex lg:hidden flex-col h-[100dvh] relative">
+<div className="flex lg:hidden flex-col h-full relative">
 
   {/* HEADER MOBILE */}
-  <div className="h-12 bg-zinc-950 flex items-center justify-between px-4 border-b border-zinc-800">
+    <div
+      className="bg-zinc-950 flex items-center justify-between px-4 border-b border-zinc-800"
+      style={{
+        paddingTop: "env(safe-area-inset-top)",
+        height: "calc(48px + env(safe-area-inset-top))",
+      }}
+    >
     <span className="text-base font-bold tracking-widest">
       MAKE YOUR BOARD
     </span>
@@ -714,6 +719,7 @@ const deleteBoard = (id: number) => {
     shadow-xl
     active:scale-95 transition-transform
   "
+  style={{ bottom: "calc(env(safe-area-inset-bottom) + 24px)" }}
 >
   <Plus className="w-6 h-6 text-white" strokeWidth={2.5} />
 </button>
@@ -746,11 +752,12 @@ const deleteBoard = (id: number) => {
       relative
       bg-zinc-950
       rounded-t-3xl
-      max-h-[85vh]
+      max-h-[85dvh]
       shadow-2xl
       px-6 pt-6 pb-24
       flex flex-col
     "
+    style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
   >
       <Sidebar
         pedalsLibrary={pedalsLibrary}
