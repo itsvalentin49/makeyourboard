@@ -420,6 +420,19 @@ useEffect(() => {
   const addPedal = (pedal: AnyRow) => {
   const { x, y } = getCanvasCenter();
 
+  const container =
+    window.innerWidth >= 1024
+      ? desktopCanvasRef.current
+      : mobileCanvasRef.current;
+
+  if (!container) return;
+
+  const rect = container.getBoundingClientRect();
+  const scale = activeProject.zoom ? activeProject.zoom / 100 : 1;
+
+  const stageWidth = rect.width / scale;
+  const stageHeight = rect.height / scale;
+
   const newPedal: BoardItem = {
     ...pedal,
     instanceId: Date.now(),
@@ -428,6 +441,10 @@ useEffect(() => {
     rotation: 0,
     draw: Number(pedal.draw) || 0,
     weight: Number(pedal.weight) || 0,
+
+    // 🔥 NOUVEAU
+    xRatio: x / stageWidth,
+    yRatio: y / stageHeight,
   };
 
   updateActiveProject({
@@ -441,12 +458,28 @@ useEffect(() => {
   const selectBoard = (board: AnyRow) => {
   const { x, y } = getCanvasCenter();
 
+  const container =
+    window.innerWidth >= 1024
+      ? desktopCanvasRef.current
+      : mobileCanvasRef.current;
+
+  if (!container) return;
+
+  const rect = container.getBoundingClientRect();
+  const scale = activeProject.zoom ? activeProject.zoom / 100 : 1;
+
+  const stageWidth = rect.width / scale;
+  const stageHeight = rect.height / scale;
+
   const newBoard: BoardItem = {
     ...board,
     instanceId: Date.now(),
     x,
     y,
     rotation: 0,
+
+    xRatio: x / stageWidth,
+    yRatio: y / stageHeight,
   };
 
   updateActiveProject({
@@ -498,11 +531,27 @@ const addCustomItem = (item: AnyRow) => {
     }
   }
 
-  // ✅ CENTRE RÉEL DU CANVAS
+  // ✅ Centre réel du canvas
   const { x, y } = getCanvasCenter();
 
+  const container =
+    window.innerWidth >= 1024
+      ? desktopCanvasRef.current
+      : mobileCanvasRef.current;
+
+  if (!container) return;
+
+  const rect = container.getBoundingClientRect();
+  const scale = (activeProject.zoom ?? 100) / 100;
+
+  const stageWidth = rect.width / scale;
+  const stageHeight = rect.height / scale;
+
+  const instanceId = Date.now();
+
   const newItem: BoardItem = {
-    id: Date.now(),
+    id: instanceId,
+    instanceId,
     slug: "custom",
     type: "Custom",
     circuit: "",
@@ -513,7 +562,6 @@ const addCustomItem = (item: AnyRow) => {
     year: "",
     manual: "",
 
-    instanceId: Date.now(),
     name: "Custom",
     brand: "Custom",
     width: widthMm,
@@ -522,11 +570,16 @@ const addCustomItem = (item: AnyRow) => {
       customType === "pedal"
         ? "/images/custom-pedal.png"
         : "/images/custom-board.png",
+
     x,
     y,
     rotation: 0,
     draw: 0,
     weight: 0,
+
+    // 🔥 position relative
+    xRatio: x / stageWidth,
+    yRatio: y / stageHeight,
   };
 
   if (customType === "pedal") {

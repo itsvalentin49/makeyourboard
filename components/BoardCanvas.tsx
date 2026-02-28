@@ -114,31 +114,55 @@ export default function BoardCanvas({
   const [stageSize, setStageSize] = useState({ width: 0, height: 0 });
 
   useLayoutEffect(() => {
-    if (!containerRef.current) return;
+  if (!containerRef.current) return;
 
-    const measure = () => {
-      const el = containerRef.current;
-      if (!el) return;
+  const measure = () => {
+    const el = containerRef.current;
+    if (!el) return;
 
-      const rect = el.getBoundingClientRect();
+    const rect = el.getBoundingClientRect();
 
-      setStageSize({
-      width: rect.width,
-      height: rect.height,
-      });
+    const newWidth = rect.width;
+    const newHeight = rect.height;
 
-      if (onStageSizeChange) {
-      onStageSizeChange({
-        width: rect.width,
-        height: rect.height,
-      });
-      }
-    };
+    setStageSize({
+      width: newWidth,
+      height: newHeight,
+    });
 
-    measure();
-    window.addEventListener("resize", measure);
-    return () => window.removeEventListener("resize", measure);
-  }, []);
+    const scale = currentZoom / 100;
+    const stageWidth = newWidth / scale;
+    const stageHeight = newHeight / scale;
+
+    // 🔥 Recalcul proportionnel
+    updateActiveProject({
+      boardPedals: activeProject.boardPedals.map((p: AnyRow) =>
+        p.xRatio !== undefined
+          ? {
+              ...p,
+              x: stageWidth * p.xRatio,
+              y: stageHeight * p.yRatio,
+            }
+          : p
+      ),
+      selectedBoards: (activeProject.selectedBoards || []).map((b: AnyRow) =>
+        b.xRatio !== undefined
+          ? {
+              ...b,
+              x: stageWidth * b.xRatio,
+              y: stageHeight * b.yRatio,
+            }
+          : b
+      ),
+    });
+  };
+
+  measure();
+
+  window.addEventListener("resize", measure);
+  return () => window.removeEventListener("resize", measure);
+
+}, [currentZoom]);
 
   
 
@@ -299,7 +323,13 @@ export default function BoardCanvas({
               selectedBoards: (activeProject.selectedBoards || []).map(
                 (x: AnyRow) =>
                   x.instanceId === b.instanceId
-                    ? { ...x, x: e.target.x(), y: e.target.y() }
+                    ? {
+    ...x,
+    x: e.target.x(),
+    y: e.target.y(),
+    xRatio: e.target.x() / (stageSize.width / (currentZoom / 100)),
+    yRatio: e.target.y() / (stageSize.height / (currentZoom / 100)),
+  }
                     : x
               ),
             });
@@ -379,7 +409,13 @@ export default function BoardCanvas({
               boardPedals: activeProject.boardPedals.map(
                 (x: AnyRow) =>
                   x.instanceId === p.instanceId
-                    ? { ...x, x: e.target.x(), y: e.target.y() }
+                    ? {
+    ...x,
+    x: e.target.x(),
+    y: e.target.y(),
+    xRatio: e.target.x() / (stageSize.width / (currentZoom / 100)),
+    yRatio: e.target.y() / (stageSize.height / (currentZoom / 100)),
+  }
                     : x
               ),
             });
