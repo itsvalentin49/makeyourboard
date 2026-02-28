@@ -140,34 +140,34 @@ export default function BoardCanvas({
   }, []);
 
   /* ================= PROPORTIONAL RECALC ================= */
-  useEffect(() => {
-    if (!stageSize.width || !stageSize.height) return;
+ useEffect(() => {
+  if (isMobile !== true) return; // 🔥 empêche le recalcul en desktop
+  if (!stageSize.width || !stageSize.height) return;
 
-    const scale = currentZoom / 100;
-    const stageWidth = stageSize.width / scale;
-    const stageHeight = stageSize.height / scale;
+  const stageWidth = stageSize.width;
+  const stageHeight = stageSize.height;
 
-    updateActiveProject({
-      boardPedals: activeProject.boardPedals.map((p: AnyRow) =>
-        p.xRatio !== undefined
-          ? {
-              ...p,
-              x: stageWidth * p.xRatio,
-              y: stageHeight * p.yRatio,
-            }
-          : p
-      ),
-      selectedBoards: (activeProject.selectedBoards || []).map((b: AnyRow) =>
-        b.xRatio !== undefined
-          ? {
-              ...b,
-              x: stageWidth * b.xRatio,
-              y: stageHeight * b.yRatio,
-            }
-          : b
-      ),
-    });
-  }, [stageSize.width, stageSize.height, currentZoom]);
+  updateActiveProject({
+    boardPedals: activeProject.boardPedals.map((p: AnyRow) =>
+      p.xRatio !== undefined
+        ? {
+            ...p,
+            x: stageWidth * p.xRatio,
+            y: stageHeight * p.yRatio,
+          }
+        : p
+    ),
+    selectedBoards: (activeProject.selectedBoards || []).map((b: AnyRow) =>
+      b.xRatio !== undefined
+        ? {
+            ...b,
+            x: stageWidth * b.xRatio,
+            y: stageHeight * b.yRatio,
+          }
+        : b
+    ),
+  });
+}, [stageSize.width, stageSize.height]);
 
   const getDragBoundsLocal = (
     id: number,
