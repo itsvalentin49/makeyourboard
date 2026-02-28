@@ -14,10 +14,11 @@
   },
 
   "canvasIntro": {
-    "title": "Bienvenido",
-    "text1": "Crea tu pedalboard en solo unos clics.\n\nUsa el panel izquierdo para añadir pedales y pedalboards. Busca por nombre, explora por tipo de efecto o crea tu propio modelo con dimensiones personalizadas.\n\n",
-    "text2": "Usa las pestañas para crear hasta 5 pedalboards.\n\n",
-    "text3": "Build your tone"
+    "title": "Make Your Board",
+    "desktopText": "Añade pedales, explora por tipo de efecto y crea tu pedalboard ideal.",
+    "desktopExtra": "Hasta 5 boards para probar, comparar y perfeccionar tus configuraciones.",
+    "mobileText": "Añade pedales, explora por tipo de efecto y crea tu pedalboard ideal.",
+    "text3": "Unlimited setups. Endless tone."
     },
 
   "pedal": {

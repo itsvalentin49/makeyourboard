@@ -370,7 +370,7 @@ const buildThomannUrl = (slug: string) => {
   className="
     relative z-40 w-full lg:w-72 shrink-0
     bg-zinc-950
-    p-4 flex flex-col gap-6
+    p-4 flex flex-col gap-4 lg:gap-6
     overflow-y-auto no-scrollbar touch-pan-y
   "
   style={{ WebkitOverflowScrolling: "touch" }}
@@ -387,21 +387,24 @@ const buildThomannUrl = (slug: string) => {
       {contactOpen ? (
   <div className="flex flex-col gap-6 animate-in slide-in-from-left duration-300">
     
-    <button
-      onClick={() => {
-        setContactOpen(false);
-        setContactSuccess(false);
-        setContactError("");
-      }}
-      className="flex items-center gap-2 text-zinc-500 hover:text-white transition-colors text-[10px] font-black uppercase tracking-widest"
-    >
-      <ArrowLeft className="size-4" /> {t("sidebar.back")}
-    </button>
+    {/* BACK + small title → DESKTOP ONLY */}
+    <div className="hidden lg:block">
+      <button
+        onClick={() => {
+          setContactOpen(false);
+          setContactSuccess(false);
+          setContactError("");
+        }}
+        className="flex items-center gap-2 text-zinc-500 hover:text-white transition-colors text-[10px] font-black uppercase tracking-widest"
+      >
+        <ArrowLeft className="size-4" /> {t("sidebar.back")}
+      </button>
 
-    <div className="space-y-1">
-      <h2 className="text-[16px] font-black leading-tight">
-        {t("contact.title")}
-      </h2>
+      <div className="space-y-1 mt-4">
+        <h2 className="text-[16px] font-black leading-tight">
+          {t("contact.title")}
+        </h2>
+      </div>
     </div>
 
     {contactSuccess ? (
@@ -417,7 +420,7 @@ const buildThomannUrl = (slug: string) => {
       <>
         {/* EMAIL */}
         <div className="flex flex-col gap-1">
-          <label className="text-[9px] uppercase font-black tracking-widest text-zinc-400">
+          <label className="text-[10px] uppercase font-black tracking-widest">
             {t("contact.email")}
           </label>
           <input
@@ -431,7 +434,7 @@ const buildThomannUrl = (slug: string) => {
 
         {/* TYPE */}
 <div className="flex flex-col gap-1 relative" ref={contactTypeRef}>
-  <label className="text-[9px] uppercase font-black tracking-widest text-zinc-400">
+  <label className="text-[10px] uppercase font-black tracking-widest">
     {t("contact.type")}
   </label>
 
@@ -475,7 +478,7 @@ const buildThomannUrl = (slug: string) => {
 
         {/* MESSAGE */}
         <div className="flex flex-col gap-1">
-          <label className="text-[9px] uppercase font-black tracking-widest text-zinc-400">
+          <label className="text-[10px] uppercase font-black tracking-widest">
             {t("contact.message")}
           </label>
           <textarea
@@ -1117,7 +1120,6 @@ return (
           {/* ADD A PEDAL */}
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-2 px-1">
-              <div className="w-[2px] h-3 bg-blue-500 rounded-full"></div>
               <span className="text-[10px] font-black uppercase tracking-widest">
                 {t("sidebar.addPedal")}
               </span>
@@ -1184,7 +1186,6 @@ return (
           {/* ADD A BOARD */}
           <div className="flex flex-col gap-1 mt-2">
             <div className="flex items-center gap-2 px-1">
-              <div className="w-[2px] h-3 bg-blue-500 rounded-full"></div>
               <span className="text-[10px] font-black uppercase tracking-widest">
                 {t("sidebar.addBoard")}
               </span>
@@ -1253,7 +1254,6 @@ return (
 
   {/* HEADER */}
   <div className="flex items-center gap-2 px-1">
-    <div className="w-[2px] h-3 bg-blue-500 rounded-full"></div>
     <span className="text-[10px] font-black uppercase tracking-widest">
       {t("custom.title")}
     </span>

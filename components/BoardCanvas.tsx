@@ -408,91 +408,30 @@ export default function BoardCanvas({
   <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
     <div className="max-w-2xl text-center px-6">
 
-      <h2 className="text-2xl font-semibold text-white mb-6">
-        👋 {t("canvasIntro.title")}
+      <h2 className="text-2xl font-semibold uppercase text-white mb-6">
+        {t("canvasIntro.title")}
       </h2>
 
       <p className="whitespace-pre-line text-sm text-zinc-300 leading-relaxed">
-        {t("canvasIntro.text1")}
+        {isMobile
+          ? t("canvasIntro.mobileText")
+          : t("canvasIntro.desktopText")}
       </p>
 
       {!isMobile && (
-        <p className="whitespace-pre-line text-sm text-zinc-300 leading-relaxed">
-          {t("canvasIntro.text2")}
+        <p className="text-sm text-zinc-300 leading-relaxed mt-4">
+          {t("canvasIntro.desktopExtra")}
         </p>
       )}
 
-      <p className="whitespace-pre-line text-sm text-zinc-300 leading-relaxed">
-        {t("canvasIntro.text3")} 🎸
+      {/* Punchline premium */}
+      <p className="mt-8 text-xs text-zinc-200 italic uppercase">
+        {t("canvasIntro.text3")}
       </p>
 
     </div>
   </div>
 )}
-
-{/* ================= PREMIUM MINI PANEL MOBILE ================= */}
-<div
-  className={`absolute bottom-6 right-6 z-50
-              transition-all duration-300
-              ${
-                isMobile &&
-                (selectedInstanceId !== null ||
-                  selectedBoardInstanceId !== null)
-                  ? "opacity-100 translate-y-0"
-                  : "opacity-0 translate-y-6 pointer-events-none"
-              }`}
->
-  <div className="
-  flex items-center
-  h-10
-  gap-6
-  px-6
-  bg-zinc-900/90 backdrop-blur-xl
-  border border-zinc-800
-  rounded-2xl
-  shadow-2xl
-">
-
-    {/* ROTATE */}
-    {(selectedInstanceId !== null ||
-      selectedBoardInstanceId !== null) && (
-      <button
-        onClick={() => {
-          if (selectedInstanceId !== null) {
-            rotatePedal(selectedInstanceId);
-          }
-          if (selectedBoardInstanceId !== null) {
-            rotateBoard(selectedBoardInstanceId);
-          }
-        }}
-        className="flex flex-col items-center text-zinc-300 hover:text-white transition-colors"
-      >
-        <RotateCw size={20} />
-        
-      </button>
-    )}
-
-    {/* DELETE */}
-    {(selectedInstanceId !== null ||
-      selectedBoardInstanceId !== null) && (
-      <button
-        onClick={() => {
-          if (selectedInstanceId !== null) {
-            deletePedal(selectedInstanceId);
-          }
-          if (selectedBoardInstanceId !== null) {
-            deleteBoard(selectedBoardInstanceId);
-          }
-        }}
-        className="flex flex-col items-center text-red-400 hover:text-red-300 transition-colors"
-      >
-        <Trash2 size={20} />
-        
-      </button>
-    )}
-
-  </div>
-</div>
 
 </div>
 );
