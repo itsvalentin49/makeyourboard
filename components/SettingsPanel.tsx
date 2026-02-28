@@ -119,25 +119,31 @@ export default function SettingsPanel({
   </div>
 </div>
 
-    {/* BACKGROUND */}
-    <div className="flex items-center gap-4 pt-5 border-t border-zinc-800/60">
-      <span className="w-28 text-[10px] text-white uppercase font-black tracking-widest">
-        {t("settings.background")}
-      </span>
+   {/* BACKGROUND TEMP DISABLED */}
+{false && (
+  <div className="flex items-center gap-4 pt-5 border-t border-zinc-800/60">
+    <span className="w-28 text-[10px] text-white uppercase font-black tracking-widest">
+      {t("settings.background")}
+    </span>
 
-      <div ref={bgRef} className="relative flex-1">
-        <button
-          type="button"
-          onClick={() => setBgOpen((v) => !v)}
-          className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2 text-[11px] text-left text-white flex items-center justify-between hover:border-zinc-600 transition-colors"
-        >
-          <span>{t(`backgrounds.${canvasBg}`)}</span>
-          <ChevronDown className={`size-3 transition-transform ${bgOpen ? "rotate-180" : ""}`} />
-        </button>
+    <div ref={bgRef} className="relative flex-1">
+      <button
+        type="button"
+        onClick={() => setBgOpen((v) => !v)}
+        className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2 text-[11px] text-left text-white flex items-center justify-between hover:border-zinc-600 transition-colors"
+      >
+        <span>{t(`backgrounds.${canvasBg}`)}</span>
+        <ChevronDown
+          className={`size-3 transition-transform ${
+            bgOpen ? "rotate-180" : ""
+          }`}
+        />
+      </button>
 
-        {bgOpen && (
-          <div className="absolute z-50 mt-1 w-full bg-zinc-950 border border-zinc-800 rounded-lg overflow-hidden">
-            {["neutral", "wood", "marble", "rug", "stage", "flightcase"].map((bg) => (
+      {bgOpen && (
+        <div className="absolute z-50 mt-1 w-full bg-zinc-950 border border-zinc-800 rounded-lg overflow-hidden">
+          {["neutral", "wood", "marble", "rug", "stage", "flightcase"].map(
+            (bg) => (
               <button
                 key={bg}
                 onClick={() => {
@@ -148,11 +154,13 @@ export default function SettingsPanel({
               >
                 {t(`backgrounds.${bg}`)}
               </button>
-            ))}
-          </div>
-        )}
-      </div>
+            )
+          )}
+        </div>
+      )}
     </div>
+  </div>
+)}
 
   </div>
 );
