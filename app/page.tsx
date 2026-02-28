@@ -5,9 +5,11 @@ import React, { useEffect, useState } from "react";
 import Sidebar from "@/components/Sidebar";
 import TopBarTabs from "@/components/TopBarTabs";
 import BoardCanvas from "@/components/BoardCanvas";
+import SettingsPanel from "@/components/SettingsPanel";
 import { useLibrary } from "@/hooks/useLibrary";
 import type { AnyRow, BoardItem, Project } from "@/types/project";
 import { getTranslator, type Language } from "@/utils/i18n";
+import { Settings, Plus } from "lucide-react";
 
 type Units = "metric" | "imperial";
 const LANGUAGE_TO_LOCALE: Record<string, "en" | "fr" | "es" | "de" | "it" | "pt"> = {
@@ -91,22 +93,21 @@ const BACKGROUNDS = [
 ];
 
 
+const [projects, setProjects] = useState<Project[]>([]);
+const [activeProjectId, setActiveProjectId] = useState<number | null>(null);
+const [workingBoard, setWorkingBoard] = useState<Project>(DEFAULT_WORKING_BOARD);
+const [editingProjectId, setEditingProjectId] = useState<number | null>(null);
+const [tempName, setTempName] = useState<string>("");
+const [canvasBg, setCanvasBg] = useState<string>("neutral");
+const [language, setLanguage] = useState<Language>("en");
+const t = getTranslator(language);
+const [units, setUnits] = useState<Units>("metric");
+const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+const [settingsOpen, setSettingsOpen] = useState(false);
 
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [activeProjectId, setActiveProjectId] = useState<number | null>(null);
 
-  const [workingBoard, setWorkingBoard] = useState<Project>(DEFAULT_WORKING_BOARD);
-
-  const [editingProjectId, setEditingProjectId] = useState<number | null>(null);
-  const [tempName, setTempName] = useState<string>("");
-
-  const [canvasBg, setCanvasBg] = useState<string>("neutral");
-  const [language, setLanguage] = useState<Language>("en");
-  const t = getTranslator(language);
-
-  const [units, setUnits] = useState<Units>("metric");
-
-  useEffect(() => {
+/* ================= SETTINGS LOAD ================= */
+useEffect(() => {
   try {
     const saved = localStorage.getItem(SETTINGS_STORAGE_KEY);
     if (!saved) return;
@@ -114,21 +115,23 @@ const BACKGROUNDS = [
     const parsed = JSON.parse(saved);
 
     if (parsed.canvasBg) setCanvasBg(parsed.canvasBg);
+
     if (parsed.language) {
-  const allowed: Language[] = ["en", "fr", "es", "de", "it", "pt"];
-
-  if (allowed.includes(parsed.language)) {
-    setLanguage(parsed.language);
-  }
-}
-
-
+      const allowed: Language[] = ["en", "fr", "es", "de", "it", "pt"];
+      if (allowed.includes(parsed.language)) {
+        setLanguage(parsed.language);
+      }
+    }
 
     if (parsed.units) setUnits(parsed.units);
+
   } catch {
     // storage corrompu → on ignore
   }
 }, []);
+
+
+/* ================= SETTINGS SAVE ================= */
 useEffect(() => {
   const data = {
     canvasBg,
@@ -138,6 +141,19 @@ useEffect(() => {
 
   localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(data));
 }, [canvasBg, language, units]);
+
+
+/* ================= FORCE CLOSE MOBILE DRAWER ON DESKTOP ================= */
+useEffect(() => {
+  const handleResize = () => {
+    if (window.innerWidth >= 1024) {
+      setMobileSidebarOpen(false);
+    }
+  };
+
+  window.addEventListener("resize", handleResize);
+  return () => window.removeEventListener("resize", handleResize);
+}, []);
 
 
 
@@ -415,7 +431,7 @@ useEffect(() => {
 };
 
 
-const addCustomItem = () => {
+const addCustomItem = (item: AnyRow) => {
   if (!customType) return;
 
   const isMobile = isMobileDevice;
@@ -542,14 +558,200 @@ const deleteBoard = (id: number) => {
     style={{ height: "100dvh" }}
     onClick={closeSearchMenus}
   >
-    <div className="flex h-full min-w-[1200px]">
+    <div className="h-full w-full">
 
-  {hydrated && isMobileDevice && (
-  <div className="absolute top-0 left-0 right-0 bg-yellow-500 text-black text-xs text-center py-1 z-50">
-    Best experienced on desktop or tablet.
+      {/* ================= DESKTOP ≥1024 ================= */}
+      <div className="hidden lg:flex h-full">
+
+        <Sidebar
+          pedalsLibrary={pedalsLibrary}
+          boardsLibrary={boardsLibrary}
+          showPedalResults={showPedalResults}
+          setShowPedalResults={setShowPedalResults}
+          showBoardResults={showBoardResults}
+          setShowBoardResults={setShowBoardResults}
+          pedalSearch={pedalSearch}
+          setPedalSearch={setPedalSearch}
+          boardSearch={boardSearch}
+          setBoardSearch={setBoardSearch}
+          selectedPedal={selectedPedal}
+          selectedBoardDetails={selectedBoardDetails}
+          selectedInstanceId={selectedInstanceId}
+          selectedBoardInstanceId={selectedBoardInstanceId}
+          setSelectedInstanceId={setSelectedInstanceId}
+          setSelectedBoardInstanceId={setSelectedBoardInstanceId}
+          customName={customName}
+          setCustomName={setCustomName}
+          customWidth={customWidth}
+          setCustomWidth={setCustomWidth}
+          customDepth={customDepth}
+          setCustomDepth={setCustomDepth}
+          customColor={customColor}
+          setCustomColor={setCustomColor}
+          addPedal={addPedal}
+          selectBoard={selectBoard}
+          addCustomItem={addCustomItem}
+          rotatePedal={rotatePedal}
+          deletePedal={deletePedal}
+          rotateBoard={rotateBoard}
+          deleteBoard={deleteBoard}
+          canvasBg={canvasBg}
+          setCanvasBg={setCanvasBg}
+          language={language}
+          setLanguage={setLanguage}
+          units={units}
+          setUnits={setUnits}
+          customType={customType}
+          setCustomType={setCustomType}
+          makeOpen={makeOpen}
+          setMakeOpen={setMakeOpen}
+          contactOpen={contactOpen}
+          setContactOpen={setContactOpen}
+        />
+
+        <div className="flex-1 min-w-0 relative bg-[#2c2c2e] bg-[linear-gradient(135deg,rgba(255,255,255,0.05)_0%,transparent_50%,rgba(0,0,0,0.1)_100%)] flex flex-col overflow-hidden">
+
+          <TopBarTabs
+            projects={projects}
+            setProjects={setProjects}
+            activeProjectId={activeProjectId}
+            setActiveProjectId={setActiveProjectId}
+            editingProjectId={editingProjectId}
+            tempName={tempName}
+            setTempName={setTempName}
+            startEditing={startEditing}
+            saveName={saveName}
+            deleteProject={deleteProject}
+            createNewProject={createNewProject}
+            language={language}
+            settingsOpen={settingsOpen}
+            setSettingsOpen={setSettingsOpen}
+          />
+
+          <BoardCanvas
+            activeProject={activeProject}
+            units={units}
+            language={language}
+            selectedInstanceId={selectedInstanceId}
+            setSelectedInstanceId={setSelectedInstanceId}
+            selectedBoardInstanceId={selectedBoardInstanceId}
+            setSelectedBoardInstanceId={setSelectedBoardInstanceId}
+            displaySizes={displaySizes}
+            handleSizeUpdate={handleSizeUpdate}
+            updateActiveProject={updateActiveProject}
+            closeSearchMenus={closeSearchMenus}
+            setContactOpen={setContactOpen}
+            BACKGROUNDS={BACKGROUNDS}
+            canvasBg={canvasBg}
+            setCanvasBg={setCanvasBg}
+            showIntro={isFirstBoard && isBoardEmpty}
+            isMobile={false}
+            rotatePedal={rotatePedal}
+            deletePedal={deletePedal}
+            rotateBoard={rotateBoard}
+            deleteBoard={deleteBoard}
+          />
+
+        </div>
+      </div>
+
+
+{/* ================= MOBILE <1024 ================= */}
+<div className="flex lg:hidden flex-col h-[100dvh] relative">
+
+  {/* HEADER MOBILE */}
+  <div className="h-12 bg-zinc-950 flex items-center justify-between px-4 border-b border-zinc-800">
+    <span className="text-base font-bold tracking-widest">
+      MAKE YOUR BOARD
+    </span>
+
+    <button
+      type="button"
+      onClick={() => setSettingsOpen(true)}
+      className="flex items-center justify-center w-12 h-12 text-white"
+      aria-label="Settings"
+    >
+      <Settings className="w-5 h-5" />
+    </button>
   </div>
-)}
 
+  {/* CANVAS MOBILE */}
+  <div className="flex-1 relative bg-[#2c2c2e] overflow-hidden">
+    <BoardCanvas
+      activeProject={activeProject}
+      units={units}
+      language={language}
+      selectedInstanceId={selectedInstanceId}
+      setSelectedInstanceId={setSelectedInstanceId}
+      selectedBoardInstanceId={selectedBoardInstanceId}
+      setSelectedBoardInstanceId={setSelectedBoardInstanceId}
+      displaySizes={displaySizes}
+      handleSizeUpdate={handleSizeUpdate}
+      updateActiveProject={updateActiveProject}
+      closeSearchMenus={closeSearchMenus}
+      setContactOpen={setContactOpen}
+      BACKGROUNDS={BACKGROUNDS}
+      canvasBg={canvasBg}
+      setCanvasBg={setCanvasBg}
+      showIntro={isFirstBoard && isBoardEmpty}
+      rotatePedal={rotatePedal}
+      deletePedal={deletePedal}
+      rotateBoard={rotateBoard}
+      deleteBoard={deleteBoard}
+      isMobile={true}
+    />
+  </div>
+
+  {/* FLOATING + BUTTON */}
+  <button
+  onClick={() => setMobileSidebarOpen(true)}
+  className="
+    absolute bottom-6 left-1/2 -translate-x-1/2 z-50
+    h-12 w-12
+    rounded-full
+    bg-blue-600
+    flex items-center justify-center
+    shadow-xl
+    active:scale-95 transition-transform
+  "
+>
+  <Plus className="w-6 h-6 text-white" strokeWidth={2.5} />
+</button>
+
+  {/* MOBILE SIDEBAR DRAWER */}
+  <div
+    className={`absolute inset-0 z-40 transition-opacity duration-300 ${
+      mobileSidebarOpen
+        ? "opacity-100 pointer-events-auto"
+        : "opacity-0 pointer-events-none"
+    }`}
+    onClick={() => setMobileSidebarOpen(false)}
+  >
+    {/* Overlay */}
+<div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
+
+{/* Drawer */}
+<div
+  className={`absolute bottom-0 left-1/2 -translate-x-1/2
+              w-[88%] max-w-[360px]
+              transition-transform duration-300 ${
+                mobileSidebarOpen
+                  ? "translate-y-0"
+                  : "translate-y-full"
+              }`}
+  onClick={(e) => e.stopPropagation()}
+>
+  <div
+  className="
+      relative
+      bg-zinc-950
+      rounded-t-3xl
+      max-h-[85vh]
+      shadow-2xl
+      px-6 pt-6 pb-24
+      flex flex-col
+    "
+  >
       <Sidebar
         pedalsLibrary={pedalsLibrary}
         boardsLibrary={boardsLibrary}
@@ -561,10 +763,10 @@ const deleteBoard = (id: number) => {
         setPedalSearch={setPedalSearch}
         boardSearch={boardSearch}
         setBoardSearch={setBoardSearch}
-        selectedPedal={selectedPedal}
-        selectedBoardDetails={selectedBoardDetails}
-        selectedInstanceId={selectedInstanceId}
-        selectedBoardInstanceId={selectedBoardInstanceId}
+        selectedPedal={undefined}
+        selectedBoardDetails={undefined}
+        selectedInstanceId={null}
+        selectedBoardInstanceId={null}
         setSelectedInstanceId={setSelectedInstanceId}
         setSelectedBoardInstanceId={setSelectedBoardInstanceId}
         customName={customName}
@@ -575,9 +777,18 @@ const deleteBoard = (id: number) => {
         setCustomDepth={setCustomDepth}
         customColor={customColor}
         setCustomColor={setCustomColor}
-        addPedal={addPedal}
-        selectBoard={selectBoard}
-        addCustomItem={addCustomItem}
+        addPedal={(p) => {
+          addPedal(p);
+          setMobileSidebarOpen(false);
+        }}
+        selectBoard={(b) => {
+          selectBoard(b);
+          setMobileSidebarOpen(false);
+        }}
+        addCustomItem={(item) => {
+          addCustomItem(item);
+          setMobileSidebarOpen(false);
+        }}
         rotatePedal={rotatePedal}
         deletePedal={deletePedal}
         rotateBoard={rotateBoard}
@@ -585,7 +796,7 @@ const deleteBoard = (id: number) => {
         canvasBg={canvasBg}
         setCanvasBg={setCanvasBg}
         language={language}
-        setLanguage={(lang) => {setLanguage(lang);}}
+        setLanguage={setLanguage}
         units={units}
         setUnits={setUnits}
         customType={customType}
@@ -594,49 +805,62 @@ const deleteBoard = (id: number) => {
         setMakeOpen={setMakeOpen}
         contactOpen={contactOpen}
         setContactOpen={setContactOpen}
+        hideLogo
       />
-
-        <div className="flex-1 min-w-0 relative bg-[#2c2c2e] bg-[linear-gradient(135deg,rgba(255,255,255,0.05)_0%,transparent_50%,rgba(0,0,0,0.1)_100%)] flex flex-col overflow-hidden">        <TopBarTabs
-          projects={projects}
-          setProjects={setProjects}
-          activeProjectId={activeProjectId}
-          setActiveProjectId={setActiveProjectId}
-          editingProjectId={editingProjectId}
-          tempName={tempName}
-          setTempName={setTempName}
-          startEditing={startEditing}
-          saveName={saveName}
-          deleteProject={deleteProject}
-          createNewProject={createNewProject}
-          language={language}
-          setLanguage={setLanguage}
-          canvasBg={canvasBg}
-          setCanvasBg={setCanvasBg}
-          units={units}
-          setUnits={setUnits}
-          />
-
-
-        <BoardCanvas
-  activeProject={activeProject}
-  units={units}
-  language={language}
-  selectedInstanceId={selectedInstanceId}
-  setSelectedInstanceId={setSelectedInstanceId}
-  selectedBoardInstanceId={selectedBoardInstanceId}
-  setSelectedBoardInstanceId={setSelectedBoardInstanceId}
-  displaySizes={displaySizes}
-  handleSizeUpdate={handleSizeUpdate}
-  updateActiveProject={updateActiveProject}
-  closeSearchMenus={closeSearchMenus}
-  setContactOpen={setContactOpen}
-  BACKGROUNDS={BACKGROUNDS}
-  canvasBg={canvasBg}
-  setCanvasBg={setCanvasBg}
-  showIntro={isFirstBoard && isBoardEmpty}
-/>
-       </div>
-      </div>
     </div>
-  );
+  </div>
+  </div>
+
+</div>
+
+          
+      </div>
+     {settingsOpen && (
+  <div className="fixed inset-0 z-[200] flex">
+
+    {/* Overlay blur */}
+    <div
+      className="flex-1 bg-black/40 backdrop-blur-sm"
+      onClick={() => setSettingsOpen(false)}
+    />
+
+    {/* Drawer (mobile + desktop unifiés) */}
+    <div
+      className="
+        w-[85%] max-w-[420px]
+        bg-zinc-950/90 backdrop-blur-xl
+        border-l border-zinc-800
+        p-6
+        shadow-2xl
+        overflow-y-auto
+        animate-slideIn
+      "
+    >
+      <div className="flex items-center justify-between mb-8">
+        <h2 className="text-[16px] font-black uppercase tracking-wider text-white">
+          {t("settings.title")}
+        </h2>
+
+        <button
+          onClick={() => setSettingsOpen(false)}
+          className="text-zinc-500 hover:text-white transition-colors"
+        >
+          ✕
+        </button>
+      </div>
+
+      <SettingsPanel
+        t={t}
+        canvasBg={canvasBg}
+        setCanvasBg={setCanvasBg}
+        language={language}
+        setLanguage={setLanguage}
+        units={units}
+        setUnits={setUnits}
+      />
+    </div>
+  </div>
+)}
+    </div>
+);
 }

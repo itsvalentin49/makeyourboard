@@ -14,8 +14,10 @@
   },
 
   "canvasIntro": {
-    "title": "Welcome",
-    "text": "Build your pedalboard in just a few clicks!\n\nUse the left panel to add pedals and pedalboards. Search by name, browse by effect type, or create your own model with custom dimensions.\n\nUse the tabs to create up to 5 pedalboards.\n\nBuild your tone"
+    "title": "Bienvenido",
+    "text1": "Crea tu pedalboard en solo unos clics.\n\nUsa el panel izquierdo para añadir pedales y pedalboards. Busca por nombre, explora por tipo de efecto o crea tu propio modelo con dimensiones personalizadas.\n\n",
+    "text2": "Usa las pestañas para crear hasta 5 pedalboards.\n\n",
+    "text3": "Build your tone"
     },
 
   "pedal": {

@@ -6,6 +6,7 @@ import { Zap, Weight, Minus, Plus } from "lucide-react";
 import PedalImage from "@/components/PedalImage";
 import { formatWeight } from "@/utils/units";
 import { getTranslator } from "@/utils/i18n";
+import { RotateCw, Trash2, X } from "lucide-react";
 
 type AnyRow = Record<string, any>;
 
@@ -26,6 +27,10 @@ type Props = {
 
   units: "metric" | "imperial";
   language: "en" | "fr" | "es" | "de" | "it" | "pt";
+  rotatePedal: (id: number) => void;
+  deletePedal: (id: number) => void;
+  rotateBoard: (id: number) => void;
+  deleteBoard: (id: number) => void;
 
   selectedInstanceId: number | null;
   setSelectedInstanceId: (v: number | null) => void;
@@ -44,6 +49,8 @@ type Props = {
   canvasBg: string;
   setCanvasBg: (v: string) => void;
   showIntro?: boolean;
+  isMobile?: boolean;
+  
 };
 
 export default function BoardCanvas({
@@ -62,6 +69,11 @@ export default function BoardCanvas({
   BACKGROUNDS = [],
   canvasBg,
   showIntro,
+  isMobile = false,
+  rotatePedal,
+  deletePedal,
+  rotateBoard,
+  deleteBoard,
 }: Props) {
 
   const t = getTranslator(language);
@@ -146,7 +158,7 @@ export default function BoardCanvas({
   return (
     <div
       ref={containerRef}
-      className="flex-1 relative overflow-hidden pb-20"
+      className={`absolute inset-0 overflow-hidden ${isMobile ? "pb-6" : "pb-20"}`}
       style={
         canvasBg === "neutral"
           ? undefined
@@ -160,72 +172,63 @@ export default function BoardCanvas({
             }
       }
     >
-      {/* ZOOM + TOTAL DRAW + TOTAL WEIGHT */}
-<div className="absolute bottom-6 left-6 flex items-end gap-4 z-50">
+      <div className="absolute bottom-6 left-6 flex items-end gap-4 z-50">
 
   {/* ZOOM */}
-<div className="flex items-center h-10 w-28 bg-zinc-950/80 backdrop-blur-md border border-zinc-800 rounded-2xl shadow-2xl">
+  <div className="flex items-center h-10 w-28 bg-zinc-950/80 backdrop-blur-md border border-zinc-800 rounded-2xl shadow-2xl">
 
-  <button
-    onClick={() =>
-      updateActiveProject({ zoom: Math.max(25, currentZoom - 5) })
-    }
-    className="w-10 flex items-center justify-center text-zinc-400 hover:text-white transition-colors"
-  >
-    <Minus size={14} />
-  </button>
+    <button
+      onClick={() =>
+        updateActiveProject({ zoom: Math.max(25, currentZoom - 5) })
+      }
+      className="w-10 flex items-center justify-center text-zinc-400 hover:text-white transition-colors"
+    >
+      <Minus size={14} />
+    </button>
 
-  <div className="w-12 text-center text-[12px] font-black font-mono tabular-nums text-zinc-300">
-    {currentZoom}
-    <span className="ml-1">%</span>
+    <div className="w-12 text-center text-[12px] font-black font-mono tabular-nums text-zinc-300">
+      {currentZoom}
+      <span className="ml-1">%</span>
+    </div>
+
+    <button
+      onClick={() =>
+        updateActiveProject({ zoom: Math.min(200, currentZoom + 5) })
+      }
+      className="w-10 flex items-center justify-center text-zinc-400 hover:text-white transition-colors"
+    >
+      <Plus size={14} />
+    </button>
+
   </div>
 
-  <button
-    onClick={() =>
-      updateActiveProject({ zoom: Math.min(200, currentZoom + 5) })
-    }
-    className="w-10 flex items-center justify-center text-zinc-400 hover:text-white transition-colors"
-  >
-    <Plus size={14} />
-  </button>
+  {/* Desktop uniquement */}
+  {!isMobile && (
+    <>
+      {/* TOTAL DRAW */}
+      <div className="relative flex items-center justify-center h-10 w-28 bg-zinc-950/80 backdrop-blur-md border border-zinc-800 rounded-2xl shadow-2xl pointer-events-none">
+        <Zap className="absolute left-3 size-4 text-yellow-500" />
+        <span className="text-[12px] font-black font-mono tabular-nums">
+          {totalDraw}
+        </span>
+        <span className="absolute right-3 text-[10px] text-zinc-500">
+          mA
+        </span>
+      </div>
 
-</div>
+      {/* TOTAL WEIGHT */}
+      <div className="relative flex items-center justify-center h-10 w-28 bg-zinc-950/80 backdrop-blur-md border border-zinc-800 rounded-2xl shadow-2xl pointer-events-none">
+        <Weight className="absolute left-3 size-4 text-blue-500" />
+        <span className="text-[12px] font-black font-mono tabular-nums">
+          {weightValue}
+        </span>
+        <span className="absolute right-3 text-[10px] text-zinc-500">
+          {weightUnit}
+        </span>
+      </div>
+    </>
+  )}
 
-  {/* TOTAL DRAW */}
-<div className="relative flex items-center justify-center h-10 w-28 bg-zinc-950/80 backdrop-blur-md border border-zinc-800 rounded-2xl shadow-2xl pointer-events-none">
-
-  {/* Icône à gauche */}
-  <Zap className="absolute left-3 size-4 text-yellow-500" />
-
-  {/* Valeur centrée */}
-  <span className="text-[12px] font-black font-mono tabular-nums">
-    {totalDraw}
-  </span>
-
-  {/* Unité à droite */}
-  <span className="absolute right-3 text-[10px] text-zinc-500">
-    mA
-  </span>
-
-</div>
-
-{/* TOTAL WEIGHT */}
-<div className="relative flex items-center justify-center h-10 w-28 bg-zinc-950/80 backdrop-blur-md border border-zinc-800 rounded-2xl shadow-2xl pointer-events-none">
-
-  {/* Icône à gauche */}
-  <Weight className="absolute left-3 size-4 text-blue-500" />
-
-  {/* Valeur centrée */}
-  <span className="text-[12px] font-black font-mono tabular-nums">
-    {weightValue}
-  </span>
-
-  {/* Unité à droite */}
-  <span className="absolute right-3 text-[10px] text-zinc-500">
-    {weightUnit}
-  </span>
-
-</div>
 </div>
 
       {stageSize.width > 0 && stageSize.height > 0 && (
@@ -313,10 +316,7 @@ export default function BoardCanvas({
       height={displaySizes[b.instanceId].h}
       stroke="white"
       strokeWidth={2}
-      cornerRadius={12}
-      shadowColor="white"
-      shadowBlur={12}
-      shadowOpacity={0.9}
+      cornerRadius={6}
       listening={false}
     />
 )}
@@ -392,10 +392,7 @@ export default function BoardCanvas({
     height={displaySizes[p.instanceId].h}
     stroke="white"
     strokeWidth={2}
-    cornerRadius={12}
-    shadowColor="white"
-    shadowBlur={12}
-    shadowOpacity={0.9}
+    cornerRadius={6}
     listening={false}
   />
 )}
@@ -416,12 +413,86 @@ export default function BoardCanvas({
       </h2>
 
       <p className="whitespace-pre-line text-sm text-zinc-300 leading-relaxed">
-        {t("canvasIntro.text")} 🎸
+        {t("canvasIntro.text1")}
+      </p>
+
+      {!isMobile && (
+        <p className="whitespace-pre-line text-sm text-zinc-300 leading-relaxed">
+          {t("canvasIntro.text2")}
+        </p>
+      )}
+
+      <p className="whitespace-pre-line text-sm text-zinc-300 leading-relaxed">
+        {t("canvasIntro.text3")} 🎸
       </p>
 
     </div>
   </div>
 )}
+
+{/* ================= PREMIUM MINI PANEL MOBILE ================= */}
+<div
+  className={`absolute bottom-6 right-6 z-50
+              transition-all duration-300
+              ${
+                isMobile &&
+                (selectedInstanceId !== null ||
+                  selectedBoardInstanceId !== null)
+                  ? "opacity-100 translate-y-0"
+                  : "opacity-0 translate-y-6 pointer-events-none"
+              }`}
+>
+  <div className="
+  flex items-center
+  h-10
+  gap-6
+  px-6
+  bg-zinc-900/90 backdrop-blur-xl
+  border border-zinc-800
+  rounded-2xl
+  shadow-2xl
+">
+
+    {/* ROTATE */}
+    {(selectedInstanceId !== null ||
+      selectedBoardInstanceId !== null) && (
+      <button
+        onClick={() => {
+          if (selectedInstanceId !== null) {
+            rotatePedal(selectedInstanceId);
+          }
+          if (selectedBoardInstanceId !== null) {
+            rotateBoard(selectedBoardInstanceId);
+          }
+        }}
+        className="flex flex-col items-center text-zinc-300 hover:text-white transition-colors"
+      >
+        <RotateCw size={20} />
+        
+      </button>
+    )}
+
+    {/* DELETE */}
+    {(selectedInstanceId !== null ||
+      selectedBoardInstanceId !== null) && (
+      <button
+        onClick={() => {
+          if (selectedInstanceId !== null) {
+            deletePedal(selectedInstanceId);
+          }
+          if (selectedBoardInstanceId !== null) {
+            deleteBoard(selectedBoardInstanceId);
+          }
+        }}
+        className="flex flex-col items-center text-red-400 hover:text-red-300 transition-colors"
+      >
+        <Trash2 size={20} />
+        
+      </button>
+    )}
+
+  </div>
+</div>
 
 </div>
 );

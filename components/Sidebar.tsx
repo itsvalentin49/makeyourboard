@@ -70,10 +70,10 @@ type Props = {
   contactOpen: boolean;
   setContactOpen: (v: boolean) => void;
 
-  // Actions (callbacks from page)
+  // Actions
   addPedal: (p: AnyRow) => void;
   selectBoard: (b: AnyRow) => void;
-  addCustomItem: () => void;
+  addCustomItem: (item: AnyRow) => void;
   rotatePedal: (id: number) => void;
   deletePedal: (id: number) => void;
   rotateBoard: (id: number) => void;
@@ -83,12 +83,14 @@ type Props = {
   canvasBg: string;
   setCanvasBg: (v: string) => void;
 
-  language: "en" | "fr" | "es" | "de" | "it"| "pt";
+  language: "en" | "fr" | "es" | "de" | "it" | "pt";
   setLanguage: (v: "en" | "fr" | "es" | "de" | "it" | "pt") => void;
 
   units: "metric" | "imperial";
   setUnits: (v: "metric" | "imperial") => void;
 
+  // NEW
+  hideLogo?: boolean;
 };
 
 export default function Sidebar({
@@ -135,6 +137,7 @@ export default function Sidebar({
   setMakeOpen,
   contactOpen,
   setContactOpen,
+  hideLogo = false,   // 👈 important
 }: Props) {
 
   const t = getTranslator(language);
@@ -229,6 +232,7 @@ React.useEffect(() => {
   const [contactType, setContactType] = React.useState("question");
   const [contactTypeOpen, setContactTypeOpen] = React.useState(false);
   const contactTypeRef = React.useRef<HTMLDivElement>(null);
+  
 
   const CONTACT_TYPES = [
   { value: "question", label: t("contact.types.question") },
@@ -364,7 +368,7 @@ const buildThomannUrl = (slug: string) => {
 
     <div
   className="
-    relative z-40 w-72 shrink-0
+    relative z-40 w-full lg:w-72 shrink-0
     bg-zinc-950
     p-4 flex flex-col gap-6
     overflow-y-auto no-scrollbar touch-pan-y
@@ -377,7 +381,7 @@ const buildThomannUrl = (slug: string) => {
   }}
     >
 
-      <SidebarLogo t={t} />
+      {!hideLogo && <SidebarLogo t={t} />}
 
 
       {contactOpen ? (
@@ -1388,7 +1392,7 @@ return (
         placeholder={withUnit(t("custom.width"))}
         value={customWidth}
         onChange={(e) => setCustomWidth(e.target.value)}
-        className="w-full bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-[11px] outline-none focus:border-blue-500"
+        className="w-full bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-[10px] outline-none focus:border-blue-500"
       />
 
       <input
@@ -1399,7 +1403,7 @@ return (
         placeholder={withUnit(t("custom.depth"))}
         value={customDepth}
         onChange={(e) => setCustomDepth(e.target.value)}
-        className="w-full bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-[11px] outline-none focus:border-blue-500"
+        className="w-full bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-[10px] outline-none focus:border-blue-500"
       />
 
     </div>
@@ -1424,36 +1428,64 @@ return (
 
         </>
       )}
-                {/* PUSH TO BOTTOM */}
-<div className="mt-auto" />
+             {/* PUSH TO BOTTOM (desktop only) */}
+<div className="hidden lg:block mt-auto" />
 
-{/* FEEDBACK + DONATE */}
-<div className="flex items-center justify-between mt-4 px-1">
+{/* ================= MOBILE FOOTER ================= */}
+<div className="lg:hidden mt-6 px-6">
+  <div className="flex items-center justify-between">
 
-  {/* FEEDBACK */}
-<button
-  onClick={() => setContactOpen(true)}
-  className="flex items-center gap-2 group cursor-pointer"
->
-  <span className="text-[12px]">💬</span>
-  <span className="text-[10px] font-black uppercase tracking-light text-zinc-500 group-hover:text-white transition-colors duration-200">
-    {t("footer.feedback")}
-  </span>
-</button>
+    {/* FEEDBACK */}
+    <button
+      onClick={() => setContactOpen(true)}
+      className="flex items-center gap-2 group"
+    >
+      <span className="text-[12px]">💬</span>
+      <span className="text-[10px] font-black uppercase text-zinc-500 group-hover:text-white transition-colors duration-200">
+        {t("footer.feedback")}
+      </span>
+    </button>
 
-  {/* DONATE */}
-<a
-  href="https://buy.stripe.com/14A8wPeGZ8uQ0tQ96I8Zq00"
-  target="_blank"
-  rel="noopener noreferrer"
-  className="flex items-center gap-2 group cursor-pointer"
->
-  <span className="text-[12px]">☕️</span>
-  <span className="text-[10px] font-black uppercase tracking-light text-zinc-500 group-hover:text-white transition-colors duration-200">
-    {t("footer.donate")}
-  </span>
-</a>
+    {/* DONATE */}
+    <a
+      href="https://buy.stripe.com/14A8wPeGZ8uQ0tQ96I8Zq00"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="flex items-center gap-2 group"
+    >
+      <span className="text-[12px]">☕️</span>
+      <span className="text-[10px] font-black uppercase text-zinc-500 group-hover:text-white transition-colors duration-200">
+        {t("footer.donate")}
+      </span>
+    </a>
 
+  </div>
+</div>
+
+{/* ================= DESKTOP FOOTER ================= */}
+<div className="hidden lg:flex mt-4 px-1 items-center justify-between">
+  
+  <button
+    onClick={() => setContactOpen(true)}
+    className="flex items-center gap-2 group cursor-pointer"
+  >
+    <span className="text-[12px]">💬</span>
+    <span className="text-[10px] font-black uppercase tracking-light text-zinc-500 group-hover:text-white transition-colors duration-200">
+      {t("footer.feedback")}
+    </span>
+  </button>
+
+  <a
+    href="https://buy.stripe.com/14A8wPeGZ8uQ0tQ96I8Zq00"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="flex items-center gap-2 group cursor-pointer"
+  >
+    <span className="text-[12px]">☕️</span>
+    <span className="text-[10px] font-black uppercase tracking-light text-zinc-500 group-hover:text-white transition-colors duration-200">
+      {t("footer.donate")}
+    </span>
+  </a>
 
 </div>
 

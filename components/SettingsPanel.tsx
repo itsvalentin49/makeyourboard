@@ -45,7 +45,7 @@ export default function SettingsPanel({
 
     {/* LANGUAGE */}
     <div className="flex items-center gap-4">
-      <span className="w-28 text-[9px] text-white uppercase font-black tracking-widest">
+      <span className="w-28 text-[10px] text-white uppercase font-black tracking-widest">
         {t("settings.language")}
       </span>
 
@@ -79,33 +79,49 @@ export default function SettingsPanel({
     </div>
 
     {/* UNITS */}
-    <div className="flex items-center gap-4 pt-5 border-t border-zinc-800/60">
-      <span className="w-28 text-[9px] text-white uppercase font-black tracking-widest">
-        {t("settings.units")}
-      </span>
+<div className="flex items-center gap-4 pt-5 border-t border-zinc-800/60">
+  <span className="w-28 text-[10px] text-white uppercase font-black tracking-widest">
+    {t("settings.units")}
+  </span>
 
-      <div className="flex-1">
-        <div className="flex bg-zinc-950 p-1 rounded-lg border border-zinc-800">
-          {["metric", "imperial"].map((u) => (
-            <button
-              key={u}
-              onClick={() => setUnits(u as any)}
-              className={`flex-1 py-1.5 text-[10px] font-black uppercase rounded-md transition-colors ${
-                units === u
-                  ? "bg-zinc-800 text-white"
-                  : "text-zinc-600 hover:text-white"
-              }`}
-            >
-              {u === "metric" ? "Metric" : "Imperial"}
-            </button>
-          ))}
-        </div>
-      </div>
+  <div className="flex-1">
+    <div className="flex bg-zinc-950 p-1 rounded-lg border border-zinc-800">
+      {[
+        { key: "metric", label: "METRIC", sub: "mm · g · kg" },
+        { key: "imperial", label: "IMPERIAL", sub: "in · oz · lb" },
+      ].map((u) => {
+        const isActive = units === u.key;
+
+        return (
+          <button
+            key={u.key}
+            onClick={() => setUnits(u.key as any)}
+            className={`flex-1 py-1.5 rounded-md transition-colors ${
+              isActive
+                ? "bg-zinc-800 text-white"
+                : "text-zinc-600 hover:text-white"
+            }`}
+          >
+            <div className="flex flex-col items-center leading-[1.05]">
+              <span className="text-[10px] font-black tracking-wide">
+                {u.label}
+              </span>
+
+              {/* mini espace contrôlé */}
+              <span className="mt-[4px] text-[8px] font-semibold tracking-wide">
+                {u.sub}
+              </span>
+            </div>
+          </button>
+        );
+      })}
     </div>
+  </div>
+</div>
 
     {/* BACKGROUND */}
     <div className="flex items-center gap-4 pt-5 border-t border-zinc-800/60">
-      <span className="w-28 text-[9px] text-white uppercase font-black tracking-widest">
+      <span className="w-28 text-[10px] text-white uppercase font-black tracking-widest">
         {t("settings.background")}
       </span>
 
