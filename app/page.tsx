@@ -797,10 +797,11 @@ return (
   className="
     absolute
     bottom-6
-    right-6
+    left-1/2
+    -translate-x-1/2
     z-50
-    w-10
-    h-10
+    w-12
+    h-12
     rounded-full
     bg-blue-500
     flex
@@ -811,7 +812,7 @@ return (
     transition
   "
 >
-  <Plus size={18} className="text-white" />
+  <Plus size={28} className="text-white" />
 </button>
 
 {/* ROTATE / DELETE GROUP */}
@@ -819,12 +820,12 @@ return (
   className="
     absolute
     bottom-6
-    right-20
+    right-6
     z-40
-    flex items-center
+    flex items-center justify-between
     h-10
+    w-28
     px-4
-    gap-4
     bg-zinc-950/80
     backdrop-blur-md
     border border-zinc-800
@@ -837,7 +838,7 @@ return (
       if (selectedInstanceId) rotatePedal(selectedInstanceId);
       if (selectedBoardInstanceId) rotateBoard(selectedBoardInstanceId);
     }}
-    className="text-zinc-400 hover:text-white transition-colors"
+    className="text-white active:scale-95 transition"
   >
     <RotateCw size={16} />
   </button>
@@ -847,7 +848,7 @@ return (
       if (selectedInstanceId) deletePedal(selectedInstanceId);
       if (selectedBoardInstanceId) deleteBoard(selectedBoardInstanceId);
     }}
-    className="text-zinc-400 hover:text-white transition-colors"
+    className="text-white active:scale-95 transition"
   >
     <Trash2 size={16} />
   </button>
