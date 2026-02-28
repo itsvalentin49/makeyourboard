@@ -9,7 +9,7 @@ import SettingsPanel from "@/components/SettingsPanel";
 import { useLibrary } from "@/hooks/useLibrary";
 import type { AnyRow, BoardItem, Project } from "@/types/project";
 import { getTranslator, type Language } from "@/utils/i18n";
-import { Settings, Plus } from "lucide-react";
+import { Settings, Plus, RotateCw, Trash2 } from "lucide-react";
 
 type Units = "metric" | "imperial";
 const LANGUAGE_TO_LOCALE: Record<string, "en" | "fr" | "es" | "de" | "it" | "pt"> = {
@@ -659,13 +659,13 @@ const deleteBoard = (id: number) => {
 <div className="flex lg:hidden flex-col h-full relative">
 
   {/* HEADER MOBILE */}
-    <div
-      className="bg-zinc-950 flex items-center justify-between px-4 border-b border-zinc-800"
-      style={{
-        paddingTop: "env(safe-area-inset-top)",
-        height: "calc(48px + env(safe-area-inset-top))",
-      }}
-    >
+  <div
+    className="bg-zinc-950 flex items-center justify-between px-4 border-b border-zinc-800"
+    style={{
+      paddingTop: "env(safe-area-inset-top)",
+      height: "calc(48px + env(safe-area-inset-top))",
+    }}
+  >
     <span className="text-base font-bold tracking-widest">
       MAKE YOUR BOARD
     </span>
@@ -707,24 +707,51 @@ const deleteBoard = (id: number) => {
     />
   </div>
 
-  {/* FLOATING + BUTTON */}
-  <button
-  onClick={() => setMobileSidebarOpen(true)}
-  className="
-    absolute bottom-6 left-1/2 -translate-x-1/2 z-50
-    h-12 w-12
-    rounded-full
-    bg-blue-600
-    flex items-center justify-center
-    shadow-xl
-    active:scale-95 transition-transform
-  "
-  style={{ bottom: "calc(env(safe-area-inset-bottom) + 24px)" }}
+  {/* ===== MOBILE BOTTOM RIGHT ACTIONS ===== */}
+<div
+  className="absolute z-50 flex items-center gap-5
+             px-5 py-3
+             bg-zinc-900/95 backdrop-blur-xl
+             rounded-2xl shadow-2xl"
+  style={{
+    bottom: "calc(env(safe-area-inset-bottom) + 16px)",
+    right: "16px",
+  }}
 >
-  <Plus className="w-6 h-6 text-white" strokeWidth={2.5} />
-</button>
 
-  {/* MOBILE SIDEBAR DRAWER */}
+  {/* ADD */}
+  <button
+    onClick={() => setMobileSidebarOpen(true)}
+    className="text-blue-600 active:scale-95 transition-transform"
+  >
+    <Plus size={22} strokeWidth={2.5} />
+  </button>
+
+  {/* ROTATE */}
+  <button
+    onClick={() => {
+      if (selectedInstanceId) rotatePedal(selectedInstanceId);
+      if (selectedBoardInstanceId) rotateBoard(selectedBoardInstanceId);
+    }}
+    className="text-white opacity-80 active:scale-95 transition-transform"
+  >
+    <RotateCw size={22} />
+  </button>
+
+  {/* DELETE */}
+  <button
+    onClick={() => {
+      if (selectedInstanceId) deletePedal(selectedInstanceId);
+      if (selectedBoardInstanceId) deleteBoard(selectedBoardInstanceId);
+    }}
+    className="text-red-500 opacity-90 active:scale-95 transition-transform"
+  >
+    <Trash2 size={22} />
+  </button>
+
+</div>
+
+  {/* ===== MOBILE SIDEBAR DRAWER ===== */}
   <div
     className={`absolute inset-0 z-40 transition-opacity duration-300 ${
       mobileSidebarOpen
@@ -733,91 +760,82 @@ const deleteBoard = (id: number) => {
     }`}
     onClick={() => setMobileSidebarOpen(false)}
   >
-    {/* Overlay */}
-<div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
+    <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
 
-{/* Drawer */}
-<div
-  className={`absolute bottom-0 left-1/2 -translate-x-1/2
-              w-[88%] max-w-[360px]
-              transition-transform duration-300 ${
-                mobileSidebarOpen
-                  ? "translate-y-0"
-                  : "translate-y-full"
-              }`}
-  onClick={(e) => e.stopPropagation()}
->
-  <div
-  className="
-      relative
-      bg-zinc-950
-      rounded-t-3xl
-      max-h-[85dvh]
-      shadow-2xl
-      px-6 pt-6 pb-24
-      flex flex-col
-    "
-    style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
-  >
-      <Sidebar
-        pedalsLibrary={pedalsLibrary}
-        boardsLibrary={boardsLibrary}
-        showPedalResults={showPedalResults}
-        setShowPedalResults={setShowPedalResults}
-        showBoardResults={showBoardResults}
-        setShowBoardResults={setShowBoardResults}
-        pedalSearch={pedalSearch}
-        setPedalSearch={setPedalSearch}
-        boardSearch={boardSearch}
-        setBoardSearch={setBoardSearch}
-        selectedPedal={undefined}
-        selectedBoardDetails={undefined}
-        selectedInstanceId={null}
-        selectedBoardInstanceId={null}
-        setSelectedInstanceId={setSelectedInstanceId}
-        setSelectedBoardInstanceId={setSelectedBoardInstanceId}
-        customName={customName}
-        setCustomName={setCustomName}
-        customWidth={customWidth}
-        setCustomWidth={setCustomWidth}
-        customDepth={customDepth}
-        setCustomDepth={setCustomDepth}
-        customColor={customColor}
-        setCustomColor={setCustomColor}
-        addPedal={(p) => {
-          addPedal(p);
-          setMobileSidebarOpen(false);
-        }}
-        selectBoard={(b) => {
-          selectBoard(b);
-          setMobileSidebarOpen(false);
-        }}
-        addCustomItem={(item) => {
-          addCustomItem(item);
-          setMobileSidebarOpen(false);
-        }}
-        rotatePedal={rotatePedal}
-        deletePedal={deletePedal}
-        rotateBoard={rotateBoard}
-        deleteBoard={deleteBoard}
-        canvasBg={canvasBg}
-        setCanvasBg={setCanvasBg}
-        language={language}
-        setLanguage={setLanguage}
-        units={units}
-        setUnits={setUnits}
-        customType={customType}
-        setCustomType={setCustomType}
-        makeOpen={makeOpen}
-        setMakeOpen={setMakeOpen}
-        contactOpen={contactOpen}
-        setContactOpen={setContactOpen}
-        hideLogo
-      />
+    <div
+      className={`absolute bottom-0 left-1/2 -translate-x-1/2
+                  w-[88%] max-w-[360px]
+                  transition-transform duration-300 ${
+                    mobileSidebarOpen
+                      ? "translate-y-0"
+                      : "translate-y-full"
+                  }`}
+      onClick={(e) => e.stopPropagation()}
+    >
+      <div
+        className="relative bg-zinc-950 rounded-t-3xl
+                   max-h-[85dvh] shadow-2xl
+                   px-6 pt-6 pb-24 flex flex-col"
+        style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+      >
+        <Sidebar
+          pedalsLibrary={pedalsLibrary}
+          boardsLibrary={boardsLibrary}
+          showPedalResults={showPedalResults}
+          setShowPedalResults={setShowPedalResults}
+          showBoardResults={showBoardResults}
+          setShowBoardResults={setShowBoardResults}
+          pedalSearch={pedalSearch}
+          setPedalSearch={setPedalSearch}
+          boardSearch={boardSearch}
+          setBoardSearch={setBoardSearch}
+          selectedPedal={undefined}
+          selectedBoardDetails={undefined}
+          selectedInstanceId={null}
+          selectedBoardInstanceId={null}
+          setSelectedInstanceId={setSelectedInstanceId}
+          setSelectedBoardInstanceId={setSelectedBoardInstanceId}
+          customName={customName}
+          setCustomName={setCustomName}
+          customWidth={customWidth}
+          setCustomWidth={setCustomWidth}
+          customDepth={customDepth}
+          setCustomDepth={setCustomDepth}
+          customColor={customColor}
+          setCustomColor={setCustomColor}
+          addPedal={(p) => {
+            addPedal(p);
+            setMobileSidebarOpen(false);
+          }}
+          selectBoard={(b) => {
+            selectBoard(b);
+            setMobileSidebarOpen(false);
+          }}
+          addCustomItem={(item) => {
+            addCustomItem(item);
+            setMobileSidebarOpen(false);
+          }}
+          rotatePedal={rotatePedal}
+          deletePedal={deletePedal}
+          rotateBoard={rotateBoard}
+          deleteBoard={deleteBoard}
+          canvasBg={canvasBg}
+          setCanvasBg={setCanvasBg}
+          language={language}
+          setLanguage={setLanguage}
+          units={units}
+          setUnits={setUnits}
+          customType={customType}
+          setCustomType={setCustomType}
+          makeOpen={makeOpen}
+          setMakeOpen={setMakeOpen}
+          contactOpen={contactOpen}
+          setContactOpen={setContactOpen}
+          hideLogo
+        />
+      </div>
     </div>
   </div>
-  </div>
-
 </div>
 
           
