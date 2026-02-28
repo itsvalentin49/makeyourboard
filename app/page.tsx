@@ -703,6 +703,52 @@ return (
           />
         </div>
 
+        {/* MOBILE ACTION BUTTONS */}
+<div
+  className="
+    absolute
+    bottom-6
+    right-6
+    z-50
+    flex items-center
+    h-10
+    px-2
+    gap-3
+    bg-zinc-950/80
+    backdrop-blur-md
+    border border-zinc-800
+    rounded-2xl
+    shadow-2xl
+  "
+>
+  <button
+    onClick={() => setMobileSidebarOpen(true)}
+    className="w-8 flex items-center justify-center text-zinc-400 hover:text-white transition-colors"
+  >
+    <Plus size={14} />
+  </button>
+
+  <button
+    onClick={() => {
+      if (selectedInstanceId) rotatePedal(selectedInstanceId);
+      if (selectedBoardInstanceId) rotateBoard(selectedBoardInstanceId);
+    }}
+    className="w-8 flex items-center justify-center text-zinc-400 hover:text-white transition-colors"
+  >
+    <RotateCw size={14} />
+  </button>
+
+  <button
+    onClick={() => {
+      if (selectedInstanceId) deletePedal(selectedInstanceId);
+      if (selectedBoardInstanceId) deleteBoard(selectedBoardInstanceId);
+    }}
+    className="w-8 flex items-center justify-center text-zinc-400 hover:text-white transition-colors"
+  >
+    <Trash2 size={14} />
+  </button>
+</div>
+
         {/* MOBILE SIDEBAR DRAWER */}
         <div
           className={`absolute inset-0 z-40 transition-opacity duration-300 ${

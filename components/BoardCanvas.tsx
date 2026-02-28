@@ -172,9 +172,9 @@ export default function BoardCanvas({
             }
       }
     >
-      <div className="absolute bottom-6 left-6 right-6 z-50 flex items-center justify-between">
+      <div className="absolute bottom-6 left-6 flex items-end gap-4 z-50">
 
-  {/* ZOOM (toujours visible) */}
+  {/* ZOOM */}
   <div className="flex items-center h-10 w-28 bg-zinc-950/80 backdrop-blur-md border border-zinc-800 rounded-2xl shadow-2xl">
 
     <button
@@ -199,11 +199,12 @@ export default function BoardCanvas({
     >
       <Plus size={14} />
     </button>
+
   </div>
 
-  {/* DESKTOP INFO (inchangé) */}
+  {/* Desktop uniquement */}
   {!isMobile && (
-    <div className="flex items-center gap-4">
+    <>
       {/* TOTAL DRAW */}
       <div className="relative flex items-center justify-center h-10 w-28 bg-zinc-950/80 backdrop-blur-md border border-zinc-800 rounded-2xl shadow-2xl pointer-events-none">
         <Zap className="absolute left-3 size-4 text-yellow-500" />
@@ -225,40 +226,7 @@ export default function BoardCanvas({
           {weightUnit}
         </span>
       </div>
-    </div>
-  )}
-
-  {/* MOBILE ACTIONS (nouveau bloc compact) */}
-  {isMobile && (
-    <div className="flex items-center h-10 px-2 gap-3 bg-zinc-950/80 backdrop-blur-md border border-zinc-800 rounded-2xl shadow-2xl">
-
-      <button
-        onClick={() => setContactOpen(false)}
-        className="w-8 flex items-center justify-center text-zinc-400 hover:text-white transition-colors"
-      >
-        <Plus size={14} />
-      </button>
-
-      <button
-        onClick={() => {
-          if (selectedInstanceId) rotatePedal(selectedInstanceId);
-          if (selectedBoardInstanceId) rotateBoard(selectedBoardInstanceId);
-        }}
-        className="w-8 flex items-center justify-center text-zinc-400 hover:text-white transition-colors"
-      >
-        <RotateCw size={14} />
-      </button>
-
-      <button
-        onClick={() => {
-          if (selectedInstanceId) deletePedal(selectedInstanceId);
-          if (selectedBoardInstanceId) deleteBoard(selectedBoardInstanceId);
-        }}
-        className="w-8 flex items-center justify-center text-zinc-400 hover:text-white transition-colors"
-      >
-        <Trash2 size={14} />
-      </button>
-    </div>
+    </>
   )}
 
 </div>
