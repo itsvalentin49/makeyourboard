@@ -789,17 +789,42 @@ return (
           />
         </div>
 
-        {/* MOBILE ACTION BUTTONS */}
-<div
+       {/* ================= MOBILE ACTION BUTTONS ================= */}
+
+{/* FLOATING ADD BUTTON */}
+<button
+  onClick={() => setMobileSidebarOpen(true)}
   className="
     absolute
     bottom-6
     right-6
     z-50
+    w-10
+    h-10
+    rounded-full
+    bg-blue-500
+    flex
+    items-center
+    justify-center
+    shadow-2xl
+    active:scale-95
+    transition
+  "
+>
+  <Plus size={18} className="text-white" />
+</button>
+
+{/* ROTATE / DELETE GROUP */}
+<div
+  className="
+    absolute
+    bottom-6
+    right-20
+    z-40
     flex items-center
     h-10
-    px-2
-    gap-3
+    px-4
+    gap-4
     bg-zinc-950/80
     backdrop-blur-md
     border border-zinc-800
@@ -808,20 +833,13 @@ return (
   "
 >
   <button
-    onClick={() => setMobileSidebarOpen(true)}
-    className="w-8 flex items-center justify-center text-zinc-400 hover:text-white transition-colors"
-  >
-    <Plus size={14} />
-  </button>
-
-  <button
     onClick={() => {
       if (selectedInstanceId) rotatePedal(selectedInstanceId);
       if (selectedBoardInstanceId) rotateBoard(selectedBoardInstanceId);
     }}
-    className="w-8 flex items-center justify-center text-zinc-400 hover:text-white transition-colors"
+    className="text-zinc-400 hover:text-white transition-colors"
   >
-    <RotateCw size={14} />
+    <RotateCw size={16} />
   </button>
 
   <button
@@ -829,9 +847,9 @@ return (
       if (selectedInstanceId) deletePedal(selectedInstanceId);
       if (selectedBoardInstanceId) deleteBoard(selectedBoardInstanceId);
     }}
-    className="w-8 flex items-center justify-center text-zinc-400 hover:text-white transition-colors"
+    className="text-zinc-400 hover:text-white transition-colors"
   >
-    <Trash2 size={14} />
+    <Trash2 size={16} />
   </button>
 </div>
 
