@@ -703,42 +703,6 @@ return (
           />
         </div>
 
-        {/* MOBILE ACTION BUTTONS */}
-        <div
-          className="absolute z-50 flex items-center gap-5 px-5 py-3 bg-zinc-900/95 backdrop-blur-xl rounded-2xl shadow-2xl"
-          style={{
-            bottom: "calc(env(safe-area-inset-bottom) + 32px)",
-            right: "16px",
-          }}
-        >
-          <button
-            onClick={() => setMobileSidebarOpen(true)}
-            className="text-white active:scale-95 transition-transform"
-          >
-            <Plus size={22} strokeWidth={2.5} />
-          </button>
-
-          <button
-            onClick={() => {
-              if (selectedInstanceId) rotatePedal(selectedInstanceId);
-              if (selectedBoardInstanceId) rotateBoard(selectedBoardInstanceId);
-            }}
-            className="text-white opacity-80 active:scale-95 transition-transform"
-          >
-            <RotateCw size={22} />
-          </button>
-
-          <button
-            onClick={() => {
-              if (selectedInstanceId) deletePedal(selectedInstanceId);
-              if (selectedBoardInstanceId) deleteBoard(selectedBoardInstanceId);
-            }}
-            className="text-white opacity-90 active:scale-95 transition-transform"
-          >
-            <Trash2 size={22} />
-          </button>
-        </div>
-
         {/* MOBILE SIDEBAR DRAWER */}
         <div
           className={`absolute inset-0 z-40 transition-opacity duration-300 ${
