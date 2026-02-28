@@ -10,6 +10,7 @@ import { useLibrary } from "@/hooks/useLibrary";
 import type { AnyRow, BoardItem, Project } from "@/types/project";
 import { getTranslator, type Language } from "@/utils/i18n";
 import { Settings, Plus, RotateCw, Trash2 } from "lucide-react";
+import { useRef } from "react";
 
 type Units = "metric" | "imperial";
 const LANGUAGE_TO_LOCALE: Record<string, "en" | "fr" | "es" | "de" | "it" | "pt"> = {
@@ -52,6 +53,9 @@ const createEmptyProject = (index: number): Project => ({
 
 
 export default function PedalBoardApp() {
+  const desktopCanvasRef = useRef<HTMLDivElement | null>(null);
+  const mobileCanvasRef = useRef<HTMLDivElement | null>(null);
+  const canvasContainerRef = useRef<HTMLDivElement | null>(null);
   const { pedalsLibrary, boardsLibrary } = useLibrary();
 
 const BACKGROUNDS = [
@@ -104,6 +108,30 @@ const t = getTranslator(language);
 const [units, setUnits] = useState<Units>("metric");
 const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 const [settingsOpen, setSettingsOpen] = useState(false);
+const [canvasSize, setCanvasSize] = useState({
+  width: 0,
+  height: 0,
+});
+const getCanvasCenter = () => {
+  const zoom = activeProject.zoom ?? 100;
+  const scale = zoom / 100;
+
+  const container =
+    window.innerWidth >= 1024
+      ? desktopCanvasRef.current
+      : mobileCanvasRef.current;
+
+  if (!container) {
+    return { x: 600, y: 400 };
+  }
+
+  const rect = container.getBoundingClientRect();
+
+  return {
+    x: rect.width / 2 / scale,
+    y: rect.height / 2 / scale,
+  };
+};
 
 
 /* ================= SETTINGS LOAD ================= */
@@ -390,14 +418,13 @@ useEffect(() => {
   };
 
   const addPedal = (pedal: AnyRow) => {
-  const isMobile = isMobileDevice;
-  const sidebarWidth = isMobile ? 0 : 320;
+  const { x, y } = getCanvasCenter();
 
   const newPedal: BoardItem = {
     ...pedal,
     instanceId: Date.now(),
-    x: 400,
-    y: 300,
+    x,
+    y,
     rotation: 0,
     draw: Number(pedal.draw) || 0,
     weight: Number(pedal.weight) || 0,
@@ -412,14 +439,13 @@ useEffect(() => {
 
 
   const selectBoard = (board: AnyRow) => {
-  const isMobile = isMobileDevice;
-  const sidebarWidth = isMobile ? 0 : 320;
+  const { x, y } = getCanvasCenter();
 
   const newBoard: BoardItem = {
     ...board,
     instanceId: Date.now(),
-    x: 400,
-    y: 300,
+    x,
+    y,
     rotation: 0,
   };
 
@@ -434,13 +460,10 @@ useEffect(() => {
 const addCustomItem = (item: AnyRow) => {
   if (!customType) return;
 
-  const isMobile = isMobileDevice;
-  const sidebarWidth = isMobile ? 0 : 320;
-
   const widthMm =
-  units === "metric"
-    ? Number(customWidth)
-    : Number(customWidth) * 25.4;
+    units === "metric"
+      ? Number(customWidth)
+      : Number(customWidth) * 25.4;
 
   const depthMm =
     units === "metric"
@@ -475,33 +498,36 @@ const addCustomItem = (item: AnyRow) => {
     }
   }
 
-const newItem: BoardItem = {
-  id: Date.now(),              // IMPORTANT
-  slug: "custom",              // IMPORTANT si utilisé
-  type: "Custom",
-  circuit: "",
-  bypass: "",
-  power: "",
-  status: "Active",
-  origin: "",
-  year: "",
-  manual: "",
+  // ✅ CENTRE RÉEL DU CANVAS
+  const { x, y } = getCanvasCenter();
 
-  instanceId: Date.now(),
-  name: "Custom",
-  brand: "Custom",
-  width: widthMm,
-  depth: depthMm,
-  image:
-  customType === "pedal"
-    ? "/images/custom-pedal.png"
-    : "/images/custom-board.png",
-  x: 400,
-  y: 300,
-  rotation: 0,
-  draw: 0,
-  weight: 0,
-};
+  const newItem: BoardItem = {
+    id: Date.now(),
+    slug: "custom",
+    type: "Custom",
+    circuit: "",
+    bypass: "",
+    power: "",
+    status: "Active",
+    origin: "",
+    year: "",
+    manual: "",
+
+    instanceId: Date.now(),
+    name: "Custom",
+    brand: "Custom",
+    width: widthMm,
+    depth: depthMm,
+    image:
+      customType === "pedal"
+        ? "/images/custom-pedal.png"
+        : "/images/custom-board.png",
+    x,
+    y,
+    rotation: 0,
+    draw: 0,
+    weight: 0,
+  };
 
   if (customType === "pedal") {
     updateActiveProject({
@@ -608,7 +634,10 @@ return (
           setContactOpen={setContactOpen}
         />
 
-        <div className="flex-1 min-w-0 relative bg-[#2c2c2e] flex flex-col overflow-hidden">
+        <div
+        ref={desktopCanvasRef}
+        className="flex-1 min-w-0 relative bg-[#2c2c2e] flex flex-col overflow-hidden"
+      >
           <TopBarTabs
             projects={projects}
             setProjects={setProjects}
@@ -648,6 +677,7 @@ return (
             deletePedal={deletePedal}
             rotateBoard={rotateBoard}
             deleteBoard={deleteBoard}
+            onStageSizeChange={setCanvasSize}
           />
         </div>
       </div>
@@ -677,7 +707,10 @@ return (
         </div>
 
         {/* CANVAS MOBILE */}
-        <div className="flex-1 relative bg-[#2c2c2e] overflow-hidden">
+        <div
+  ref={mobileCanvasRef}
+  className="flex-1 relative bg-[#2c2c2e] overflow-hidden"
+>
           <BoardCanvas
             activeProject={activeProject}
             units={units}
@@ -777,8 +810,8 @@ return (
 <div className="flex items-center justify-between px-6 pt-6 pb-4 shrink-0">
 
   <h2 className="text-[16px] font-black uppercase tracking-wider text-white">
-    {contactOpen ? "CONTACT" : "ADD AN ITEM"}
-  </h2>
+  {contactOpen ? t("contact.title") : t("sidebar.addItem")}
+</h2>
 
   <button
     onClick={() => {

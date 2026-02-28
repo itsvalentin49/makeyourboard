@@ -50,6 +50,8 @@ type Props = {
   setCanvasBg: (v: string) => void;
   showIntro?: boolean;
   isMobile?: boolean;
+
+  onStageSizeChange?: (size: { width: number; height: number }) => void;
   
 };
 
@@ -74,6 +76,7 @@ export default function BoardCanvas({
   deletePedal,
   rotateBoard,
   deleteBoard,
+  onStageSizeChange,
 }: Props) {
 
   const t = getTranslator(language);
@@ -118,10 +121,18 @@ export default function BoardCanvas({
       if (!el) return;
 
       const rect = el.getBoundingClientRect();
+
       setStageSize({
+      width: rect.width,
+      height: rect.height,
+      });
+
+      if (onStageSizeChange) {
+      onStageSizeChange({
         width: rect.width,
         height: rect.height,
       });
+      }
     };
 
     measure();
