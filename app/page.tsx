@@ -688,52 +688,54 @@ return (
         />
 
         <div
-        ref={desktopCanvasRef}
-        className="flex-1 min-w-0 relative bg-[#2c2c2e] flex flex-col overflow-hidden"
-      >
-          <TopBarTabs
-            projects={projects}
-            setProjects={setProjects}
-            activeProjectId={activeProjectId}
-            setActiveProjectId={setActiveProjectId}
-            editingProjectId={editingProjectId}
-            tempName={tempName}
-            setTempName={setTempName}
-            startEditing={startEditing}
-            saveName={saveName}
-            deleteProject={deleteProject}
-            createNewProject={createNewProject}
-            language={language}
-            settingsOpen={settingsOpen}
-            setSettingsOpen={setSettingsOpen}
-          />
+  ref={desktopCanvasRef}
+  className="flex-1 min-w-0 bg-[#2c2c2e] flex flex-col overflow-hidden"
+>
+  <TopBarTabs
+    projects={projects}
+    setProjects={setProjects}
+    activeProjectId={activeProjectId}
+    setActiveProjectId={setActiveProjectId}
+    editingProjectId={editingProjectId}
+    tempName={tempName}
+    setTempName={setTempName}
+    startEditing={startEditing}
+    saveName={saveName}
+    deleteProject={deleteProject}
+    createNewProject={createNewProject}
+    language={language}
+    settingsOpen={settingsOpen}
+    setSettingsOpen={setSettingsOpen}
+  />
 
-          <BoardCanvas
-            activeProject={activeProject}
-            units={units}
-            language={language}
-            selectedInstanceId={selectedInstanceId}
-            setSelectedInstanceId={setSelectedInstanceId}
-            selectedBoardInstanceId={selectedBoardInstanceId}
-            setSelectedBoardInstanceId={setSelectedBoardInstanceId}
-            displaySizes={displaySizes}
-            handleSizeUpdate={handleSizeUpdate}
-            updateActiveProject={updateActiveProject}
-            closeSearchMenus={closeSearchMenus}
-            setContactOpen={setContactOpen}
-            BACKGROUNDS={BACKGROUNDS}
-            canvasBg={canvasBg}
-            setCanvasBg={setCanvasBg}
-            showIntro={isFirstBoard && isBoardEmpty}
-            isMobile={false}
-            rotatePedal={rotatePedal}
-            deletePedal={deletePedal}
-            rotateBoard={rotateBoard}
-            deleteBoard={deleteBoard}
-            onStageSizeChange={setCanvasSize}
-          />
-        </div>
-      </div>
+  <div className="flex-1 relative overflow-hidden">
+    <BoardCanvas
+      activeProject={activeProject}
+      units={units}
+      language={language}
+      selectedInstanceId={selectedInstanceId}
+      setSelectedInstanceId={setSelectedInstanceId}
+      selectedBoardInstanceId={selectedBoardInstanceId}
+      setSelectedBoardInstanceId={setSelectedBoardInstanceId}
+      displaySizes={displaySizes}
+      handleSizeUpdate={handleSizeUpdate}
+      updateActiveProject={updateActiveProject}
+      closeSearchMenus={closeSearchMenus}
+      setContactOpen={setContactOpen}
+      BACKGROUNDS={BACKGROUNDS}
+      canvasBg={canvasBg}
+      setCanvasBg={setCanvasBg}
+      showIntro={isFirstBoard && isBoardEmpty}
+      isMobile={false}
+      rotatePedal={rotatePedal}
+      deletePedal={deletePedal}
+      rotateBoard={rotateBoard}
+      deleteBoard={deleteBoard}
+      onStageSizeChange={setCanvasSize}
+    />
+  </div>
+</div>
+</div>
 
       {/* ================= MOBILE <1024 ================= */}
       <div className="flex lg:hidden flex-col h-full relative">

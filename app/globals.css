@@ -34,3 +34,24 @@ input[type="number"] {
   -moz-appearance: textfield;
   appearance: textfield;
 }
+
+/* =========================
+   Force Dark Scrollbar (Mac Fix)
+   ========================= */
+
+.custom-scrollbar {
+  overflow-y: auto;
+}
+
+/* =========================
+   Hide Native Scrollbar
+   ========================= */
+
+.custom-scrollbar {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE */
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome / Safari */
+}
