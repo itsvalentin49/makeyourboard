@@ -304,27 +304,10 @@ const buildThomannUrl = (slug: string) => {
 
 
 
-React.useEffect(() => {
+  React.useEffect(() => {
   const handleClickOutside = (e: MouseEvent) => {
     const target = e.target as Node;
 
-    // PEDAL dropdown
-    if (
-      pedalDropdownRef.current &&
-      !pedalDropdownRef.current.contains(target)
-    ) {
-      setShowPedalResults(false);
-    }
-
-    // BOARD dropdown
-    if (
-      boardDropdownRef.current &&
-      !boardDropdownRef.current.contains(target)
-    ) {
-      setShowBoardResults(false);
-    }
-
-    // Autres menus existants
     if (bgRef.current && !bgRef.current.contains(target)) {
       setBgOpen(false);
     }
@@ -333,10 +316,8 @@ React.useEffect(() => {
       setLangOpen(false);
     }
 
-    if (
-      contactTypeRef.current &&
-      !contactTypeRef.current.contains(target)
-    ) {
+
+    if (contactTypeRef.current && !contactTypeRef.current.contains(target)) {
       setContactTypeOpen(false);
     }
   };
@@ -1076,11 +1057,7 @@ React.useEffect(() => {
     </span>
   </div>
 
-  <div
-  ref={pedalDropdownRef}
-  className="relative"
-  style={{ zIndex: showPedalResults ? 60 : 10 }}
->
+  <div className="relative" style={{ zIndex: showPedalResults ? 60 : 10 }}>
     <div className="relative flex items-center">
       <input
         type="text"
@@ -1101,10 +1078,11 @@ React.useEffect(() => {
           setShowPedalResults(true);
         }}
       />
-     <ChevronDown
+      <ChevronDown
   onClick={(e) => {
     e.stopPropagation();
     setShowPedalResults(!showPedalResults);
+    setShowBoardResults(false);
   }}
   className={`absolute right-3 size-4 cursor-pointer transition-transform ${
     showPedalResults
@@ -1157,11 +1135,7 @@ React.useEffect(() => {
     </span>
   </div>
 
-  <div
-  ref={boardDropdownRef}
-  className="relative"
-  style={{ zIndex: showBoardResults ? 60 : 5 }}
->
+  <div className="relative" style={{ zIndex: showBoardResults ? 60 : 5 }}>
     <div className="relative flex items-center">
       <input
         type="text"
@@ -1186,6 +1160,7 @@ React.useEffect(() => {
   onClick={(e) => {
     e.stopPropagation();
     setShowBoardResults(!showBoardResults);
+    setShowPedalResults(false);
   }}
   className={`absolute right-3 size-4 cursor-pointer transition-transform ${
     showBoardResults
