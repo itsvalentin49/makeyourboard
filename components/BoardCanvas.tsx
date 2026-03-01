@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useRef, useLayoutEffect, useEffect, useState } from "react";
-import { Stage, Layer, Group, Rect } from "react-konva";
+import { Stage, Layer, Group, Rect, Text } from "react-konva";
 import { Zap, Weight, Minus, Plus } from "lucide-react";
 import PedalImage from "@/components/PedalImage";
 import { formatWeight } from "@/utils/units";
@@ -114,9 +114,13 @@ export default function BoardCanvas({
 
   const containerRef = useRef<HTMLDivElement>(null);
   const [stageSize, setStageSize] = useState({ width: 0, height: 0 });
-  // 💎 HOVER (desktop only)
   const [hoveredPedalId, setHoveredPedalId] = useState<number | null>(null);
   const [hoveredBoardId, setHoveredBoardId] = useState<number | null>(null);
+  const [overlayPosition, setOverlayPosition] = useState<{
+  x: number;
+  y: number;
+  } | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
 
   /* ================= MEASURE STAGE ================= */
   useLayoutEffect(() => {
@@ -176,6 +180,62 @@ export default function BoardCanvas({
   });
 }, [stageSize.width, stageSize.height]);
 
+
+
+/* ================= OVERLAY POSITION ================= */
+useEffect(() => {
+
+  // 🟣 PEDAL sélectionnée
+  if (selectedInstanceId !== null) {
+    const pedal = activeProject.boardPedals.find(
+      (p) => p.instanceId === selectedInstanceId
+    );
+    if (!pedal) return;
+
+    const scale = currentZoom / 100;
+    const size = displaySizes[selectedInstanceId];
+    if (!size) return;
+
+    setOverlayPosition({
+      x: pedal.x * scale,
+      y: pedal.y * scale - (size.h * scale) / 2 - 8,
+    });
+
+    return;
+  }
+
+  // 🟢 BOARD sélectionné
+  if (selectedBoardInstanceId !== null) {
+    const board = (activeProject.selectedBoards || []).find(
+      (b) => b.instanceId === selectedBoardInstanceId
+    );
+    if (!board) return;
+
+    const scale = currentZoom / 100;
+    const size = displaySizes[selectedBoardInstanceId];
+    if (!size) return;
+
+    setOverlayPosition({
+      x: board.x * scale,
+      y: board.y * scale - (size.h * scale) / 2 - 8,
+    });
+
+    return;
+  }
+
+  // rien sélectionné
+  setOverlayPosition(null);
+
+}, [
+  selectedInstanceId,
+  selectedBoardInstanceId,
+  activeProject.boardPedals,
+  (activeProject.selectedBoards || []),
+  currentZoom,
+  displaySizes,
+]);
+
+
   const getDragBoundsLocal = (
     id: number,
     rotation: number,
@@ -202,7 +262,7 @@ export default function BoardCanvas({
   return (
     <div
       ref={containerRef}
-      className={`absolute inset-0 overflow-hidden ${isMobile ? "pb-6" : "pb-20"}`}
+      className={`relative w-full h-full overflow-hidden ${isMobile ? "pb-6" : "pb-20"}`}
       style={
         canvasBg === "neutral"
           ? undefined
@@ -246,7 +306,7 @@ export default function BoardCanvas({
     </button>
 
   </div>
-  
+
 
   {/* Desktop uniquement */}
   {!isMobile && (
@@ -296,6 +356,9 @@ export default function BoardCanvas({
   y={b.y}
   draggable
   rotation={b.rotation || 0}
+  onDragStart={() => {
+    setIsDragging(true);
+  }}
 
   onMouseEnter={() => {
   if (!isMobile) setHoveredBoardId(b.instanceId);
@@ -349,6 +412,7 @@ onPointerUp={(e) => {
           }}
 
           onDragEnd={(e) => {
+            setIsDragging(false);
             updateActiveProject({
               selectedBoards: (activeProject.selectedBoards || []).map(
                 (x: AnyRow) =>
@@ -417,7 +481,7 @@ onPointerUp={(e) => {
       width={displaySizes[b.instanceId].w}
       height={displaySizes[b.instanceId].h}
       stroke="white"
-      strokeWidth={2}
+      strokeWidth={1}
       cornerRadius={6}
       listening={false}
     />
@@ -434,7 +498,7 @@ onPointerUp={(e) => {
       width={displaySizes[b.instanceId].w}
       height={displaySizes[b.instanceId].h}
       stroke="white"
-      strokeWidth={2}
+      strokeWidth={1}
       cornerRadius={6}
       listening={false}
     />
@@ -450,6 +514,10 @@ onPointerUp={(e) => {
   y={p.y}
   rotation={p.rotation || 0}
   draggable
+
+  onDragStart={() => {
+  setIsDragging(true);
+}}
 
   onMouseEnter={() => {
   if (!isMobile) setHoveredPedalId(p.instanceId);
@@ -501,7 +569,9 @@ onPointerUp={(e) => {
           }}
 
           onDragEnd={(e) => {
-            updateActiveProject({
+  setIsDragging(false);
+
+  updateActiveProject({
               boardPedals: activeProject.boardPedals.map(
                 (x: AnyRow) =>
                   x.instanceId === p.instanceId
@@ -554,7 +624,7 @@ onPointerUp={(e) => {
     width={displaySizes[p.instanceId].w}
     height={displaySizes[p.instanceId].h}
     stroke="white"
-    strokeWidth={2}
+    strokeWidth={1}
     cornerRadius={6}
     listening={false}
   />
@@ -565,6 +635,51 @@ onPointerUp={(e) => {
 
         </Layer>
   </Stage>
+)}
+
+{!isMobile && overlayPosition && !isDragging && (
+  <div
+    style={{
+      position: "absolute",
+      left: overlayPosition.x,
+      top: overlayPosition.y,
+      transform: "translate(-50%, -100%)",
+      zIndex: 100,
+    }}
+    className="pointer-events-auto"
+  >
+    <div className="flex items-center justify-between w-14 h-6 px-2 bg-black/90 backdrop-blur-md rounded-full shadow-lg">
+
+      <button
+  onClick={() => {
+    if (selectedInstanceId !== null) {
+      rotatePedal(selectedInstanceId);
+    }
+    if (selectedBoardInstanceId !== null) {
+      rotateBoard(selectedBoardInstanceId);
+    }
+  }}
+  className="text-white hover:text-blue-500 transition-colors duration-150"
+>
+  <RotateCw size={14} />
+</button>
+
+<button
+  onClick={() => {
+    if (selectedInstanceId !== null) {
+      deletePedal(selectedInstanceId);
+    }
+    if (selectedBoardInstanceId !== null) {
+      deleteBoard(selectedBoardInstanceId);
+    }
+  }}
+  className="text-white hover:text-red-500 transition-colors"
+>
+  <Trash2 size={14} />
+</button>
+
+    </div>
+  </div>
 )}
 
 {showIntro && (

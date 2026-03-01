@@ -224,8 +224,8 @@ React.useEffect(() => {
   const [langOpen, setLangOpen] = React.useState(false);
   const langRef = React.useRef<HTMLDivElement>(null);
   const [settingsOpen, setSettingsOpen] = React.useState(false);
-  const [shopOpen, setShopOpen] = React.useState(false);
-  const shopRef = React.useRef<HTMLDivElement>(null);
+  const pedalDropdownRef = React.useRef<HTMLDivElement>(null);
+  const boardDropdownRef = React.useRef<HTMLDivElement>(null);
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [formatOpen, setFormatOpen] = React.useState(false);
   const [contactEmail, setContactEmail] = React.useState("");
@@ -304,10 +304,27 @@ const buildThomannUrl = (slug: string) => {
 
 
 
-  React.useEffect(() => {
+React.useEffect(() => {
   const handleClickOutside = (e: MouseEvent) => {
     const target = e.target as Node;
 
+    // PEDAL dropdown
+    if (
+      pedalDropdownRef.current &&
+      !pedalDropdownRef.current.contains(target)
+    ) {
+      setShowPedalResults(false);
+    }
+
+    // BOARD dropdown
+    if (
+      boardDropdownRef.current &&
+      !boardDropdownRef.current.contains(target)
+    ) {
+      setShowBoardResults(false);
+    }
+
+    // Autres menus existants
     if (bgRef.current && !bgRef.current.contains(target)) {
       setBgOpen(false);
     }
@@ -316,11 +333,10 @@ const buildThomannUrl = (slug: string) => {
       setLangOpen(false);
     }
 
-    if (shopRef.current && !shopRef.current.contains(target)) {
-      setShopOpen(false);
-    }
-
-    if (contactTypeRef.current && !contactTypeRef.current.contains(target)) {
+    if (
+      contactTypeRef.current &&
+      !contactTypeRef.current.contains(target)
+    ) {
       setContactTypeOpen(false);
     }
   };
@@ -368,11 +384,11 @@ const buildThomannUrl = (slug: string) => {
 
     <div
   className="
-    relative z-40 w-full lg:w-72 shrink-0
-    bg-zinc-950
-    p-4 flex flex-col gap-4 lg:gap-6
-    overflow-y-auto no-scrollbar touch-pan-y
-  "
+  relative z-40 w-full lg:w-72 shrink-0
+  bg-zinc-950
+  px-6 py-4 flex flex-col gap-4 lg:gap-6
+  overflow-y-auto no-scrollbar touch-pan-y
+"
   style={{ WebkitOverflowScrolling: "touch" }}
   onClick={(e) => {
     e.stopPropagation();
@@ -385,7 +401,7 @@ const buildThomannUrl = (slug: string) => {
 
 
       {contactOpen ? (
-  <div className="flex flex-col gap-6 animate-in slide-in-from-left duration-300">
+  <div className="flex flex-col gap-6 animate-in slide-in-from-left duration-300 px-1">
     
     {/* BACK + small title → DESKTOP ONLY */}
     <div className="hidden lg:block">
@@ -565,133 +581,86 @@ const buildThomannUrl = (slug: string) => {
       </>
     )}
   </div>
+
 ) : selectedPedal ? (
 
-  
-        <div className="flex flex-col gap-6 animate-in slide-in-from-left duration-300">
-          <button
-            onClick={() => setSelectedInstanceId(null)}
-            className="flex items-center gap-2 text-zinc-500 hover:text-white transition-colors text-[10px] font-black uppercase tracking-widest"
-          >
-            <ArrowLeft className="size-4" /> {t("sidebar.back")}
-          </button>
+  <div className="flex flex-col gap-6 animate-in slide-in-from-left duration-300 px-1">
+
+    {/* PEDAL INFO */}
+    <div className="space-y-0.5 border-zinc-900">
+
+      <div className="mt-4 mb-4 flex items-center gap-3">
+  <div className="w-[3px] h-5 bg-blue-500 rounded-full" />
+  <span className="text-[12px] uppercase font-bold tracking-[0.18em] text-white">
+    {t("pedal.features")}
+  </span>
+</div>
+
+  {/* STATUT */}
+  {!isCustomPedal && (
+    <div className="flex justify-between items-center py-2 border-b border-zinc-900">
+      <span className="text-[10px] text-white uppercase font-bold tracking-wider">
+        {t("pedal.status.label")}
+      </span>
+      <span
+        className={`text-[9px] px-2 py-0.5 rounded-full font-black uppercase ${
+          (selectedPedal.status || "").toLowerCase().includes("active")
+            ? "bg-green-500/10 text-green-500"
+            : "bg-red-500/10 text-red-500"
+        }`}
+      >
+        {selectedPedal.status
+          ? t(`pedal.status.${selectedPedal.status.toLowerCase()}`)
+          : "N/A"}
+      </span>
+    </div>
+  )}
+
+  {/* MARQUE */}
+  {!isCustomPedal && (
+    <div className="flex justify-between items-center py-2 border-b border-zinc-900">
+      <span className="text-[10px] text-white uppercase font-bold tracking-wider">
+        Marque
+      </span>
+      <span className="text-[11px] font-bold text-zinc-400">
+        {selectedPedal.brand || "N/A"}
+      </span>
+    </div>
+  )}
+
+  {/* MODÈLE */}
+  {!isCustomPedal && (
+    <div className="flex justify-between items-center py-2 border-b border-zinc-900">
+      <span className="text-[10px] text-white uppercase font-bold tracking-wider">
+        Modèle
+      </span>
+      <span className="text-[11px] font-bold text-zinc-400">
+        {selectedPedal.name || "N/A"}
+      </span>
+    </div>
+  )}
 
 
-          <div className={`${isCustomPedal ? "hidden" : "space-y-1"}`}>
-            {!isCustomPedal && (
-            <p className="text-blue-500 text-[12px] font-black uppercase tracking-[0.2em]">
-              {selectedPedal.brand}
-            </p>)}
-
-            {!isCustomPedal && (
-            <h2 className="text-l font-black text-[16px] leading-tight">
-              {selectedPedal.name}
-            </h2>)}
-
-            {!isCustomPedal && (
-            <p className="text-zinc-500 text-[10px] font-medium">
-              {selectedPedal.year || "No date"}
-            </p>
-          )}
-{/*
-            <div className="py-2 border-zinc-900">
-              <p className="text-[12px] text-zinc-400 font-medium">
-                {selectedPedal.overview}
-              </p>
-            </div>
-*/}
-          </div>
-
-          {/* ACTIONS */}
-          <div className="flex gap-2">
-            <div className="flex gap-2 pointer-events-auto w-full">
-              {/* ROTATE */}
-              <button onClick={() => {if (selectedInstanceId !== null) {rotatePedal(selectedInstanceId);}
-}}
-
-  className="group pointer-events-auto flex-1 flex items-center justify-center px-4 py-3 rounded-xl
-  bg-zinc-600/10 border border-zinc-500/20
-  hover:bg-blue-500/10 hover:border-blue-400/70
-  hover:ring-2 hover:ring-blue-500/30
-  hover:shadow-lg
-  active:scale-[0.99]
-  transition-all duration-200"
->
-  <div className="flex items-center gap-3">
-    <RotateCw
-      size={16}
-      className="text-white group-hover:text-white
-      group-active:rotate-90 transition-transform duration-200"
-    />
-    <span className="text-[10px] font-black uppercase tracking-widest text-white group-hover:text-white">
-      {t("sidebar.rotate")}
-    </span>
-  </div>
-</button>
-
-
-              {/* DELETE */}
-              <button
-  onClick={() => {if (selectedInstanceId !== null) {deletePedal(selectedInstanceId);}
-}}
-
-  className="group pointer-events-auto flex-1 flex items-center justify-center px-4 py-3 rounded-xl
-  bg-zinc-600/10 border border-zinc-500/20
-  hover:bg-red-500/10 hover:border-red-400/80
-  hover:ring-2 hover:ring-red-500/30
-  hover:shadow-lg
-  active:scale-[0.99]
-  transition-all duration-200"
->
-  <div className="flex items-center gap-3">
-    <Trash2 size={16} className="text-white group-hover:text-white transition-colors" />
-    <span className="text-[10px] font-black uppercase tracking-widest text-white group-hover:text-white">
-      {t("sidebar.delete")}
-    </span>
-  </div>
-</button>
-
-            </div>
-          </div>
-
-          {/* PEDAL INFO */}
-          <div className="space-y-0.5 border-zinc-900">
-            {!isCustomPedal && (
-            <div className="flex justify-between items-center py-2 border-b border-t border-zinc-900">
-              <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
-                {t("pedal.status.label")}
-              </span>
-              <span
-                className={`text-[9px] px-2 py-0.5 rounded-full font-black uppercase ${
-                  (selectedPedal.status || "").toLowerCase().includes("active")
-                    ? "bg-green-500/10 text-green-500"
-                    : "bg-red-500/10 text-red-500"
-                }`}
-              >
-                {selectedPedal.status
-                ? t(`pedal.status.${selectedPedal.status.toLowerCase()}`)
-                : "N/A"}
-              </span>
-            </div>)}
+  {/* TYPE */}
+  {!isCustomPedal && (
+    <div className="flex justify-between items-center py-2 border-b border-zinc-900">
+      <span className="text-[10px] text-white uppercase font-bold tracking-wider">
+        {t("pedal.type.label")}
+      </span>
+      <span className="text-[11px] font-bold font-mono text-zinc-400">
+        {selectedPedal.type
+          ? t(`pedal.type.${selectedPedal.type}`)
+          : "N/A"}
+      </span>
+    </div>
+  )}
 
             {!isCustomPedal && (
             <div className="flex justify-between items-center py-2 border-b border-zinc-900">
-              <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
-                {t("pedal.type.label")}
-              </span>
-              <span className="text-[11px] font-bold font-mono text-zinc-300">
-                {selectedPedal.type
-                ? t(`pedal.type.${selectedPedal.type}`)
-                : "N/A"}
-              </span>
-            </div>)}
-
-            {!isCustomPedal && (
-            <div className="flex justify-between items-center py-2 border-b border-zinc-900">
-              <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
+              <span className="text-[10px] text-white uppercase font-bold tracking-wider">
                 {t("pedal.circuit.label")}
               </span>
-              <span className="text-[11px] font-bold font-mono text-zinc-300">
+              <span className="text-[11px] font-bold font-mono text-zinc-400">
                 {selectedPedal.circuit
                 ? t(`pedal.circuit.${selectedPedal.circuit}`)
                 : "N/A"}
@@ -700,10 +669,10 @@ const buildThomannUrl = (slug: string) => {
 
             {!isCustomPedal && (
             <div className="flex justify-between items-center py-2 border-b border-zinc-900">
-              <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
+              <span className="text-[10px] text-white uppercase font-bold tracking-wider">
                 {t("pedal.bypass.label")}
               </span>
-              <span className="text-[11px] font-bold font-mono text-zinc-300">
+              <span className="text-[11px] font-bold font-mono text-zinc-400">
                 {selectedPedal.bypass
                 ? t(`pedal.bypass.${selectedPedal.bypass}`)
                 : "N/A"}
@@ -712,10 +681,10 @@ const buildThomannUrl = (slug: string) => {
 
             {!isCustomPedal && (
             <div className="flex justify-between items-center py-2 border-b border-zinc-900">
-              <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
+              <span className="text-[10px] text-white uppercase font-bold tracking-wider">
                 {t("pedal.power.label")}
               </span>
-              <span className="text-[11px] font-bold font-mono text-zinc-300">
+              <span className="text-[11px] font-bold font-mono text-zinc-400">
                 {selectedPedal.power
                 ? t(`pedal.power.${selectedPedal.power}`)
                 : "N/A"}
@@ -724,19 +693,19 @@ const buildThomannUrl = (slug: string) => {
 
             {!isCustomPedal && (
             <div className="flex justify-between items-center py-2 border-b border-zinc-900">
-              <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
+              <span className="text-[10px] text-white uppercase font-bold tracking-wider">
                 {t("pedal.draw")}
               </span>
-              <span className="text-[11px] font-bold font-mono">
+              <span className="text-[11px] font-bold font-mono text-zinc-400">
                 {selectedPedal.draw || 0} mA
               </span>
             </div>)}
 
             <div className="flex justify-between items-center py-2 border-b border-zinc-900">
-            <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
+            <span className="text-[10px] text-white uppercase font-bold tracking-wider">
               {t("pedal.dimensions")}
             </span>
-            <span className="text-[11px] font-bold font-mono">
+            <span className="text-[11px] font-bold font-mono text-zinc-400">
               {units === "metric"
                 ? `${selectedPedal.width} x ${selectedPedal.depth || 0} mm`
                 : `${mmToIn(selectedPedal.width).toFixed(2)} x ${mmToIn(
@@ -747,27 +716,27 @@ const buildThomannUrl = (slug: string) => {
 
             {!isCustomPedal && (
             <div className="flex justify-between items-center py-2 border-b border-zinc-900">
-            <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
+            <span className="text-[10px] text-white uppercase font-bold tracking-wider">
               {t("pedal.weight")}
             </span>
-            <span className="text-[11px] font-bold font-mono">
+            <span className="text-[11px] font-bold font-mono text-zinc-400">
               {formatWeight(selectedPedal.weight || 0, units, language)}
             </span>
             </div>)}
 
             {!isCustomPedal && (
             <div className="flex justify-between items-center py-2 border-b border-zinc-900">
-              <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
+              <span className="text-[10px] text-white uppercase font-bold tracking-wider">
                {t("pedal.origin")}
               </span>
-              <span className="text-[11px] font-bold text-zinc-300">
+              <span className="text-[11px] font-bold text-zinc-400">
                 {selectedPedal.origin || "N/A"}
               </span>
             </div>)}
 
             {!isCustomPedal && (
-            <div className="flex justify-between items-center py-2 border-b border-zinc-900">
-              <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
+            <div className="flex justify-between items-center py-2 border-zinc-900">
+              <span className="text-[10px] text-white uppercase font-bold tracking-wider">
                 {t("pedal.manual")}
               </span>
               {selectedPedal.manual ? (
@@ -780,38 +749,28 @@ const buildThomannUrl = (slug: string) => {
                   PDF <ExternalLink size={10} />
                 </a>
               ) : (
-                <span className="text-[11px] font-bold text-zinc-600">N/A</span>
+                <span className="text-[11px] font-bold text-zinc-400">N/A</span>
               )}
             </div>)}
 
+{/* BUY ONLINE */}
+{!isCustomPedal && (
+  <div className="mt-8">
 
-            <div className={`pt-5 space-y-4 ${isCustomPedal ? "hidden" : ""}`}>
-              <span className="text-[10px] uppercase font-black tracking-wider">
-                {t("sidebar.buyOnline")}
-              </span>
-
-              <div className="relative mt-3" ref={shopRef}>
-  <button
-    onClick={() => setShopOpen((v) => !v)}
-    className="flex items-center justify-between w-full px-4 py-3 bg-blue-600/10 border border-blue-500/20 rounded-xl hover:bg-blue-600 transition-all group"
-  >
-    <div className="flex items-center gap-3">
-      <ShoppingCart size={16} className="text-blue-400 group-hover:text-white" />
-      <span className="text-[11px] font-black uppercase tracking-widest text-blue-400 group-hover:text-white">
-        {t("sidebar.shop")}
+    <div className="mb-4 flex items-center gap-3">
+      <div className="w-[3px] h-5 bg-blue-500 rounded-full" />
+      <span className="text-[12px] uppercase font-bold tracking-[0.18em] text-white">
+        {t("sidebar.buyOnline")}
       </span>
     </div>
-    <ChevronDown
-      size={14}
-      className={`text-blue-400 transition-transform ${
-        shopOpen ? "rotate-180" : ""
-      }`}
-    />
-  </button>
 
-  {shopOpen && (
-    <div className="absolute left-0 right-0 mt-2 bg-zinc-900 border border-zinc-800 rounded-xl shadow-xl z-50 overflow-hidden">
-      {(isDiscontinued ? ["reverb"] : getStoresForCountry()).map((store) => {
+    <div className="space-y-3">
+      {(
+        (selectedPedal.status || "").toLowerCase().includes("discontinued")
+          ? ["reverb"]
+          : getStoresForCountry()
+      ).map((store) => {
+
         let url = "";
 
         if (store === "reverb") {
@@ -835,432 +794,452 @@ const buildThomannUrl = (slug: string) => {
         if (!url) return null;
 
         const storeData = {
-  sweetwater: { label: "Sweetwater", logo: "/logos/sweetwater.png" },
-  woodbrass: { label: "Woodbrass", logo: "/logos/woodbrass.png" },
-  reverb: { label: "Reverb", logo: "/logos/reverb.png" },
-  thomann: { label: "Thomann", logo: "/logos/thomann.png" },
-};
+          sweetwater: { label: "Sweetwater", logo: "/logos/sweetwater.png" },
+          woodbrass: { label: "Woodbrass", logo: "/logos/woodbrass.png" },
+          reverb: { label: "Reverb", logo: "/logos/reverb.png" },
+          thomann: { label: "Thomann", logo: "/logos/thomann.png" },
+        };
 
-const key =
-  store.includes("thomann") ? "thomann" : store;
+        const key =
+          store.includes("thomann") ? "thomann" : store;
 
-const data = storeData[key as keyof typeof storeData];
+        const data = storeData[key as keyof typeof storeData];
 
-return (
-  <a
-    key={store}
-    href={url}
-    target="_blank"
-    rel="noopener noreferrer"
-    className="flex items-center gap-3 px-4 py-3 hover:bg-zinc-800 text-[11px] font-bold"
-  >
-    <img
-      src={data.logo}
-      alt={data.label}
-      className="w-4 h-4 object-contain"
-    />
+        return (
+          <a
+  key={store}
+  href={url}
+  target="_blank"
+  rel="noopener noreferrer"
+  className="
+    flex items-center gap-3
+    px-3 py-3
+    rounded-lg
+    transition-all duration-200 ease-out
+    hover:bg-zinc-900
+    hover:scale-[1.02]
+    active:scale-[0.98]
+    group
+  "
+>
+  <img
+    src={data.logo}
+    alt={data.label}
+    className="w-5 h-5 object-contain transition-transform duration-200 group-hover:scale-110"
+  />
+  <span className="
+    text-[12px] font-semibold text-zinc-300
+    transition-all duration-200
+    group-hover:text-white
+    group-hover:translate-x-1
+  ">
     {data.label}
-  </a>
-);
-
+  </span>
+</a>
+        );
       })}
     </div>
-  )}
-</div>
 
-            </div>
+  </div>
+)}
+
           </div>
         </div>
-      ) : selectedBoardDetails ? (
-        // BOARD DETAILS
-        <div className="flex flex-col gap-6 animate-in slide-in-from-left duration-300">
-          <button
-            onClick={() => setSelectedBoardInstanceId(null)}
-            className="flex items-center gap-2 text-zinc-500 hover:text-white transition-colors text-[10px] font-black uppercase tracking-widest"
+) : selectedBoardDetails ? (
+  // BOARD DETAILS
+  <div className="flex flex-col gap-6 animate-in slide-in-from-left duration-300 px-1">
+
+    <div className="space-y-0.5 border-zinc-900">
+
+      {/* HEADER (identique aux pédales) */}
+      <div className="mt-4 mb-4 flex items-center gap-3">
+        <div className="w-[3px] h-5 bg-blue-500 rounded-full" />
+        <span className="text-[12px] uppercase font-bold tracking-[0.18em] text-white">
+          {t("pedal.features")}
+        </span>
+      </div>
+
+      {/* STATUT */}
+      {!isCustomBoard && (
+        <div className="flex justify-between items-center py-2 border-b border-zinc-900">
+          <span className="text-[10px] text-white uppercase font-bold tracking-wider">
+            {t("board.status.label")}
+          </span>
+          <span
+            className={`text-[9px] px-2 py-0.5 rounded-full font-black uppercase ${
+              (selectedBoardDetails.status || "").toLowerCase().includes("active")
+                ? "bg-green-500/10 text-green-500"
+                : "bg-red-500/10 text-red-500"
+            }`}
           >
-            <ArrowLeft className="size-4" /> {t("sidebar.back")}
-          </button>
+            {selectedBoardDetails.status
+              ? t(`board.status.${selectedBoardDetails.status.toLowerCase()}`)
+              : "N/A"}
+          </span>
+        </div>
+      )}
 
-          {!isCustomBoard && (
-          <div className="space-y-1">
-            <p className="text-blue-500 text-[12px] font-black uppercase tracking-[0.2em]">
-              {selectedBoardDetails.brand}
-            </p>
-            <h2 className="text-l font-black leading-tight">{selectedBoardDetails.name}</h2>
-            <p className="text-zinc-500 text-[10px] font-medium">
-              {selectedBoardDetails.year || "No date"}
-            </p>
+      {/* MARQUE */}
+      {!isCustomBoard && (
+        <div className="flex justify-between items-center py-2 border-b border-zinc-900">
+          <span className="text-[10px] text-white uppercase font-bold tracking-wider">
+            Marque
+          </span>
+          <span className="text-[11px] font-bold text-zinc-400">
+            {selectedBoardDetails.brand || "N/A"}
+          </span>
+        </div>
+      )}
+
+      {/* MODÈLE */}
+      {!isCustomBoard && (
+        <div className="flex justify-between items-center py-2 border-b border-zinc-900">
+          <span className="text-[10px] text-white uppercase font-bold tracking-wider">
+            Modèle
+          </span>
+          <span className="text-[11px] font-bold text-zinc-400">
+            {selectedBoardDetails.name || "N/A"}
+          </span>
+        </div>
+      )}
+
+      {/* MATÉRIAU */}
+      {!isCustomBoard && (
+        <div className="flex justify-between items-center py-2 border-b border-zinc-900">
+          <span className="text-[10px] text-white uppercase font-bold tracking-wider">
+            {t("board.material.label")}
+          </span>
+          <span className="text-[11px] font-bold font-mono text-zinc-400">
+            {selectedBoardDetails.material
+              ? t(`board.material.${selectedBoardDetails.material}`)
+              : "N/A"}
+          </span>
+        </div>
+      )}
+
+      {/* PROFIL */}
+      {!isCustomBoard && (
+        <div className="flex justify-between items-center py-2 border-b border-zinc-900">
+          <span className="text-[10px] text-white uppercase font-bold tracking-wider">
+            {t("board.profile.label")}
+          </span>
+          <span className="text-[11px] font-bold font-mono text-zinc-400">
+            {selectedBoardDetails.profile
+              ? t(`board.profile.${selectedBoardDetails.profile}`)
+              : "N/A"}
+          </span>
+        </div>
+      )}
+
+      {/* DIMENSIONS */}
+      <div className="flex justify-between items-center py-2 border-b border-zinc-900">
+        <span className="text-[10px] text-white uppercase font-bold tracking-wider">
+          {t("board.dimensions")}
+        </span>
+        <span className="text-[11px] font-bold font-mono text-zinc-400">
+          {units === "metric"
+            ? `${selectedBoardDetails.width} x ${selectedBoardDetails.depth || 0} mm`
+            : `${mmToIn(selectedBoardDetails.width).toFixed(2)} x ${mmToIn(
+                selectedBoardDetails.depth || 0
+              ).toFixed(2)} in`}
+        </span>
+      </div>
+
+      {/* POIDS */}
+      {!isCustomBoard && (
+        <div className="flex justify-between items-center py-2 border-b border-zinc-900">
+          <span className="text-[10px] text-white uppercase font-bold tracking-wider">
+            {t("board.weight")}
+          </span>
+          <span className="text-[11px] font-bold font-mono text-zinc-400">
+            {formatWeight(selectedBoardDetails.weight || 0, units, language)}
+          </span>
+        </div>
+      )}
+
+      {/* ORIGINE */}
+      {!isCustomBoard && (
+        <div className="flex justify-between items-center py-2 border-zinc-900">
+          <span className="text-[10px] text-white uppercase font-bold tracking-wider">
+            {t("board.origin")}
+          </span>
+          <span className="text-[11px] font-bold text-zinc-400">
+            {selectedBoardDetails.origin || "N/A"}
+          </span>
+        </div>
+      )}
+    </div>
+
+    {/* BUY ONLINE */}
+    {!isCustomBoard && (
+      <div className="mt-8">
+
+        <div className="mb-4 flex items-center gap-3">
+          <div className="w-[3px] h-5 bg-blue-500 rounded-full" />
+          <span className="text-[12px] uppercase font-bold tracking-[0.18em] text-white">
+            {t("sidebar.buyOnline")}
+          </span>
+        </div>
+
+        <div className="space-y-3">
+          {(
+            (selectedBoardDetails.status || "")
+              .toLowerCase()
+              .includes("discontinued")
+              ? ["reverb"]
+              : getStoresForCountry()
+          ).map((store) => {
+
+            let url = "";
+
+            if (store === "reverb") {
+              url = `https://reverb.com/marketplace?query=${encodeURIComponent(
+                selectedBoardDetails.brand + " " + selectedBoardDetails.name
+              )}`;
+            }
+
+            if (store === "sweetwater") {
+              url = selectedBoardDetails.sweetwater;
+            }
+
+            if (store === "woodbrass") {
+              url = selectedBoardDetails.woodbrass;
+            }
+
+            if (store.includes("thomann")) {
+              url = buildThomannUrl(selectedBoardDetails.thomann);
+            }
+
+            if (!url) return null;
+
+            const storeData = {
+              sweetwater: { label: "Sweetwater", logo: "/logos/sweetwater.png" },
+              woodbrass: { label: "Woodbrass", logo: "/logos/woodbrass.png" },
+              reverb: { label: "Reverb", logo: "/logos/reverb.png" },
+              thomann: { label: "Thomann", logo: "/logos/thomann.png" },
+            };
+
+            const key = store.includes("thomann") ? "thomann" : store;
+            const data = storeData[key as keyof typeof storeData];
+
+            return (
+              <a
+                key={store}
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="
+                  flex items-center gap-3
+                  px-3 py-3
+                  rounded-lg
+                  transition-all duration-200 ease-out
+                  hover:bg-zinc-900
+                  hover:scale-[1.02]
+                  active:scale-[0.98]
+                  group
+                "
+              >
+                <img
+                  src={data.logo}
+                  alt={data.label}
+                  className="w-5 h-5 object-contain transition-transform duration-200 group-hover:scale-110"
+                />
+                <span className="
+                  text-[12px] font-semibold text-zinc-300
+                  transition-all duration-200
+                  group-hover:text-white
+                  group-hover:translate-x-1
+                ">
+                  {data.label}
+                </span>
+              </a>
+            );
+          })}
+        </div>
+      </div>
+    )}
+
+  </div>
+
+      ) : (
+
+  // LIBRARY (default view)
+  <div className="px-1">
+
+{/* ADD A PEDAL */}
+<div className="flex flex-col gap-2">
+
+  <div className="mt-3 mb-1 flex items-center gap-3">
+    <div className="w-[3px] h-5 bg-blue-500 rounded-full" />
+    <span className="text-[12px] uppercase font-bold tracking-[0.18em] text-white">
+      {t("sidebar.addPedal")}
+    </span>
+  </div>
+
+  <div
+  ref={pedalDropdownRef}
+  className="relative"
+  style={{ zIndex: showPedalResults ? 60 : 10 }}
+>
+    <div className="relative flex items-center">
+      <input
+        type="text"
+        placeholder={`${t("sidebar.searchPedal")}...`}
+        className={`w-full bg-zinc-900 border rounded-lg py-2 pl-4 pr-10 text-[11px] italic text-zinc-200 placeholder:text-zinc-500 outline-none transition-all ${
+          showPedalResults
+            ? "border-zinc-500"
+            : "border-zinc-700"
+        }`}
+        value={pedalSearch}
+        onClick={(e) => {
+          e.stopPropagation();
+          setShowBoardResults(false);
+          setShowPedalResults(true);
+        }}
+        onChange={(e) => {
+          setPedalSearch(e.target.value);
+          setShowPedalResults(true);
+        }}
+      />
+     <ChevronDown
+  onClick={(e) => {
+    e.stopPropagation();
+    setShowPedalResults(!showPedalResults);
+  }}
+  className={`absolute right-3 size-4 cursor-pointer transition-transform ${
+    showPedalResults
+      ? "rotate-180 text-zinc-400"
+      : "text-zinc-500"
+  }`}
+/>
+    </div>
+
+    {showPedalResults && (
+      <div className="absolute top-10 left-0 right-0 bg-zinc-900 border border-zinc-700 rounded-xl shadow-2xl z-50 max-h-80 overflow-y-auto custom-scrollbar">
+        {Object.keys(groupItems(pedalsLibrary, pedalSearch)).length > 0 ? (
+          Object.keys(groupItems(pedalsLibrary, pedalSearch)).map((brand) => (
+            <div key={brand} className="flex flex-col">
+  <div className="px-4 h-10 flex items-center bg-zinc-950">
+  <span className="text-[11px] font-bold text-zinc-100 uppercase tracking-widest">
+    {brand}
+  </span>
+</div>
+              {groupItems(pedalsLibrary, pedalSearch)[brand].map((p) => (
+                <button
+                  key={p.id}
+                  onClick={() => addPedal(p)}
+                  className="w-full px-5 py-2 text-left hover:bg-zinc-700 text-zinc-300 text-[12px] transition-colors"
+                >
+                  <span className="font-semibold opacity-50 mr-2">{brand}</span>
+                  {p.name}
+                </button>
+              ))}
+            </div>
+          ))
+        ) : (
+          <div className="p-4 text-center text-[10px] text-zinc-500 uppercase font-semibold tracking-widest">
+            No pedals found
           </div>
-          )}
-
-          {/* ACTIONS */}
-<div className="flex gap-2">
-  <div className="flex gap-2 pointer-events-auto w-full">
-    {/* ROTATE */}
-    <button
-      onClick={() => {
-        if (selectedBoardInstanceId !== null) {
-          rotateBoard(selectedBoardInstanceId);
-        }
-      }}
-      className="group flex-1 flex items-center justify-center px-4 py-3 rounded-xl
-      bg-zinc-600/10 border border-zinc-500/20
-      hover:bg-blue-500/10 hover:border-blue-400/70
-      hover:ring-2 hover:ring-blue-500/30
-      active:scale-[0.99]
-      transition-all duration-200"
-    >
-      <div className="flex items-center gap-3">
-        <RotateCw size={16} />
-        <span className="text-[10px] font-black uppercase tracking-widest">
-          {t("sidebar.rotate")}
-        </span>
+        )}
       </div>
-    </button>
-
-    {/* DELETE */}
-    <button
-      onClick={() => {
-        if (selectedBoardInstanceId !== null) {
-          deleteBoard(selectedBoardInstanceId);
-        }
-      }}
-      className="group flex-1 flex items-center justify-center px-4 py-3 rounded-xl
-      bg-zinc-600/10 border border-zinc-500/20
-      hover:bg-red-500/10 hover:border-red-400/80
-      hover:ring-2 hover:ring-red-500/30
-      active:scale-[0.99]
-      transition-all duration-200"
-    >
-      <div className="flex items-center gap-3">
-        <Trash2 size={16} />
-        <span className="text-[10px] font-black uppercase tracking-widest text-white">
-          {t("sidebar.delete")}
-        </span>
-      </div>
-    </button>
+    )}
   </div>
 </div>
 
 
-          <div className="space-y-0.5 border-zinc-900">
-            {!isCustomBoard && (
-            <div className="flex justify-between items-center py-2 border-b border-t border-zinc-900">
-              <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
-                {t("board.status.label")}
-              </span>
-              <span
-                className={`text-[9px] px-2 py-0.5 rounded-full font-black uppercase ${
-                  (selectedBoardDetails.status || "").toLowerCase().includes("active")
-                    ? "bg-green-500/10 text-green-500"
-                    : "bg-red-500/10 text-red-500"
-                }`}
-              >
-                {selectedBoardDetails.status
-                ? t(`board.status.${selectedBoardDetails.status.toLowerCase()}`)
-                : "N/A"}
-              </span>
-            </div>)}
+{/* ADD A BOARD */}
+<div className="flex flex-col gap-2 mt-8">
 
-            {!isCustomBoard && (
-            <div className="flex justify-between items-center py-2 border-b border-zinc-900">
-              <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
-                {t("board.material.label")}
-              </span>
-              <span className="text-[11px] font-bold font-mono">
-                {selectedBoardDetails.material
-                ? t(`board.material.${selectedBoardDetails.material}`)
-                : "N/A"}
-              </span>
-            </div>
-            )}
+  <div className="mb-1 flex items-center gap-3">
+    <div className="w-[3px] h-5 bg-blue-500 rounded-full" />
+    <span className="text-[12px] uppercase font-bold tracking-[0.18em] text-white">
+      {t("sidebar.addBoard")}
+    </span>
+  </div>
 
-            {!isCustomBoard && (
-            <div className="flex justify-between items-center py-2 border-b border-zinc-900">
-              <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
-                {t("board.profile.label")}
-              </span>
-              <span className="text-[11px] font-bold font-mono">
-                {selectedBoardDetails.profile
-                ? t(`board.profile.${selectedBoardDetails.profile}`)
-                : "N/A"}
-              </span>
-            </div>
-            )}
-
-            <div className="flex justify-between items-center py-2 border-b border-zinc-900">
-            <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
-              {t("board.dimensions")}
-            </span>
-            <span className="text-[11px] font-bold font-mono">
-              {units === "metric"
-                ? `${selectedBoardDetails.width} x ${
-                    selectedBoardDetails.depth || 0
-                  } mm`
-                : `${mmToIn(selectedBoardDetails.width).toFixed(2)} x ${mmToIn(
-                    selectedBoardDetails.depth || 0
-                  ).toFixed(2)} in`}
-            </span>
-            </div>
-
-            {!isCustomBoard && (
-            <div className="flex justify-between items-center py-2 border-b border-zinc-900">
-            <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
-              {t("board.weight")}
-            </span>
-            <span className="text-[11px] font-bold font-mono">
-              {formatWeight(selectedBoardDetails.weight || 0, units, language)}
-            </span>
-            </div>
-            )}
-
-            {!isCustomBoard && (
-            <div className="flex justify-between items-center py-2 border-b border-zinc-900">
-              <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">
-                {t("board.origin")}
-              </span>
-              <span className="text-[11px] font-bold font-mono">
-                {selectedBoardDetails.origin || 0}
-              </span>
-            </div>
-            )}
-
-            <div className={`pt-5 space-y-4 ${isCustomBoard ? "hidden" : ""}`}>
-              <span className="text-[10px] uppercase font-black tracking-wider">
-                {t("sidebar.buyOnline")}
-              </span>
-
-              <div className="relative mt-3" ref={shopRef}>
-  <button
-    onClick={() => setShopOpen((v) => !v)}
-    className="flex items-center justify-between w-full px-4 py-3 bg-blue-600/10 border border-blue-500/20 rounded-xl hover:bg-blue-600 transition-all group"
-  >
-    <div className="flex items-center gap-3">
-      <ShoppingCart size={16} className="text-blue-400 group-hover:text-white" />
-      <span className="text-[11px] font-black uppercase tracking-widest text-blue-400 group-hover:text-white">
-        {t("sidebar.shop")}
-      </span>
+  <div
+  ref={boardDropdownRef}
+  className="relative"
+  style={{ zIndex: showBoardResults ? 60 : 5 }}
+>
+    <div className="relative flex items-center">
+      <input
+        type="text"
+        placeholder={`${t("sidebar.searchBoard")}...`}
+        className={`w-full bg-zinc-900 border rounded-lg py-2 pl-4 pr-10 text-[11px] italic text-zinc-200 placeholder:text-zinc-500 outline-none transition-all ${
+          showBoardResults
+            ? "border-zinc-500"
+            : "border-zinc-700"
+        }`}
+        value={boardSearch}
+        onClick={(e) => {
+          e.stopPropagation();
+          setShowPedalResults(false);
+          setShowBoardResults(true);
+        }}
+        onChange={(e) => {
+          setBoardSearch(e.target.value);
+          setShowBoardResults(true);
+        }}
+      />
+      <ChevronDown
+  onClick={(e) => {
+    e.stopPropagation();
+    setShowBoardResults(!showBoardResults);
+  }}
+  className={`absolute right-3 size-4 cursor-pointer transition-transform ${
+    showBoardResults
+      ? "rotate-180 text-zinc-400"
+      : "text-zinc-500"
+  }`}
+/>
     </div>
-    <ChevronDown
-      size={14}
-      className={`text-blue-400 transition-transform ${
-        shopOpen ? "rotate-180" : ""
-      }`}
-    />
-  </button>
 
-  {shopOpen && (
-    <div className="absolute left-0 right-0 mt-2 bg-zinc-900 border border-zinc-800 rounded-xl shadow-xl z-50 overflow-hidden">
-
-      {((selectedBoardDetails.status || "").toLowerCase().includes("discontinued")
-        ? ["reverb"]
-        : getStoresForCountry()
-      ).map((store) => {
-
-        let url = "";
-
-        if (store === "reverb") {
-          url = `https://reverb.com/marketplace?query=${encodeURIComponent(
-            selectedBoardDetails.brand + " " + selectedBoardDetails.name
-          )}`;
-        }
-
-        if (store === "sweetwater") {
-          url = selectedBoardDetails.sweetwater;
-        }
-
-        if (store === "woodbrass") {
-          url = selectedBoardDetails.woodbrass;
-        }
-
-        if (store.includes("thomann")) {
-          url = buildThomannUrl(selectedBoardDetails.thomann);
-        }
-
-        if (!url) return null;
-
-        return (
-          <a
-            key={store}
-            href={url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-3 px-4 py-3 hover:bg-zinc-800 text-[11px] font-bold"
-          >
-            {store === "reverb" && (
-              <img src="/logos/reverb.png" className="w-5 h-5 object-contain" />
-            )}
-            {store === "sweetwater" && (
-              <img src="/logos/sweetwater.png" className="w-5 h-5 object-contain" />
-            )}
-            {store === "woodbrass" && (
-              <img src="/logos/woodbrass.png" className="w-5 h-5 object-contain" />
-            )}
-            {store.includes("thomann") && (
-              <img src="/logos/thomann.png" className="w-5 h-5 object-contain" />
-            )}
-
-            {store === "reverb" && "Reverb"}
-            {store === "sweetwater" && "Sweetwater"}
-            {store === "woodbrass" && "Woodbrass"}
-            {store.includes("thomann") && "Thomann"}
-          </a>
-        );
-      })}
-    </div>
-  )}
+    {showBoardResults && (
+      <div className="absolute top-10 left-0 right-0 bg-zinc-900 border border-zinc-700 rounded-xl shadow-2xl z-50 max-h-80 overflow-y-auto custom-scrollbar">
+        {Object.keys(groupItems(boardsLibrary, boardSearch)).length > 0 ? (
+          Object.keys(groupItems(boardsLibrary, boardSearch)).map((brand) => (
+            <div key={brand} className="flex flex-col">
+  <div className="px-4 h-10 flex items-center bg-zinc-950">
+  <span className="text-[11px] font-bold text-zinc-100 uppercase tracking-widest">
+    {brand}
+  </span>
+</div>
+              {groupItems(boardsLibrary, boardSearch)[brand].map((b) => (
+                <button
+                  key={b.id}
+                  onClick={() => selectBoard(b)}
+                  className="w-full px-5 py-2 text-left hover:bg-zinc-700 text-zinc-300 text-[12px] transition-colors"
+                >
+                  <span className="font-semibold opacity-50 mr-2">{brand}</span>
+                  {b.name}
+                </button>
+              ))}
+            </div>
+          ))
+        ) : (
+          <div className="p-4 text-center text-[10px] text-zinc-500 uppercase font-semibold tracking-widest">
+            No boards found
+          </div>
+        )}
+      </div>
+    )}
+  </div>
 </div>
 
-            </div>
-          </div>
-        </div>
-      ) : (
-        // LIBRARY (default view)
-        <>
-          {/* ADD A PEDAL */}
-          <div className="flex flex-col gap-1">
-            <div className="flex items-center gap-2 px-1">
-              <span className="text-[10px] font-black uppercase tracking-widest">
-                {t("sidebar.addPedal")}
-              </span>
-            </div>
 
-            <div className="relative" style={{ zIndex: showPedalResults ? 60 : 10 }}>
-              <div className="relative flex items-center">
-                <input
-                  type="text"
-                  placeholder={`${t("sidebar.searchPedal")}...`}
-                  className={`w-full bg-zinc-900 border rounded-lg py-2 pl-4 pr-10 text-[11px] outline-none transition-all ${
-                    showPedalResults
-                      ? "border-blue-500 ring-1 ring-blue-500"
-                      : "border-zinc-800"
-                  }`}
-                  value={pedalSearch}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setShowBoardResults(false);
-                    setShowPedalResults(true);
-                  }}
-                  onChange={(e) => {
-                    setPedalSearch(e.target.value);
-                    setShowPedalResults(true);
-                  }}
-                />
-                <ChevronDown
-                  className={`absolute right-3 size-3 text-zinc-600 transition-transform pointer-events-none ${
-                    showPedalResults ? "rotate-180 text-blue-500" : ""
-                  }`}
-                />
-              </div>
+{/* MAKE YOUR OWN */}
+<div className="flex flex-col gap-2 mt-8">
 
-              {showPedalResults && (
-                <div className="absolute top-10 left-0 right-0 bg-zinc-900 border border-zinc-800 rounded-xl shadow-2xl z-50 max-h-80 overflow-y-auto">
-                  {Object.keys(groupItems(pedalsLibrary, pedalSearch)).length > 0 ? (
-                    Object.keys(groupItems(pedalsLibrary, pedalSearch)).map((brand) => (
-                      <div key={brand} className="flex flex-col border-b border-zinc-800/50">
-                        <div className="px-4 py-1 text-[10px] font-black text-blue-400 bg-zinc-950/50 uppercase tracking-widest">
-                          {brand}
-                        </div>
-                        {groupItems(pedalsLibrary, pedalSearch)[brand].map((p) => (
-                          <button
-                            key={p.id}
-                            onClick={() => addPedal(p)}
-                            className="w-full px-5 py-2 text-left hover:bg-zinc-800 text-zinc-300 text-[12px]"
-                          >
-                            <span className="font-bold opacity-50 mr-2">{brand}</span>
-                            {p.name}
-                          </button>
-                        ))}
-                      </div>
-                    ))
-                  ) : (
-                    <div className="p-4 text-center text-[10px] text-zinc-600 uppercase font-bold tracking-widest">
-                      No pedals found
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* ADD A BOARD */}
-          <div className="flex flex-col gap-1 mt-2">
-            <div className="flex items-center gap-2 px-1">
-              <span className="text-[10px] font-black uppercase tracking-widest">
-                {t("sidebar.addBoard")}
-              </span>
-            </div>
-
-            <div className="relative" style={{ zIndex: showBoardResults ? 60 : 5 }}>
-              <div className="relative flex items-center">
-                <input
-                  type="text"
-                  placeholder={`${t("sidebar.searchBoard")}...`}
-                  className={`w-full bg-zinc-900 border rounded-lg py-2 pl-4 pr-10 text-[11px] outline-none transition-all ${
-                    showBoardResults
-                      ? "border-blue-500 ring-1 ring-blue-500"
-                      : "border-zinc-800"
-                  }`}
-                  value={boardSearch}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setShowPedalResults(false);
-                    setShowBoardResults(true);
-                  }}
-                  onChange={(e) => {
-                    setBoardSearch(e.target.value);
-                    setShowBoardResults(true);
-                  }}
-                />
-                <ChevronDown
-                  className={`absolute right-3 size-3 text-zinc-600 transition-transform pointer-events-none ${
-                    showBoardResults ? "rotate-180 text-blue-500" : ""
-                  }`}
-                />
-              </div>
-
-              {showBoardResults && (
-                <div className="absolute top-10 left-0 right-0 bg-zinc-900 border border-zinc-800 rounded-xl shadow-2xl z-50 max-h-80 overflow-y-auto">
-                  {Object.keys(groupItems(boardsLibrary, boardSearch)).length > 0 ? (
-                    Object.keys(groupItems(boardsLibrary, boardSearch)).map((brand) => (
-                      <div key={brand} className="flex flex-col border-b border-zinc-800/50">
-                        <div className="px-4 py-1 text-[10px] font-black text-blue-400 bg-zinc-950/50 uppercase tracking-widest">
-                          {brand}
-                        </div>
-                        {groupItems(boardsLibrary, boardSearch)[brand].map((b) => (
-                          <button
-                            key={b.id}
-                            onClick={() => selectBoard(b)}
-                            className="w-full px-5 py-2 text-left hover:bg-zinc-800 text-zinc-300 text-[12px]"
-                          >
-                            <span className="font-bold opacity-50 mr-2">{brand}</span>
-                            {b.name}
-                          </button>
-                        ))}
-                      </div>
-                    ))
-                  ) : (
-                    <div className="p-4 text-center text-[10px] text-zinc-600 uppercase font-bold tracking-widest">
-                      No boards found
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-
-         {/* MAKE YOUR OWN */}
-<div className="flex flex-col gap-1 mt-2">
-
-  {/* HEADER */}
-  <div className="flex items-center gap-2 px-1">
-    <span className="text-[10px] font-black uppercase tracking-widest">
+  <div className="mb-2 flex items-center gap-3">
+    <div className="w-[3px] h-5 bg-blue-500 rounded-full" />
+    <span className="text-[12px] uppercase font-bold tracking-[0.18em] text-white">
       {t("custom.title")}
     </span>
   </div>
 
   {/* GREY CONTAINER */}
-  <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 flex flex-col gap-4">
+  <div className="flex flex-col gap-6">
 
     {/* SELECT TYPE */}
     <div className="flex flex-col gap-2">
@@ -1272,44 +1251,43 @@ return (
 
   {/* PEDAL */}
   <button
-    onClick={() => {
-      setCustomType("pedal");
-      setCustomWidth("");
-      setCustomDepth("");
-    }}
-    className={`
-      flex-1 py-2 text-[10px] font-black uppercase tracking-widest
-      transition-all duration-200
-      ${
-        customType === "pedal"
-          ? "bg-zinc-800 text-white"
-          : "text-zinc-500 hover:text-white"
-      }
-    `}
-  >
-    {t("custom.pedal")}
-  </button>
+  onClick={() => {
+    setCustomType("pedal");
+    setCustomWidth("");
+    setCustomDepth("");
+  }}
+  className={`
+    flex-1 py-2 text-[10px] font-black uppercase tracking-widest
+    transition-all duration-200
+    ${
+      customType === "pedal"
+        ? "bg-blue-500 text-white"
+        : "bg-zinc-900 text-zinc-500 hover:text-white"
+    }
+  `}
+>
+  {t("custom.pedal")}
+</button>
 
-  {/* BOARD */}
-  <button
-    onClick={() => {
-      setCustomType("board");
-      setCustomWidth("");
-      setCustomDepth("");
-    }}
-    className={`
-      flex-1 py-2 text-[10px] font-black uppercase tracking-widest
-      transition-all duration-200
-      border-l border-zinc-800
-      ${
-        customType === "board"
-          ? "bg-zinc-800 text-white"
-          : "text-zinc-500 hover:text-white"
-      }
-    `}
-  >
-    {t("custom.board")}
-  </button>
+<button
+  onClick={() => {
+    setCustomType("board");
+    setCustomWidth("");
+    setCustomDepth("");
+  }}
+  className={`
+    flex-1 py-2 text-[10px] font-black uppercase tracking-widest
+    transition-all duration-200
+    border-l border-zinc-800
+    ${
+      customType === "board"
+        ? "bg-blue-500 text-white"
+        : "bg-zinc-900 text-zinc-500 hover:text-white"
+    }
+  `}
+>
+  {t("custom.board")}
+</button>
 
 </div>
     </div>
@@ -1337,7 +1315,7 @@ return (
             placeholder={withUnit(t("custom.width"))}
             value={customWidth}
             onChange={(e) => setCustomWidth(e.target.value)}
-            className="w-full bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-[10px] outline-none focus:border-blue-500"
+            className="w-full bg-zinc-900 italic border border-zinc-700 rounded-md py-2 px-3 text-[10px] outline-none focus:outline-none focus:ring-0 focus:border-zinc-600 transition-colors"
           />
 
           <input
@@ -1348,7 +1326,7 @@ return (
             placeholder={withUnit(t("custom.depth"))}
             value={customDepth}
             onChange={(e) => setCustomDepth(e.target.value)}
-            className="w-full bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-[10px] outline-none focus:border-blue-500"
+            className="w-full bg-zinc-900 italic border border-zinc-700 rounded-md py-2 px-3 text-[10px] outline-none focus:outline-none focus:ring-0 focus:border-zinc-600 transition-colors"
           />
 
         </div>
@@ -1356,11 +1334,7 @@ return (
         <button
   onClick={addCustomItem}
   disabled={!isPedalValid}
-  className={`w-full text-[10px] mt-2 font-black uppercase py-2 rounded-md transition-all ${
-    !isPedalValid
-      ? "bg-zinc-800 text-zinc-500 cursor-not-allowed"
-      : "bg-blue-600 hover:bg-blue-500 text-white"
-  }`}
+  className="w-full text-[10px] mt-2 font-black uppercase py-2 rounded-md bg-blue-500 hover:bg-blue-400 text-white transition-all disabled:cursor-not-allowed"
 >
   {t("custom.addPedal")}
 </button>
@@ -1392,7 +1366,7 @@ return (
         placeholder={withUnit(t("custom.width"))}
         value={customWidth}
         onChange={(e) => setCustomWidth(e.target.value)}
-        className="w-full bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-[10px] outline-none focus:border-blue-500"
+        className="w-full bg-zinc-900 italic border border-zinc-700 rounded-md py-2 px-3 text-[10px] outline-none focus:outline-none focus:ring-0 focus:border-zinc-600 transition-colors"
       />
 
       <input
@@ -1403,22 +1377,18 @@ return (
         placeholder={withUnit(t("custom.depth"))}
         value={customDepth}
         onChange={(e) => setCustomDepth(e.target.value)}
-        className="w-full bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-[10px] outline-none focus:border-blue-500"
+        className="w-full bg-zinc-900 italic border border-zinc-700 rounded-md py-2 px-3 text-[10px] outline-none focus:outline-none focus:ring-0 focus:border-zinc-600 transition-colors"
       />
 
     </div>
 
     <button
-      onClick={addCustomItem}
-      disabled={!isBoardValid}
-      className={`w-full mt-2 text-[10px] font-black uppercase py-2 rounded-md transition-all ${
-        !isBoardValid
-          ? "bg-zinc-800 text-zinc-500 cursor-not-allowed"
-          : "bg-blue-600 hover:bg-blue-500 text-white"
-      }`}
-    >
-      {t("custom.addBoard")}
-    </button>
+  onClick={addCustomItem}
+  disabled={!isBoardValid}
+  className="w-full mt-2 text-[10px] font-black uppercase py-2 rounded-md bg-blue-500 hover:bg-blue-400 text-white transition-all disabled:cursor-not-allowed"
+>
+  {t("custom.addBoard")}
+</button>
 
   </div>
 )}
@@ -1426,7 +1396,7 @@ return (
   </div>
 </div>
 
-        </>
+        </div>
       )}
              {/* PUSH TO BOTTOM (desktop only) */}
 <div className="hidden lg:block mt-auto" />

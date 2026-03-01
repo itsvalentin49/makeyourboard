@@ -24,6 +24,8 @@
 
   "pedal": {
 
+    "features": "Caractéristiques",
+
     "status": {
       "label": "Statut",
       "active": "En production",

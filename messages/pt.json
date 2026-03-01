@@ -23,6 +23,9 @@
     },
 
   "pedal": {
+
+    "features": "Especificações",
+    
     "status": {
       "label": "Estado",
       "active": "Em produção",
