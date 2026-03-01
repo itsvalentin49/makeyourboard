@@ -9,7 +9,7 @@ import SettingsPanel from "@/components/SettingsPanel";
 import { useLibrary } from "@/hooks/useLibrary";
 import type { AnyRow, BoardItem, Project } from "@/types/project";
 import { getTranslator, type Language } from "@/utils/i18n";
-import { Settings, Plus, RotateCw, Trash2 } from "lucide-react";
+import { Settings, Plus, Minus, RotateCw, Trash2 } from "lucide-react";
 import { useRef } from "react";
 
 type Units = "metric" | "imperial";
@@ -633,7 +633,7 @@ const deleteBoard = (id: number) => {
 
 return (
   <div
-    className="bg-zinc-950 text-white font-sans select-none overflow-hidden h-screen"
+    className="bg-zinc-950 text-[#f5f5f7] font-sans select-none overflow-hidden h-screen"
     onClick={closeSearchMenus}
   >
     <div className="h-full w-full">
@@ -786,14 +786,15 @@ return (
             rotateBoard={rotateBoard}
             deleteBoard={deleteBoard}
             isMobile
+            mobileSidebarOpen={mobileSidebarOpen}
           />
         </div>
 
        {/* ================= MOBILE ACTION BUTTONS ================= */}
 
-{/* FLOATING ADD BUTTON */}
+{/* FLOATING ADD / CLOSE BUTTON */}
 <button
-  onClick={() => setMobileSidebarOpen(true)}
+  onClick={() => setMobileSidebarOpen((prev) => !prev)}
   className="
     absolute
     bottom-6
@@ -812,7 +813,11 @@ return (
     transition
   "
 >
-  <Plus size={28} className="text-white" />
+  {mobileSidebarOpen ? (
+    <Minus size={28} className="text-white" />
+  ) : (
+    <Plus size={28} className="text-white" />
+  )}
 </button>
 
 {/* ROTATE / DELETE GROUP */}
@@ -893,7 +898,7 @@ return (
         setMobileSidebarOpen(false);
       }
     }}
-    className="text-zinc-500 hover:text-white transition-colors"
+    className="text-white text-xl leading-none active:scale-95 transition"
   >
     ✕
   </button>
@@ -1018,7 +1023,7 @@ return (
 
           <button
             onClick={() => setSettingsOpen(false)}
-            className="text-zinc-500 hover:text-white transition-colors text-lg"
+            className="text-white text-xl leading-none active:scale-95 transition"
           >
             ✕
           </button>

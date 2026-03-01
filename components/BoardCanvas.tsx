@@ -26,6 +26,9 @@ type Props = {
 
   units: "metric" | "imperial";
   language: "en" | "fr" | "es" | "de" | "it" | "pt";
+
+  mobileSidebarOpen?: boolean;
+
   rotatePedal: (id: number) => void;
   deletePedal: (id: number) => void;
   rotateBoard: (id: number) => void;
@@ -70,6 +73,7 @@ export default function BoardCanvas({
   canvasBg,
   showIntro,
   isMobile = false,
+  mobileSidebarOpen = false,
   rotatePedal,
   deletePedal,
   rotateBoard,
@@ -110,6 +114,9 @@ export default function BoardCanvas({
 
   const containerRef = useRef<HTMLDivElement>(null);
   const [stageSize, setStageSize] = useState({ width: 0, height: 0 });
+  // 💎 HOVER (desktop only)
+  const [hoveredPedalId, setHoveredPedalId] = useState<number | null>(null);
+  const [hoveredBoardId, setHoveredBoardId] = useState<number | null>(null);
 
   /* ================= MEASURE STAGE ================= */
   useLayoutEffect(() => {
@@ -209,7 +216,8 @@ export default function BoardCanvas({
             }
       }
     >
-      <div className="absolute bottom-6 left-6 flex items-end gap-4 z-50">
+      {!(isMobile && mobileSidebarOpen) && (
+  <div className="absolute bottom-6 left-6 flex items-end gap-4 z-50">
 
   {/* ZOOM */}
   <div className="flex items-center h-10 w-28 bg-zinc-950/80 backdrop-blur-md border border-zinc-800 rounded-2xl shadow-2xl">
@@ -238,6 +246,7 @@ export default function BoardCanvas({
     </button>
 
   </div>
+  
 
   {/* Desktop uniquement */}
   {!isMobile && (
@@ -267,6 +276,7 @@ export default function BoardCanvas({
   )}
 
 </div>
+)}
 
       {stageSize.width > 0 && stageSize.height > 0 && (
   <Stage
@@ -287,11 +297,29 @@ export default function BoardCanvas({
   draggable
   rotation={b.rotation || 0}
 
-  onPointerDown={(e) => {
-    e.cancelBubble = true; // empêche le stage de désélectionner
-    setSelectedBoardInstanceId(b.instanceId);
-    setSelectedInstanceId(null);
+  onMouseEnter={() => {
+  if (!isMobile) setHoveredBoardId(b.instanceId);
   }}
+
+  onMouseLeave={() => {
+    if (!isMobile) setHoveredBoardId(null);
+  }}
+
+ onClick={(e) => {
+  if (isMobile) return;
+
+  e.cancelBubble = true;
+  setSelectedBoardInstanceId(b.instanceId);
+  setSelectedInstanceId(null);
+}}
+
+onPointerUp={(e) => {
+  if (!isMobile) return;
+
+  e.cancelBubble = true;
+  setSelectedBoardInstanceId(b.instanceId);
+  setSelectedInstanceId(null);
+}}
 
           
 
@@ -350,8 +378,56 @@ export default function BoardCanvas({
             }
             
           />
-          {selectedBoardInstanceId === b.instanceId &&
+
+          <PedalImage
+  url={b.image || b.image_url || b.photo || null}
+  width={b.width}
+  depth={b.depth}
+  color={b.color}
+  isBoard
+  rotation={0}
+  onSizeReady={(w, h) =>
+    handleSizeUpdate(b.instanceId, w, h)
+  }
+/>
+
+{/* 💎 Hover halo (desktop only) */}
+{hoveredBoardId === b.instanceId &&
+  selectedBoardInstanceId !== b.instanceId &&
   displaySizes[b.instanceId] && (
+    <Rect
+      x={-displaySizes[b.instanceId].w / 2}
+      y={-displaySizes[b.instanceId].h / 2}
+      width={displaySizes[b.instanceId].w}
+      height={displaySizes[b.instanceId].h}
+      stroke="white"
+      strokeWidth={1}
+      opacity={0.25}
+      cornerRadius={6}
+      listening={false}
+    />
+)}
+
+{selectedBoardInstanceId === b.instanceId &&
+  displaySizes[b.instanceId] && (
+    
+    <Rect
+      x={-displaySizes[b.instanceId].w / 2}
+      y={-displaySizes[b.instanceId].h / 2}
+      width={displaySizes[b.instanceId].w}
+      height={displaySizes[b.instanceId].h}
+      stroke="white"
+      strokeWidth={2}
+      cornerRadius={6}
+      listening={false}
+    />
+)}
+
+          
+          {!isMobile &&
+          selectedBoardInstanceId === b.instanceId &&
+          displaySizes[b.instanceId] && (
+
     <Rect
       x={-displaySizes[b.instanceId].w / 2}
       y={-displaySizes[b.instanceId].h / 2}
@@ -375,11 +451,29 @@ export default function BoardCanvas({
   rotation={p.rotation || 0}
   draggable
 
-  onPointerDown={(e) => {
-    e.cancelBubble = true; // empêche le stage click
-    setSelectedInstanceId(p.instanceId);
-    setSelectedBoardInstanceId(null);
+  onMouseEnter={() => {
+  if (!isMobile) setHoveredPedalId(p.instanceId);
+}}
+
+  onMouseLeave={() => {
+    if (!isMobile) setHoveredPedalId(null);
   }}
+
+  onClick={(e) => {
+  if (isMobile) return; // desktop only
+
+  e.cancelBubble = true;
+  setSelectedInstanceId(p.instanceId);
+  setSelectedBoardInstanceId(null);
+}}
+
+onPointerUp={(e) => {
+  if (!isMobile) return; // mobile only
+
+  e.cancelBubble = true;
+  setSelectedInstanceId(p.instanceId);
+  setSelectedBoardInstanceId(null);
+}}
 
           onDragMove={(e) => {
             const node = e.target;
@@ -433,7 +527,27 @@ export default function BoardCanvas({
               handleSizeUpdate(p.instanceId, nw, nh)
             }
           />
-          {selectedInstanceId === p.instanceId && displaySizes[p.instanceId] && (
+
+          {/* 💎 Hover halo (desktop only) */}
+{hoveredPedalId === p.instanceId &&
+  selectedInstanceId !== p.instanceId &&
+  displaySizes[p.instanceId] && (
+    <Rect
+      x={-displaySizes[p.instanceId].w / 2}
+      y={-displaySizes[p.instanceId].h / 2}
+      width={displaySizes[p.instanceId].w}
+      height={displaySizes[p.instanceId].h}
+      stroke="white"
+      strokeWidth={1}
+      opacity={0.25}
+      cornerRadius={6}
+      listening={false}
+    />
+)}
+
+          {selectedInstanceId === p.instanceId &&
+  displaySizes[p.instanceId] && (
+
   <Rect
     x={-displaySizes[p.instanceId].w / 2}
     y={-displaySizes[p.instanceId].h / 2}
@@ -455,26 +569,28 @@ export default function BoardCanvas({
 
 {showIntro && (
   <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-    <div className="max-w-2xl text-center px-6">
+    <div className="max-w-2xl text-center px-8">
 
-      <h2 className="text-2xl font-semibold uppercase text-white mb-6">
+      {/* Title */}
+      <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-white mb-8">
         {t("canvasIntro.title")}
       </h2>
 
-      <p className="whitespace-pre-line text-sm text-zinc-300 leading-relaxed">
+      {/* Main text */}
+      <p className="whitespace-pre-line text-[15px] text-zinc-300 leading-relaxed">
         {isMobile
           ? t("canvasIntro.mobileText")
           : t("canvasIntro.desktopText")}
       </p>
 
       {!isMobile && (
-        <p className="text-sm text-zinc-300 leading-relaxed mt-4">
+        <p className="text-[15px] text-zinc-300 leading-relaxed mt-4">
           {t("canvasIntro.desktopExtra")}
         </p>
       )}
 
-      {/* Punchline premium */}
-      <p className="mt-8 text-xs text-zinc-200 italic uppercase">
+      {/* Punchline */}
+      <p className="mt-10 text-[10px] tracking-widest uppercase text-zinc-400">
         {t("canvasIntro.text3")}
       </p>
 
