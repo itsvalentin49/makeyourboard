@@ -11,7 +11,7 @@ export default function SidebarLogo({ t }: Props) {
       {/* TITLE */}
       <div>
         <div
-          className="uppercase font-bold text-zinc-100"
+          className="uppercase font-bold text-white"
           style={{ fontSize: 24.5 }}
         >
           MAKE YOUR BOARD

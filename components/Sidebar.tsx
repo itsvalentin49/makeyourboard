@@ -1052,7 +1052,7 @@ const buildThomannUrl = (slug: string) => {
       <input
         type="text"
         placeholder={`${t("sidebar.searchPedal")}...`}
-        className={`w-full bg-zinc-900 border rounded-lg py-2 pl-4 pr-10 text-[11px] italic text-zinc-200 placeholder:text-zinc-500 outline-none transition-all ${
+        className={`w-full bg-zinc-900 border rounded-lg py-2 pl-4 pr-10 text-[11px] text-zinc-200 placeholder:text-zinc-500 outline-none transition-all ${
           showPedalResults
             ? "border-zinc-500"
             : "border-zinc-700"
@@ -1130,7 +1130,7 @@ const buildThomannUrl = (slug: string) => {
       <input
         type="text"
         placeholder={`${t("sidebar.searchBoard")}...`}
-        className={`w-full bg-zinc-900 border rounded-lg py-2 pl-4 pr-10 text-[11px] italic text-zinc-200 placeholder:text-zinc-500 outline-none transition-all ${
+        className={`w-full bg-zinc-900 border rounded-lg py-2 pl-4 pr-10 text-[11px] text-zinc-200 placeholder:text-zinc-500 outline-none transition-all ${
           showBoardResults
             ? "border-zinc-500"
             : "border-zinc-700"
@@ -1280,7 +1280,7 @@ const buildThomannUrl = (slug: string) => {
             placeholder={withUnit(t("custom.width"))}
             value={customWidth}
             onChange={(e) => setCustomWidth(e.target.value)}
-            className="w-full bg-zinc-900 italic border border-zinc-700 rounded-md py-2 px-3 text-[10px] outline-none focus:outline-none focus:ring-0 focus:border-zinc-600 transition-colors"
+            className="w-full bg-zinc-900 border border-zinc-700 rounded-md py-2 px-3 text-[10px] outline-none focus:outline-none focus:ring-0 focus:border-zinc-600 transition-colors"
           />
 
           <input
@@ -1291,7 +1291,7 @@ const buildThomannUrl = (slug: string) => {
             placeholder={withUnit(t("custom.depth"))}
             value={customDepth}
             onChange={(e) => setCustomDepth(e.target.value)}
-            className="w-full bg-zinc-900 italic border border-zinc-700 rounded-md py-2 px-3 text-[10px] outline-none focus:outline-none focus:ring-0 focus:border-zinc-600 transition-colors"
+            className="w-full bg-zinc-900 border border-zinc-700 rounded-md py-2 px-3 text-[10px] outline-none focus:outline-none focus:ring-0 focus:border-zinc-600 transition-colors"
           />
 
         </div>
@@ -1331,7 +1331,7 @@ const buildThomannUrl = (slug: string) => {
         placeholder={withUnit(t("custom.width"))}
         value={customWidth}
         onChange={(e) => setCustomWidth(e.target.value)}
-        className="w-full bg-zinc-900 italic border border-zinc-700 rounded-md py-2 px-3 text-[10px] outline-none focus:outline-none focus:ring-0 focus:border-zinc-600 transition-colors"
+        className="w-full bg-zinc-900 border border-zinc-700 rounded-md py-2 px-3 text-[10px] outline-none focus:outline-none focus:ring-0 focus:border-zinc-600 transition-colors"
       />
 
       <input
@@ -1342,7 +1342,7 @@ const buildThomannUrl = (slug: string) => {
         placeholder={withUnit(t("custom.depth"))}
         value={customDepth}
         onChange={(e) => setCustomDepth(e.target.value)}
-        className="w-full bg-zinc-900 italic border border-zinc-700 rounded-md py-2 px-3 text-[10px] outline-none focus:outline-none focus:ring-0 focus:border-zinc-600 transition-colors"
+        className="w-full bg-zinc-900 border border-zinc-700 rounded-md py-2 px-3 text-[10px] outline-none focus:outline-none focus:ring-0 focus:border-zinc-600 transition-colors"
       />
 
     </div>
