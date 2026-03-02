@@ -648,7 +648,7 @@ useEffect(() => {
   </Stage>
 )}
 
-{!isMobile && overlayPosition && !isDragging && (
+{overlayPosition && !isDragging && (
   <div
     style={{
       position: "absolute",
