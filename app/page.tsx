@@ -324,10 +324,7 @@ useEffect(() => {
     typeof window !== "undefined" &&
     ("ontouchstart" in window || navigator.maxTouchPoints > 0);
 
-  const isSmallScreen =
-    typeof window !== "undefined" && window.innerWidth < 768;
-
-  setIsMobileDevice(isTouch && isSmallScreen);
+  setIsMobileDevice(isTouch);
 }, []);
 
   /**
@@ -726,7 +723,7 @@ return (
       canvasBg={canvasBg}
       setCanvasBg={setCanvasBg}
       showIntro={isFirstBoard && isBoardEmpty}
-      isMobile={false}
+      isMobile={isMobileDevice}
       rotatePedal={rotatePedal}
       deletePedal={deletePedal}
       rotateBoard={rotateBoard}
