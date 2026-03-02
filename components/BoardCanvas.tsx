@@ -129,6 +129,7 @@ export default function BoardCanvas({
 
   const containerRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<any>(null);
+  const wasDraggingRef = useRef(false);
   const lastDist = useRef<number | null>(null);
   const lastCenter = useRef<{ x: number; y: number } | null>(null);
   
@@ -625,9 +626,15 @@ onTouchEnd={() => {
     draggable
     rotation={b.rotation || 0}
 
-    onDragStart={() => {
-      setIsDragging(true);
-    }}
+onDragStart={() => {
+  setIsDragging(true);
+  wasDraggingRef.current = true;
+
+  // 🔥 désélection immédiate si board sélectionné
+  if (selectedBoardInstanceId === b.instanceId) {
+    setSelectedBoardInstanceId(null);
+  }
+}}
 
     onMouseEnter={() => {
       if (!isMobile) setHoveredBoardId(b.instanceId);
@@ -637,12 +644,17 @@ onTouchEnd={() => {
       if (!isMobile) setHoveredBoardId(null);
     }}
 
-    onPointerDown={(e) => {
-      e.cancelBubble = true;
-      setSelectedBoardInstanceId(b.instanceId);
-      setSelectedInstanceId(null);
-    }}
+    onPointerUp={(e) => {
+  e.cancelBubble = true;
 
+  // Si on vient de drag → ne pas sélectionner
+  if (wasDraggingRef.current) return;
+
+  setSelectedBoardInstanceId(b.instanceId);
+  setSelectedInstanceId(null);
+}}
+
+    
     onDragMove={(e) => {
       const node = e.target;
       const bounds = getVisibleBounds();
@@ -664,22 +676,26 @@ onTouchEnd={() => {
       node.position({ x, y });
     }}
 
-    onDragEnd={(e) => {
-      setIsDragging(false);
+onDragEnd={(e) => {
+  setIsDragging(false);
 
-      updateActiveProject({
-        selectedBoards: (activeProject.selectedBoards || []).map(
-          (x: AnyRow) =>
-            x.instanceId === b.instanceId
-              ? {
-                  ...x,
-                  x: e.target.x(),
-                  y: e.target.y(),
-                }
-              : x
-        ),
-      });
-    }}
+  updateActiveProject({
+    selectedBoards: (activeProject.selectedBoards || []).map(
+      (x: AnyRow) =>
+        x.instanceId === b.instanceId
+          ? {
+              ...x,
+              x: e.target.x(),
+              y: e.target.y(),
+            }
+          : x
+    ),
+  });
+
+  requestAnimationFrame(() => {
+    wasDraggingRef.current = false;
+  });
+}}
   >
           <PedalImage
           
@@ -767,9 +783,15 @@ onTouchEnd={() => {
     rotation={p.rotation || 0}
     draggable
 
-    onDragStart={() => {
-      setIsDragging(true);
-    }}
+onDragStart={() => {
+  setIsDragging(true);
+  wasDraggingRef.current = true;
+
+  // 🔥 désélection immédiate si elle était sélectionnée
+  if (selectedInstanceId === p.instanceId) {
+    setSelectedInstanceId(null);
+  }
+}}
 
     onMouseEnter={() => {
       if (!isMobile) setHoveredPedalId(p.instanceId);
@@ -779,12 +801,16 @@ onTouchEnd={() => {
       if (!isMobile) setHoveredPedalId(null);
     }}
 
-    onPointerDown={(e) => {
+    onPointerUp={(e) => {
   e.cancelBubble = true;
+
+  // Si on vient de drag → ne pas sélectionner
+  if (wasDraggingRef.current) return;
 
   setSelectedInstanceId(p.instanceId);
   setSelectedBoardInstanceId(null);
 }}
+
 
     onDragMove={(e) => {
   const node = e.target;
@@ -807,7 +833,7 @@ onTouchEnd={() => {
   node.position({ x, y });
 }}
 
-    onDragEnd={(e) => {
+ onDragEnd={(e) => {
   setIsDragging(false);
 
   updateActiveProject({
@@ -820,6 +846,11 @@ onTouchEnd={() => {
           }
         : x
     ),
+  });
+
+  // Reset propre après le cycle d'event Konva
+  requestAnimationFrame(() => {
+    wasDraggingRef.current = false;
   });
 }}
   >
