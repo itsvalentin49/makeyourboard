@@ -112,26 +112,8 @@ const [canvasSize, setCanvasSize] = useState({
   width: 0,
   height: 0,
 });
-const getCanvasCenter = () => {
-  const zoom = activeProject.zoom ?? 100;
-  const scale = zoom / 100;
-
-  const container =
-    window.innerWidth >= 1024
-      ? desktopCanvasRef.current
-      : mobileCanvasRef.current;
-
-  if (!container) {
-    return { x: 600, y: 400 };
-  }
-
-  const rect = container.getBoundingClientRect();
-
-  return {
-    x: rect.width / 2 / scale,
-    y: rect.height / 2 / scale,
-  };
-};
+const [stagePos, setStagePos] = useState({ x: 0, y: 0 });
+const getCenterRef = useRef<(() => { x: number; y: number }) | null>(null);
 
 
 /* ================= SETTINGS LOAD ================= */
@@ -264,20 +246,7 @@ useEffect(() => {
     }
   };
 
-  useEffect(() => {
-    const handleWheel = (e: WheelEvent) => {
-      if (e.ctrlKey || e.metaKey) {
-        e.preventDefault();
-        const currentZoom = activeProject.zoom ?? 100;
-        const delta = e.deltaY > 0 ? -5 : 5;
-        const newZoom = Math.min(Math.max(currentZoom + delta, 25), 200);
-        updateActiveProject({ zoom: newZoom });
-      }
-    };
 
-    window.addEventListener("wheel", handleWheel, { passive: false });
-    return () => window.removeEventListener("wheel", handleWheel);
-  }, [activeProjectId, activeProject.zoom]);
   
   useEffect(() => {
 
@@ -414,21 +383,9 @@ useEffect(() => {
     setEditingProjectId(null);
   };
 
-  const addPedal = (pedal: AnyRow) => {
-  const { x, y } = getCanvasCenter();
-
-  const container =
-    window.innerWidth >= 1024
-      ? desktopCanvasRef.current
-      : mobileCanvasRef.current;
-
-  if (!container) return;
-
-  const rect = container.getBoundingClientRect();
-  const scale = activeProject.zoom ? activeProject.zoom / 100 : 1;
-
-  const stageWidth = rect.width / scale;
-  const stageHeight = rect.height / scale;
+const addPedal = (pedal: AnyRow) => {
+  const center = getCenterRef.current?.() ?? { x: 0, y: 0 };
+  const { x, y } = center;
 
   const newPedal: BoardItem = {
     ...pedal,
@@ -438,10 +395,6 @@ useEffect(() => {
     rotation: 0,
     draw: Number(pedal.draw) || 0,
     weight: Number(pedal.weight) || 0,
-
-    // 🔥 NOUVEAU
-    xRatio: x / stageWidth,
-    yRatio: y / stageHeight,
   };
 
   updateActiveProject({
@@ -451,22 +404,12 @@ useEffect(() => {
   closeSearchMenus();
 };
 
+  
+
 
   const selectBoard = (board: AnyRow) => {
-  const { x, y } = getCanvasCenter();
-
-  const container =
-    window.innerWidth >= 1024
-      ? desktopCanvasRef.current
-      : mobileCanvasRef.current;
-
-  if (!container) return;
-
-  const rect = container.getBoundingClientRect();
-  const scale = activeProject.zoom ? activeProject.zoom / 100 : 1;
-
-  const stageWidth = rect.width / scale;
-  const stageHeight = rect.height / scale;
+  const center = getCenterRef.current?.() ?? { x: 0, y: 0 };
+const { x, y } = center;
 
   const newBoard: BoardItem = {
     ...board,
@@ -474,9 +417,6 @@ useEffect(() => {
     x,
     y,
     rotation: 0,
-
-    xRatio: x / stageWidth,
-    yRatio: y / stageHeight,
   };
 
   updateActiveProject({
@@ -485,7 +425,6 @@ useEffect(() => {
 
   closeSearchMenus();
 };
-
 
 const addCustomItem = (item: AnyRow) => {
   if (!customType) return;
@@ -529,20 +468,8 @@ const addCustomItem = (item: AnyRow) => {
   }
 
   // ✅ Centre réel du canvas
-  const { x, y } = getCanvasCenter();
-
-  const container =
-    window.innerWidth >= 1024
-      ? desktopCanvasRef.current
-      : mobileCanvasRef.current;
-
-  if (!container) return;
-
-  const rect = container.getBoundingClientRect();
-  const scale = (activeProject.zoom ?? 100) / 100;
-
-  const stageWidth = rect.width / scale;
-  const stageHeight = rect.height / scale;
+  const center = getCenterRef.current?.() ?? { x: 0, y: 0 };
+const { x, y } = center;
 
   const instanceId = Date.now();
 
@@ -573,10 +500,6 @@ const addCustomItem = (item: AnyRow) => {
     rotation: 0,
     draw: 0,
     weight: 0,
-
-    // 🔥 position relative
-    xRatio: x / stageWidth,
-    yRatio: y / stageHeight,
   };
 
   if (customType === "pedal") {
@@ -729,6 +652,9 @@ return (
       rotateBoard={rotateBoard}
       deleteBoard={deleteBoard}
       onStageSizeChange={setCanvasSize}
+      stagePos={stagePos}
+      setStagePos={setStagePos}
+      getCenterRef={getCenterRef}
     />
   </div>
 </div>
@@ -786,6 +712,9 @@ return (
             deleteBoard={deleteBoard}
             isMobile
             mobileSidebarOpen={mobileSidebarOpen}
+            stagePos={stagePos}
+            setStagePos={setStagePos}
+            getCenterRef={getCenterRef}
           />
         </div>
 
@@ -818,45 +747,6 @@ return (
     <Plus size={28} className="text-white" />
   )}
 </button>
-
-{/* ROTATE / DELETE GROUP */}
-<div
-  className="
-    absolute
-    bottom-6
-    right-6
-    z-40
-    flex items-center justify-between
-    h-10
-    w-28
-    px-4
-    bg-zinc-950/80
-    backdrop-blur-md
-    border border-zinc-800
-    rounded-2xl
-    shadow-2xl
-  "
->
-  <button
-    onClick={() => {
-      if (selectedInstanceId) rotatePedal(selectedInstanceId);
-      if (selectedBoardInstanceId) rotateBoard(selectedBoardInstanceId);
-    }}
-    className="text-white active:scale-95 transition"
-  >
-    <RotateCw size={16} />
-  </button>
-
-  <button
-    onClick={() => {
-      if (selectedInstanceId) deletePedal(selectedInstanceId);
-      if (selectedBoardInstanceId) deleteBoard(selectedBoardInstanceId);
-    }}
-    className="text-white active:scale-95 transition"
-  >
-    <Trash2 size={16} />
-  </button>
-</div>
 
         {/* MOBILE SIDEBAR DRAWER */}
         <div

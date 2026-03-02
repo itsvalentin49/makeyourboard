@@ -384,25 +384,14 @@ const buildThomannUrl = (slug: string) => {
       {contactOpen ? (
   <div className="flex flex-col gap-6 animate-in slide-in-from-left duration-300 px-1">
     
-    {/* BACK + small title → DESKTOP ONLY */}
-    <div className="hidden lg:block">
-      <button
-        onClick={() => {
-          setContactOpen(false);
-          setContactSuccess(false);
-          setContactError("");
-        }}
-        className="flex items-center gap-2 text-zinc-500 hover:text-white transition-colors text-[10px] font-black uppercase tracking-widest"
-      >
-        <ArrowLeft className="size-4" /> {t("sidebar.back")}
-      </button>
-
-      <div className="space-y-1 mt-4">
-        <h2 className="text-[16px] font-black leading-tight">
-          {t("contact.title")}
-        </h2>
-      </div>
-    </div>
+    {/* TITLE → DESKTOP ONLY */}
+<div className="hidden lg:block">
+  <div className="space-y-1 mt-4">
+    <h2 className="text-[16px] font-black leading-tight">
+      {t("contact.title")}
+    </h2>
+  </div>
+</div>
 
     {contactSuccess ? (
   <div className="flex items-center gap-2 text-white text-[11px] font-bold animate-in fade-in duration-300">
@@ -413,6 +402,7 @@ const buildThomannUrl = (slug: string) => {
   {t("contact.thanks")}
 </span>
 </div>
+
 ) : (
       <>
         {/* EMAIL */}

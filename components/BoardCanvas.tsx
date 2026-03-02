@@ -54,7 +54,12 @@ type Props = {
   isMobile?: boolean;
 
   onStageSizeChange?: (size: { width: number; height: number }) => void;
-};
+  stagePos?: { x: number; y: number };
+  setStagePos?: React.Dispatch<React.SetStateAction<{ x: number; y: number }>>;
+    getCenterRef?: React.MutableRefObject<
+    (() => { x: number; y: number }) | null
+  >;
+  };
 
 export default function BoardCanvas({
   activeProject,
@@ -79,10 +84,20 @@ export default function BoardCanvas({
   rotateBoard,
   deleteBoard,
   onStageSizeChange,
+  stagePos,
+  setStagePos,
+  getCenterRef,
 }: Props) {
 
   const t = getTranslator(language);
   const currentZoom = activeProject.zoom || 100;
+  const zoomPercent = Math.round(currentZoom);
+  const MIN_ZOOM = 50;
+  const MAX_ZOOM = 150;
+
+  const isMinZoom = zoomPercent <= MIN_ZOOM;
+  const isMaxZoom = zoomPercent >= MAX_ZOOM;
+  const effectiveStagePos = stagePos ?? { x: 0, y: 0 };
 
   const totalDraw = activeProject.boardPedals.reduce(
     (sum, p) => sum + (Number(p.draw) || 0),
@@ -113,7 +128,35 @@ export default function BoardCanvas({
   };
 
   const containerRef = useRef<HTMLDivElement>(null);
+  const stageRef = useRef<any>(null);
+  const lastDist = useRef<number | null>(null);
+  const lastCenter = useRef<{ x: number; y: number } | null>(null);
+  
+
   const [stageSize, setStageSize] = useState({ width: 0, height: 0 });
+
+
+  useEffect(() => {
+  if (!getCenterRef) return;
+
+  getCenterRef.current = () => {
+    const stage = stageRef.current;
+    if (!stage) return { x: 0, y: 0 };
+
+    const scale = stage.scaleX();
+    const stagePos = stage.position();
+
+    const centerX =
+      (stageSize.width / 2 - stagePos.x) / scale;
+
+    const centerY =
+      (stageSize.height / 2 - stagePos.y) / scale;
+
+    return { x: centerX, y: centerY };
+  };
+}, [getCenterRef, stageSize.width, stageSize.height]);
+
+
   const [hoveredPedalId, setHoveredPedalId] = useState<number | null>(null);
   const [hoveredBoardId, setHoveredBoardId] = useState<number | null>(null);
   const [overlayPosition, setOverlayPosition] = useState<{
@@ -150,40 +193,17 @@ export default function BoardCanvas({
     return () => window.removeEventListener("resize", measure);
   }, []);
 
-  /* ================= PROPORTIONAL RECALC ================= */
- useEffect(() => {
-  if (isMobile !== true) return; // 🔥 empêche le recalcul en desktop
-  if (!stageSize.width || !stageSize.height) return;
-
-  const stageWidth = stageSize.width;
-  const stageHeight = stageSize.height;
-
-  updateActiveProject({
-    boardPedals: activeProject.boardPedals.map((p: AnyRow) =>
-      p.xRatio !== undefined
-        ? {
-            ...p,
-            x: stageWidth * p.xRatio,
-            y: stageHeight * p.yRatio,
-          }
-        : p
-    ),
-    selectedBoards: (activeProject.selectedBoards || []).map((b: AnyRow) =>
-      b.xRatio !== undefined
-        ? {
-            ...b,
-            x: stageWidth * b.xRatio,
-            y: stageHeight * b.yRatio,
-          }
-        : b
-    ),
-  });
-}, [stageSize.width, stageSize.height]);
 
 
 
 /* ================= OVERLAY POSITION ================= */
 useEffect(() => {
+  const stage = stageRef.current;
+  if (!stage) return;
+
+  const scale = stage.scaleX();
+  const stageX = stage.x();
+  const stageY = stage.y();
 
   // 🟣 PEDAL sélectionnée
   if (selectedInstanceId !== null) {
@@ -192,13 +212,16 @@ useEffect(() => {
     );
     if (!pedal) return;
 
-    const scale = currentZoom / 100;
     const size = displaySizes[selectedInstanceId];
     if (!size) return;
 
     setOverlayPosition({
-      x: pedal.x * scale,
-      y: pedal.y * scale - (size.h * scale) / 2 - 8,
+      x: pedal.x * scale + stageX,
+      y:
+        pedal.y * scale +
+        stageY -
+        (size.h * scale) / 2 -
+        8,
     });
 
     return;
@@ -211,29 +234,54 @@ useEffect(() => {
     );
     if (!board) return;
 
-    const scale = currentZoom / 100;
     const size = displaySizes[selectedBoardInstanceId];
     if (!size) return;
 
     setOverlayPosition({
-      x: board.x * scale,
-      y: board.y * scale - (size.h * scale) / 2 - 8,
+      x: board.x * scale + stageX,
+      y:
+        board.y * scale +
+        stageY -
+        (size.h * scale) / 2 -
+        8,
     });
 
     return;
   }
 
-  // rien sélectionné
   setOverlayPosition(null);
 
 }, [
   selectedInstanceId,
   selectedBoardInstanceId,
   activeProject.boardPedals,
-  (activeProject.selectedBoards || []),
-  currentZoom,
+  activeProject.selectedBoards,
   displaySizes,
+  currentZoom,
+  stagePos,
 ]);
+
+const getVisibleBounds = () => {
+  const stage = stageRef.current;
+  if (!stage) {
+    return { minX: 0, minY: 0, maxX: 0, maxY: 0 };
+  }
+
+  const scale = stage.scaleX();
+
+  const visibleWidth = stageSize.width / scale;
+  const visibleHeight = stageSize.height / scale;
+
+  const offsetX = -stage.x() / scale;
+  const offsetY = -stage.y() / scale;
+
+  return {
+    minX: offsetX,
+    minY: offsetY,
+    maxX: offsetX + visibleWidth,
+    maxY: offsetY + visibleHeight,
+  };
+};
 
 
   const getDragBoundsLocal = (
@@ -259,6 +307,20 @@ useEffect(() => {
     };
   };
 
+  const getDistance = (p1: any, p2: any) => {
+  return Math.sqrt(
+    Math.pow(p2.clientX - p1.clientX, 2) +
+    Math.pow(p2.clientY - p1.clientY, 2)
+  );
+};
+
+const getCenter = (p1: any, p2: any) => {
+  return {
+    x: (p1.clientX + p2.clientX) / 2,
+    y: (p1.clientY + p2.clientY) / 2,
+  };
+};
+
   return (
     <div
       ref={containerRef}
@@ -277,40 +339,34 @@ useEffect(() => {
       }
     >
       {!(isMobile && mobileSidebarOpen) && (
-  <div className="absolute bottom-6 left-6 flex items-end gap-4 z-50">
+  <div className="absolute bottom-6 left-6 flex items-center gap-4 z-50">
 
-  {/* ZOOM */}
-  <div className="flex items-center h-10 w-28 bg-zinc-950/80 backdrop-blur-md border border-zinc-800 rounded-2xl shadow-2xl">
-
-    <button
-      onClick={() =>
-        updateActiveProject({ zoom: Math.max(25, currentZoom - 5) })
-      }
-      className="w-10 flex items-center justify-center text-zinc-400 hover:text-white transition-colors"
-    >
-      <Minus size={14} />
-    </button>
-
-    <div className="w-12 text-center text-[12px] font-black font-mono tabular-nums text-zinc-300">
-      {currentZoom}
-      <span className="ml-1">%</span>
-    </div>
-
-    <button
-      onClick={() =>
-        updateActiveProject({ zoom: Math.min(200, currentZoom + 5) })
-      }
-      className="w-10 flex items-center justify-center text-zinc-400 hover:text-white transition-colors"
-    >
-      <Plus size={14} />
-    </button>
-
-  </div>
 
 
   {/* Desktop uniquement */}
   {!isMobile && (
     <>
+
+    {/* ZOOM */}
+      <div className="relative flex items-center justify-center h-10 w-28 bg-zinc-950/80 backdrop-blur-md border border-zinc-800 rounded-2xl shadow-2xl">
+
+  {/* Icône gauche */}
+  <span className="absolute left-3 text-sm">🔍</span>
+
+  {/* % parfaitement centré */}
+  <span className="text-[12px] font-black font-mono tabular-nums">
+    {zoomPercent}%
+  </span>
+
+  {/* MIN / MAX toujours à droite */}
+  {(isMinZoom || isMaxZoom) && (
+    <span className="absolute right-3 text-[9px] text-zinc-500 tracking-wider uppercase">
+      {isMinZoom ? "MIN" : "MAX"}
+    </span>
+  )}
+
+</div>
+
       {/* TOTAL DRAW */}
       <div className="relative flex items-center justify-center h-10 w-28 bg-zinc-950/80 backdrop-blur-md border border-zinc-800 rounded-2xl shadow-2xl pointer-events-none">
         <Zap className="absolute left-3 size-4 text-yellow-500" />
@@ -339,13 +395,180 @@ useEffect(() => {
 )}
 
       {stageSize.width > 0 && stageSize.height > 0 && (
+
   <Stage
-    width={stageSize.width}
-    height={stageSize.height}
-    scaleX={currentZoom / 100}
-    scaleY={currentZoom / 100}
-    onPointerDown={handleStageClick}
-  >
+  ref={stageRef}
+  width={stageSize.width}
+  height={stageSize.height}
+
+  draggable={false}
+
+  onPointerDown={handleStageClick}
+
+onPointerUp={() => {
+  const stage = stageRef.current;
+  if (!stage) return;
+  stage.draggable(false);
+}}
+
+
+onDragMove={(e) => {
+  const stage = stageRef.current;
+  if (!stage) return;
+
+  const newPos = {
+    x: e.target.x(),
+    y: e.target.y(),
+  };
+
+  setStagePos?.(newPos);
+
+  const scale = stage.scaleX();
+  const stageX = stage.x();
+  const stageY = stage.y();
+
+  if (selectedInstanceId !== null) {
+    const pedal = activeProject.boardPedals.find(
+      (p) => p.instanceId === selectedInstanceId
+    );
+    const size = displaySizes[selectedInstanceId];
+    if (!pedal || !size) return;
+
+    setOverlayPosition({
+      x: pedal.x * scale + stageX,
+      y:
+        pedal.y * scale +
+        stageY -
+        (size.h * scale) / 2 -
+        8,
+    });
+  }
+
+  if (selectedBoardInstanceId !== null) {
+    const board = (activeProject.selectedBoards || []).find(
+      (b) => b.instanceId === selectedBoardInstanceId
+    );
+    const size = displaySizes[selectedBoardInstanceId];
+    if (!board || !size) return;
+
+    setOverlayPosition({
+      x: board.x * scale + stageX,
+      y:
+        board.y * scale +
+        stageY -
+        (size.h * scale) / 2 -
+        8,
+    });
+  }
+}}
+
+onWheel={(e) => {
+  e.evt.preventDefault();
+
+  const stage = stageRef.current;
+  if (!stage) return;
+
+  const oldScale = stage.scaleX();
+  const pointer = stage.getPointerPosition();
+  if (!pointer) return;
+
+  const scaleBy = 1.05;
+  const direction = e.evt.deltaY > 0 ? -1 : 1;
+
+  const newScale =
+    direction > 0
+      ? oldScale * scaleBy
+      : oldScale / scaleBy;
+
+  const clampedScale = Math.max(0.5, Math.min(1.5, newScale));
+
+  const mousePointTo = {
+    x: (pointer.x - stage.x()) / oldScale,
+    y: (pointer.y - stage.y()) / oldScale,
+  };
+
+  stage.scale({ x: clampedScale, y: clampedScale });
+
+  const newPos = {
+    x: pointer.x - mousePointTo.x * clampedScale,
+    y: pointer.y - mousePointTo.y * clampedScale,
+  };
+
+  stage.position(newPos);
+  stage.batchDraw();
+
+  setStagePos?.(newPos);
+
+  updateActiveProject({
+    zoom: clampedScale * 100,
+  });
+}}
+
+onTouchMove={(e) => {
+  const stage = stageRef.current;
+  if (!stage) return;
+
+  const touches = e.evt.touches;
+
+  if (touches.length !== 2) {
+    lastDist.current = null;
+    lastCenter.current = null;
+    return;
+  }
+
+  e.evt.preventDefault();
+
+  const touch1 = touches[0];
+  const touch2 = touches[1];
+
+  const newDist = getDistance(touch1, touch2);
+  const newCenter = getCenter(touch1, touch2);
+
+  if (!lastDist.current) {
+    lastDist.current = newDist;
+    lastCenter.current = newCenter;
+    return;
+  }
+
+  const oldScale = stage.scaleX();
+  const scaleBy = newDist / lastDist.current;
+  let newScale = oldScale * scaleBy;
+
+  newScale = Math.max(0.5, Math.min(1.5, newScale));
+
+  const rect = stage.container().getBoundingClientRect();
+
+  const pointTo = {
+    x: (newCenter.x - rect.left - stage.x()) / oldScale,
+    y: (newCenter.y - rect.top - stage.y()) / oldScale,
+  };
+
+  stage.scale({ x: newScale, y: newScale });
+
+  const newPos = {
+    x: newCenter.x - rect.left - pointTo.x * newScale,
+    y: newCenter.y - rect.top - pointTo.y * newScale,
+  };
+
+  stage.position(newPos);
+  stage.batchDraw();
+
+  setStagePos?.(newPos);
+
+  updateActiveProject({
+    zoom: newScale * 100,
+  });
+
+  lastDist.current = newDist;
+  lastCenter.current = newCenter;
+}}
+
+onTouchEnd={() => {
+  lastDist.current = null;
+  lastCenter.current = null;
+}}
+
+>
     <Layer>
 
 {/* BOARDS */}
@@ -369,19 +592,7 @@ useEffect(() => {
       if (!isMobile) setHoveredBoardId(null);
     }}
 
-    /* DESKTOP */
-    onClick={(e) => {
-      if (isMobile) return;
-
-      e.cancelBubble = true;
-      setSelectedBoardInstanceId(b.instanceId);
-      setSelectedInstanceId(null);
-    }}
-
-    /* MOBILE / IPAD */
-    onTap={(e) => {
-      if (!isMobile) return;
-
+    onPointerDown={(e) => {
       e.cancelBubble = true;
       setSelectedBoardInstanceId(b.instanceId);
       setSelectedInstanceId(null);
@@ -389,12 +600,10 @@ useEffect(() => {
 
     onDragMove={(e) => {
       const node = e.target;
-      const scale = currentZoom / 100;
-
-      const stageW = stageSize.width;
-      const stageH = stageSize.height;
+      const bounds = getVisibleBounds();
 
       const box = node.getClientRect({ skipTransform: false });
+      const scale = stageRef.current?.scaleX() || 1;
 
       const width = box.width / scale;
       const height = box.height / scale;
@@ -402,12 +611,10 @@ useEffect(() => {
       let x = node.x();
       let y = node.y();
 
-      if (x - width / 2 < 0) x = width / 2;
-      if (y - height / 2 < 0) y = height / 2;
-      if (x + width / 2 > stageW / scale)
-        x = stageW / scale - width / 2;
-      if (y + height / 2 > stageH / scale)
-        y = stageH / scale - height / 2;
+      if (x - width / 2 < bounds.minX) x = bounds.minX + width / 2;
+      if (y - height / 2 < bounds.minY) y = bounds.minY + height / 2;
+      if (x + width / 2 > bounds.maxX) x = bounds.maxX - width / 2;
+      if (y + height / 2 > bounds.maxY) y = bounds.maxY - height / 2;
 
       node.position({ x, y });
     }}
@@ -423,12 +630,6 @@ useEffect(() => {
                   ...x,
                   x: e.target.x(),
                   y: e.target.y(),
-                  xRatio:
-                    e.target.x() /
-                    (stageSize.width / (currentZoom / 100)),
-                  yRatio:
-                    e.target.y() /
-                    (stageSize.height / (currentZoom / 100)),
                 }
               : x
         ),
@@ -533,70 +734,49 @@ useEffect(() => {
       if (!isMobile) setHoveredPedalId(null);
     }}
 
-    /* DESKTOP */
-    onClick={(e) => {
-      if (isMobile) return;
+    onPointerDown={(e) => {
+  e.cancelBubble = true;
 
-      e.cancelBubble = true;
-      setSelectedInstanceId(p.instanceId);
-      setSelectedBoardInstanceId(null);
-    }}
-
-    /* MOBILE / IPAD */
-    onTap={(e) => {
-      if (!isMobile) return;
-
-      e.cancelBubble = true;
-      setSelectedInstanceId(p.instanceId);
-      setSelectedBoardInstanceId(null);
-    }}
+  setSelectedInstanceId(p.instanceId);
+  setSelectedBoardInstanceId(null);
+}}
 
     onDragMove={(e) => {
-      const node = e.target;
-      const scale = currentZoom / 100;
+  const node = e.target;
+  const bounds = getVisibleBounds();
 
-      const stageW = stageSize.width;
-      const stageH = stageSize.height;
+  const box = node.getClientRect({ skipTransform: false });
+  const scale = stageRef.current?.scaleX() || 1;
 
-      const box = node.getClientRect({ skipTransform: false });
+  const width = box.width / scale;
+  const height = box.height / scale;
 
-      const width = box.width / scale;
-      const height = box.height / scale;
+  let x = node.x();
+  let y = node.y();
 
-      let x = node.x();
-      let y = node.y();
+  if (x - width / 2 < bounds.minX) x = bounds.minX + width / 2;
+  if (y - height / 2 < bounds.minY) y = bounds.minY + height / 2;
+  if (x + width / 2 > bounds.maxX) x = bounds.maxX - width / 2;
+  if (y + height / 2 > bounds.maxY) y = bounds.maxY - height / 2;
 
-      if (x - width / 2 < 0) x = width / 2;
-      if (y - height / 2 < 0) y = height / 2;
-      if (x + width / 2 > stageW / scale)
-        x = stageW / scale - width / 2;
-      if (y + height / 2 > stageH / scale)
-        y = stageH / scale - height / 2;
-
-      node.position({ x, y });
-    }}
+  node.position({ x, y });
+}}
 
     onDragEnd={(e) => {
-      setIsDragging(false);
+  setIsDragging(false);
 
-      updateActiveProject({
-        boardPedals: activeProject.boardPedals.map((x: AnyRow) =>
-          x.instanceId === p.instanceId
-            ? {
-                ...x,
-                x: e.target.x(),
-                y: e.target.y(),
-                xRatio:
-                  e.target.x() /
-                  (stageSize.width / (currentZoom / 100)),
-                yRatio:
-                  e.target.y() /
-                  (stageSize.height / (currentZoom / 100)),
-              }
-            : x
-        ),
-      });
-    }}
+  updateActiveProject({
+    boardPedals: activeProject.boardPedals.map((x: AnyRow) =>
+      x.instanceId === p.instanceId
+        ? {
+            ...x,
+            x: e.target.x(),
+            y: e.target.y(),
+          }
+        : x
+    ),
+  });
+}}
   >
           <PedalImage
             url={p.image || p.image_url || p.photo || null}
