@@ -348,87 +348,93 @@ useEffect(() => {
   >
     <Layer>
 
-      {/* BOARDS */}
-      {(activeProject.selectedBoards || []).map((b: AnyRow) => (
-        <Group
-  key={b.instanceId}
-  x={b.x}
-  y={b.y}
-  draggable
-  rotation={b.rotation || 0}
-  onDragStart={() => {
-    setIsDragging(true);
-  }}
+{/* BOARDS */}
+{(activeProject.selectedBoards || []).map((b: AnyRow) => (
+  <Group
+    key={b.instanceId}
+    x={b.x}
+    y={b.y}
+    draggable
+    rotation={b.rotation || 0}
 
-  onMouseEnter={() => {
-  if (!isMobile) setHoveredBoardId(b.instanceId);
-  }}
+    onDragStart={() => {
+      setIsDragging(true);
+    }}
 
-  onMouseLeave={() => {
-    if (!isMobile) setHoveredBoardId(null);
-  }}
+    onMouseEnter={() => {
+      if (!isMobile) setHoveredBoardId(b.instanceId);
+    }}
 
- onClick={(e) => {
-  if (isMobile) return;
+    onMouseLeave={() => {
+      if (!isMobile) setHoveredBoardId(null);
+    }}
 
-  e.cancelBubble = true;
-  setSelectedBoardInstanceId(b.instanceId);
-  setSelectedInstanceId(null);
-}}
+    /* DESKTOP */
+    onClick={(e) => {
+      if (isMobile) return;
 
-onPointerUp={(e) => {
-  if (!isMobile) return;
+      e.cancelBubble = true;
+      setSelectedBoardInstanceId(b.instanceId);
+      setSelectedInstanceId(null);
+    }}
 
-  e.cancelBubble = true;
-  setSelectedBoardInstanceId(b.instanceId);
-  setSelectedInstanceId(null);
-}}
+    /* MOBILE / IPAD */
+    onTap={(e) => {
+      if (!isMobile) return;
 
-          
+      e.cancelBubble = true;
+      setSelectedBoardInstanceId(b.instanceId);
+      setSelectedInstanceId(null);
+    }}
 
-          onDragMove={(e) => {
-            const node = e.target;
-            const scale = currentZoom / 100;
+    onDragMove={(e) => {
+      const node = e.target;
+      const scale = currentZoom / 100;
 
-            const stageW = stageSize.width;
-            const stageH = stageSize.height;
+      const stageW = stageSize.width;
+      const stageH = stageSize.height;
 
-            const box = node.getClientRect({ skipTransform: false });
+      const box = node.getClientRect({ skipTransform: false });
 
-            const width = box.width / scale;
-            const height = box.height / scale;
+      const width = box.width / scale;
+      const height = box.height / scale;
 
-            let x = node.x();
-            let y = node.y();
+      let x = node.x();
+      let y = node.y();
 
-            if (x - width / 2 < 0) x = width / 2;
-            if (y - height / 2 < 0) y = height / 2;
-            if (x + width / 2 > stageW / scale)
-              x = stageW / scale - width / 2;
-            if (y + height / 2 > stageH / scale)
-              y = stageH / scale - height / 2;
+      if (x - width / 2 < 0) x = width / 2;
+      if (y - height / 2 < 0) y = height / 2;
+      if (x + width / 2 > stageW / scale)
+        x = stageW / scale - width / 2;
+      if (y + height / 2 > stageH / scale)
+        y = stageH / scale - height / 2;
 
-            node.position({ x, y });
-          }}
+      node.position({ x, y });
+    }}
 
-          onDragEnd={(e) => {
-            setIsDragging(false);
-            updateActiveProject({
-              selectedBoards: (activeProject.selectedBoards || []).map(
-                (x: AnyRow) =>
-                  x.instanceId === b.instanceId
-                    ? {
-    ...x,
-    x: e.target.x(),
-    y: e.target.y(),
-    xRatio: e.target.x() / (stageSize.width / (currentZoom / 100)),
-    yRatio: e.target.y() / (stageSize.height / (currentZoom / 100)),
-  }
-                    : x
-              ),
-            });
-          }}
-        >
+    onDragEnd={(e) => {
+      setIsDragging(false);
+
+      updateActiveProject({
+        selectedBoards: (activeProject.selectedBoards || []).map(
+          (x: AnyRow) =>
+            x.instanceId === b.instanceId
+              ? {
+                  ...x,
+                  x: e.target.x(),
+                  y: e.target.y(),
+                  xRatio:
+                    e.target.x() /
+                    (stageSize.width / (currentZoom / 100)),
+                  yRatio:
+                    e.target.y() /
+                    (stageSize.height / (currentZoom / 100)),
+                }
+              : x
+        ),
+      });
+    }}
+  >
           <PedalImage
           
             url={b.image || b.image_url || b.photo || null}
@@ -506,87 +512,92 @@ onPointerUp={(e) => {
         </Group>
       ))}
 
-      {/* PEDALS */}
-      {activeProject.boardPedals.map((p: AnyRow) => (
-        <Group
-  key={p.instanceId}
-  x={p.x}
-  y={p.y}
-  rotation={p.rotation || 0}
-  draggable
+{/* PEDALS */}
+{activeProject.boardPedals.map((p: AnyRow) => (
+  <Group
+    key={p.instanceId}
+    x={p.x}
+    y={p.y}
+    rotation={p.rotation || 0}
+    draggable
 
-  onDragStart={() => {
-  setIsDragging(true);
-}}
+    onDragStart={() => {
+      setIsDragging(true);
+    }}
 
-  onMouseEnter={() => {
-  if (!isMobile) setHoveredPedalId(p.instanceId);
-}}
+    onMouseEnter={() => {
+      if (!isMobile) setHoveredPedalId(p.instanceId);
+    }}
 
-  onMouseLeave={() => {
-    if (!isMobile) setHoveredPedalId(null);
-  }}
+    onMouseLeave={() => {
+      if (!isMobile) setHoveredPedalId(null);
+    }}
 
-  onClick={(e) => {
-  if (isMobile) return; // desktop only
+    /* DESKTOP */
+    onClick={(e) => {
+      if (isMobile) return;
 
-  e.cancelBubble = true;
-  setSelectedInstanceId(p.instanceId);
-  setSelectedBoardInstanceId(null);
-}}
+      e.cancelBubble = true;
+      setSelectedInstanceId(p.instanceId);
+      setSelectedBoardInstanceId(null);
+    }}
 
-onPointerUp={(e) => {
-  if (!isMobile) return; // mobile only
+    /* MOBILE / IPAD */
+    onTap={(e) => {
+      if (!isMobile) return;
 
-  e.cancelBubble = true;
-  setSelectedInstanceId(p.instanceId);
-  setSelectedBoardInstanceId(null);
-}}
+      e.cancelBubble = true;
+      setSelectedInstanceId(p.instanceId);
+      setSelectedBoardInstanceId(null);
+    }}
 
-          onDragMove={(e) => {
-            const node = e.target;
-            const scale = currentZoom / 100;
+    onDragMove={(e) => {
+      const node = e.target;
+      const scale = currentZoom / 100;
 
-            const stageW = stageSize.width;
-            const stageH = stageSize.height;
+      const stageW = stageSize.width;
+      const stageH = stageSize.height;
 
-            const box = node.getClientRect({ skipTransform: false });
+      const box = node.getClientRect({ skipTransform: false });
 
-            const width = box.width / scale;
-            const height = box.height / scale;
+      const width = box.width / scale;
+      const height = box.height / scale;
 
-            let x = node.x();
-            let y = node.y();
+      let x = node.x();
+      let y = node.y();
 
-            if (x - width / 2 < 0) x = width / 2;
-            if (y - height / 2 < 0) y = height / 2;
-            if (x + width / 2 > stageW / scale)
-              x = stageW / scale - width / 2;
-            if (y + height / 2 > stageH / scale)
-              y = stageH / scale - height / 2;
+      if (x - width / 2 < 0) x = width / 2;
+      if (y - height / 2 < 0) y = height / 2;
+      if (x + width / 2 > stageW / scale)
+        x = stageW / scale - width / 2;
+      if (y + height / 2 > stageH / scale)
+        y = stageH / scale - height / 2;
 
-            node.position({ x, y });
-          }}
+      node.position({ x, y });
+    }}
 
-          onDragEnd={(e) => {
-  setIsDragging(false);
+    onDragEnd={(e) => {
+      setIsDragging(false);
 
-  updateActiveProject({
-              boardPedals: activeProject.boardPedals.map(
-                (x: AnyRow) =>
-                  x.instanceId === p.instanceId
-                    ? {
-    ...x,
-    x: e.target.x(),
-    y: e.target.y(),
-    xRatio: e.target.x() / (stageSize.width / (currentZoom / 100)),
-    yRatio: e.target.y() / (stageSize.height / (currentZoom / 100)),
-  }
-                    : x
-              ),
-            });
-          }}
-        >
+      updateActiveProject({
+        boardPedals: activeProject.boardPedals.map((x: AnyRow) =>
+          x.instanceId === p.instanceId
+            ? {
+                ...x,
+                x: e.target.x(),
+                y: e.target.y(),
+                xRatio:
+                  e.target.x() /
+                  (stageSize.width / (currentZoom / 100)),
+                yRatio:
+                  e.target.y() /
+                  (stageSize.height / (currentZoom / 100)),
+              }
+            : x
+        ),
+      });
+    }}
+  >
           <PedalImage
             url={p.image || p.image_url || p.photo || null}
             width={p.width}
