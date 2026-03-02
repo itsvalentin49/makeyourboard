@@ -447,15 +447,15 @@ const getCenter = (p1: any, p2: any) => {
   width={stageSize.width}
   height={stageSize.height}
 
-  draggable={false}
+  draggable={
+  selectedInstanceId === null &&
+  selectedBoardInstanceId === null &&
+  !isDragging
+}
+
+
 
   onPointerDown={handleStageClick}
-
-onPointerUp={() => {
-  const stage = stageRef.current;
-  if (!stage) return;
-  stage.draggable(false);
-}}
 
 
 onDragMove={(e) => {
