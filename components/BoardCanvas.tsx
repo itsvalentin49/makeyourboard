@@ -164,6 +164,51 @@ export default function BoardCanvas({
   y: number;
   } | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  useEffect(() => {
+  setSelectedInstanceId(null);
+  setSelectedBoardInstanceId(null);
+}, [activeProject]);
+
+useEffect(() => {
+  const handleKeyDown = (e: KeyboardEvent) => {
+    const target = e.target as HTMLElement;
+
+    // 🔒 Ne rien faire si on tape dans un input / textarea
+    if (
+      target.tagName === "INPUT" ||
+      target.tagName === "TEXTAREA" ||
+      target.isContentEditable
+    ) {
+      return;
+    }
+
+    // 🗑️ Delete ou Backspace
+    if (e.key === "Delete" || e.key === "Backspace") {
+      if (selectedInstanceId !== null) {
+        deletePedal(selectedInstanceId);
+        setSelectedInstanceId(null);
+      }
+
+      if (selectedBoardInstanceId !== null) {
+        deleteBoard(selectedBoardInstanceId);
+        setSelectedBoardInstanceId(null);
+      }
+    }
+  };
+
+  window.addEventListener("keydown", handleKeyDown);
+
+  return () => {
+    window.removeEventListener("keydown", handleKeyDown);
+  };
+}, [
+  selectedInstanceId,
+  selectedBoardInstanceId,
+  deletePedal,
+  deleteBoard,
+  setSelectedInstanceId,
+  setSelectedBoardInstanceId,
+]);
 
   /* ================= MEASURE STAGE ================= */
   useLayoutEffect(() => {
