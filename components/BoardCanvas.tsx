@@ -828,7 +828,9 @@ onTouchEnd={() => {
   </Stage>
 )}
 
-{overlayPosition && !isDragging && (
+{overlayPosition &&
+  !isDragging &&
+  !(isMobile && mobileSidebarOpen) && (
   <div
     style={{
       position: "absolute",
