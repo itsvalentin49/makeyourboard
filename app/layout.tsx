@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     siteName: "MakeYourBoard",
     images: [
       {
-        url: "https://makeyourboard.com/og-image.jpg",
+        url: "https://makeyourboard.com/og-image.png",
         width: 1200,
         height: 630,
         alt: "MakeYourBoard – Online Guitar Pedalboard Builder",
@@ -55,7 +55,7 @@ export const metadata: Metadata = {
     title: "MakeYourBoard – Online Guitar Pedalboard Builder",
     description:
       "Build and design your guitar pedalboard online. Add pedals, boards, customize layout, calculate power consumption and visualize your setup in real time.",
-    images: ["https://makeyourboard.com/og-image.jpg"],
+    images: ["https://makeyourboard.com/og-image.png"],
   },
 };
 
