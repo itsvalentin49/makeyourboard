@@ -95,7 +95,7 @@ export default function BoardCanvas({
   const currentZoom = activeProject.zoom || 100;
   const zoomPercent = Math.round(currentZoom);
   const MIN_ZOOM = 50;
-  const MAX_ZOOM = 150;
+  const MAX_ZOOM = 200;
 
   const isMinZoom = zoomPercent <= MIN_ZOOM;
   const isMaxZoom = zoomPercent >= MAX_ZOOM;
@@ -131,14 +131,15 @@ export default function BoardCanvas({
 
   const containerRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<any>(null);
-  
-  
-
+  const lastDist = useRef<number | null>(null);
+  const lastCenter = useRef<{ x: number; y: number } | null>(null);
   const [stageSize, setStageSize] = useState({ width: 0, height: 0 });
 
 
   useEffect(() => {
   if (!getCenterRef) return;
+
+  
 
   getCenterRef.current = () => {
     const stage = stageRef.current;
@@ -262,6 +263,43 @@ useEffect(() => {
   displaySizes,
   currentZoom,
   stagePos,
+]);
+
+useEffect(() => {
+  const handleKeyDown = (e: KeyboardEvent) => {
+    const target = e.target as HTMLElement;
+
+    if (
+      target.tagName === "INPUT" ||
+      target.tagName === "TEXTAREA" ||
+      target.isContentEditable
+    ) {
+      return;
+    }
+
+    if (e.key === "Backspace") {
+      if (selectedInstanceId !== null) {
+        deletePedal(selectedInstanceId);
+        return;
+      }
+
+      if (selectedBoardInstanceId !== null) {
+        deleteBoard(selectedBoardInstanceId);
+        return;
+      }
+    }
+  };
+
+  window.addEventListener("keydown", handleKeyDown);
+
+  return () => {
+    window.removeEventListener("keydown", handleKeyDown);
+  };
+}, [
+  selectedInstanceId,
+  selectedBoardInstanceId,
+  deletePedal,
+  deleteBoard,
 ]);
 
 const getVisibleBounds = () => {
@@ -413,7 +451,7 @@ const getVisibleBounds = () => {
         ? oldScale * scaleBy
         : oldScale / scaleBy;
 
-    const clampedScale = Math.max(0.5, Math.min(1.5, newScale));
+    const clampedScale = Math.max(0.5, Math.min(2, newScale));
 
     const mousePointTo = {
       x: (pointer.x - stage.x()) / oldScale,
@@ -436,6 +474,71 @@ const getVisibleBounds = () => {
       stageY: newPos.y,
     });
   }}
+
+  onTouchMove={(e: any) => {
+  const stage = stageRef.current;
+  if (!stage) return;
+
+  const touch1 = e.evt.touches[0];
+  const touch2 = e.evt.touches[1];
+
+  // On ne fait rien si pas 2 doigts
+  if (!touch1 || !touch2) {
+    lastDist.current = null;
+    return;
+  }
+
+  e.evt.preventDefault();
+
+  // Distance entre les 2 doigts
+  const dist = Math.sqrt(
+    Math.pow(touch1.clientX - touch2.clientX, 2) +
+    Math.pow(touch1.clientY - touch2.clientY, 2)
+  );
+
+  // Centre entre les 2 doigts
+  const center = {
+    x: (touch1.clientX + touch2.clientX) / 2,
+    y: (touch1.clientY + touch2.clientY) / 2,
+  };
+
+  if (!lastDist.current) {
+    lastDist.current = dist;
+    lastCenter.current = center;
+    return;
+  }
+
+  const oldScale = stage.scaleX();
+  const scaleBy = dist / lastDist.current;
+  const newScale = oldScale * scaleBy;
+
+  const clampedScale = Math.max(0.5, Math.min(2, newScale));
+
+  const pointTo = {
+    x: (center.x - stage.x()) / oldScale,
+    y: (center.y - stage.y()) / oldScale,
+  };
+
+  stage.scale({ x: clampedScale, y: clampedScale });
+
+  const newPos = {
+    x: center.x - pointTo.x * clampedScale,
+    y: center.y - pointTo.y * clampedScale,
+  };
+
+  stage.position(newPos);
+  stage.batchDraw();
+
+  updateActiveProject({
+    zoom: clampedScale * 100,
+    stageX: newPos.x,
+    stageY: newPos.y,
+  });
+
+  lastDist.current = dist;
+  lastCenter.current = center;
+}}
+
 >
     <Layer>
 
@@ -461,6 +564,13 @@ const getVisibleBounds = () => {
     }}
 
     onClick={(e) => {
+  e.cancelBubble = true;
+
+  setSelectedBoardInstanceId(b.instanceId);
+  setSelectedInstanceId(null);
+}}
+
+onTap={(e) => {
   e.cancelBubble = true;
 
   setSelectedBoardInstanceId(b.instanceId);
@@ -604,6 +714,13 @@ const getVisibleBounds = () => {
     }}
 
     onClick={(e) => {
+  e.cancelBubble = true;
+
+  setSelectedInstanceId(p.instanceId);
+  setSelectedBoardInstanceId(null);
+}}
+
+onTap={(e) => {
   e.cancelBubble = true;
 
   setSelectedInstanceId(p.instanceId);
