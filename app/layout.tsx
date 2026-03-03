@@ -71,6 +71,17 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    name: "MakeYourBoard",
+    url: "https://makeyourboard.com",
+    applicationCategory: "MusicApplication",
+    operatingSystem: "All",
+    description:
+      "Build and design your guitar pedalboard online. Add pedals, boards, customize layout, calculate power consumption and visualize your setup in real time.",
+  };
+
   return (
     <html lang="en">
       <body
@@ -81,6 +92,13 @@ export default function RootLayout({
         }}
       >
         {children}
+
+        {/* Structured Data */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
+
         <Analytics />
       </body>
     </html>
