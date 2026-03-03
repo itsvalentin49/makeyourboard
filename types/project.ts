@@ -11,6 +11,8 @@ export type Project = {
   id: number;
   name: string;
   zoom: number;
+  stageX?: number;
+  stageY?: number;
   boardPedals: BoardItem[];
   selectedBoards: BoardItem[];
 };

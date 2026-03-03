@@ -18,11 +18,13 @@ type Background = {
 };
 
 type Props = {
-  activeProject: {
-    boardPedals: AnyRow[];
-    selectedBoards?: AnyRow[];
-    zoom?: number;
-  };
+activeProject: {
+  boardPedals: AnyRow[];
+  selectedBoards?: AnyRow[];
+  zoom?: number;
+  stageX?: number;
+  stageY?: number;
+};
 
   units: "metric" | "imperial";
   language: "en" | "fr" | "es" | "de" | "it" | "pt";
@@ -129,9 +131,7 @@ export default function BoardCanvas({
 
   const containerRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<any>(null);
-  const wasDraggingRef = useRef(false);
-  const lastDist = useRef<number | null>(null);
-  const lastCenter = useRef<{ x: number; y: number } | null>(null);
+  
   
 
   const [stageSize, setStageSize] = useState({ width: 0, height: 0 });
@@ -158,6 +158,8 @@ export default function BoardCanvas({
 }, [getCenterRef, stageSize.width, stageSize.height]);
 
 
+
+
   const [hoveredPedalId, setHoveredPedalId] = useState<number | null>(null);
   const [hoveredBoardId, setHoveredBoardId] = useState<number | null>(null);
   const [overlayPosition, setOverlayPosition] = useState<{
@@ -165,51 +167,6 @@ export default function BoardCanvas({
   y: number;
   } | null>(null);
   const [isDragging, setIsDragging] = useState(false);
-  useEffect(() => {
-  setSelectedInstanceId(null);
-  setSelectedBoardInstanceId(null);
-}, [activeProject]);
-
-useEffect(() => {
-  const handleKeyDown = (e: KeyboardEvent) => {
-    const target = e.target as HTMLElement;
-
-    // 🔒 Ne rien faire si on tape dans un input / textarea
-    if (
-      target.tagName === "INPUT" ||
-      target.tagName === "TEXTAREA" ||
-      target.isContentEditable
-    ) {
-      return;
-    }
-
-    // 🗑️ Delete ou Backspace
-    if (e.key === "Delete" || e.key === "Backspace") {
-      if (selectedInstanceId !== null) {
-        deletePedal(selectedInstanceId);
-        setSelectedInstanceId(null);
-      }
-
-      if (selectedBoardInstanceId !== null) {
-        deleteBoard(selectedBoardInstanceId);
-        setSelectedBoardInstanceId(null);
-      }
-    }
-  };
-
-  window.addEventListener("keydown", handleKeyDown);
-
-  return () => {
-    window.removeEventListener("keydown", handleKeyDown);
-  };
-}, [
-  selectedInstanceId,
-  selectedBoardInstanceId,
-  deletePedal,
-  deleteBoard,
-  setSelectedInstanceId,
-  setSelectedBoardInstanceId,
-]);
 
   /* ================= MEASURE STAGE ================= */
   useLayoutEffect(() => {
@@ -353,20 +310,6 @@ const getVisibleBounds = () => {
     };
   };
 
-  const getDistance = (p1: any, p2: any) => {
-  return Math.sqrt(
-    Math.pow(p2.clientX - p1.clientX, 2) +
-    Math.pow(p2.clientY - p1.clientY, 2)
-  );
-};
-
-const getCenter = (p1: any, p2: any) => {
-  return {
-    x: (p1.clientX + p2.clientX) / 2,
-    y: (p1.clientY + p2.clientY) / 2,
-  };
-};
-
   return (
     <div
       ref={containerRef}
@@ -442,178 +385,57 @@ const getCenter = (p1: any, p2: any) => {
 
       {stageSize.width > 0 && stageSize.height > 0 && (
 
-  <Stage
+<Stage
   ref={stageRef}
   width={stageSize.width}
   height={stageSize.height}
+  draggable={false}
+  x={activeProject.stageX || 0}
+  y={activeProject.stageY || 0}
+  scaleX={(activeProject.zoom || 100) / 100}
+  scaleY={(activeProject.zoom || 100) / 100}
+  onClick={handleStageClick}
+  onWheel={(e: any) => {
+    e.evt.preventDefault();
 
-  draggable={
-  selectedInstanceId === null &&
-  selectedBoardInstanceId === null &&
-  !isDragging
-}
+    const stage = stageRef.current;
+    if (!stage) return;
 
+    const oldScale = stage.scaleX();
+    const pointer = stage.getPointerPosition();
+    if (!pointer) return;
 
+    const scaleBy = 1.05;
+    const direction = e.evt.deltaY > 0 ? -1 : 1;
 
-  onPointerDown={handleStageClick}
+    const newScale =
+      direction > 0
+        ? oldScale * scaleBy
+        : oldScale / scaleBy;
 
+    const clampedScale = Math.max(0.5, Math.min(1.5, newScale));
 
-onDragMove={(e) => {
-  const stage = stageRef.current;
-  if (!stage) return;
+    const mousePointTo = {
+      x: (pointer.x - stage.x()) / oldScale,
+      y: (pointer.y - stage.y()) / oldScale,
+    };
 
-  const newPos = {
-    x: e.target.x(),
-    y: e.target.y(),
-  };
+    stage.scale({ x: clampedScale, y: clampedScale });
 
-  setStagePos?.(newPos);
+    const newPos = {
+      x: pointer.x - mousePointTo.x * clampedScale,
+      y: pointer.y - mousePointTo.y * clampedScale,
+    };
 
-  const scale = stage.scaleX();
-  const stageX = stage.x();
-  const stageY = stage.y();
+    stage.position(newPos);
+    stage.batchDraw();
 
-  if (selectedInstanceId !== null) {
-    const pedal = activeProject.boardPedals.find(
-      (p) => p.instanceId === selectedInstanceId
-    );
-    const size = displaySizes[selectedInstanceId];
-    if (!pedal || !size) return;
-
-    setOverlayPosition({
-      x: pedal.x * scale + stageX,
-      y:
-        pedal.y * scale +
-        stageY -
-        (size.h * scale) / 2 -
-        8,
+    updateActiveProject({
+      zoom: clampedScale * 100,
+      stageX: newPos.x,
+      stageY: newPos.y,
     });
-  }
-
-  if (selectedBoardInstanceId !== null) {
-    const board = (activeProject.selectedBoards || []).find(
-      (b) => b.instanceId === selectedBoardInstanceId
-    );
-    const size = displaySizes[selectedBoardInstanceId];
-    if (!board || !size) return;
-
-    setOverlayPosition({
-      x: board.x * scale + stageX,
-      y:
-        board.y * scale +
-        stageY -
-        (size.h * scale) / 2 -
-        8,
-    });
-  }
-}}
-
-onWheel={(e) => {
-  e.evt.preventDefault();
-
-  const stage = stageRef.current;
-  if (!stage) return;
-
-  const oldScale = stage.scaleX();
-  const pointer = stage.getPointerPosition();
-  if (!pointer) return;
-
-  const scaleBy = 1.05;
-  const direction = e.evt.deltaY > 0 ? -1 : 1;
-
-  const newScale =
-    direction > 0
-      ? oldScale * scaleBy
-      : oldScale / scaleBy;
-
-  const clampedScale = Math.max(0.5, Math.min(1.5, newScale));
-
-  const mousePointTo = {
-    x: (pointer.x - stage.x()) / oldScale,
-    y: (pointer.y - stage.y()) / oldScale,
-  };
-
-  stage.scale({ x: clampedScale, y: clampedScale });
-
-  const newPos = {
-    x: pointer.x - mousePointTo.x * clampedScale,
-    y: pointer.y - mousePointTo.y * clampedScale,
-  };
-
-  stage.position(newPos);
-  stage.batchDraw();
-
-  setStagePos?.(newPos);
-
-  updateActiveProject({
-    zoom: clampedScale * 100,
-  });
-}}
-
-onTouchMove={(e) => {
-  const stage = stageRef.current;
-  if (!stage) return;
-
-  const touches = e.evt.touches;
-
-  if (touches.length !== 2) {
-    lastDist.current = null;
-    lastCenter.current = null;
-    return;
-  }
-
-  e.evt.preventDefault();
-
-  const touch1 = touches[0];
-  const touch2 = touches[1];
-
-  const newDist = getDistance(touch1, touch2);
-  const newCenter = getCenter(touch1, touch2);
-
-  if (!lastDist.current) {
-    lastDist.current = newDist;
-    lastCenter.current = newCenter;
-    return;
-  }
-
-  const oldScale = stage.scaleX();
-  const scaleBy = newDist / lastDist.current;
-  let newScale = oldScale * scaleBy;
-
-  newScale = Math.max(0.5, Math.min(1.5, newScale));
-
-  const rect = stage.container().getBoundingClientRect();
-
-  const pointTo = {
-    x: (newCenter.x - rect.left - stage.x()) / oldScale,
-    y: (newCenter.y - rect.top - stage.y()) / oldScale,
-  };
-
-  stage.scale({ x: newScale, y: newScale });
-
-  const newPos = {
-    x: newCenter.x - rect.left - pointTo.x * newScale,
-    y: newCenter.y - rect.top - pointTo.y * newScale,
-  };
-
-  stage.position(newPos);
-  stage.batchDraw();
-
-  setStagePos?.(newPos);
-
-  updateActiveProject({
-    zoom: newScale * 100,
-  });
-
-  lastDist.current = newDist;
-  lastCenter.current = newCenter;
-}}
-
-onTouchEnd={() => {
-  lastDist.current = null;
-  lastCenter.current = null;
-}}
-
+  }}
 >
     <Layer>
 
@@ -626,15 +448,9 @@ onTouchEnd={() => {
     draggable
     rotation={b.rotation || 0}
 
-onDragStart={() => {
-  setIsDragging(true);
-  wasDraggingRef.current = true;
-
-  // 🔥 désélection immédiate si board sélectionné
-  if (selectedBoardInstanceId === b.instanceId) {
-    setSelectedBoardInstanceId(null);
-  }
-}}
+    onDragStart={() => {
+      setIsDragging(true);
+    }}
 
     onMouseEnter={() => {
       if (!isMobile) setHoveredBoardId(b.instanceId);
@@ -644,39 +460,35 @@ onDragStart={() => {
       if (!isMobile) setHoveredBoardId(null);
     }}
 
-    onPointerUp={(e) => {
+    onClick={(e) => {
   e.cancelBubble = true;
-
-  // Si on vient de drag → ne pas sélectionner
-  if (wasDraggingRef.current) return;
 
   setSelectedBoardInstanceId(b.instanceId);
   setSelectedInstanceId(null);
 }}
 
-    
     onDragMove={(e) => {
-      const node = e.target;
-      const bounds = getVisibleBounds();
+  const node = e.target;
+  const bounds = getVisibleBounds();
 
-      const box = node.getClientRect({ skipTransform: false });
-      const scale = stageRef.current?.scaleX() || 1;
+  const box = node.getClientRect({ skipTransform: false });
+  const scale = stageRef.current?.scaleX() || 1;
 
-      const width = box.width / scale;
-      const height = box.height / scale;
+  const width = box.width / scale;
+  const height = box.height / scale;
 
-      let x = node.x();
-      let y = node.y();
+  let x = node.x();
+  let y = node.y();
 
-      if (x - width / 2 < bounds.minX) x = bounds.minX + width / 2;
-      if (y - height / 2 < bounds.minY) y = bounds.minY + height / 2;
-      if (x + width / 2 > bounds.maxX) x = bounds.maxX - width / 2;
-      if (y + height / 2 > bounds.maxY) y = bounds.maxY - height / 2;
+  if (x - width / 2 < bounds.minX) x = bounds.minX + width / 2;
+  if (y - height / 2 < bounds.minY) y = bounds.minY + height / 2;
+  if (x + width / 2 > bounds.maxX) x = bounds.maxX - width / 2;
+  if (y + height / 2 > bounds.maxY) y = bounds.maxY - height / 2;
 
-      node.position({ x, y });
-    }}
+  node.position({ x, y });
+}}
 
-onDragEnd={(e) => {
+   onDragEnd={(e) => {
   setIsDragging(false);
 
   updateActiveProject({
@@ -690,10 +502,6 @@ onDragEnd={(e) => {
             }
           : x
     ),
-  });
-
-  requestAnimationFrame(() => {
-    wasDraggingRef.current = false;
   });
 }}
   >
@@ -783,15 +591,9 @@ onDragEnd={(e) => {
     rotation={p.rotation || 0}
     draggable
 
-onDragStart={() => {
-  setIsDragging(true);
-  wasDraggingRef.current = true;
-
-  // 🔥 désélection immédiate si elle était sélectionnée
-  if (selectedInstanceId === p.instanceId) {
-    setSelectedInstanceId(null);
-  }
-}}
+    onDragStart={() => {
+      setIsDragging(true);
+    }}
 
     onMouseEnter={() => {
       if (!isMobile) setHoveredPedalId(p.instanceId);
@@ -801,17 +603,13 @@ onDragStart={() => {
       if (!isMobile) setHoveredPedalId(null);
     }}
 
-    onPointerUp={(e) => {
+    onClick={(e) => {
   e.cancelBubble = true;
-
-  // Si on vient de drag → ne pas sélectionner
-  if (wasDraggingRef.current) return;
 
   setSelectedInstanceId(p.instanceId);
   setSelectedBoardInstanceId(null);
 }}
-
-
+    
     onDragMove={(e) => {
   const node = e.target;
   const bounds = getVisibleBounds();
@@ -833,7 +631,7 @@ onDragStart={() => {
   node.position({ x, y });
 }}
 
- onDragEnd={(e) => {
+    onDragEnd={(e) => {
   setIsDragging(false);
 
   updateActiveProject({
@@ -846,11 +644,6 @@ onDragStart={() => {
           }
         : x
     ),
-  });
-
-  // Reset propre après le cycle d'event Konva
-  requestAnimationFrame(() => {
-    wasDraggingRef.current = false;
   });
 }}
   >
@@ -904,9 +697,7 @@ onDragStart={() => {
   </Stage>
 )}
 
-{overlayPosition &&
-  !isDragging &&
-  !(isMobile && mobileSidebarOpen) && (
+{overlayPosition && !isDragging && (
   <div
     style={{
       position: "absolute",

@@ -32,6 +32,8 @@ const DEFAULT_WORKING_BOARD: Project = {
   id: -1,
   name: "WORKING",
   zoom: 100,
+  stageX: 0,
+  stageY: 0,
   boardPedals: [],
   selectedBoards: [],
 };
@@ -39,6 +41,8 @@ const DEFAULT_WORKING_BOARD: Project = {
 // 👉 updates “compatibles BoardCanvas”
 type ActiveProjectUpdates = Partial<{
   zoom: number;
+  stageX: number;
+  stageY: number;
   boardPedals: AnyRow[];
   selectedBoards: AnyRow[];
 }>;
@@ -112,7 +116,7 @@ const [canvasSize, setCanvasSize] = useState({
   width: 0,
   height: 0,
 });
-const [stagePos, setStagePos] = useState({ x: 0, y: 0 });
+
 const getCenterRef = useRef<(() => { x: number; y: number }) | null>(null);
 
 
@@ -187,6 +191,8 @@ useEffect(() => {
       id: Date.now(),
       name: "Pedalboard 1",
       zoom: 100,
+      stageX: 0,
+      stageY: 0,
       boardPedals: [],
       selectedBoards: [],
     };
@@ -231,11 +237,13 @@ useEffect(() => {
    * ✅ Fix TS: accepte AnyRow[] (BoardCanvas) puis normalise en BoardItem[] (state)
    */
   const updateActiveProject = (updates: ActiveProjectUpdates) => {
-    const normalized: Partial<Pick<Project, "zoom" | "boardPedals" | "selectedBoards">> = {
-      ...(typeof updates.zoom === "number" ? { zoom: updates.zoom } : {}),
-      ...(updates.boardPedals ? { boardPedals: updates.boardPedals as BoardItem[] } : {}),
-      ...(updates.selectedBoards ? { selectedBoards: updates.selectedBoards as BoardItem[] } : {}),
-    };
+    const normalized: Partial<Project> = {
+  ...(typeof updates.zoom === "number" ? { zoom: updates.zoom } : {}),
+  ...(typeof updates.stageX === "number" ? { stageX: updates.stageX } : {}),
+  ...(typeof updates.stageY === "number" ? { stageY: updates.stageY } : {}),
+  ...(updates.boardPedals ? { boardPedals: updates.boardPedals as BoardItem[] } : {}),
+  ...(updates.selectedBoards ? { selectedBoards: updates.selectedBoards as BoardItem[] } : {}),
+};
 
     if (activeProjectId !== null) {
       setProjects((prev) =>
@@ -344,6 +352,8 @@ useEffect(() => {
       id: newId,
       name: `Pedalboard ${projects.length + 1}`,
       zoom: 100,
+      stageX: 0,
+      stageY: 0,
       boardPedals: [],
       selectedBoards: [],
     };
@@ -609,7 +619,7 @@ return (
 
         <div
   ref={desktopCanvasRef}
-  className="flex-1 min-w-0 bg-[#2c2c2e] flex flex-col overflow-hidden"
+  className="flex-1 min-w-0 bg-[#323234] flex flex-col overflow-hidden"
 >
   <TopBarTabs
     projects={projects}
@@ -630,6 +640,7 @@ return (
 
   <div className="flex-1 relative overflow-hidden">
     <BoardCanvas
+    key={activeProject.id}
       activeProject={activeProject}
       units={units}
       language={language}
@@ -652,8 +663,6 @@ return (
       rotateBoard={rotateBoard}
       deleteBoard={deleteBoard}
       onStageSizeChange={setCanvasSize}
-      stagePos={stagePos}
-      setStagePos={setStagePos}
       getCenterRef={getCenterRef}
     />
   </div>
@@ -687,7 +696,7 @@ return (
         {/* CANVAS MOBILE */}
         <div
   ref={mobileCanvasRef}
-  className="flex-1 relative bg-[#2c2c2e] overflow-hidden"
+  className="flex-1 relative bg-[#323234] overflow-hidden"
 >
           <BoardCanvas
             activeProject={activeProject}
@@ -712,8 +721,6 @@ return (
             deleteBoard={deleteBoard}
             isMobile
             mobileSidebarOpen={mobileSidebarOpen}
-            stagePos={stagePos}
-            setStagePos={setStagePos}
             getCenterRef={getCenterRef}
           />
         </div>

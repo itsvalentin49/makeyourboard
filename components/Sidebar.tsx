@@ -226,6 +226,8 @@ React.useEffect(() => {
   const [settingsOpen, setSettingsOpen] = React.useState(false);
   const pedalDropdownRef = React.useRef<HTMLDivElement>(null);
   const boardDropdownRef = React.useRef<HTMLDivElement>(null);
+  const pedalInputRef = React.useRef<HTMLInputElement>(null);
+  const boardInputRef = React.useRef<HTMLInputElement>(null);
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [formatOpen, setFormatOpen] = React.useState(false);
   const [contactEmail, setContactEmail] = React.useState("");
@@ -302,7 +304,17 @@ const buildThomannUrl = (slug: string) => {
   return `https://www.${domain}/${slug}`;
 };
 
+React.useEffect(() => {
+  if (showPedalResults) {
+    pedalInputRef.current?.focus();
+  }
+}, [showPedalResults]);
 
+React.useEffect(() => {
+  if (showBoardResults) {
+    boardInputRef.current?.focus();
+  }
+}, [showBoardResults]);
 
   React.useEffect(() => {
   const handleClickOutside = (e: MouseEvent) => {
@@ -429,7 +441,7 @@ const buildThomannUrl = (slug: string) => {
     type="button"
     onClick={() => setContactTypeOpen((v) => !v)}
     className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2
-               text-[11px] text-left text-white
+               text-[11px] text-left text-zinc-400
                flex items-center justify-between
                hover:border-zinc-600 transition-colors"
   >
@@ -1050,8 +1062,13 @@ const buildThomannUrl = (slug: string) => {
   <div className="relative" style={{ zIndex: showPedalResults ? 60 : 10 }}>
     <div className="relative flex items-center">
       <input
-        type="text"
-        placeholder={`${t("sidebar.searchPedal")}...`}
+  ref={pedalInputRef}
+  type="text"
+  autoComplete="off"
+  autoCorrect="off"
+  autoCapitalize="off"
+  spellCheck={false}
+  placeholder={`${t("sidebar.searchPedal")}...`}
         className={`w-full bg-zinc-900 border rounded-lg py-2 pl-4 pr-10 text-[11px] text-zinc-200 placeholder:text-zinc-500 outline-none transition-all ${
           showPedalResults
             ? "border-zinc-500"
@@ -1128,8 +1145,13 @@ const buildThomannUrl = (slug: string) => {
   <div className="relative" style={{ zIndex: showBoardResults ? 60 : 5 }}>
     <div className="relative flex items-center">
       <input
-        type="text"
-        placeholder={`${t("sidebar.searchBoard")}...`}
+  ref={boardInputRef}
+  type="text"
+  autoComplete="off"
+  autoCorrect="off"
+  autoCapitalize="off"
+  spellCheck={false}
+  placeholder={`${t("sidebar.searchBoard")}...`}
         className={`w-full bg-zinc-900 border rounded-lg py-2 pl-4 pr-10 text-[11px] text-zinc-200 placeholder:text-zinc-500 outline-none transition-all ${
           showBoardResults
             ? "border-zinc-500"
