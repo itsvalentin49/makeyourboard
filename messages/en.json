@@ -25,7 +25,10 @@
   "pedal": {
 
     "features": "Specifications",
-
+    "brand": "Brand",
+    "model": "Model",
+    "year": "Year",
+    
     "status": {
       "label": "Status",
       "active": "Active",

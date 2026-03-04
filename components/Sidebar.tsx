@@ -603,7 +603,7 @@ React.useEffect(() => {
   {!isCustomPedal && (
     <div className="flex justify-between items-center py-2 border-b border-zinc-900">
       <span className="text-[10px] text-white uppercase font-bold tracking-wider">
-        Marque
+        {t("pedal.brand")}
       </span>
       <span className="text-[11px] font-bold text-zinc-400">
         {selectedPedal.brand || "N/A"}
@@ -615,10 +615,22 @@ React.useEffect(() => {
   {!isCustomPedal && (
     <div className="flex justify-between items-center py-2 border-b border-zinc-900">
       <span className="text-[10px] text-white uppercase font-bold tracking-wider">
-        Modèle
+        {t("pedal.model")}
       </span>
       <span className="text-[11px] font-bold text-zinc-400">
         {selectedPedal.name || "N/A"}
+      </span>
+    </div>
+  )}
+
+    {/* MODÈLE */}
+  {!isCustomPedal && (
+    <div className="flex justify-between items-center py-2 border-b border-zinc-900">
+      <span className="text-[10px] text-white uppercase font-bold tracking-wider">
+        {t("pedal.year")}
+      </span>
+      <span className="text-[11px] font-bold text-zinc-400">
+        {selectedPedal.year || "N/A"}
       </span>
     </div>
   )}

@@ -25,6 +25,9 @@
   "pedal": {
 
     "features": "Specifiche",
+    "brand": "Marca",
+    "model": "Modello",
+    "year": "Anno",
     
     "status": {
       "label": "Stato",
