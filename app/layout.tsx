@@ -33,7 +33,7 @@ export const metadata: Metadata = {
   ],
 
   openGraph: {
-    title: "MakeYourBoard – Online Guitar Pedalboard Builder",
+    title: "MakeYourBoard – Guitar Pedalboard Builder",
     description:
       "Build and design your guitar pedalboard online. Add pedals, boards, customize layout, calculate power consumption and visualize your setup in real time.",
     url: "https://makeyourboard.com",
@@ -43,7 +43,7 @@ export const metadata: Metadata = {
         url: "https://makeyourboard.com/og-image.png",
         width: 1200,
         height: 630,
-        alt: "MakeYourBoard – Online Guitar Pedalboard Builder",
+        alt: "MakeYourBoard – Guitar Pedalboard Builder",
       },
     ],
     locale: "en_US",
