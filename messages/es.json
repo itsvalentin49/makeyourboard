@@ -197,25 +197,24 @@
 
   "contact": {
     "title": "Contacto",
-      "subtitle": "Normalmente respondemos en un día laborable.",
-      "email": "Tu correo electrónico",
-      "type": "Tipo",
-      "message": "Mensaje",
-      "placeholderEmail": "tu@email.com",
-      "placeholderMessage": "Escribe tu mensaje...",
-      "send": "Enviar mensaje",
-      "sending": "Enviando...",
-      "success": "Tu mensaje se ha enviado correctamente.",
-      "thanks": "Gracias por usar MakeYourBoard 🎸",
-      "errorRequired": "Por favor, completa todos los campos.",
-      "errorInvalidEmail": "Por favor, introduce un correo electrónico válido.",
-      "errorGeneric": "Ha ocurrido un error. Inténtalo de nuevo.",
+    "subtitle": "Normalmente respondemos en un día laborable.",
+    "email": "Tu correo electrónico",
+    "type": "Tipo",
+    "message": "Mensaje",
+    "placeholderEmail": "tu@email.com",
+    "placeholderMessage": "Escribe tu mensaje...",
+    "send": "Enviar mensaje",
+    "sending": "Enviando...",
+    "sent": "Mensaje enviado",
+    "errorRequired": "Por favor completa todos los campos.",
+    "errorInvalidEmail": "Por favor introduce un correo electrónico válido.",
+    "errorGeneric": "Algo salió mal. Inténtalo de nuevo.",
 
     "types": {
       "question": "Pregunta",
       "request": "Solicitud",
       "bug": "Error",
       "other": "Otro"
-}
-}
+    }
+  }
 }

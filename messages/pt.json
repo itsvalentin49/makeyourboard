@@ -196,26 +196,25 @@
   },
 
   "contact": {
-    "title": "Contacto",
-      "subtitle": "Normalmente respondemos no prazo de um dia útil.",
-      "email": "O seu email",
-      "type": "Tipo",
-      "message": "Mensagem",
-      "placeholderEmail": "seu@email.com",
-      "placeholderMessage": "Escreva a sua mensagem...",
-      "send": "Enviar mensagem",
-      "sending": "A enviar...",
-      "success": "A sua mensagem foi enviada com sucesso.",
-      "thanks": "Obrigado por usar o MakeYourBoard 🎸",
-      "errorRequired": "Por favor, preencha todos os campos.",
-      "errorInvalidEmail": "Por favor, insira um endereço de email válido.",
-      "errorGeneric": "Ocorreu um erro. Por favor, tente novamente.",
+    "title": "Contato",
+    "subtitle": "Normalmente respondemos dentro de um dia útil.",
+    "email": "Seu email",
+    "type": "Tipo",
+    "message": "Mensagem",
+    "placeholderEmail": "voce@email.com",
+    "placeholderMessage": "Escreva sua mensagem...",
+    "send": "Enviar mensagem",
+    "sending": "Enviando...",
+    "sent": "Mensagem enviada",
+    "errorRequired": "Por favor preencha todos os campos.",
+    "errorInvalidEmail": "Por favor insira um email válido.",
+    "errorGeneric": "Algo deu errado. Tente novamente.",
 
     "types": {
       "question": "Pergunta",
       "request": "Pedido",
       "bug": "Erro",
       "other": "Outro"
-}
-}
+    }
+  }
 }

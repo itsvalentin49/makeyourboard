@@ -16,9 +16,15 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL("https://makeyourboard.com"),
 
+  applicationName: "Make Your Board",
+
+  alternates: {
+    canonical: "https://makeyourboard.com",
+  },
+
   title: {
-    default: "MakeYourBoard – Online Guitar Pedalboard Builder",
-    template: "%s | MakeYourBoard",
+    default: "Make Your Board – Guitar Pedalboard Builder Online",
+    template: "%s | Make Your Board",
   },
 
   description:
@@ -33,17 +39,17 @@ export const metadata: Metadata = {
   ],
 
   openGraph: {
-    title: "MakeYourBoard – Guitar Pedalboard Builder",
+    title: "Make Your Board – Guitar Pedalboard Builder",
     description:
       "Build and design your guitar pedalboard online. Add pedals, boards, customize layout, calculate power consumption and visualize your setup in real time.",
     url: "https://makeyourboard.com",
-    siteName: "MakeYourBoard",
+    siteName: "Make Your Board",
     images: [
       {
         url: "https://makeyourboard.com/og-image.png",
         width: 1200,
         height: 630,
-        alt: "MakeYourBoard – Guitar Pedalboard Builder",
+        alt: "Make Your Board – Guitar Pedalboard Builder",
       },
     ],
     locale: "en_US",
@@ -52,7 +58,7 @@ export const metadata: Metadata = {
 
   twitter: {
     card: "summary_large_image",
-    title: "MakeYourBoard – Online Guitar Pedalboard Builder",
+    title: "Make Your Board – Guitar Pedalboard Builder Online",
     description:
       "Build and design your guitar pedalboard online. Add pedals, boards, customize layout, calculate power consumption and visualize your setup in real time.",
     images: ["https://makeyourboard.com/og-image.png"],
@@ -71,10 +77,18 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const structuredData = {
+  const structuredDataWebsite = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "Make Your Board",
+    alternateName: "MakeYourBoard",
+    url: "https://makeyourboard.com",
+  };
+
+  const structuredDataApp = {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    name: "MakeYourBoard",
+    name: "Make Your Board",
     url: "https://makeyourboard.com",
     applicationCategory: "MusicApplication",
     operatingSystem: "All",
@@ -93,10 +107,20 @@ export default function RootLayout({
       >
         {children}
 
-        {/* Structured Data */}
+        {/* Structured Data - Website */}
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(structuredDataWebsite),
+          }}
+        />
+
+        {/* Structured Data - Web Application */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(structuredDataApp),
+          }}
         />
 
         <Analytics />

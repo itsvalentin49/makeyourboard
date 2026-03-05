@@ -205,8 +205,7 @@
       "placeholderMessage": "Write your message...",
       "send": "Send message",
       "sending": "Sending...",
-      "success": "Your message has been sent successfully.",
-      "thanks": "Thanks for using MakeYourBoard 🎸",
+      "sent": "Message sent",
       "errorRequired": "Please fill in all fields.",
       "errorInvalidEmail": "Please enter a valid email address.",
       "errorGeneric": "Something went wrong. Please try again.",
@@ -217,5 +216,5 @@
       "bug": "Bug",
       "other": "Other"
     }
-}
+  }
 }

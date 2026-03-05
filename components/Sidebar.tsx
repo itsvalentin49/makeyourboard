@@ -248,11 +248,13 @@ React.useEffect(() => {
   };
   const [contactLoading, setContactLoading] = React.useState(false);
   const [contactSuccess, setContactSuccess] = React.useState(false);
+
   React.useEffect(() => {
   if (contactSuccess) {
     const timer = setTimeout(() => {
       setContactSuccess(false);
-    }, 10000);
+      setContactOpen(false);
+    }, 3000);
 
     return () => clearTimeout(timer);
   }
@@ -407,7 +409,7 @@ React.useEffect(() => {
       {contactOpen ? (
   <div className="flex flex-col gap-6 animate-in slide-in-from-left duration-300 px-1">
     
-    {/* TITLE → DESKTOP ONLY */}
+{/* TITLE → DESKTOP ONLY */}
 <div className="hidden lg:block">
   <div className="space-y-1 mt-4">
     <h2 className="text-[16px] font-black leading-tight">
@@ -416,18 +418,7 @@ React.useEffect(() => {
   </div>
 </div>
 
-    {contactSuccess ? (
-  <div className="flex items-center gap-2 text-white text-[11px] font-bold animate-in fade-in duration-300">
-  <span className="text-emerald-400">✓</span>
-  <span>
-  {t("contact.success")}
-  <br />
-  {t("contact.thanks")}
-</span>
-</div>
-
-) : (
-      <>
+<>
         {/* EMAIL */}
         <div className="flex flex-col gap-1">
           <label className="text-[10px] uppercase font-black tracking-widest">
@@ -518,7 +509,7 @@ React.useEffect(() => {
 
         {/* SEND BUTTON */}
         <button
-          disabled={contactLoading}
+          disabled={contactLoading || contactSuccess}
           onClick={async () => {
             setContactError("");
             // Anti-spam check
@@ -564,17 +555,22 @@ React.useEffect(() => {
               setContactLoading(false);
             }
           }}
-          className={`w-full mt-2 text-[10px] font-black uppercase py-2 rounded-lg transition-all ${
-          contactLoading
+          className={`w-full mt-2 text-[10px] font-black uppercase py-2 rounded-lg transition-all duration-300 ${
+          contactSuccess
+            ? "bg-emerald-500 text-white animate-in zoom-in duration-300"
+            : contactLoading
             ? "bg-zinc-700 text-zinc-400 cursor-not-allowed"
             : "bg-blue-600 hover:bg-blue-500 text-white"
         }`}
         >
-          {contactLoading ? t("contact.sending") : t("contact.send")}
+          {contactSuccess
+            ? `✓ ${t("contact.sent")}`
+            : contactLoading
+            ? t("contact.sending")
+            : t("contact.send")}
         </button>
-      </>
-    )}
-  </div>
+</>
+</div>
 
 ) : selectedPedal ? (
 

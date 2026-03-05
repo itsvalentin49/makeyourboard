@@ -197,25 +197,24 @@
 
   "contact": {
     "title": "Kontakt",
-      "subtitle": "Wir antworten in der Regel innerhalb eines Werktages.",
-      "email": "Ihre E-Mail-Adresse",
-      "type": "Typ",
-      "message": "Nachricht",
-      "placeholderEmail": "ihre@email.de",
-      "placeholderMessage": "Schreiben Sie Ihre Nachricht...",
-      "send": "Nachricht senden",
-      "sending": "Wird gesendet...",
-      "success": "Ihre Nachricht wurde erfolgreich gesendet.",
-      "thanks": "Danke, dass Sie MakeYourBoard nutzen 🎸",
-      "errorRequired": "Bitte füllen Sie alle Felder aus.",
-      "errorInvalidEmail": "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
-      "errorGeneric": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
+    "subtitle": "Wir antworten normalerweise innerhalb eines Werktages.",
+    "email": "Ihre E-Mail",
+    "type": "Typ",
+    "message": "Nachricht",
+    "placeholderEmail": "sie@email.com",
+    "placeholderMessage": "Schreiben Sie Ihre Nachricht...",
+    "send": "Nachricht senden",
+    "sending": "Wird gesendet...",
+    "sent": "Nachricht gesendet",
+    "errorRequired": "Bitte füllen Sie alle Felder aus.",
+    "errorInvalidEmail": "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
+    "errorGeneric": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.",
 
     "types": {
       "question": "Frage",
       "request": "Anfrage",
       "bug": "Fehler",
       "other": "Sonstiges"
-      }
+    }
   }
 }
