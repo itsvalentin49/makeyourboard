@@ -254,7 +254,7 @@ React.useEffect(() => {
     const timer = setTimeout(() => {
       setContactSuccess(false);
       setContactOpen(false);
-    }, 3000);
+    }, 2000);
 
     return () => clearTimeout(timer);
   }
