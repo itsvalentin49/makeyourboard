@@ -29,7 +29,7 @@ if (!isValidEmail(email)) {
 }
 
     await resend.emails.send({
-      from: "MakeYourBoard <onboarding@resend.dev>",
+      from: "Make Your Board <contact@makeyourboard.com>",
       to: process.env.CONTACT_EMAIL as string,
       subject: `[${type}] ${subject}`,
       replyTo: email,
@@ -43,9 +43,11 @@ if (!isValidEmail(email)) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    return NextResponse.json(
-      { error: "Server error" },
-      { status: 500 }
+  console.error("CONTACT ERROR:", error);
+
+  return NextResponse.json(
+    { error: "Server error" },
+    { status: 500 }
     );
   }
 }

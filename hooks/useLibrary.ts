@@ -1,4 +1,3 @@
-// hooks/useLibrary.ts
 "use client";
 
 import { useEffect, useState } from "react";
@@ -11,7 +10,6 @@ type NormalizedErr = {
 };
 
 function normalizeSupabaseError(err: unknown): NormalizedErr {
-  // Error classique (TypeError, Error, etc.)
   if (err instanceof Error) {
     return {
       message: err.message || "Unknown error",
@@ -19,10 +17,8 @@ function normalizeSupabaseError(err: unknown): NormalizedErr {
     };
   }
 
-  // string
   if (typeof err === "string") return { message: err };
 
-  // objets (PostgrestError, AuthError, etc.)
   if (err && typeof err === "object") {
     const e = err as any;
     const message =
@@ -95,7 +91,6 @@ async function fetchTable(table: string, orderCols: string[] = []) {
   return allRows;
 }
 
-
 export function useLibrary() {
   const [pedalsLibrary, setPedalsLibrary] = useState<AnyRow[]>([]);
   const [boardsLibrary, setBoardsLibrary] = useState<AnyRow[]>([]);
@@ -110,15 +105,47 @@ export function useLibrary() {
         setLoading(true);
         setLibraryError(null);
 
-        // ✅ adapte les noms de tables si besoin
+        // ===============================
+        // 1️⃣ Check local cache
+        // ===============================
+        const cached = localStorage.getItem("myb_library");
+
+        if (cached) {
+          const parsed = JSON.parse(cached);
+
+          if (!cancelled) {
+            setPedalsLibrary(parsed.pedals || []);
+            setBoardsLibrary(parsed.boards || []);
+            setLoading(false);
+          }
+
+          return;
+        }
+
+        // ===============================
+        // 2️⃣ Fetch from Supabase
+        // ===============================
         const [pedals, boards] = await Promise.all([
           fetchTable("pedals", ["brand", "name"]),
           fetchTable("boards", ["brand", "name"]),
         ]);
 
         if (cancelled) return;
+
         setPedalsLibrary(pedals);
         setBoardsLibrary(boards);
+
+        // ===============================
+        // 3️⃣ Save cache
+        // ===============================
+        localStorage.setItem(
+          "myb_library",
+          JSON.stringify({
+            pedals,
+            boards,
+          })
+        );
+
       } catch (err) {
         if (cancelled) return;
 

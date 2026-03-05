@@ -287,6 +287,17 @@ const isDiscontinued =
     .toLowerCase()
     .includes("discontinued");
 
+const hasPedalCommercialLinks = Boolean(
+  selectedPedal?.sweetwater ||
+  selectedPedal?.woodbrass ||
+  selectedPedal?.thomann
+);
+
+const hasBoardCommercialLinks = Boolean(
+  selectedBoardDetails?.sweetwater ||
+  selectedBoardDetails?.woodbrass ||
+  selectedBoardDetails?.thomann
+);
 
 const buildThomannUrl = (slug: string) => {
   const map: Record<string, string> = {
@@ -761,10 +772,11 @@ React.useEffect(() => {
 
     <div className="space-y-3">
       {(
-        (selectedPedal.status || "").toLowerCase().includes("discontinued")
-          ? ["reverb"]
-          : getStoresForCountry()
-      ).map((store) => {
+  (selectedPedal.status || "").toLowerCase().includes("discontinued") ||
+  !hasPedalCommercialLinks
+    ? ["reverb"]
+    : getStoresForCountry()
+).map((store) => {
 
         let url = "";
 
@@ -990,11 +1002,12 @@ React.useEffect(() => {
 
         <div className="space-y-3">
           {(
-            (selectedBoardDetails.status || "")
-              .toLowerCase()
-              .includes("discontinued")
-              ? ["reverb"]
-              : getStoresForCountry()
+          (selectedBoardDetails.status || "")
+            .toLowerCase()
+            .includes("discontinued") ||
+          !hasBoardCommercialLinks
+            ? ["reverb"]
+            : getStoresForCountry()
           ).map((store) => {
 
             let url = "";

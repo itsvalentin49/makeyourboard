@@ -568,6 +568,17 @@ return (
     className="bg-zinc-950 text-[#f5f5f7] font-sans select-none overflow-hidden h-screen"
     onClick={closeSearchMenus}
   >
+
+    {/* SEO content invisible */}
+    <div className="sr-only">
+      <h1>Build Your Guitar Pedalboard Online</h1>
+      <p>
+        Make Your Board is an online guitar pedalboard builder that lets you
+        design your pedalboard layout, add pedals, choose a board size and
+        calculate power consumption in real time.
+      </p>
+    </div>
+
     <div className="h-full w-full">
 
       {/* ================= DESKTOP ≥1024 ================= */}
