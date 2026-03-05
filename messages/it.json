@@ -121,11 +121,16 @@
   },
 
   "board": {
+
     "status": {
       "label": "Stato",
       "active": "In produzione",
       "discontinued": "Fuori produzione"
     },
+
+    "brand": "Marca",
+    "model": "Modello",
+    "year": "Anno",
 
     "material": {
       "label": "Materiale",

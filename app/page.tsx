@@ -296,12 +296,14 @@ useEffect(() => {
     setHydrated(true);
     }, []);
 
-  useEffect(() => {
-  const isTouch =
-    typeof window !== "undefined" &&
-    ("ontouchstart" in window || navigator.maxTouchPoints > 0);
+useEffect(() => {
+  const check = () => {
+    setIsMobileDevice(window.innerWidth < 768);
+  };
 
-  setIsMobileDevice(isTouch);
+  check();
+  window.addEventListener("resize", check);
+  return () => window.removeEventListener("resize", check);
 }, []);
 
   /**

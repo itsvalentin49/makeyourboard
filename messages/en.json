@@ -128,6 +128,10 @@
       "discontinued": "Discontinued"
     },
 
+    "brand": "Brand",
+    "model": "Model",
+    "year": "Year",
+
     "material": {
       "label": "Material",
       "Aluminium": "Aluminium",

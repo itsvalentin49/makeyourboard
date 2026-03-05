@@ -878,7 +878,7 @@ React.useEffect(() => {
       {!isCustomBoard && (
         <div className="flex justify-between items-center py-2 border-b border-zinc-900">
           <span className="text-[10px] text-white uppercase font-bold tracking-wider">
-            Marque
+            {t("board.brand")}
           </span>
           <span className="text-[11px] font-bold text-zinc-400">
             {selectedBoardDetails.brand || "N/A"}
@@ -890,10 +890,22 @@ React.useEffect(() => {
       {!isCustomBoard && (
         <div className="flex justify-between items-center py-2 border-b border-zinc-900">
           <span className="text-[10px] text-white uppercase font-bold tracking-wider">
-            Modèle
+            {t("board.model")}
           </span>
           <span className="text-[11px] font-bold text-zinc-400">
             {selectedBoardDetails.name || "N/A"}
+          </span>
+        </div>
+      )}
+
+      {/* YEAR */}
+      {!isCustomBoard && (
+        <div className="flex justify-between items-center py-2 border-b border-zinc-900">
+          <span className="text-[10px] text-white uppercase font-bold tracking-wider">
+            {t("board.year")}
+          </span>
+          <span className="text-[11px] font-bold text-zinc-400">
+            {selectedBoardDetails.year || "N/A"}
           </span>
         </div>
       )}
