@@ -19,20 +19,8 @@ import PedalSpecs from "@/components/sidebar/PedalSpecs";
 import BoardSpecs from "@/components/sidebar/BoardSpecs";
 import SearchPedals from "@/components/sidebar/SearchPedals";
 import SearchBoards from "@/components/sidebar/SearchBoards";
+import CustomBuilder from "@/components/sidebar/CustomBuilder";
 
-
-const HAMMOND_RATIOS: Record<
-  "1590LB" | "1590A" | "1590B" | "125B" | "1590BB" | "1590XX" | "1590DD",
-  number
-> = {
-  "1590LB": 51 / 51,
-  "1590A": 93 / 39,
-  "1590B": 112 / 60,
-  "125B": 121 / 66,
-  "1590BB": 119 / 94,
-  "1590XX": 114 / 114,
-  "1590DD": 130 / 171,
-};
 
 type AnyRow = Record<string, any>;
 
@@ -648,173 +636,25 @@ React.useEffect(() => {
 />
 
 
-{/* MAKE YOUR OWN */}
-<div className="flex flex-col gap-2 mt-8">
-
-  <div className="mb-2 flex items-center gap-3">
-    <div className="w-[3px] h-5 bg-blue-500 rounded-full" />
-    <span className="text-[12px] uppercase font-bold tracking-[0.18em] text-white">
-      {t("custom.title")}
-    </span>
-  </div>
-
-  {/* GREY CONTAINER */}
-  <div className="flex flex-col gap-6">
-
-    {/* SELECT TYPE */}
-    <div className="flex flex-col gap-2">
-      <span className="text-[9px] text-white uppercase font-black tracking-widest">
-        {t("custom.selectType")}
-      </span>
-
-      <div className="flex w-full bg-zinc-950 border border-zinc-800 rounded-xl overflow-hidden">
-
-  {/* PEDAL */}
-  <button
-  onClick={() => {
-    setCustomType("pedal");
-    setCustomWidth("");
-    setCustomDepth("");
-  }}
-  className={`
-    flex-1 py-2 text-[10px] font-black uppercase tracking-widest
-    transition-all duration-200
-    ${
-      customType === "pedal"
-        ? "bg-blue-500 text-white"
-        : "bg-zinc-900 text-zinc-500 hover:text-white"
-    }
-  `}
->
-  {t("custom.pedal")}
-</button>
-
-<button
-  onClick={() => {
-    setCustomType("board");
-    setCustomWidth("");
-    setCustomDepth("");
-  }}
-  className={`
-    flex-1 py-2 text-[10px] font-black uppercase tracking-widest
-    transition-all duration-200
-    border-l border-zinc-800
-    ${
-      customType === "board"
-        ? "bg-blue-500 text-white"
-        : "bg-zinc-900 text-zinc-500 hover:text-white"
-    }
-  `}
->
-  {t("custom.board")}
-</button>
-
-</div>
-    </div>
-
-    {/* PEDAL FLOW */}
-    {customType === "pedal" && (
-      <div className="flex flex-col gap-1">
-        <div className="flex flex-col gap-0.5">
-  <span className="text-[9px] text-white uppercase font-black tracking-widest leading-tight">
-    {t("custom.enterDimensions")}
-  </span>
-
-  <span className="text-[9px] text-zinc-500 font-mono leading-tight">
-    min: {displayMin} {unitLabel} / max: {displayMax} {unitLabel}
-  </span>
-</div>
-
-        <div className="grid grid-cols-2 gap-2 mt-2">
-
-          <input
-            type="number"
-            min={minValue}
-            max={maxValue}
-            step={units === "metric" ? 1 : 0.1}
-            placeholder={withUnit(t("custom.width"))}
-            value={customWidth}
-            onChange={(e) => setCustomWidth(e.target.value)}
-            className="w-full bg-zinc-900 border border-zinc-700 rounded-md py-2 px-3 text-[10px] outline-none focus:outline-none focus:ring-0 focus:border-zinc-600 transition-colors"
-          />
-
-          <input
-            type="number"
-            min={minValue}
-            max={maxValue}
-            step={units === "metric" ? 1 : 0.1}
-            placeholder={withUnit(t("custom.depth"))}
-            value={customDepth}
-            onChange={(e) => setCustomDepth(e.target.value)}
-            className="w-full bg-zinc-900 border border-zinc-700 rounded-md py-2 px-3 text-[10px] outline-none focus:outline-none focus:ring-0 focus:border-zinc-600 transition-colors"
-          />
-
-        </div>
-
-        <button
-  onClick={addCustomItem}
-  disabled={!isPedalValid}
-  className="w-full text-[10px] mt-2 font-black uppercase py-2 rounded-md bg-blue-500 hover:bg-blue-400 text-white transition-all disabled:cursor-not-allowed"
->
-  {t("custom.addPedal")}
-</button>
-
-      </div>
-    )}
-
-    {/* BOARD FLOW */}
-{customType === "board" && (
-  <div className="flex flex-col gap-1">
-
-    <div className="flex flex-col gap-0.5">
-      <span className="text-[9px] text-white uppercase font-black tracking-widest leading-tight">
-        {t("custom.enterDimensions")}
-      </span>
-
-      <span className="text-[9px] text-zinc-500 font-mono leading-tight">
-        min: {displayMin} {unitLabel} / max: {displayMax} {unitLabel}
-      </span>
-    </div>
-
-    <div className="grid grid-cols-2 gap-2 mt-2">
-
-      <input
-        type="number"
-        min={minValue}
-        max={maxValue}
-        step={units === "metric" ? 1 : 0.1}
-        placeholder={withUnit(t("custom.width"))}
-        value={customWidth}
-        onChange={(e) => setCustomWidth(e.target.value)}
-        className="w-full bg-zinc-900 border border-zinc-700 rounded-md py-2 px-3 text-[10px] outline-none focus:outline-none focus:ring-0 focus:border-zinc-600 transition-colors"
-      />
-
-      <input
-        type="number"
-        min={minValue}
-        max={maxValue}
-        step={units === "metric" ? 1 : 0.1}
-        placeholder={withUnit(t("custom.depth"))}
-        value={customDepth}
-        onChange={(e) => setCustomDepth(e.target.value)}
-        className="w-full bg-zinc-900 border border-zinc-700 rounded-md py-2 px-3 text-[10px] outline-none focus:outline-none focus:ring-0 focus:border-zinc-600 transition-colors"
-      />
-
-    </div>
-
-    <button
-  onClick={addCustomItem}
-  disabled={!isBoardValid}
-  className="w-full mt-2 text-[10px] font-black uppercase py-2 rounded-md bg-blue-500 hover:bg-blue-400 text-white transition-all disabled:cursor-not-allowed"
->
-  {t("custom.addBoard")}
-</button>
-
-  </div>
-)}
-
-  </div>
-</div>
+<CustomBuilder
+  customType={customType}
+  setCustomType={setCustomType}
+  customWidth={customWidth}
+  setCustomWidth={setCustomWidth}
+  customDepth={customDepth}
+  setCustomDepth={setCustomDepth}
+  addCustomItem={addCustomItem}
+  isPedalValid={isPedalValid}
+  isBoardValid={isBoardValid}
+  minValue={minValue}
+  maxValue={maxValue}
+  displayMin={displayMin}
+  displayMax={displayMax}
+  units={units}
+  unitLabel={unitLabel}
+  withUnit={withUnit}
+  t={t}
+/>
 
         </div>
       )}

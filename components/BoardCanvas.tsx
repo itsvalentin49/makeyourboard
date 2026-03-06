@@ -224,6 +224,7 @@ const zoomOut = () => {
   y: number;
   } | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [isStageDragging, setIsStageDragging] = useState(false);
 
   /* ================= MEASURE STAGE ================= */
   useLayoutEffect(() => {
@@ -332,10 +333,11 @@ if (selectedInstanceId !== null) {
   selectedInstanceId,
   selectedBoardInstanceId,
   activeProject.boardPedals,
-  activeProject.selectedBoards,
+  activeProject.selectedBoards ?? [],
   displaySizes,
   currentZoom,
-  stagePos,
+  activeProject.stageX,
+  activeProject.stageY
 ]);
 
 useEffect(() => {
@@ -515,11 +517,46 @@ const getVisibleBounds = () => {
   width={stageSize.width}
   height={stageSize.height}
   draggable={false}
+
+  onDragStart={() => {
+  setIsStageDragging(true);
+}}
+
   x={activeProject.stageX || 0}
   y={activeProject.stageY || 0}
+
   scaleX={(activeProject.zoom || 100) / 100}
   scaleY={(activeProject.zoom || 100) / 100}
+
+  onMouseDown={(e) => {
+    const stage = stageRef.current;
+    if (!stage) return;
+
+    if (e.target === stage) {
+      stage.draggable(true);
+    }
+  }}
+
+  onMouseUp={() => {
+    const stage = stageRef.current;
+    if (!stage) return;
+    stage.draggable(false);
+  }}
+
+  onDragEnd={(e) => {
+  const stage = e.target.getStage();
+  if (!stage) return;
+
+  updateActiveProject({
+    stageX: stage.x(),
+    stageY: stage.y(),
+  });
+
+  setIsStageDragging(false);
+}}
+
   onClick={handleStageClick}
+
   onWheel={(e: any) => {
     e.evt.preventDefault();
 
@@ -686,7 +723,9 @@ onTap={(e) => {
 }}
 
    onDragEnd={(e) => {
+  setTimeout(() => {
   setIsDragging(false);
+}, 0);
 
   updateActiveProject({
     selectedBoards: (activeProject.selectedBoards || []).map(
@@ -836,7 +875,9 @@ onTap={(e) => {
 }}
 
     onDragEnd={(e) => {
+  setTimeout(() => {
   setIsDragging(false);
+}, 0);
 
   updateActiveProject({
     boardPedals: activeProject.boardPedals.map((x: AnyRow) =>
@@ -901,7 +942,7 @@ onTap={(e) => {
   </Stage>
 )}
 
-{overlayPosition && !isDragging && (
+{overlayPosition && !isDragging && !isStageDragging && (
   <div
     style={{
       position: "absolute",
