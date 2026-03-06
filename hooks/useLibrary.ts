@@ -110,7 +110,7 @@ export function useLibrary() {
         // ===============================
         const cached = localStorage.getItem("myb_library");
 
-        if (cached) {
+        if (cached && process.env.NODE_ENV === "production") {
           const parsed = JSON.parse(cached);
 
           if (!cancelled) {
