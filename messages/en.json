@@ -20,15 +20,14 @@
     "desktopExtra": "Up to 5 boards to test, compare, and refine your setups.",
     "mobileText": "Add pedals, explore by effect type, and create your ideal pedalboard.",
     "text3": "Unlimited setups. Endless tone."
-    },
+  },
 
   "pedal": {
-
     "features": "Specifications",
     "brand": "Brand",
     "model": "Model",
     "year": "Year",
-    
+
     "status": {
       "label": "Status",
       "active": "Active",
@@ -122,7 +121,6 @@
   },
 
   "board": {
-
     "status": {
       "label": "Status",
       "active": "Active",
@@ -166,8 +164,13 @@
   "settings": {
     "title": "Settings",
     "background": "Background",
-    "language": "Languages",
-    "units": "Units"
+    "language": "Language",
+    "units": "Unit",
+
+    "unitsOptions": {
+      "metric": "METRIC",
+      "imperial": "IMPERIAL"
+    }
   },
 
   "backgrounds": {
@@ -177,7 +180,7 @@
     "rug": "Rug",
     "stage": "Stage",
     "flightcase": "Flightcase"
-},
+  },
 
   "canvas": {
     "totalDraw": "Total draw",
@@ -197,18 +200,18 @@
 
   "contact": {
     "title": "Contact",
-      "subtitle": "We typically respond within one business day.",
-      "email": "Your email",
-      "type": "Type",
-      "message": "Message",
-      "placeholderEmail": "you@email.com",
-      "placeholderMessage": "Write your message...",
-      "send": "Send message",
-      "sending": "Sending...",
-      "sent": "Message sent",
-      "errorRequired": "Please fill in all fields.",
-      "errorInvalidEmail": "Please enter a valid email address.",
-      "errorGeneric": "Something went wrong. Please try again.",
+    "subtitle": "We typically respond within one business day.",
+    "email": "Your email",
+    "type": "Type",
+    "message": "Message",
+    "placeholderEmail": "you@email.com",
+    "placeholderMessage": "Write your message...",
+    "send": "Send message",
+    "sending": "Sending...",
+    "sent": "Message sent",
+    "errorRequired": "Please fill in all fields.",
+    "errorInvalidEmail": "Please enter a valid email address.",
+    "errorGeneric": "Something went wrong. Please try again.",
 
     "types": {
       "question": "Question",

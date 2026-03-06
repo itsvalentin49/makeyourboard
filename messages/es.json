@@ -164,10 +164,15 @@
   },
 
   "settings": {
-    "title": "Ajustes",
+    "title": "Configuración",
     "background": "Fondo",
-    "language": "Idiomas",
-    "units": "Unidades"
+    "language": "Idioma",
+    "units": "Unidad",
+
+    "unitsOptions": {
+      "metric": "MÉTRICO",
+      "imperial": "IMPERIAL"
+    }
   },
 
   "backgrounds": {

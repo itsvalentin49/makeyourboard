@@ -166,8 +166,13 @@
   "settings": {
     "title": "Einstellungen",
     "background": "Hintergrund",
-    "language": "Sprachen",
-    "units": "Einheiten"
+    "language": "Sprache",
+    "units": "Einheiten",
+
+    "unitsOptions": {
+      "metric": "METRISCH",
+      "imperial": "IMPERIAL"
+    }
   },
 
   "backgrounds": {

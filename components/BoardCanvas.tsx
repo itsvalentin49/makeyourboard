@@ -6,7 +6,7 @@ import { Zap, Weight, Minus, Plus } from "lucide-react";
 import PedalImage from "@/components/PedalImage";
 import { formatWeight } from "@/utils/units";
 import { getTranslator } from "@/utils/i18n";
-import { RotateCw, Trash2, X } from "lucide-react";
+import { RotateCw, Trash2, X, Info } from "lucide-react";
 
 type AnyRow = Record<string, any>;
 
@@ -25,6 +25,9 @@ activeProject: {
   stageX?: number;
   stageY?: number;
 };
+
+setMobileSidebarOpen: (v: boolean) => void;
+setSpecsOpen: (v: boolean) => void;
 
   units: "metric" | "imperial";
   language: "en" | "fr" | "es" | "de" | "it" | "pt";
@@ -89,6 +92,8 @@ export default function BoardCanvas({
   stagePos,
   setStagePos,
   getCenterRef,
+  setMobileSidebarOpen,
+  setSpecsOpen,
 }: Props) {
 
   const t = getTranslator(language);
@@ -96,6 +101,53 @@ export default function BoardCanvas({
   const zoomPercent = Math.round(currentZoom);
   const MIN_ZOOM = 50;
   const MAX_ZOOM = 200;
+
+const ZOOM_STEP = 10;
+
+const applyZoom = (newZoomPercent: number) => {
+  const stage = stageRef.current;
+  if (!stage) return;
+
+  const oldScale = stage.scaleX();
+  const newScale = newZoomPercent / 100;
+
+  const center = {
+    x: stageSize.width / 2,
+    y: stageSize.height / 2,
+  };
+
+  const pointTo = {
+    x: (center.x - stage.x()) / oldScale,
+    y: (center.y - stage.y()) / oldScale,
+  };
+
+  const newPos = {
+    x: center.x - pointTo.x * newScale,
+    y: center.y - pointTo.y * newScale,
+  };
+
+  stage.scale({ x: newScale, y: newScale });
+  stage.position(newPos);
+  stage.batchDraw();
+
+  updateActiveProject({
+    zoom: newZoomPercent,
+    stageX: newPos.x,
+    stageY: newPos.y,
+  });
+};
+
+const zoomIn = () => {
+  if (zoomPercent >= MAX_ZOOM) return;
+  const newZoom = Math.min(MAX_ZOOM, zoomPercent + ZOOM_STEP);
+  applyZoom(newZoom);
+};
+
+const zoomOut = () => {
+  if (zoomPercent <= MIN_ZOOM) return;
+  const newZoom = Math.max(MIN_ZOOM, zoomPercent - ZOOM_STEP);
+  applyZoom(newZoom);
+};
 
   const isMinZoom = zoomPercent <= MIN_ZOOM;
   const isMaxZoom = zoomPercent >= MAX_ZOOM;
@@ -167,6 +219,10 @@ export default function BoardCanvas({
   x: number;
   y: number;
   } | null>(null);
+  const [infoPosition, setInfoPosition] = useState<{
+  x: number;
+  y: number;
+  } | null>(null);
   const [isDragging, setIsDragging] = useState(false);
 
   /* ================= MEASURE STAGE ================= */
@@ -210,26 +266,42 @@ useEffect(() => {
   const stageY = stage.y();
 
   // 🟣 PEDAL sélectionnée
-  if (selectedInstanceId !== null) {
-    const pedal = activeProject.boardPedals.find(
-      (p) => p.instanceId === selectedInstanceId
-    );
-    if (!pedal) return;
+if (selectedInstanceId !== null) {
+  const pedal = activeProject.boardPedals.find(
+    (p) => p.instanceId === selectedInstanceId
+  );
+  if (!pedal) return;
 
-    const size = displaySizes[selectedInstanceId];
-    if (!size) return;
+  const size = displaySizes[selectedInstanceId];
+  if (!size) return;
 
-    setOverlayPosition({
-      x: pedal.x * scale + stageX,
+  setOverlayPosition({
+    x: pedal.x * scale + stageX,
+    y:
+      pedal.y * scale +
+      stageY -
+      (size.h * scale) / 2 -
+      8,
+  });
+
+  // position du bouton info (mobile seulement)
+  if (isMobile) {
+    setInfoPosition({
+      x:
+        pedal.x * scale +
+        stageX +
+        (size.w * scale) / 2 +
+        10,
       y:
         pedal.y * scale +
         stageY -
         (size.h * scale) / 2 -
-        8,
+        10,
     });
-
-    return;
   }
+
+  return;
+}
 
   // 🟢 BOARD sélectionné
   if (selectedBoardInstanceId !== null) {
@@ -254,6 +326,7 @@ useEffect(() => {
   }
 
   setOverlayPosition(null);
+  setInfoPosition(null);
 
 }, [
   selectedInstanceId,
@@ -371,31 +444,47 @@ const getVisibleBounds = () => {
 
 
   {/* Desktop uniquement */}
-  {!isMobile && (
     <>
 
     {/* ZOOM */}
-      <div className="relative flex items-center justify-center h-10 w-28 bg-zinc-950/80 backdrop-blur-md border border-zinc-800 rounded-2xl shadow-2xl">
+<div className="relative flex items-center justify-center h-9 w-24 md:h-10 md:w-28 bg-zinc-950/80 backdrop-blur-md border border-zinc-800 rounded-2xl shadow-2xl">
 
-  {/* Icône gauche */}
-  <span className="absolute left-3 text-sm">🔍</span>
+  {/* LEFT BUTTON */}
+  <button
+    onClick={zoomOut}
+    disabled={isMinZoom}
+    className="absolute left-2 flex items-center justify-center w-6 h-6 text-white hover:text-blue-400 disabled:text-zinc-600"
+  >
+    {isMinZoom ? (
+      <span className="text-[9px] tracking-wider text-zinc-500">MIN</span>
+    ) : (
+      <Minus size={14} />
+    )}
+  </button>
 
-  {/* % parfaitement centré */}
+  {/* % CENTER */}
   <span className="text-[12px] font-black font-mono tabular-nums">
     {zoomPercent}%
   </span>
 
-  {/* MIN / MAX toujours à droite */}
-  {(isMinZoom || isMaxZoom) && (
-    <span className="absolute right-3 text-[9px] text-zinc-500 tracking-wider uppercase">
-      {isMinZoom ? "MIN" : "MAX"}
-    </span>
-  )}
+  {/* RIGHT BUTTON */}
+  <button
+    onClick={zoomIn}
+    disabled={isMaxZoom}
+    className="absolute right-2 flex items-center justify-center w-6 h-6 text-white hover:text-blue-400 disabled:text-zinc-600"
+  >
+    {isMaxZoom ? (
+      <span className="text-[9px] tracking-wider text-zinc-500">MAX</span>
+    ) : (
+      <Plus size={14} />
+    )}
+  </button>
 
 </div>
 
+
       {/* TOTAL DRAW */}
-      <div className="relative flex items-center justify-center h-10 w-28 bg-zinc-950/80 backdrop-blur-md border border-zinc-800 rounded-2xl shadow-2xl pointer-events-none">
+      <div className="relative flex items-center justify-center h-9 w-24 md:h-10 md:w-28 bg-zinc-950/80 backdrop-blur-md border border-zinc-800 rounded-2xl shadow-2xl pointer-events-none">
         <Zap className="absolute left-3 size-4 text-yellow-500" />
         <span className="text-[12px] font-black font-mono tabular-nums">
           {totalDraw}
@@ -406,7 +495,7 @@ const getVisibleBounds = () => {
       </div>
 
       {/* TOTAL WEIGHT */}
-      <div className="relative flex items-center justify-center h-10 w-28 bg-zinc-950/80 backdrop-blur-md border border-zinc-800 rounded-2xl shadow-2xl pointer-events-none">
+      <div className="relative flex items-center justify-center h-9 w-24 md:h-10 md:w-28 bg-zinc-950/80 backdrop-blur-md border border-zinc-800 rounded-2xl shadow-2xl pointer-events-none">
         <Weight className="absolute left-3 size-4 text-blue-500" />
         <span className="text-[12px] font-black font-mono tabular-nums">
           {weightValue}
@@ -416,8 +505,6 @@ const getVisibleBounds = () => {
         </span>
       </div>
     </>
-  )}
-
 </div>
 )}
 
@@ -821,11 +908,11 @@ onTap={(e) => {
       left: overlayPosition.x,
       top: overlayPosition.y,
       transform: "translate(-50%, -100%)",
-      zIndex: 100,
+      zIndex: 10,
     }}
     className="pointer-events-auto"
   >
-    <div className="flex items-center justify-between w-14 h-6 px-2 bg-black/90 backdrop-blur-md rounded-full shadow-lg">
+    <div className="flex items-center justify-between w-20 lg:w-14 h-6 px-2 bg-black/90 backdrop-blur-md rounded-full shadow-lg">
 
       <button
   onClick={() => {
@@ -840,6 +927,17 @@ onTap={(e) => {
 >
   <RotateCw size={14} />
 </button>
+
+{isMobile && (selectedInstanceId !== null || selectedBoardInstanceId !== null) && (
+  <button
+    onClick={() => {
+      setSpecsOpen(true);
+    }}
+    className="text-white hover:text-blue-500 transition-colors"
+  >
+    <Info size={14} />
+  </button>
+)}
 
 <button
   onClick={() => {

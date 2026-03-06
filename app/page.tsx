@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 
-import Sidebar from "@/components/Sidebar";
+import Sidebar from "@/components/sidebar/Sidebar";
 import TopBarTabs from "@/components/TopBarTabs";
 import BoardCanvas from "@/components/BoardCanvas";
 import SettingsPanel from "@/components/SettingsPanel";
@@ -111,6 +111,7 @@ const [language, setLanguage] = useState<Language>("en");
 const t = getTranslator(language);
 const [units, setUnits] = useState<Units>("metric");
 const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+const [specsOpen, setSpecsOpen] = useState(false);
 const [settingsOpen, setSettingsOpen] = useState(false);
 const [canvasSize, setCanvasSize] = useState({
   width: 0,
@@ -657,6 +658,8 @@ return (
       activeProject={activeProject}
       units={units}
       language={language}
+      setMobileSidebarOpen={setMobileSidebarOpen}
+      setSpecsOpen={setSpecsOpen}
       selectedInstanceId={selectedInstanceId}
       setSelectedInstanceId={setSelectedInstanceId}
       selectedBoardInstanceId={selectedBoardInstanceId}
@@ -715,6 +718,8 @@ return (
             activeProject={activeProject}
             units={units}
             language={language}
+            setMobileSidebarOpen={setMobileSidebarOpen}
+            setSpecsOpen={setSpecsOpen}
             selectedInstanceId={selectedInstanceId}
             setSelectedInstanceId={setSelectedInstanceId}
             selectedBoardInstanceId={selectedBoardInstanceId}
@@ -746,8 +751,7 @@ return (
   className="
     absolute
     bottom-6
-    left-1/2
-    -translate-x-1/2
+    right-6
     z-50
     w-12
     h-12
@@ -826,10 +830,10 @@ return (
                   setPedalSearch={setPedalSearch}
                   boardSearch={boardSearch}
                   setBoardSearch={setBoardSearch}
-                  selectedPedal={undefined}
-                  selectedBoardDetails={undefined}
-                  selectedInstanceId={null}
-                  selectedBoardInstanceId={null}
+                  selectedPedal={selectedPedal}
+                  selectedBoardDetails={selectedBoardDetails}
+                  selectedInstanceId={selectedInstanceId}
+                  selectedBoardInstanceId={selectedBoardInstanceId}
                   setSelectedInstanceId={setSelectedInstanceId}
                   setSelectedBoardInstanceId={setSelectedBoardInstanceId}
                   customName={customName}
@@ -877,6 +881,113 @@ return (
 
       </div>
     </div>
+
+    {specsOpen && (
+  <div className="fixed inset-0 z-[300]">
+
+    <div
+      className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+      onClick={() => setSpecsOpen(false)}
+    />
+
+    <div className="absolute inset-0 bg-zinc-950 flex flex-col">
+
+      {/* HEADER */}
+      <div
+        className="flex items-center justify-between px-6"
+        style={{
+          paddingTop: "env(safe-area-inset-top)",
+          height: "calc(60px + env(safe-area-inset-top))",
+        }}
+      >
+        <h2 className="text-[18px] font-black uppercase tracking-wider">
+          {t("pedal.features")}
+        </h2>
+
+        <button
+          onClick={() => setSpecsOpen(false)}
+          className="text-white text-xl leading-none"
+        >
+          ✕
+        </button>
+      </div>
+
+      {/* CONTENT */}
+      <div className="flex-1 overflow-y-auto p-6">
+
+        <Sidebar
+  pedalsLibrary={pedalsLibrary}
+  boardsLibrary={boardsLibrary}
+
+  showPedalResults={false}
+  setShowPedalResults={() => {}}
+
+  showBoardResults={false}
+  setShowBoardResults={() => {}}
+
+  pedalSearch=""
+  setPedalSearch={() => {}}
+
+  boardSearch=""
+  setBoardSearch={() => {}}
+
+  selectedPedal={selectedPedal}
+  selectedBoardDetails={selectedBoardDetails}
+
+  selectedInstanceId={null}
+  selectedBoardInstanceId={null}
+
+  setSelectedInstanceId={() => {}}
+  setSelectedBoardInstanceId={() => {}}
+
+  customName=""
+  setCustomName={() => {}}
+
+  customWidth=""
+  setCustomWidth={() => {}}
+
+  customDepth=""
+  setCustomDepth={() => {}}
+
+  customColor="#000"
+  setCustomColor={() => {}}
+
+  addPedal={() => {}}
+  selectBoard={() => {}}
+  addCustomItem={() => {}}
+
+  rotatePedal={() => {}}
+  deletePedal={() => {}}
+
+  rotateBoard={() => {}}
+  deleteBoard={() => {}}
+
+  canvasBg={canvasBg}
+  setCanvasBg={setCanvasBg}
+
+  language={language}
+  setLanguage={setLanguage}
+
+  units={units}
+  setUnits={setUnits}
+
+  customType={null}
+  setCustomType={() => {}}
+
+  makeOpen={false}
+  setMakeOpen={() => {}}
+
+  contactOpen={false}
+  setContactOpen={() => {}}
+
+  hideLogo
+/>
+
+      </div>
+
+    </div>
+  </div>
+)}
 
     {/* SETTINGS DRAWER */}
 {settingsOpen && (

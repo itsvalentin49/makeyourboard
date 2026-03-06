@@ -31,6 +31,30 @@ export default function SettingsPanel({
   const bgRef = React.useRef<HTMLDivElement>(null);
   const langRef = React.useRef<HTMLDivElement>(null);
 
+  React.useEffect(() => {
+  function handleClickOutside(e: MouseEvent) {
+    if (
+      langRef.current &&
+      !langRef.current.contains(e.target as Node)
+    ) {
+      setLangOpen(false);
+    }
+
+    if (
+      bgRef.current &&
+      !bgRef.current.contains(e.target as Node)
+    ) {
+      setBgOpen(false);
+    }
+  }
+
+  document.addEventListener("mousedown", handleClickOutside);
+
+  return () => {
+    document.removeEventListener("mousedown", handleClickOutside);
+  };
+}, []);
+
   const LANGUAGE_LABELS: Record<string, string> = {
     en: "English",
     fr: "Français",
@@ -87,8 +111,8 @@ export default function SettingsPanel({
   <div className="flex-1">
     <div className="flex bg-zinc-950 p-1 rounded-lg border border-zinc-800">
       {[
-        { key: "metric", label: "METRIC", sub: "mm · g · kg" },
-        { key: "imperial", label: "IMPERIAL", sub: "in · oz · lb" },
+{ key: "metric", label: t("settings.unitsOptions.metric"), sub: "mm · g · kg" },
+{ key: "imperial", label: t("settings.unitsOptions.imperial"), sub: "in · oz · lb" },
       ].map((u) => {
         const isActive = units === u.key;
 
