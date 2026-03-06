@@ -901,7 +901,7 @@ return (
         }}
       >
         <h2 className="text-[18px] font-black uppercase tracking-wider">
-          {t("pedal.features")}
+          MAKE YOUR BOARD
         </h2>
 
         <button
