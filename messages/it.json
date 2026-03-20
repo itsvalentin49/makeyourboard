@@ -40,8 +40,10 @@
       "A/B Box": "Box A/B",
       "Acoustic": "Acustico",
       "Amp Simulator": "Simulatore di amplificatore",
+      "Audio Interface": "Interfaccia audio",
       "Boost": "Boost",
       "Buffer": "Buffer",
+      "Cab Simulator": "Simulatore di altoparlante",
       "Chorus": "Chorus",
       "Compressor": "Compressore",
       "Delay": "Delay",
@@ -112,7 +114,7 @@
       "48V DC": "48V DC",
       "9-18V DC": "9-18V DC",
       "Passive": "Passivo",
-      "Battery": "Batteria 9V"
+      "Battery": "Batteria"
     },
 
     "draw": "Consumo",
