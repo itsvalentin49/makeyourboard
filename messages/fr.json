@@ -93,6 +93,7 @@
       "label": "Circuit",
       "Digital": "Numérique",
       "Analog": "Analogique",
+      "Hybrid": "Hybride",
       "N/A": "N/A"
     },
 

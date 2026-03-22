@@ -93,6 +93,7 @@
       "label": "Schaltung",
       "Digital": "Digital",
       "Analog": "Analog",
+      "Hybrid": "Hybrid",
       "N/A": "N/A"
     },
 
