@@ -38,148 +38,209 @@ export default function BoardSpecs({
       <div className="space-y-0.5 border-zinc-900">
 
         {/* HEADER */}
-        <div className="mt-4 mb-4 flex items-center gap-3">
-          <div className="w-[3px] h-5 bg-blue-500 rounded-full" />
-          <span className="text-[12px] uppercase font-bold tracking-[0.18em] text-white">
-            {t("pedal.features")}
-          </span>
-        </div>
+<div className="mt-4 mb-4">
+  <div
+    className="
+      w-full
+      text-[11px] font-black uppercase
+      py-2 rounded-md
+      bg-blue-500 !text-white
+      text-center
+      cursor-default
+    "
+  >
+    {t("pedal.features")}
+  </div>
+</div>
 
-        {/* STATUT */}
-        {!isCustomBoard && (
-          <div className="flex justify-between items-center py-2 border-b border-zinc-900">
-            <span className="text-[10px] text-white uppercase font-bold tracking-wider">
-              {t("board.status.label")}
-            </span>
-            <span
-              className={`text-[9px] px-2 py-0.5 rounded-full font-black uppercase ${
-                (selectedBoardDetails.status || "")
-                  .toLowerCase()
-                  .includes("active")
-                  ? "bg-green-500/10 text-green-500"
-                  : "bg-red-500/10 text-red-500"
-              }`}
-            >
-              {selectedBoardDetails.status
-                ? t(`board.status.${selectedBoardDetails.status.toLowerCase()}`)
-                : "N/A"}
-            </span>
-          </div>
-        )}
+{/* STATUT */}
+{!isCustomBoard && (
+  <div className="flex items-center py-2 border-b border-zinc-900">
 
-        {/* MARQUE */}
-        {!isCustomBoard && (
-          <div className="flex justify-between items-center py-2 border-b border-zinc-900">
-            <span className="text-[10px] text-white uppercase font-bold tracking-wider">
-              {t("board.brand")}
-            </span>
-            <span className="text-[11px] font-bold text-zinc-400">
-              {selectedBoardDetails.brand || "N/A"}
-            </span>
-          </div>
-        )}
+    <span className="text-[10px] text-white uppercase font-bold tracking-wider whitespace-nowrap">
+      {t("board.status.label")}
+    </span>
 
-        {/* MODÈLE */}
-        {!isCustomBoard && (
-          <div className="flex justify-between items-center py-2 border-b border-zinc-900">
-            <span className="text-[10px] text-white uppercase font-bold tracking-wider">
-              {t("board.model")}
-            </span>
-            <span className="text-[11px] font-bold text-zinc-400">
-              {selectedBoardDetails.name || "N/A"}
-            </span>
-          </div>
-        )}
+    <div className="flex-1 border-b border-dotted border-zinc-600 mx-2 translate-y-[3.5px]" />
 
-        {/* YEAR */}
-        {!isCustomBoard && (
-          <div className="flex justify-between items-center py-2 border-b border-zinc-900">
-            <span className="text-[10px] text-white uppercase font-bold tracking-wider">
-              {t("board.year")}
-            </span>
-            <span className="text-[11px] font-bold text-zinc-400">
-              {selectedBoardDetails.year || "N/A"}
-            </span>
-          </div>
-        )}
+<span
+  className={`text-[9px] px-2 py-0.5 rounded-full font-black uppercase whitespace-nowrap ${
+    (selectedBoardDetails.status || "")
+      .toLowerCase()
+      .includes("active")
+          ? "bg-green-500/20 text-green-500"
+          : "bg-red-500/20 text-red-500"
+      }`}
+    >
+      {selectedBoardDetails.status
+        ? t(`board.status.${selectedBoardDetails.status.toLowerCase()}`)
+        : "N/A"}
+    </span>
 
-        {/* MATÉRIAU */}
-        {!isCustomBoard && (
-          <div className="flex justify-between items-center py-2 border-b border-zinc-900">
-            <span className="text-[10px] text-white uppercase font-bold tracking-wider">
-              {t("board.material.label")}
-            </span>
-            <span className="text-[11px] font-bold font-mono text-zinc-400">
-              {selectedBoardDetails.material
-                ? t(`board.material.${selectedBoardDetails.material}`)
-                : "N/A"}
-            </span>
-          </div>
-        )}
+  </div>
+)}
 
-        {/* PROFIL */}
-        {!isCustomBoard && (
-          <div className="flex justify-between items-center py-2 border-b border-zinc-900">
-            <span className="text-[10px] text-white uppercase font-bold tracking-wider">
-              {t("board.profile.label")}
-            </span>
-            <span className="text-[11px] font-bold font-mono text-zinc-400">
-              {selectedBoardDetails.profile
-                ? t(`board.profile.${selectedBoardDetails.profile}`)
-                : "N/A"}
-            </span>
-          </div>
-        )}
+{/* MARQUE */}
+{!isCustomBoard && (
+  <div className="flex items-center py-2 border-b border-zinc-900">
 
-        {/* DIMENSIONS */}
-        <div className="flex justify-between items-center py-2 border-b border-zinc-900">
-          <span className="text-[10px] text-white uppercase font-bold tracking-wider">
-            {t("board.dimensions")}
-          </span>
-          <span className="text-[11px] font-bold font-mono text-zinc-400">
-            {units === "metric"
-              ? `${selectedBoardDetails.width} x ${selectedBoardDetails.depth || 0} mm`
-              : `${mmToIn(selectedBoardDetails.width).toFixed(2)} x ${mmToIn(
-                  selectedBoardDetails.depth || 0
-                ).toFixed(2)} in`}
-          </span>
-        </div>
+    <span className="text-[10px] text-white uppercase font-bold tracking-wider whitespace-nowrap">
+      {t("board.brand")}
+    </span>
 
-        {/* POIDS */}
-        {!isCustomBoard && (
-          <div className="flex justify-between items-center py-2 border-b border-zinc-900">
-            <span className="text-[10px] text-white uppercase font-bold tracking-wider">
-              {t("board.weight")}
-            </span>
-            <span className="text-[11px] font-bold font-mono text-zinc-400">
-              {formatWeight(selectedBoardDetails.weight || 0, units, language)}
-            </span>
-          </div>
-        )}
+    <div className="flex-1 border-b border-dotted border-zinc-600 mx-2 translate-y-[3.5px]" />
 
-        {/* ORIGINE */}
-        {!isCustomBoard && (
-          <div className="flex justify-between items-center py-2 border-zinc-900">
-            <span className="text-[10px] text-white uppercase font-bold tracking-wider">
-              {t("board.origin")}
-            </span>
-            <span className="text-[11px] font-bold text-zinc-400">
-              {selectedBoardDetails.origin || "N/A"}
-            </span>
-          </div>
-        )}
+    <span className="text-[11px] font-bold text-white whitespace-nowrap">
+      {selectedBoardDetails.brand || "N/A"}
+    </span>
+
+  </div>
+)}
+
+{/* MODÈLE */}
+{!isCustomBoard && (
+  <div className="flex items-center py-2 border-b border-zinc-900">
+
+    <span className="text-[10px] text-white uppercase font-bold tracking-wider whitespace-nowrap">
+      {t("board.model")}
+    </span>
+
+    <div className="flex-1 border-b border-dotted border-zinc-600 mx-2 translate-y-[3.5px]" />
+
+    <span className="text-[11px] font-bold text-white whitespace-nowrap">
+      {selectedBoardDetails.name || "N/A"}
+    </span>
+
+  </div>
+)}
+
+{/* YEAR */}
+{!isCustomBoard && (
+  <div className="flex items-center py-2 border-b border-zinc-900">
+
+    <span className="text-[10px] text-white uppercase font-bold tracking-wider whitespace-nowrap">
+      {t("board.year")}
+    </span>
+
+    <div className="flex-1 border-b border-dotted border-zinc-600 mx-2 translate-y-[3.5px]" />
+
+    <span className="text-[11px] font-bold text-white whitespace-nowrap">
+      {selectedBoardDetails.year || "N/A"}
+    </span>
+
+  </div>
+)}
+
+{/* MATÉRIAU */}
+{!isCustomBoard && (
+  <div className="flex items-center py-2 border-b border-zinc-900">
+
+    <span className="text-[10px] text-white uppercase font-bold tracking-wider whitespace-nowrap">
+      {t("board.material.label")}
+    </span>
+
+    <div className="flex-1 border-b border-dotted border-zinc-600 mx-2 translate-y-[3.5px]" />
+
+    <span className="text-[11px] font-bold font-mono text-white whitespace-nowrap">
+      {selectedBoardDetails.material
+        ? t(`board.material.${selectedBoardDetails.material}`)
+        : "N/A"}
+    </span>
+
+  </div>
+)}
+
+{/* PROFIL */}
+{!isCustomBoard && (
+  <div className="flex items-center py-2 border-b border-zinc-900">
+
+    <span className="text-[10px] text-white uppercase font-bold tracking-wider whitespace-nowrap">
+      {t("board.profile.label")}
+    </span>
+
+    <div className="flex-1 border-b border-dotted border-zinc-600 mx-2 translate-y-[3.5px]" />
+
+    <span className="text-[11px] font-bold font-mono text-white whitespace-nowrap">
+      {selectedBoardDetails.profile
+        ? t(`board.profile.${selectedBoardDetails.profile}`)
+        : "N/A"}
+    </span>
+
+  </div>
+)}
+
+{/* DIMENSIONS */}
+<div className="flex items-center py-2 border-b border-zinc-900">
+
+  <span className="text-[10px] text-white uppercase font-bold tracking-wider whitespace-nowrap">
+    {t("board.dimensions")}
+  </span>
+
+  <div className="flex-1 border-b border-dotted border-zinc-600 mx-2 translate-y-[3.5px]" />
+
+  <span className="text-[11px] font-bold font-mono text-white whitespace-nowrap">
+    {units === "metric"
+      ? `${selectedBoardDetails.width} x ${selectedBoardDetails.depth || 0} mm`
+      : `${mmToIn(selectedBoardDetails.width).toFixed(2)} x ${mmToIn(
+          selectedBoardDetails.depth || 0
+        ).toFixed(2)} in`}
+  </span>
+
+</div>
+
+{/* POIDS */}
+{!isCustomBoard && (
+  <div className="flex items-center py-2 border-b border-zinc-900">
+
+    <span className="text-[10px] text-white uppercase font-bold tracking-wider whitespace-nowrap">
+      {t("board.weight")}
+    </span>
+
+    <div className="flex-1 border-b border-dotted border-zinc-600 mx-2 translate-y-[3.5px]" />
+
+    <span className="text-[11px] font-bold font-mono text-white whitespace-nowrap">
+      {formatWeight(selectedBoardDetails.weight || 0, units, language)}
+    </span>
+
+  </div>
+)}
+
+{/* ORIGINE */}
+{!isCustomBoard && (
+  <div className="flex items-center py-2 border-zinc-900">
+
+    <span className="text-[10px] text-white uppercase font-bold tracking-wider whitespace-nowrap">
+      {t("board.origin")}
+    </span>
+
+    <div className="flex-1 border-b border-dotted border-zinc-600 mx-2 translate-y-[3.5px]" />
+
+    <span className="text-[11px] font-bold text-white whitespace-nowrap">
+      {selectedBoardDetails.origin || "N/A"}
+    </span>
+
+  </div>
+)}
       </div>
 
       {/* BUY ONLINE */}
       {!isCustomBoard && selectedBoardDetails && (
         <div className="mt-8">
 
-          <div className="mb-4 flex items-center gap-3">
-            <div className="w-[3px] h-5 bg-blue-500 rounded-full" />
-            <span className="text-[12px] uppercase font-bold tracking-[0.18em] text-white">
-              {t("sidebar.buyOnline")}
-            </span>
-          </div>
+<div className="mb-4">
+  <div
+    className="
+      w-full
+      text-[11px] font-black uppercase
+      py-2 rounded-md
+      bg-blue-500 !text-white
+      text-center
+      cursor-default
+    "
+  >
+    {t("sidebar.buyOnline")}
+  </div>
+</div>
 
           <div className="space-y-3">
             {(

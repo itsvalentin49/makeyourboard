@@ -1,17 +1,11 @@
 {
-  "sidebar": {
-    "searchPedal": "Buscar pedal",
-    "searchBoard": "Buscar pedalboard",
-    "buyOnline": "Comprar online",
-    "shop": "Tiendas",
-    "addPedal": "Pedal",
-    "addBoard": "Pedalboard",
-    "addItem": "Añadir",
-    "back": "Volver al menú",
-    "rotate": "Rotar",
-    "delete": "Eliminar",
-    "subtitleLine1": "Diseña tu próximo pedalboard en segundos.",
-    "subtitleLine2": "Selecciona tus pedales y crea tu configuración."
+"sidebar": {
+  "searchPedal": "Buscar pedal",
+  "searchBoard": "Buscar pedalboard",
+  "buyOnline": "Comprar online",
+  "addPedal": "Añadir pedal",
+  "addBoard": "Añadir pedalboard",
+  "back": "Volver"
   },
 
   "canvasIntro": {
@@ -155,29 +149,38 @@
     "origin": "Origen"
   },
 
-  "custom": {
-    "title": "Personalizado",
-    "selectType": "Seleccionar pedal o board",
-    "pedal": "Pedal",
-    "board": "Board",
-    "enterDimensions": "Introducir dimensiones",
-    "width": "Anchura",
-    "depth": "Profundidad",
-    "addPedal": "Añadir pedal personalizado",
-    "addBoard": "Añadir board personalizado"
+"custom": {
+  "title": "Añadir custom",
+  "selectType": "Seleccionar pedal o board",
+  "pedal": "Pedal",
+  "board": "Board",
+  "nameOptional": "Nombre",
+  "namePlaceholder": "Fuzz",
+  "enterDimensions": "Dimensiones",
+  "width": "Ancho",
+  "depth": "Profundidad",
+  "color": "Color",
+  "addPedal": "Añadir pedal custom",
+  "addBoard": "Añadir board custom"
   },
 
-  "settings": {
-    "title": "Configuración",
-    "background": "Fondo",
-    "language": "Idioma",
-    "units": "Unidad",
+"settings": {
+  "title": "Configuración",
+  "background": "Fondo",
+  "language": "Idioma",
+  "units": "Unidad",
+  "theme": "Tema",
 
-    "unitsOptions": {
-      "metric": "MÉTRICO",
-      "imperial": "IMPERIAL"
-    }
+  "unitsOptions": {
+    "metric": "MÉTRICO",
+    "imperial": "IMPERIAL"
   },
+  
+  "themeOptions": {
+    "dark": "Oscuro",
+    "light": "Claro"
+  }
+},
 
   "backgrounds": {
     "neutral": "Neutro",

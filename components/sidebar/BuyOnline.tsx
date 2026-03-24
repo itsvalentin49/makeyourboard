@@ -52,12 +52,21 @@ export default function BuyOnline({
   return (
     <div className="mt-8">
 
-      <div className="mb-4 flex items-center gap-3">
-        <div className="w-[3px] h-5 bg-blue-500 rounded-full" />
-        <span className="text-[12px] uppercase font-bold tracking-[0.18em] text-white">
-          {t("sidebar.buyOnline")}
-        </span>
-      </div>
+<div className="mb-4">
+  <div
+    className="
+      w-full
+      text-[11px] font-black uppercase
+      py-2 rounded-md
+      bg-blue-500 !text-white
+      transition-all duration-150
+      text-center
+      cursor-default
+    "
+  >
+    {t("sidebar.buyOnline")}
+  </div>
+</div>
 
       <div className="flex flex-col">
 

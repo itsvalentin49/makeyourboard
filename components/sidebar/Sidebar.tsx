@@ -28,6 +28,8 @@ type Props = {
   // Data
   pedalsLibrary: AnyRow[];
   boardsLibrary: AnyRow[];
+  lastSelectedPedal: AnyRow | null;
+  lastSelectedBoard: AnyRow | null;
 
   // UI state
   showPedalResults: boolean;
@@ -131,7 +133,9 @@ export default function Sidebar({
   setMakeOpen,
   contactOpen,
   setContactOpen,
-  hideLogo = false,   // 👈 important
+  hideLogo = false,
+  lastSelectedPedal,
+  lastSelectedBoard,
 }: Props) {
 
   const t = getTranslator(language);
@@ -394,7 +398,7 @@ React.useEffect(() => {
     <div
   className="
   relative z-40 w-full lg:w-72 shrink-0
-  bg-zinc-950
+  bg-zinc-900
   px-6 py-4 flex flex-col gap-4 lg:gap-6
   overflow-y-auto no-scrollbar touch-pan-y
   h-full
@@ -621,6 +625,24 @@ React.useEffect(() => {
   groupItems={groupItems}
 />
 
+<button
+  onClick={() => {
+    if (!lastSelectedPedal) return;
+    addPedal(lastSelectedPedal);
+  }}
+  className="
+    w-full mt-2
+    text-[10px] font-black uppercase
+    py-2 rounded-md
+    bg-blue-500 !text-white
+    hover:bg-blue-600 hover:brightness-110
+    active:scale-[0.98]
+    transition-all duration-150
+    cursor-pointer
+  "
+>
+  {t("sidebar.addPedal")}
+</button>
 
 <SearchBoards
   boardsLibrary={boardsLibrary}
@@ -635,10 +657,33 @@ React.useEffect(() => {
   groupItems={groupItems}
 />
 
+<button
+  onClick={() => {
+    if (!lastSelectedBoard) return;
+    selectBoard(lastSelectedBoard);
+  }}
+  className="
+    w-full mt-2
+    text-[10px] font-black uppercase
+    py-2 rounded-md
+    bg-blue-500 !text-white
+    hover:bg-blue-600 hover:brightness-110
+    active:scale-[0.98]
+    transition-all duration-150
+    cursor-pointer
+  "
+>
+  {t("sidebar.addBoard")}
+</button>
+
 
 <CustomBuilder
   customType={customType}
   setCustomType={setCustomType}
+  customName={customName}
+  setCustomName={setCustomName}
+  customColor={customColor}
+  setCustomColor={setCustomColor}
   customWidth={customWidth}
   setCustomWidth={setCustomWidth}
   customDepth={customDepth}
@@ -655,6 +700,8 @@ React.useEffect(() => {
   withUnit={withUnit}
   t={t}
 />
+
+
 
         </div>
       )}
@@ -680,7 +727,7 @@ React.useEffect(() => {
   className="flex items-center gap-2 group"
   >
       <span className="text-[12px]">💬</span>
-      <span className="text-[10px] font-black uppercase text-zinc-500 group-hover:text-white transition-colors duration-200">
+      <span className="text-[10px] font-black uppercase text-white transition-colors duration-200">
         {t("footer.feedback")}
       </span>
     </button>
@@ -705,7 +752,8 @@ React.useEffect(() => {
 {/* ================= DESKTOP FOOTER ================= */}
 <div className="hidden lg:flex mt-4 px-1 items-center justify-between">
   
-  <button
+{/* FEEDBACK */}
+<button
   onClick={() => {
     setSelectedInstanceId(null);
     setSelectedBoardInstanceId(null);
@@ -714,26 +762,27 @@ React.useEffect(() => {
     setShowBoardResults(false);
 
     setContactOpen(true);
-}}
-    className="flex items-center gap-2 group cursor-pointer"
-  >
-    <span className="text-[12px]">💬</span>
-    <span className="text-[10px] font-black uppercase tracking-light text-zinc-500 group-hover:text-white transition-colors duration-200">
-      {t("footer.feedback")}
-    </span>
-  </button>
+  }}
+  className="flex items-center gap-2 group"
+>
+  <span className="text-[12px]">💬</span>
+  <span className="text-[10px] font-black uppercase text-white transition-all duration-200 group-hover:text-white group-hover:-translate-y-[1px] group-hover:scale-[1.03]">
+    {t("footer.feedback")}
+  </span>
+</button>
 
-  <a
-    href="https://buy.stripe.com/14A8wPeGZ8uQ0tQ96I8Zq00"
-    target="_blank"
-    rel="noopener noreferrer"
-    className="flex items-center gap-2 group cursor-pointer"
-  >
-    <span className="text-[12px]">☕️</span>
-    <span className="text-[10px] font-black uppercase tracking-light text-zinc-500 group-hover:text-white transition-colors duration-200">
-      {t("footer.donate")}
-    </span>
-  </a>
+{/* DONATE */}
+<a
+  href="https://buy.stripe.com/14A8wPeGZ8uQ0tQ96I8Zq00"
+  target="_blank"
+  rel="noopener noreferrer"
+  className="flex items-center gap-2 group cursor-pointer"
+>
+  <span className="text-[12px]">☕️</span>
+  <span className="text-[10px] font-black uppercase text-white transition-all duration-200 group-hover:text-white group-hover:-translate-y-[1px] group-hover:scale-[1.03]">
+    {t("footer.donate")}
+  </span>
+</a>
 
 </div>
 

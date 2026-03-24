@@ -1,16 +1,23 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { HexColorPicker } from "react-colorful";
 
 type Props = {
   customType: "pedal" | "board" | null;
   setCustomType: (v: "pedal" | "board") => void;
+
+  customName: string;
+  setCustomName: (v: string) => void;
 
   customWidth: string;
   setCustomWidth: (v: string) => void;
 
   customDepth: string;
   setCustomDepth: (v: string) => void;
+
+  customColor: string;
+  setCustomColor: (v: string) => void;
 
   addCustomItem: (item?: any) => void;
 
@@ -35,10 +42,14 @@ type Props = {
 export default function CustomBuilder({
   customType,
   setCustomType,
+  customName,
+  setCustomName,
   customWidth,
   setCustomWidth,
   customDepth,
   setCustomDepth,
+  customColor,
+  setCustomColor,
   addCustomItem,
   isPedalValid,
   isBoardValid,
@@ -52,40 +63,45 @@ export default function CustomBuilder({
   t,
 }: Props) {
 
+  const [showPicker, setShowPicker] = useState(false);
+
+  useEffect(() => {
+    const close = () => setShowPicker(false);
+    window.addEventListener("click", close);
+    return () => window.removeEventListener("click", close);
+  }, []);
+
   return (
     <div className="flex flex-col gap-2 mt-8">
 
-      <div className="mb-2 flex items-center gap-3">
-        <div className="w-[3px] h-5 bg-blue-500 rounded-full" />
+      <div className="flex items-center gap-3">
+
         <span className="text-[12px] uppercase font-bold tracking-[0.18em] text-white">
           {t("custom.title")}
         </span>
       </div>
 
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-4">
 
         {/* SELECT TYPE */}
         <div className="flex flex-col gap-2">
 
-          <span className="text-[9px] text-white uppercase font-black tracking-widest">
-            {t("custom.selectType")}
-          </span>
-
-          <div className="flex w-full bg-zinc-950 border border-zinc-800 rounded-xl overflow-hidden">
+          <div className="flex w-full bg-zinc-950 border border-zinc-700 rounded-lg overflow-hidden">
 
             <button
               onClick={() => {
                 setCustomType("pedal");
                 setCustomWidth("");
                 setCustomDepth("");
+                setCustomName("");
               }}
               className={`
                 flex-1 py-2 text-[10px] font-black uppercase tracking-widest
                 transition-all duration-200
                 ${
                   customType === "pedal"
-                    ? "bg-blue-500 text-white"
-                    : "bg-zinc-900 text-zinc-500 hover:text-white"
+                    ? "bg-blue-500 !text-white"
+                    : "bg-zinc-950 text-white"
                 }
               `}
             >
@@ -97,6 +113,7 @@ export default function CustomBuilder({
                 setCustomType("board");
                 setCustomWidth("");
                 setCustomDepth("");
+                setCustomName("");
               }}
               className={`
                 flex-1 py-2 text-[10px] font-black uppercase tracking-widest
@@ -104,8 +121,8 @@ export default function CustomBuilder({
                 border-l border-zinc-800
                 ${
                   customType === "board"
-                    ? "bg-blue-500 text-white"
-                    : "bg-zinc-900 text-zinc-500 hover:text-white"
+                    ? "bg-blue-500 !text-white"
+                    : "bg-zinc-950 text-white"
                 }
               `}
             >
@@ -119,50 +136,117 @@ export default function CustomBuilder({
         {/* PEDAL FLOW */}
         {customType === "pedal" && (
 
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-2">
 
-            <div className="flex flex-col gap-0.5">
+            {/* ENTER DIMENSIONS */}
+              <div className="flex flex-col gap-1.5">
 
-              <span className="text-[9px] text-white uppercase font-black tracking-widest leading-tight">
-                {t("custom.enterDimensions")}
-              </span>
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-[9px] text-white uppercase font-black tracking-widest leading-tight">
+                    {t("custom.enterDimensions")}
+                  </span>
 
-              <span className="text-[9px] text-zinc-500 font-mono leading-tight">
-                min: {displayMin} {unitLabel} / max: {displayMax} {unitLabel}
-              </span>
+                  <span className="text-[9px] text-white font-mono leading-tight">
+                    min: {displayMin} {unitLabel} / max: {displayMax} {unitLabel}
+                  </span>
+                </div>
 
-            </div>
+                <div className="grid grid-cols-2 gap-2">
 
-            <div className="grid grid-cols-2 gap-2 mt-2">
+                  <input
+                    type="number"
+                    min={minValue}
+                    max={maxValue}
+                    step={units === "metric" ? 1 : 0.1}
+                    placeholder={withUnit(t("custom.width"))}
+                    value={customWidth}
+                    onChange={(e) => setCustomWidth(e.target.value)}
+                    className="w-full bg-zinc-950 border border-zinc-700 rounded-md py-2 px-3 text-[10px] outline-none focus:border-zinc-600"
+                  />
 
-              <input
-                type="number"
-                min={minValue}
-                max={maxValue}
-                step={units === "metric" ? 1 : 0.1}
-                placeholder={withUnit(t("custom.width"))}
-                value={customWidth}
-                onChange={(e) => setCustomWidth(e.target.value)}
-                className="w-full bg-zinc-900 border border-zinc-700 rounded-md py-2 px-3 text-[10px] outline-none focus:border-zinc-600"
-              />
+                  <input
+                    type="number"
+                    min={minValue}
+                    max={maxValue}
+                    step={units === "metric" ? 1 : 0.1}
+                    placeholder={withUnit(t("custom.depth"))}
+                    value={customDepth}
+                    onChange={(e) => setCustomDepth(e.target.value)}
+                    className="w-full bg-zinc-950 border border-zinc-700 rounded-md py-2 px-3 text-[10px] outline-none focus:border-zinc-600"
+                  />
 
-              <input
-                type="number"
-                min={minValue}
-                max={maxValue}
-                step={units === "metric" ? 1 : 0.1}
-                placeholder={withUnit(t("custom.depth"))}
-                value={customDepth}
-                onChange={(e) => setCustomDepth(e.target.value)}
-                className="w-full bg-zinc-900 border border-zinc-700 rounded-md py-2 px-3 text-[10px] outline-none focus:border-zinc-600"
-              />
+                </div>
 
-            </div>
+              </div>
+
+
+{/* NAME + COLOR */}
+<div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+
+  {/* NAME (aligné à gauche) */}
+  <div className="flex flex-col items-center gap-1 text-center">
+
+    <span className="text-[9px] text-white uppercase font-black tracking-widest">
+      {t("custom.nameOptional")}
+    </span>
+
+    <input
+      type="text"
+      placeholder={t("custom.namePlaceholder")}
+      value={customName}
+      onChange={(e) => setCustomName(e.target.value)}
+      className="w-full bg-zinc-950 border border-zinc-700 rounded-md py-2 px-3 text-[10px] outline-none focus:border-zinc-600"
+    />
+
+  </div>
+
+  {/* COLOR (centré) */}
+  <div className="flex flex-col items-center gap-1 text-center">
+
+    <span className="text-[9px] text-white uppercase font-black tracking-widest">
+      {t("custom.color")}
+    </span>
+
+    <div
+  onClick={(e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setShowPicker(true);
+  }}
+  className="w-full max-w-[120px] h-[34px] rounded-md border border-zinc-700 cursor-pointer overflow-hidden"
+>
+  <div
+    className="w-full h-full"
+    style={{
+      background: customColor || "#7f1d1d",
+    }}
+  />
+</div>
+
+  </div>
+
+</div>
+
+{showPicker && (
+  <div
+    className="mt-2 p-3 bg-zinc-900 border border-zinc-700 rounded-lg"
+    onClick={(e) => e.stopPropagation()}
+  >
+
+    <HexColorPicker
+      color={customColor || "#7f1d1d"}
+      onChange={setCustomColor}
+      style={{ width: "100%" }}
+    />
+
+  </div>
+)}
+
 
             <button
-              onClick={addCustomItem}
+              onClick={() => addCustomItem({ name: customName })}
               disabled={!isPedalValid}
-              className="w-full text-[10px] mt-2 font-black uppercase py-2 rounded-md bg-blue-500 hover:bg-blue-400 text-white disabled:cursor-not-allowed"
+              className="w-full text-[10px] mt-2 font-black uppercase py-2 rounded-md bg-blue-500 hover:bg-blue-400 !text-white disabled:cursor-not-allowed"
             >
               {t("custom.addPedal")}
             </button>
@@ -174,48 +258,51 @@ export default function CustomBuilder({
         {/* BOARD FLOW */}
         {customType === "board" && (
 
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-0.5">
 
-            <div className="flex flex-col gap-0.5">
+              {/* ENTER DIMENSIONS */}
+              <div className="flex flex-col gap-1.5">
 
-              <span className="text-[9px] text-white uppercase font-black tracking-widest leading-tight">
-                {t("custom.enterDimensions")}
-              </span>
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-[9px] text-white uppercase font-black tracking-widest leading-tight">
+                    {t("custom.enterDimensions")}
+                  </span>
 
-              <span className="text-[9px] text-zinc-500 font-mono leading-tight">
-                min: {displayMin} {unitLabel} / max: {displayMax} {unitLabel}
-              </span>
+                  <span className="text-[9px] text-white talic font-mono leading-tight">
+                    min: {displayMin} {unitLabel} / max: {displayMax} {unitLabel}
+                  </span>
+                </div>
 
-            </div>
+                <div className="grid grid-cols-2 gap-2">
 
-            <div className="grid grid-cols-2 gap-2 mt-2">
+                  <input
+                    type="number"
+                    min={minValue}
+                    max={maxValue}
+                    step={units === "metric" ? 1 : 0.1}
+                    placeholder={withUnit(t("custom.width"))}
+                    value={customWidth}
+                    onChange={(e) => setCustomWidth(e.target.value)}
+                    className="w-full bg-zinc-950 border border-zinc-700 rounded-md py-2 px-3 text-[10px] outline-none focus:border-zinc-600"
+                  />
 
-              <input
-                type="number"
-                min={minValue}
-                max={maxValue}
-                step={units === "metric" ? 1 : 0.1}
-                placeholder={withUnit(t("custom.width"))}
-                value={customWidth}
-                onChange={(e) => setCustomWidth(e.target.value)}
-                className="w-full bg-zinc-900 border border-zinc-700 rounded-md py-2 px-3 text-[10px] outline-none focus:border-zinc-600"
-              />
+                  <input
+                    type="number"
+                    min={minValue}
+                    max={maxValue}
+                    step={units === "metric" ? 1 : 0.1}
+                    placeholder={withUnit(t("custom.depth"))}
+                    value={customDepth}
+                    onChange={(e) => setCustomDepth(e.target.value)}
+                    className="w-full bg-zinc-950 border border-zinc-700 rounded-md py-2 px-3 text-[10px] outline-none focus:border-zinc-600"
+                  />
 
-              <input
-                type="number"
-                min={minValue}
-                max={maxValue}
-                step={units === "metric" ? 1 : 0.1}
-                placeholder={withUnit(t("custom.depth"))}
-                value={customDepth}
-                onChange={(e) => setCustomDepth(e.target.value)}
-                className="w-full bg-zinc-900 border border-zinc-700 rounded-md py-2 px-3 text-[10px] outline-none focus:border-zinc-600"
-              />
+                </div>
 
-            </div>
+              </div>
 
             <button
-              onClick={addCustomItem}
+              onClick={() => addCustomItem({ name: customName })}
               disabled={!isBoardValid}
               className="w-full mt-2 text-[10px] font-black uppercase py-2 rounded-md bg-blue-500 hover:bg-blue-400 text-white disabled:cursor-not-allowed"
             >

@@ -83,9 +83,9 @@ border-r border-zinc-800
 transition-all duration-200
 ${isDragging ? "cursor-grabbing opacity-0" : "cursor-grab"}
 ${
-  activeProjectId === project.id
-    ? "bg-zinc-900 text-white"
-    : "text-zinc-500 hover:text-white hover:bg-zinc-900/60"
+activeProjectId === project.id
+  ? "bg-tab text-white"
+  : "text-white hover:text-white hover:bg-tab"
 }
 `}
     >

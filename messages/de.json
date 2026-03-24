@@ -1,17 +1,11 @@
 {
-  "sidebar": {
-    "searchPedal": "Pedal suchen",
-    "searchBoard": "Pedalboard suchen",
-    "buyOnline": "Online kaufen",
-    "shop": "Shops",
-    "addPedal": "Pedal",
-    "addBoard": "Pedalboard",
-    "addItem": "Hinzu",
-    "back": "Zurück zum Menü",
-    "rotate": "Drehen",
-    "delete": "Löschen",
-    "subtitleLine1": "Entwirf dein nächstes Pedalboard in Sekunden.",
-    "subtitleLine2": "Wähle deine Pedale und erstelle dein Setup."
+"sidebar": {
+  "searchPedal": "Pedal suchen",
+  "searchBoard": "Pedalboard suchen",
+  "buyOnline": "Online kaufen",
+  "addPedal": "Pedal hinzufügen",
+  "addBoard": "Pedalboard hinzufügen",
+  "back": "Zurück"
   },
 
   "canvasIntro": {
@@ -155,28 +149,37 @@
     "origin": "Herkunft"
   },
 
-  "custom": {
-    "title": "Custom",
-    "selectType": "Pedal oder Board auswählen",
-    "pedal": "Pedal",
-    "board": "Board",
-    "enterDimensions": "Abmessungen eingeben",
-    "width": "Breite",
-    "depth": "Tiefe",
-    "addPedal": "Benutzerdefiniertes Pedal hinzufügen",
-    "addBoard": "Benutzerdefiniertes Board hinzufügen"
+"custom": {
+  "title": "Custom hinzufügen",
+  "selectType": "Pedal oder Board auswählen",
+  "pedal": "Pedal",
+  "board": "Board",
+  "nameOptional": "Name",
+  "namePlaceholder": "Fuzz",
+  "enterDimensions": "Abmessungen",
+  "width": "Breite",
+  "depth": "Tiefe",
+  "color": "Farbe",
+  "addPedal": "Custom Pedal hinzufügen",
+  "addBoard": "Custom Board hinzufügen"
   },
 
-  "settings": {
-    "title": "Einstellungen",
-    "background": "Hintergrund",
-    "language": "Sprache",
-    "units": "Einheiten",
+"settings": {
+  "title": "Einstellungen",
+  "background": "Hintergrund",
+  "language": "Sprache",
+  "units": "Einheit",
+  "theme": "Design",
 
-    "unitsOptions": {
-      "metric": "METRISCH",
-      "imperial": "IMPERIAL"
-    }
+  "unitsOptions": {
+    "metric": "METRISCH",
+    "imperial": "IMPERIAL"
+  },
+  
+  "themeOptions": {
+    "dark": "Dunkel",
+    "light": "Hell"
+  }
   },
 
   "backgrounds": {

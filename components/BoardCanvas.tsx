@@ -1,12 +1,13 @@
 "use client";
 
 import React, { useRef, useLayoutEffect, useEffect, useState } from "react";
-import { Stage, Layer, Group, Rect, Text } from "react-konva";
+import { Stage, Layer, Group, Rect, Text, Image as KonvaImage } from "react-konva";
 import { Zap, Weight, Minus, Plus } from "lucide-react";
 import PedalImage from "@/components/PedalImage";
 import { formatWeight } from "@/utils/units";
 import { getTranslator } from "@/utils/i18n";
 import { RotateCw, Trash2, X, Info } from "lucide-react";
+import useImage from "use-image";
 
 type AnyRow = Record<string, any>;
 
@@ -97,6 +98,8 @@ export default function BoardCanvas({
 }: Props) {
 
   const t = getTranslator(language);
+  const [knob] = useImage("/images/knob.png");
+  const [footswitch] = useImage("/images/footswitch.png");
   const currentZoom = activeProject.zoom || 100;
   const zoomPercent = Math.round(currentZoom);
   const MIN_ZOOM = 50;
@@ -425,8 +428,12 @@ const getVisibleBounds = () => {
 
   return (
     <div
-      ref={containerRef}
-      className={`relative w-full h-full overflow-hidden ${isMobile ? "pb-6" : "pb-20"}`}
+  ref={containerRef}
+  className={`
+    relative w-full h-full overflow-hidden
+    ${isMobile ? "pb-6" : "pb-20"}
+    ${canvasBg === "neutral" ? "bg-canvas" : ""}
+  `}
       style={
         canvasBg === "neutral"
           ? undefined
@@ -449,7 +456,7 @@ const getVisibleBounds = () => {
     <>
 
     {/* ZOOM */}
-<div className="relative flex items-center justify-center h-9 w-24 md:h-10 md:w-28 bg-zinc-950/80 backdrop-blur-md border border-zinc-800 rounded-2xl shadow-2xl">
+<div className="relative flex items-center justify-center h-9 w-24 md:h-10 md:w-28 bg-zinc-900 backdrop-blur-md border border-zinc-800 rounded-2xl shadow-2xl">
 
   {/* LEFT BUTTON */}
   <button
@@ -486,7 +493,7 @@ const getVisibleBounds = () => {
 
 
       {/* TOTAL DRAW */}
-      <div className="relative flex items-center justify-center h-9 w-24 md:h-10 md:w-28 bg-zinc-950/80 backdrop-blur-md border border-zinc-800 rounded-2xl shadow-2xl pointer-events-none">
+      <div className="relative flex items-center justify-center h-9 w-24 md:h-10 md:w-28 bg-zinc-900 backdrop-blur-md border border-zinc-800 rounded-2xl shadow-2xl pointer-events-none">
         <Zap className="absolute left-3 size-4 text-yellow-500" />
         <span className="text-[12px] font-black font-mono tabular-nums">
           {totalDraw}
@@ -497,7 +504,7 @@ const getVisibleBounds = () => {
       </div>
 
       {/* TOTAL WEIGHT */}
-      <div className="relative flex items-center justify-center h-9 w-24 md:h-10 md:w-28 bg-zinc-950/80 backdrop-blur-md border border-zinc-800 rounded-2xl shadow-2xl pointer-events-none">
+      <div className="relative flex items-center justify-center h-9 w-24 md:h-10 md:w-28 bg-zinc-900 backdrop-blur-md border border-zinc-800 rounded-2xl shadow-2xl pointer-events-none">
         <Weight className="absolute left-3 size-4 text-blue-500" />
         <span className="text-[12px] font-black font-mono tabular-nums">
           {weightValue}
@@ -755,18 +762,6 @@ onTap={(e) => {
             
           />
 
-          <PedalImage
-  url={b.image || b.image_url || b.photo || null}
-  width={b.width}
-  depth={b.depth}
-  color={b.color}
-  isBoard
-  rotation={0}
-  onSizeReady={(w, h) =>
-    handleSizeUpdate(b.instanceId, w, h)
-  }
-/>
-
 {/* 💎 Hover halo (desktop only) */}
 {hoveredBoardId === b.instanceId &&
   selectedBoardInstanceId !== b.instanceId &&
@@ -902,6 +897,86 @@ onTap={(e) => {
               handleSizeUpdate(p.instanceId, nw, nh)
             }
           />
+
+{/* 🎛 CUSTOM CONTROLS */}
+{p.slug === "custom" &&
+  displaySizes[p.instanceId] &&
+  knob &&
+  footswitch && (() => {
+
+    const size = displaySizes[p.instanceId];
+
+    // 🎛 tailles CUSTOM
+    const SMALL_KNOB = 30;
+    const MEDIUM_KNOB = 32;
+    const LARGE_KNOB = 40;
+
+    let knobSize =
+      p.width < 50 ? SMALL_KNOB :
+      p.width <= 100 ? MEDIUM_KNOB :
+      LARGE_KNOB;
+
+    const footswitchSize = 25;
+
+    const knobCount =
+      p.width < 50 ? 1 :
+      p.width <= 100 ? 2 :
+      3;
+
+    // 📍 position verticale
+    const knobY = -size.h / 2 + 20;
+
+    // 👉 espacement contrôlé (centré)
+    const spacing = size.w / (knobCount + 1);
+    const spread = 1.25;
+
+    return (
+      <>
+        {/* KNOBS */}
+        {Array.from({ length: knobCount }).map((_, i) => {
+          const offsetFromCenter =
+            (i - (knobCount - 1) / 2) * spacing * spread;
+
+          return (
+            <KonvaImage
+              key={i}
+              image={knob}
+              width={knobSize}
+              height={knobSize}
+              x={offsetFromCenter - knobSize / 2}
+              y={knobY}
+              listening={false}
+            />
+          );
+        })}
+
+        {/* FOOTSWITCH */}
+        <KonvaImage
+          image={footswitch}
+          width={footswitchSize}
+          height={footswitchSize}
+          x={-footswitchSize / 2}
+          y={size.h / 2 - 35}
+          listening={false}
+        />
+      </>
+    );
+})()}
+
+          {p.slug === "custom" && p.name && displaySizes[p.instanceId] && (
+<Text
+  text={p.name}
+  fontSize={12}
+  fill="#000000"
+  align="center"
+  verticalAlign="middle" 
+  width={displaySizes[p.instanceId].w}
+  height={displaySizes[p.instanceId].h}
+  x={-displaySizes[p.instanceId].w / 2}
+  y={-displaySizes[p.instanceId].h / 2}
+  listening={false}
+/>
+)}
 
           {/* 💎 Hover halo (desktop only) */}
 {hoveredPedalId === p.instanceId &&

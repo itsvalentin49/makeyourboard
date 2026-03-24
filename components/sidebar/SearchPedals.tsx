@@ -41,8 +41,8 @@ export default function SearchPedals({
   return (
     <div className="flex flex-col gap-2">
 
-      <div className="mt-3 mb-1 flex items-center gap-3">
-        <div className="w-[3px] h-5 bg-blue-500 rounded-full" />
+      <div className="mt-3 flex items-center gap-3">
+
         <span className="text-[12px] uppercase font-bold tracking-[0.18em] text-white">
           {t("sidebar.addPedal")}
         </span>
@@ -60,7 +60,7 @@ export default function SearchPedals({
             autoCapitalize="off"
             spellCheck={false}
             placeholder={`${t("sidebar.searchPedal")}...`}
-            className={`w-full bg-zinc-900 border rounded-lg py-2 pl-4 pr-10 text-[11px] text-zinc-200 placeholder:text-zinc-500 outline-none transition-all ${
+            className={`w-full bg-zinc-950 border rounded-lg py-2 pl-4 pr-10 text-[11px] text-white placeholder:text-zinc-500 outline-none transition-all ${
               showPedalResults
                 ? "border-zinc-500"
                 : "border-zinc-700"
@@ -111,10 +111,14 @@ export default function SearchPedals({
 
                     <button
                       key={p.id}
-                      onClick={() => addPedal(p)}
+                      onClick={() => {
+  setPedalSearch(`${p.brand} ${p.name}`);
+  addPedal(p);
+  setShowPedalResults(false);
+}}
                       className="w-full px-5 py-2 text-left hover:bg-zinc-700 text-zinc-300 text-[12px] transition-colors"
                     >
-                      <span className="font-semibold opacity-50 mr-2">
+                      <span className="font-semibold mr-2 text-zinc-500">
                         {brand}
                       </span>
 

@@ -1,15 +1,53 @@
 @import "tailwindcss";
 
 /* =========================
-   Global CSS variables
+   DARK THEME (DEFAULT)
    ========================= */
 :root {
   --background: #0a0a0a;
   --foreground: #ededed;
+
+  /* zinc scale */
+  --zinc-950: #09090b;
+  --zinc-900: #18181b;
+  --zinc-800: #27272a;
+  --zinc-700: #3f3f46;
+  --zinc-600: #52525b;
+  --zinc-500: #71717a;
+  --zinc-400: #a1a1aa;
+  --zinc-300: #d4d4d8;
+  --zinc-200: #e4e4e7;
+
+  /* semantic */
+  --blue: #3b82f6;
+  --green: #22c55e
+  --red: #ef4444;
 }
 
 /* =========================
-   Base styles
+   LIGHT THEME
+   ========================= */
+.light {
+  --background: #ffffff;
+  --foreground: #0a0a0a;
+
+  --zinc-950: #f8f9fa;
+  --zinc-900: #f1f3f5;
+  --zinc-800: #e9ecef;
+  --zinc-700: #dee2e6;
+  --zinc-600: #adb5bd;
+  --zinc-500: #868e96;
+  --zinc-400: #495057;
+  --zinc-300: #343a40;
+  --zinc-200: #e4e4e7;
+
+  --blue: #2563eb;
+  --green: #16a34a;
+  --red: #dc2626;
+}
+
+/* =========================
+   BASE
    ========================= */
 html,
 body {
@@ -21,6 +59,89 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* =========================
+   TEXT OVERRIDES
+   ========================= */
+.text-white { color: var(--foreground) !important; }
+.text-zinc-100 { color: var(--zinc-100) !important; }
+.text-zinc-200 { color: var(--zinc-200) !important; }
+.text-zinc-300 { color: var(--zinc-300) !important; }
+.text-zinc-400 { color: var(--zinc-400) !important; }
+.text-zinc-500 { color: var(--zinc-500) !important; }
+.text-zinc-600 { color: var(--zinc-600) !important; }
+
+.text-blue-400,
+.text-blue-500 { color: var(--blue) !important; }
+
+
+
+/* =========================
+   BACKGROUND OVERRIDES
+   ========================= */
+
+.bg-zinc-200 { background-color: var(--zinc-200) !important; }
+.bg-zinc-950 { background-color: var(--zinc-950) !important; }
+.bg-zinc-950\/80 { background-color: var(--zinc-950) !important; }
+
+.bg-zinc-900 { background-color: var(--zinc-900) !important; }
+.bg-zinc-900\/60 { background-color: var(--zinc-900) !important; }
+.bg-zinc-900\/80 { background-color: var(--zinc-900) !important; }
+
+.bg-zinc-800 { background-color: var(--zinc-800) !important; }
+.bg-zinc-800\/60 { background-color: var(--zinc-800) !important; }
+
+.bg-black { background-color: var(--zinc-950) !important; }
+.bg-black\/90 { background-color: var(--zinc-950) !important; }
+
+.bg-blue-500 { background-color: var(--blue) !important; }
+
+/* badges */
+.bg-green-500\/10 {
+  background-color: color-mix(in srgb, var(--green) 15%, transparent) !important;
+}
+
+.bg-red-500\/10 {
+  background-color: color-mix(in srgb, var(--red) 15%, transparent) !important;
+}
+
+/* =========================
+   BORDER OVERRIDES
+   ========================= */
+.border-zinc-900 { border-color: var(--zinc-900) !important; }
+.border-zinc-800 { border-color: var(--zinc-800) !important; }
+.border-zinc-800\/60 { border-color: var(--zinc-800) !important; }
+
+/* =========================
+   HOVER
+   ========================= */
+
+/* DARK (default) */
+html:not(.light) .hover\:bg-zinc-900:hover {
+  background-color: var(--zinc-600) !important;
+}
+
+/* LIGHT */
+.light .hover\:bg-zinc-900:hover {
+  background-color: var(--zinc-200) !important;
+}
+
+/* autres hover */
+html:not(.light) .hover\:bg-zinc-800:hover {
+  background-color: var(--zinc-700) !important;
+}
+
+.light .hover\:bg-zinc-800:hover {
+  background-color: var(--zinc-300) !important;
+}
+
+.light .hover\:bg-zinc-700:hover {
+  background-color: var(--zinc-200) !important;
+}
+
+/* =========================
+   INPUT FIX
+   ========================= */
 
 /* Chrome, Safari, Edge */
 input[type="number"]::-webkit-outer-spin-button,
@@ -36,22 +157,72 @@ input[type="number"] {
 }
 
 /* =========================
-   Force Dark Scrollbar (Mac Fix)
+   SCROLLBAR
    ========================= */
 
 .custom-scrollbar {
   overflow-y: auto;
 }
 
-/* =========================
-   Hide Native Scrollbar
-   ========================= */
-
+/* Hide native scrollbar */
 .custom-scrollbar {
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 .custom-scrollbar::-webkit-scrollbar {
-  display: none; /* Chrome / Safari */
+  display: none;
+}
+
+/* ================= PILLS ================= */
+
+.pill-ui {
+  backdrop-filter: blur(8px);
+  border-radius: 1rem;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+
+  background-color: rgba(255,255,255,0.8);
+  border: 1px solid var(--zinc-300);
+  color: var(--foreground);
+}
+
+/* DARK (default) */
+html:not(.light) .pill-ui {
+  background-color: rgba(9,9,11,0.8);
+  border: 1px solid var(--zinc-800);
+  color: var(--foreground);
+}
+
+/* petite pill */
+.pill-ui-sm {
+  backdrop-filter: blur(8px);
+  border-radius: 9999px;
+  padding: 0 8px;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+
+  background-color: rgba(255,255,255,0.9);
+  border: 1px solid var(--zinc-300);
+  color: var(--foreground);
+}
+
+html:not(.light) .pill-ui-sm {
+  background-color: rgba(9,9,11,0.9);
+  border: 1px solid var(--zinc-700);
+  color: var(--foreground);
+}
+
+.bg-canvas {
+  background-color: var(--zinc-600); /* DARK */
+}
+
+.light .bg-canvas {
+  background-color: var(--zinc-200); /* LIGHT */
+}
+
+.bg-tab {
+  background-color: var(--zinc-600); /* dark */
+}
+
+.light .bg-tab {
+  background-color: var(--zinc-200); /* light */
 }

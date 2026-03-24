@@ -41,8 +41,8 @@ export default function SearchBoards({
   return (
     <div className="flex flex-col gap-2 mt-8">
 
-      <div className="mb-1 flex items-center gap-3">
-        <div className="w-[3px] h-5 bg-blue-500 rounded-full" />
+      <div className="flex items-center gap-3">
+
         <span className="text-[12px] uppercase font-bold tracking-[0.18em] text-white">
           {t("sidebar.addBoard")}
         </span>
@@ -60,7 +60,7 @@ export default function SearchBoards({
             autoCapitalize="off"
             spellCheck={false}
             placeholder={`${t("sidebar.searchBoard")}...`}
-            className={`w-full bg-zinc-900 border rounded-lg py-2 pl-4 pr-10 text-[11px] text-zinc-200 placeholder:text-zinc-500 outline-none transition-all ${
+            className={`w-full bg-zinc-950 border rounded-lg py-2 pl-4 pr-10 text-[11px] text-white placeholder:text-zinc-500 outline-none transition-all ${
               showBoardResults
                 ? "border-zinc-500"
                 : "border-zinc-700"
@@ -110,16 +110,20 @@ export default function SearchBoards({
                   {groupItems(boardsLibrary, boardSearch)[brand].map((b) => (
 
                     <button
-                      key={b.id}
-                      onClick={() => selectBoard(b)}
-                      className="w-full px-5 py-2 text-left hover:bg-zinc-700 text-zinc-300 text-[12px] transition-colors"
-                    >
-                      <span className="font-semibold opacity-50 mr-2">
-                        {brand}
-                      </span>
+  key={b.id}
+  onClick={() => {
+    setBoardSearch(`${b.brand} ${b.name}`);
+    selectBoard(b);
+    setShowBoardResults(false);
+  }}
+  className="w-full px-5 py-2 text-left hover:bg-zinc-700 text-zinc-300 text-[12px] transition-colors"
+>
+  <span className="font-semibold mr-2 text-zinc-500">
+    {brand}
+  </span>
 
-                      {b.name}
-                    </button>
+  {b.name}
+</button>
 
                   ))}
 

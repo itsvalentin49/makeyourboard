@@ -125,26 +125,35 @@ const getCenterRef = useRef<(() => { x: number; y: number }) | null>(null);
 useEffect(() => {
   try {
     const saved = localStorage.getItem(SETTINGS_STORAGE_KEY);
-    if (!saved) return;
 
-    const parsed = JSON.parse(saved);
+    if (saved) {
+      const parsed = JSON.parse(saved);
 
-    if (parsed.canvasBg) setCanvasBg(parsed.canvasBg);
+      if (parsed.canvasBg) setCanvasBg(parsed.canvasBg);
 
-    if (parsed.language) {
-      const allowed: Language[] = ["en", "fr", "es", "de", "it", "pt"];
-      if (allowed.includes(parsed.language)) {
-        setLanguage(parsed.language);
+      if (parsed.language) {
+        const allowed: Language[] = ["en", "fr", "es", "de", "it", "pt"];
+        if (allowed.includes(parsed.language)) {
+          setLanguage(parsed.language);
+        }
       }
+
+      if (parsed.units) setUnits(parsed.units);
     }
 
-    if (parsed.units) setUnits(parsed.units);
+    // ✅ THEME (AJOUT)
+    const savedTheme = localStorage.getItem("theme");
+
+    if (savedTheme === "light") {
+      document.documentElement.classList.add("light");
+    } else {
+      document.documentElement.classList.remove("light");
+    }
 
   } catch {
     // storage corrompu → on ignore
   }
 }, []);
-
 
 /* ================= SETTINGS SAVE ================= */
 useEffect(() => {
@@ -180,6 +189,8 @@ useEffect(() => {
 
   const [showPedalResults, setShowPedalResults] = useState<boolean>(false);
   const [showBoardResults, setShowBoardResults] = useState<boolean>(false);
+  const [lastSelectedPedal, setLastSelectedPedal] = useState<AnyRow | null>(null);
+  const [lastSelectedBoard, setLastSelectedBoard] = useState<AnyRow | null>(null);
   const [contactOpen, setContactOpen] = useState(false);
 
   const [displaySizes, setDisplaySizes] = useState<Record<number, { w: number; h: number }>>({});
@@ -205,10 +216,10 @@ useEffect(() => {
 
 
   // Custom item
-  const [customName, setCustomName] = useState<string>("pedal");
+  const [customName, setCustomName] = useState<string>("");
   const [customWidth, setCustomWidth] = useState<string>("");
   const [customDepth, setCustomDepth] = useState<string>("");
-  const [customColor, setCustomColor] = useState<string>("#3b82f6");
+  const [customColor, setCustomColor] = useState<string>("");
   const [makeOpen, setMakeOpen] = useState(true);
 
 
@@ -414,15 +425,16 @@ const addPedal = (pedal: AnyRow) => {
     boardPedals: [...activeProject.boardPedals, newPedal],
   });
 
+  setLastSelectedPedal(pedal);
+
   closeSearchMenus();
 };
 
   
 
-
   const selectBoard = (board: AnyRow) => {
   const center = getCenterRef.current?.() ?? { x: 0, y: 0 };
-const { x, y } = center;
+  const { x, y } = center;
 
   const newBoard: BoardItem = {
     ...board,
@@ -435,6 +447,9 @@ const { x, y } = center;
   updateActiveProject({
     selectedBoards: [...activeProject.selectedBoards, newBoard],
   });
+
+  setLastSelectedBoard(board);
+  setSelectedBoardInstanceId(null);
 
   closeSearchMenus();
 };
@@ -499,10 +514,11 @@ const { x, y } = center;
     year: "",
     manual: "",
 
-    name: "Custom",
+    name: item?.name?.trim() || "",
     brand: "Custom",
     width: widthMm,
     depth: depthMm,
+    color: customType === "pedal" ? (customColor || "#7f1d1d") : "",
     image:
       customType === "pedal"
         ? "/images/custom-pedal.png"
@@ -525,8 +541,7 @@ const { x, y } = center;
     });
   }
 
-  setCustomWidth("");
-  setCustomDepth("");
+  setCustomName("");
 };
 
   const rotatePedal = (id: number) => {
@@ -565,9 +580,9 @@ const deleteBoard = (id: number) => {
 
 
 return (
-  <div
-    className="bg-zinc-950 text-[#f5f5f7] font-sans select-none overflow-hidden h-screen"
-    onClick={closeSearchMenus}
+<div
+  className="bg-[var(--background)] text-[var(--foreground)] font-sans select-none overflow-hidden h-screen"
+  onClick={closeSearchMenus}
   >
 
     {/* SEO content invisible */}
@@ -600,6 +615,8 @@ return (
           selectedBoardDetails={selectedBoardDetails}
           selectedInstanceId={selectedInstanceId}
           selectedBoardInstanceId={selectedBoardInstanceId}
+          lastSelectedPedal={lastSelectedPedal}
+          lastSelectedBoard={lastSelectedBoard}
           setSelectedInstanceId={setSelectedInstanceId}
           setSelectedBoardInstanceId={setSelectedBoardInstanceId}
           customName={customName}
@@ -819,6 +836,7 @@ return (
 
               {/* CONTENT */}
               <div className="flex-1 overflow-y-auto px-6 pb-24">
+
                 <Sidebar
                   pedalsLibrary={pedalsLibrary}
                   boardsLibrary={boardsLibrary}
@@ -832,6 +850,8 @@ return (
                   setBoardSearch={setBoardSearch}
                   selectedPedal={selectedPedal}
                   selectedBoardDetails={selectedBoardDetails}
+                  lastSelectedPedal={lastSelectedPedal}
+                  lastSelectedBoard={lastSelectedBoard}
                   selectedInstanceId={selectedInstanceId}
                   selectedBoardInstanceId={selectedBoardInstanceId}
                   setSelectedInstanceId={setSelectedInstanceId}
@@ -918,25 +938,20 @@ return (
         <Sidebar
   pedalsLibrary={pedalsLibrary}
   boardsLibrary={boardsLibrary}
-
   showPedalResults={false}
   setShowPedalResults={() => {}}
-
   showBoardResults={false}
   setShowBoardResults={() => {}}
-
   pedalSearch=""
   setPedalSearch={() => {}}
-
   boardSearch=""
   setBoardSearch={() => {}}
-
   selectedPedal={selectedPedal}
   selectedBoardDetails={selectedBoardDetails}
-
+  lastSelectedPedal={lastSelectedPedal}
+  lastSelectedBoard={lastSelectedBoard}
   selectedInstanceId={null}
   selectedBoardInstanceId={null}
-
   setSelectedInstanceId={() => {}}
   setSelectedBoardInstanceId={() => {}}
 

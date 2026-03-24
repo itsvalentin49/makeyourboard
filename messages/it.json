@@ -1,17 +1,11 @@
 {
-  "sidebar": {
-    "searchPedal": "Cerca pedale",
-    "searchBoard": "Cerca pedalboard",
-    "buyOnline": "Acquista online",
-    "shop": "Negozi",
-    "addPedal": "Pedale",
-    "addBoard": "Pedalboard",
-    "addItem": "Aggiungi",
-    "back": "Torna al menu",
-    "rotate": "Ruota",
-    "delete": "Elimina",
-    "subtitleLine1": "Progetta la tua prossima pedalboard in pochi secondi.",
-    "subtitleLine2": "Seleziona i tuoi pedali e crea il tuo setup."
+"sidebar": {
+  "searchPedal": "Cerca pedal",
+  "searchBoard": "Cerca pedalboard",
+  "buyOnline": "Acquista online",
+  "addPedal": "Aggiungi pedale",
+  "addBoard": "Aggiungi pedalboard",
+  "back": "Indietro"
   },
 
   "canvasIntro": {
@@ -155,29 +149,38 @@
     "origin": "Origine"
   },
 
-  "custom": {
-    "title": "Personalizzato",
-    "selectType": "Seleziona pedale o board",
-    "pedal": "Pedale",
-    "board": "Board",
-    "enterDimensions": "Inserisci dimensioni",
-    "width": "Larghezza",
-    "depth": "Profondità",
-    "addPedal": "Aggiungi pedale personalizzato",
-    "addBoard": "Aggiungi board personalizzato"
+"custom": {
+  "title": "Aggiungi custom",
+  "selectType": "Seleziona pedal o board",
+  "pedal": "Pedale",
+  "board": "Board",
+  "nameOptional": "Nome",
+  "namePlaceholder": "Fuzz",
+  "enterDimensions": "Dimensioni",
+  "width": "Larghezza",
+  "depth": "Profondità",
+  "color": "Colore",
+  "addPedal": "Aggiungi pedale custom",
+  "addBoard": "Aggiungi board custom"
   },
 
-  "settings": {
-    "title": "Impostazioni",
-    "background": "Sfondo",
-    "language": "Lingua",
-    "units": "Unità",
+"settings": {
+  "title": "Impostazioni",
+  "background": "Sfondo",
+  "language": "Lingua",
+  "units": "Unità",
+  "theme": "Tema",
 
-    "unitsOptions": {
-      "metric": "METRICO",
-      "imperial": "IMPERIALE"
-    }
+  "unitsOptions": {
+    "metric": "METRICO",
+    "imperial": "IMPERIALE"
   },
+  
+  "themeOptions": {
+    "dark": "Scuro",
+    "light": "Chiaro"
+  }
+},
 
   "backgrounds": {
     "neutral": "Neutro",

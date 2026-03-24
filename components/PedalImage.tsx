@@ -115,22 +115,25 @@ export default function PedalImage({
   // Image OK
   return (
     <Group offsetX={scaledWidth / 2} offsetY={proportionalHeight / 2} rotation={rotation}>
-      <KonvaImage image={img} width={scaledWidth} height={proportionalHeight} ref={imageRef} cornerRadius={6} />
+      <KonvaImage
+  image={img}
+  width={scaledWidth}
+  height={proportionalHeight}
+  ref={imageRef}
+  cornerRadius={6}
+/>
 
-      {name && (
-        <Text
-          text={name}
-          width={scaledWidth}
-          height={proportionalHeight}
-          align="center"
-          verticalAlign="middle"
-          fill="white"
-          fontSize={10}
-          fontStyle="bold"
-          padding={5}
-          wrap="char"
-        />
-      )}
+{/* 🎨 COLOR OVERLAY (AJOUT) */}
+{color && (
+  <Rect
+    width={scaledWidth}
+    height={proportionalHeight}
+    fill={color}
+    opacity={0.7}
+    cornerRadius={6}
+    listening={false}
+  />
+)}
     </Group>
   );
 }

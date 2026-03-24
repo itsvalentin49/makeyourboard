@@ -109,7 +109,7 @@ export default function TopBarTabs({
   };
 
   return (
-    <div className="h-12 bg-zinc-950 flex items-stretch relative z-20">
+    <div className="h-12 bg-zinc-900 flex items-stretch relative z-20">
 
       {/* ZONE SCROLLABLE */}
       <div className="flex-1 min-w-0 overflow-hidden">

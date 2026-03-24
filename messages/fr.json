@@ -1,17 +1,11 @@
 {
-  "sidebar": {
-    "searchPedal": "Rechercher une pédale",
-    "searchBoard": "Rechercher un pedalboard",
-    "buyOnline": "Acheter en ligne",
-    "shop": "Magasins",
-    "addPedal": "Pédale",
-    "addBoard": "Pedalboard",
-    "addItem": "Ajouter",
-    "back": "Retour",
-    "rotate": "Pivoter",
-    "delete": "Supprimer",
-    "subtitleLine1": "Concevez votre pedalboard en quelques clics.",
-    "subtitleLine2": "Sélectionnez vos pédales et construisez votre prochain pedalboard."
+"sidebar": {
+  "searchPedal": "Rechercher une pédale",
+  "searchBoard": "Rechercher un pedalboard",
+  "buyOnline": "Acheter en ligne",
+  "addPedal": "Ajouter une pédale",
+  "addBoard": "Ajouter un pedalboard",
+  "back": "Retour"
   },
 
   "canvasIntro": {
@@ -155,29 +149,38 @@
     "origin": "Origine"
   },
 
-  "custom": {
-    "title": "Custom",
-    "selectType": "Sélectionner pédale ou board",
-    "pedal": "Pédale",
-    "board": "Board",
-    "enterDimensions": "Entrer les dimensions",
-    "width": "Largeur",
-    "depth": "Profondeur",
-    "addPedal": "Ajouter la pédale custom",
-    "addBoard": "Ajouter le board custom"
-  },
+"custom": {
+  "title": "Ajouter un custom",
+  "selectType": "Sélectionner pédale ou board",
+  "pedal": "Pédale",
+  "board": "Board",
+  "nameOptional": "Nom",
+  "namePlaceholder": "Fuzz",
+  "enterDimensions": "Dimensions",
+  "width": "Largeur",
+  "depth": "Profondeur",
+  "color": "Couleur",
+  "addPedal": "Ajouter une pédale custom",
+  "addBoard": "Ajouter un board custom"
+  }, 
 
-  "settings": {
-    "title": "Paramètres",
-    "background": "Arrière-plan",
-    "language": "Langue",
-    "units": "Unité",
+"settings": {
+  "title": "Paramètres",
+  "background": "Arrière-plan",
+  "language": "Langue",
+  "units": "Unité",
+  "theme": "Thème",
 
-    "unitsOptions": {
-      "metric": "MÉTRIQUE",
-      "imperial": "IMPÉRIAL"
-    }
+  "unitsOptions": {
+    "metric": "MÉTRIQUE",
+    "imperial": "IMPÉRIAL"
   },
+  
+  "themeOptions": {
+    "dark": "Sombre",
+    "light": "Clair"
+  }
+},
 
   "backgrounds": {
     "neutral": "Neutre",

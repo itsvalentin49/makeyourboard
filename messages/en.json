@@ -3,15 +3,9 @@
     "searchPedal": "Search a pedal",
     "searchBoard": "Search a pedalboard",
     "buyOnline": "Buy online",
-    "shop": "Stores",
-    "addPedal": "Pedal",
-    "addBoard": "Pedalboard",
-    "addItem": "Add",
-    "back": "Back",
-    "rotate": "Rotate",
-    "delete": "Delete",
-    "subtitleLine1": "Design your next pedalboard in seconds.",
-    "subtitleLine2": "Select your pedals and build your setup."
+    "addPedal": "Add a Pedal",
+    "addBoard": "Add a Pedalboard",
+    "back": "Back"
   },
 
   "canvasIntro": {
@@ -153,29 +147,38 @@
     "origin": "Origin"
   },
 
-  "custom": {
-    "title": "Custom",
-    "selectType": "Select pedal or board",
-    "pedal": "Pedal",
-    "board": "Board",
-    "enterDimensions": "Enter dimensions",
-    "width": "Width",
-    "depth": "Depth",
-    "addPedal": "Add custom pedal",
-    "addBoard": "Add custom board"
+"custom": {
+  "title": "Add Custom Item",
+  "selectType": "Select pedal or board",
+  "pedal": "Pedal",
+  "board": "Board",
+  "nameOptional": "Name",
+  "namePlaceholder": "Fuzz",
+  "enterDimensions": "Dimensions",
+  "width": "Width",
+  "depth": "Depth",
+  "color": "Color",
+  "addPedal": "Add custom pedal",
+  "addBoard": "Add custom board"
   },
 
-  "settings": {
-    "title": "Settings",
-    "background": "Background",
-    "language": "Language",
-    "units": "Unit",
+"settings": {
+  "title": "Settings",
+  "background": "Background",
+  "language": "Language",
+  "units": "Unit",
+  "theme": "Theme",
 
-    "unitsOptions": {
-      "metric": "METRIC",
-      "imperial": "IMPERIAL"
-    }
+  "unitsOptions": {
+    "metric": "METRIC",
+    "imperial": "IMPERIAL"
   },
+  
+  "themeOptions": {
+    "dark": "Dark",
+    "light": "Light"
+  }
+},
 
   "backgrounds": {
     "neutral": "Neutral",

@@ -1,17 +1,11 @@
 {
-  "sidebar": {
-    "searchPedal": "Pesquisar pedal",
-    "searchBoard": "Pesquisar pedalboard",
-    "buyOnline": "Comprar online",
-    "shop": "Lojas",
-    "addPedal": "Pedal",
-    "addBoard": "Pedalboard",
-    "addItem": "Adicionar",
-    "back": "Voltar ao menu",
-    "rotate": "Rodar",
-    "delete": "Eliminar",
-    "subtitleLine1": "Crie seu próximo pedalboard em segundos.",
-    "subtitleLine2": "Selecione seus pedais e monte seu setup."
+"sidebar": {
+  "searchPedal": "Buscar pedal",
+  "searchBoard": "Buscar pedalboard",
+  "buyOnline": "Comprar online",
+  "addPedal": "Adicionar pedal",
+  "addBoard": "Adicionar pedalboard",
+  "back": "Voltar"
   },
 
   "canvasIntro": {
@@ -155,29 +149,38 @@
     "origin": "Origem"
   },
 
-  "custom": {
-    "title": "Personalizado",
-    "selectType": "Selecionar pedal ou board",
-    "pedal": "Pedal",
-    "board": "Board",
-    "enterDimensions": "Inserir dimensões",
-    "width": "Largura",
-    "depth": "Profundidade",
-    "addPedal": "Adicionar pedal personalizado",
-    "addBoard": "Adicionar board personalizado"
+"custom": {
+  "title": "Adicionar custom",
+  "selectType": "Selecionar pedal ou board",
+  "pedal": "Pedal",
+  "board": "Board",
+  "nameOptional": "Nome",
+  "namePlaceholder": "Fuzz",
+  "enterDimensions": "Dimensões",
+  "width": "Largura",
+  "depth": "Profundidade",
+  "color": "Cor",
+  "addPedal": "Adicionar pedal custom",
+  "addBoard": "Adicionar board custom"
   },
 
-  "settings": {
-    "title": "Configurações",
-    "background": "Fundo",
-    "language": "Idioma",
-    "units": "Unidad",
+"settings": {
+  "title": "Configurações",
+  "background": "Fundo",
+  "language": "Idioma",
+  "units": "Unidade",
+  "theme": "Tema",
 
-    "unitsOptions": {
-      "metric": "MÉTRICO",
-      "imperial": "IMPERIAL"
-    }
+  "unitsOptions": {
+    "metric": "MÉTRICO",
+    "imperial": "IMPERIAL"
   },
+  
+  "themeOptions": {
+    "dark": "Escuro",
+    "light": "Claro"
+  }
+},
 
   "backgrounds": {
     "neutral": "Neutro",
