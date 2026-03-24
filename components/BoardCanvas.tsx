@@ -1039,9 +1039,12 @@ onTap={(e) => {
       rotateBoard(selectedBoardInstanceId);
     }
   }}
-  className="text-white hover:text-blue-500 transition-colors duration-150"
+  className="text-white"
 >
-  <RotateCw size={14} />
+  <RotateCw
+    size={14}
+    className="transition-colors duration-150 hover:text-blue-500"
+  />
 </button>
 
 {isMobile && (selectedInstanceId !== null || selectedBoardInstanceId !== null) && (
@@ -1049,9 +1052,12 @@ onTap={(e) => {
     onClick={() => {
       setSpecsOpen(true);
     }}
-    className="text-white hover:text-blue-500 transition-colors"
+    className="text-white"
   >
-    <Info size={14} />
+    <Info
+      size={14}
+      className="transition-colors hover:text-blue-500"
+    />
   </button>
 )}
 
@@ -1064,9 +1070,12 @@ onTap={(e) => {
       deleteBoard(selectedBoardInstanceId);
     }
   }}
-  className="text-white hover:text-red-500 transition-colors"
+  className="text-white"
 >
-  <Trash2 size={14} />
+  <Trash2
+    size={14}
+    className="transition-colors hover:text-red-500"
+  />
 </button>
 
     </div>
