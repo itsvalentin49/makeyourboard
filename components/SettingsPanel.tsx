@@ -28,7 +28,7 @@ export default function SettingsPanel({
   const [bgOpen, setBgOpen] = React.useState(false);
   const [langOpen, setLangOpen] = React.useState(false);
   const [theme, setTheme] = React.useState<"dark" | "light">(() => {
-  if (typeof window === "undefined") return "dark";
+  if (typeof window === "undefined") return "light";
 
   const isLight = document.documentElement.classList.contains("light");
   return isLight ? "light" : "dark";
@@ -40,13 +40,13 @@ export default function SettingsPanel({
   React.useEffect(() => {
   const savedTheme = localStorage.getItem("theme");
 
-  if (savedTheme === "light") {
-    document.documentElement.classList.add("light");
-    setTheme("light");
-  } else {
-    document.documentElement.classList.remove("light");
-    setTheme("dark");
-  }
+  if (savedTheme === "dark") {
+  document.documentElement.classList.remove("light");
+  setTheme("dark");
+} else {
+  document.documentElement.classList.add("light");
+  setTheme("light");
+}
 }, []);
 
   React.useEffect(() => {

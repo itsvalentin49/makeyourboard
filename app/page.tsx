@@ -197,7 +197,9 @@ useEffect(() => {
   const [hydrated, setHydrated] = useState<boolean>(false);
   const [isMobileDevice, setIsMobileDevice] = useState(false);
 
-  useEffect(() => {
+useEffect(() => {
+  if (!hydrated) return;
+
   if (projects.length === 0) {
     const firstProject: Project = {
       id: Date.now(),
@@ -212,7 +214,7 @@ useEffect(() => {
     setProjects([firstProject]);
     setActiveProjectId(firstProject.id);
   }
-}, [projects]);
+}, [projects, hydrated]);
 
 
   // Custom item
@@ -276,13 +278,16 @@ useEffect(() => {
         const parsed = JSON.parse(saved);
 
         const parsedProjects = (parsed.projects ?? []) as any[];
-        const safeProjects: Project[] = parsedProjects.map((p: any, i: number) => ({
-          id: typeof p.id === "number" ? p.id : Date.now() + i,
-          name: typeof p.name === "string" ? p.name : `Pedalboard ${i + 1}`,
-          zoom: typeof p.zoom === "number" ? p.zoom : 100,
-          boardPedals: Array.isArray(p.boardPedals) ? p.boardPedals : [],
-          selectedBoards: Array.isArray(p.selectedBoards) ? p.selectedBoards : [],
-        }));
+
+const safeProjects: Project[] = parsedProjects.map((p: any, i: number) => ({
+  id: typeof p.id === "number" ? p.id : Date.now() + i,
+  name: typeof p.name === "string" ? p.name : `Pedalboard ${i + 1}`,
+  zoom: typeof p.zoom === "number" ? p.zoom : 100,
+  stageX: typeof p.stageX === "number" ? p.stageX : 0,
+  stageY: typeof p.stageY === "number" ? p.stageY : 0,
+  boardPedals: Array.isArray(p.boardPedals) ? p.boardPedals : [],
+  selectedBoards: Array.isArray(p.selectedBoards) ? p.selectedBoards : [],
+}));
 
         setProjects(safeProjects);
 
