@@ -67,6 +67,68 @@ setSpecsOpen: (v: boolean) => void;
   >;
   };
 
+  // ================== GEOMETRY (PRO) ==================
+
+function getOrientedBox(p: any, size: { w: number; h: number }) {
+  const angle = ((p.rotation || 0) * Math.PI) / 180;
+
+  const cos = Math.cos(angle);
+  const sin = Math.sin(angle);
+
+  const hw = size.w / 2;
+  const hh = size.h / 2;
+
+  const cx = p.x;
+  const cy = p.y;
+
+  const axisX = { x: cos, y: sin };
+  const axisY = { x: -sin, y: cos };
+
+  const corners = [
+    { x: cx + axisX.x * hw + axisY.x * hh, y: cy + axisX.y * hw + axisY.y * hh },
+    { x: cx - axisX.x * hw + axisY.x * hh, y: cy - axisX.y * hw + axisY.y * hh },
+    { x: cx - axisX.x * hw - axisY.x * hh, y: cy - axisX.y * hw - axisY.y * hh },
+    { x: cx + axisX.x * hw - axisY.x * hh, y: cy + axisX.y * hw - axisY.y * hh },
+  ];
+
+  return { cx, cy, axisX, axisY, corners };
+}
+
+function projectBox(axis: any, box: any) {
+  const dots = box.corners.map((p: any) => p.x * axis.x + p.y * axis.y);
+  return {
+    min: Math.min(...dots),
+    max: Math.max(...dots),
+  };
+}
+
+function getOverlap(projA: any, projB: any) {
+  return Math.min(projA.max, projB.max) - Math.max(projA.min, projB.min);
+}
+
+function getSATOverlap(boxA: any, boxB: any) {
+  const axes = [boxA.axisX, boxA.axisY, boxB.axisX, boxB.axisY];
+
+  let minOverlap = Infinity;
+  let smallestAxis = null;
+
+  for (const axis of axes) {
+    const projA = projectBox(axis, boxA);
+    const projB = projectBox(axis, boxB);
+
+    const overlap = getOverlap(projA, projB);
+
+    if (overlap <= 0) return null;
+
+    if (overlap < minOverlap) {
+      minOverlap = overlap;
+      smallestAxis = axis;
+    }
+  }
+
+  return { overlap: minOverlap, axis: smallestAxis };
+}
+
 export default function BoardCanvas({
   activeProject,
   units,
@@ -186,6 +248,9 @@ const zoomOut = () => {
 
   const containerRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<any>(null);
+  const lastRenderedPos = useRef<{ x: number; y: number } | null>(null);
+  const lastStablePos = useRef<{ x: number; y: number } | null>(null);
+  const dragStartPos = useRef<{ x: number; y: number } | null>(null);
   const lastDist = useRef<number | null>(null);
   const lastCenter = useRef<{ x: number; y: number } | null>(null);
   const [stageSize, setStageSize] = useState({ width: 0, height: 0 });
@@ -212,8 +277,6 @@ const zoomOut = () => {
     return { x: centerX, y: centerY };
   };
 }, [getCenterRef, stageSize.width, stageSize.height]);
-
-
 
 
   const [hoveredPedalId, setHoveredPedalId] = useState<number | null>(null);
@@ -710,6 +773,22 @@ onTap={(e) => {
 
     onDragMove={(e) => {
   const node = e.target;
+
+  const MOVE_THRESHOLD = 3;
+
+  if (lastStablePos.current) {
+    const dxMove = Math.abs(node.x() - lastStablePos.current.x);
+    const dyMove = Math.abs(node.y() - lastStablePos.current.y);
+
+
+
+    // ✅ vrai mouvement → on valide la position
+    lastStablePos.current = {
+      x: node.x(),
+      y: node.y(),
+    };
+  }
+
   const bounds = getVisibleBounds();
 
   const box = node.getClientRect({ skipTransform: false });
@@ -729,10 +808,11 @@ onTap={(e) => {
   node.position({ x, y });
 }}
 
-   onDragEnd={(e) => {
+
+onDragEnd={(e) => {
   setTimeout(() => {
-  setIsDragging(false);
-}, 0);
+    setIsDragging(false);
+  }, 0);
 
   updateActiveProject({
     selectedBoards: (activeProject.selectedBoards || []).map(
@@ -747,6 +827,9 @@ onTap={(e) => {
     ),
   });
 }}
+
+
+
   >
           <PedalImage
           
@@ -763,7 +846,9 @@ onTap={(e) => {
           />
 
 {/* 💎 Hover halo (desktop only) */}
-{hoveredBoardId === b.instanceId &&
+
+{!isDragging &&
+  hoveredBoardId === b.instanceId &&
   selectedBoardInstanceId !== b.instanceId &&
   displaySizes[b.instanceId] && (
     <Rect
@@ -779,7 +864,8 @@ onTap={(e) => {
     />
 )}
 
-{selectedBoardInstanceId === b.instanceId &&
+{!isDragging &&
+  selectedBoardInstanceId === b.instanceId &&
   displaySizes[b.instanceId] && (
     
     <Rect
@@ -795,9 +881,10 @@ onTap={(e) => {
 )}
 
           
-          {!isMobile &&
-          selectedBoardInstanceId === b.instanceId &&
-          displaySizes[b.instanceId] && (
+{!isDragging &&
+  !isMobile &&
+  selectedBoardInstanceId === b.instanceId &&
+  displaySizes[b.instanceId] && (
 
     <Rect
       x={-displaySizes[b.instanceId].w / 2}
@@ -821,10 +908,16 @@ onTap={(e) => {
     y={p.y}
     rotation={p.rotation || 0}
     draggable
+    instanceId={p.instanceId}
 
-    onDragStart={() => {
-      setIsDragging(true);
-    }}
+onDragStart={(e) => {
+  setIsDragging(true);
+
+  lastRenderedPos.current = {
+    x: e.target.x(),
+    y: e.target.y(),
+  };
+}}
 
     onMouseEnter={() => {
       if (!isMobile) setHoveredPedalId(p.instanceId);
@@ -847,8 +940,11 @@ onTap={(e) => {
   setSelectedInstanceId(p.instanceId);
   setSelectedBoardInstanceId(null);
 }}
-    
-    onDragMove={(e) => {
+
+
+
+// MOVE ON CANVAS
+onDragMove={(e) => {
   const node = e.target;
   const bounds = getVisibleBounds();
 
@@ -866,37 +962,55 @@ onTap={(e) => {
   if (x + width / 2 > bounds.maxX) x = bounds.maxX - width / 2;
   if (y + height / 2 > bounds.maxY) y = bounds.maxY - height / 2;
 
+  
+
+  const hasMovedVisually =
+    !lastRenderedPos.current ||
+    Math.abs(lastRenderedPos.current.x - x) > 0.5 ||
+    Math.abs(lastRenderedPos.current.y - y) > 0.5;
+
   node.position({ x, y });
+
+  if (!hasMovedVisually) return;
+
+  lastRenderedPos.current = { x, y };
 }}
 
-    onDragEnd={(e) => {
+onDragEnd={(e) => {
   setTimeout(() => {
-  setIsDragging(false);
-}, 0);
+    setIsDragging(false);
+  }, 0);
+
+  const node = e.target;
+
+  let finalX = node.x();
+  let finalY = node.y();
+
+  lastRenderedPos.current = null;
 
   updateActiveProject({
     boardPedals: activeProject.boardPedals.map((x: AnyRow) =>
       x.instanceId === p.instanceId
         ? {
             ...x,
-            x: e.target.x(),
-            y: e.target.y(),
+            x: finalX,
+            y: finalY,
           }
         : x
     ),
   });
 }}
-  >
-          <PedalImage
-            url={p.image || p.image_url || p.photo || null}
-            width={p.width}
-            depth={p.depth}
-            color={p.color}
-            rotation={0}
-            onSizeReady={(nw, nh) =>
-              handleSizeUpdate(p.instanceId, nw, nh)
-            }
-          />
+>
+<PedalImage
+  url={p.image || p.image_url || p.photo || null}
+  width={p.width}
+  depth={p.depth}
+  color={p.color}
+  rotation={0}
+  onSizeReady={(nw, nh) =>
+    handleSizeUpdate(p.instanceId, nw, nh)
+  }
+/>
 
 {/* 🎛 CUSTOM CONTROLS */}
 {p.slug === "custom" &&
@@ -978,8 +1092,9 @@ onTap={(e) => {
 />
 )}
 
-          {/* 💎 Hover halo (desktop only) */}
-{hoveredPedalId === p.instanceId &&
+         {/* 💎 Hover halo (desktop only) */}
+{!isDragging &&
+  hoveredPedalId === p.instanceId &&
   selectedInstanceId !== p.instanceId &&
   displaySizes[p.instanceId] && (
     <Rect
@@ -995,9 +1110,10 @@ onTap={(e) => {
     />
 )}
 
-          {selectedInstanceId === p.instanceId &&
+{!isDragging &&
+  selectedInstanceId === p.instanceId &&
   displaySizes[p.instanceId] && (
-
+    
   <Rect
     x={-displaySizes[p.instanceId].w / 2}
     y={-displaySizes[p.instanceId].h / 2}
@@ -1009,7 +1125,9 @@ onTap={(e) => {
     listening={false}
   />
 )}
-          
+
+
+
         </Group>
       ))}
 
