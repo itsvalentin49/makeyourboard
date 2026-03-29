@@ -6,8 +6,9 @@ import { Zap, Weight, Minus, Plus } from "lucide-react";
 import PedalImage from "@/components/PedalImage";
 import { formatWeight } from "@/utils/units";
 import { getTranslator } from "@/utils/i18n";
-import { RotateCw, Trash2, X, Info } from "lucide-react";
+import { RotateCw, Trash2, X, Download, Info } from "lucide-react";
 import useImage from "use-image";
+import ExportPNG from "@/components/ExportPNG";
 
 type AnyRow = Record<string, any>;
 
@@ -20,6 +21,7 @@ type Background = {
 
 type Props = {
 activeProject: {
+  name?: string;
   boardPedals: AnyRow[];
   selectedBoards?: AnyRow[];
   zoom?: number;
@@ -243,6 +245,7 @@ const zoomOut = () => {
       setSelectedBoardInstanceId(null);
       closeSearchMenus();
       setContactOpen(false);
+      setShowExport(false);
     }
   };
 
@@ -280,6 +283,7 @@ const zoomOut = () => {
 
 
   const [hoveredPedalId, setHoveredPedalId] = useState<number | null>(null);
+  const [showExport, setShowExport] = useState(false);
   const [hoveredBoardId, setHoveredBoardId] = useState<number | null>(null);
   const [overlayPosition, setOverlayPosition] = useState<{
   x: number;
@@ -513,8 +517,6 @@ const getVisibleBounds = () => {
       {!(isMobile && mobileSidebarOpen) && (
   <div className="absolute bottom-6 left-6 flex items-center gap-4 z-50">
 
-
-
   {/* Desktop uniquement */}
     <>
 
@@ -577,6 +579,38 @@ const getVisibleBounds = () => {
         </span>
       </div>
     </>
+
+    {/* EXPORT */}
+<div className="relative">
+
+  <button
+  onClick={() => setShowExport((v) => !v)}
+  className="
+    relative flex items-center justify-center gap-2
+    h-9 w-24 md:h-10 md:w-28
+    bg-zinc-900 backdrop-blur-md border border-zinc-800
+    rounded-2xl shadow-2xl
+    text-[12px] font-mono font-bold text-white uppercase
+    transition-all duration-150
+    hover:border-blue-500 hover:scale-[1.02]
+    active:scale-95
+  "
+>
+  <Download size={16} className="text-green-600" />
+  {t("export.button")}
+</button>
+
+  {showExport && (
+    <div className="absolute bottom-12 left-0 z-50">
+<ExportPNG
+  boardPedals={activeProject.boardPedals}
+  selectedBoards={activeProject.selectedBoards}
+  displaySizes={displaySizes}
+  boardName={activeProject.name}
+/>
+    </div>
+  )}
+</div>
 </div>
 )}
 
@@ -739,6 +773,7 @@ const getVisibleBounds = () => {
 {/* BOARDS */}
 {(activeProject.selectedBoards || []).map((b: AnyRow) => (
   <Group
+    name="exportable"
     key={b.instanceId}
     x={b.x}
     y={b.y}
@@ -903,6 +938,7 @@ onDragEnd={(e) => {
 {/* PEDALS */}
 {activeProject.boardPedals.map((p: AnyRow) => (
   <Group
+    name="exportable"
     key={p.instanceId}
     x={p.x}
     y={p.y}

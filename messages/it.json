@@ -228,5 +228,18 @@
       "bug": "Errore",
       "other": "Altro"
   }
-}
+},
+
+  "export": {
+    "button": "Esporta",
+    "title": "Esporta immagine",
+    "name": "Nome",
+    "background": "Sfondo",
+    "preview": "Anteprima",
+    "transparent": "Trasparente (PNG)",
+    "white": "Bianco (JPG)",
+    "download": "Scarica"
+  }
+
+
 }

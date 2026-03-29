@@ -228,5 +228,17 @@
       "bug": "Error",
       "other": "Otro"
     }
+  },
+
+  "export": {
+    "button": "Exportar",
+    "title": "Exportar imagen",
+    "name": "Nombre",
+    "background": "Fondo",
+    "preview": "Vista previa",
+    "transparent": "Transparente (PNG)",
+    "white": "Blanco (JPG)",
+    "download": "Descargar"
   }
+
 }

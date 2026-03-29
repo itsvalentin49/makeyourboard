@@ -226,5 +226,19 @@
       "bug": "Bug",
       "other": "Other"
     }
+  },
+
+  "export": {
+    "button": "Export",
+    "title": "Export Image",
+    "name": "Name",
+    "background": "Background",
+    "preview": "Preview",
+    "transparent": "Transparent (PNG)",
+    "white": "White (JPG)",
+    "download": "Download"
   }
+
+
+
 }
