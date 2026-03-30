@@ -122,7 +122,7 @@ if (value === "light") {
               setLanguage(l as any);
               setLangOpen(false);
             }}
-            className="w-full h-[36px] px-4 text-left text-[10px] text-white flex items-center hover:bg-zinc-800"
+            className="w-full h-[36px] px-4 text-left text-[10px] text-white flex items-center hover:bg-canvas"
           >
             {LANGUAGE_LABELS[l]}
           </button>
@@ -152,7 +152,7 @@ if (value === "light") {
             onClick={() => setUnits(u.key as any)}
             className={`flex-1 h-[36px] rounded-md ${
               isActive
-                ? "bg-zinc-800 text-white"
+                ? "bg-canvas text-white"
                 : "text-white"
             }`}
           >
@@ -191,7 +191,7 @@ if (value === "light") {
             onClick={() => handleThemeChange(t.key as any)}
             className={`flex-1 h-[36px] rounded-md ${
               isActive
-                ? "bg-zinc-800 text-white"
+                ? "bg-canvas text-white"
                 : "text-white"
             }`}
           >

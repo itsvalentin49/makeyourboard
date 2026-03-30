@@ -237,6 +237,20 @@
     "transparent": "Transparent (PNG)",
     "white": "White (JPG)",
     "download": "Download"
+  },
+
+  "share": {
+    "button": "Share",
+    "title": "Share Your Board",
+    "preview": "Preview",
+    "social": "Share via",
+    "copy": "Copy link",
+    "copied": "Copied"
+  },
+
+  "list": {
+    "button": "List",
+    "title": "Pedalboard"
   }
 
 

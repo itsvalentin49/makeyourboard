@@ -2,13 +2,13 @@
 
 import React, { useRef, useLayoutEffect, useEffect, useState } from "react";
 import { Stage, Layer, Group, Rect, Text, Image as KonvaImage } from "react-konva";
-import { Zap, Weight, Minus, Plus } from "lucide-react";
+import { Zap, Weight, Minus, Plus, Upload, RotateCw, Trash2, X, Download, Info, List } from "lucide-react";
 import PedalImage from "@/components/PedalImage";
 import { formatWeight } from "@/utils/units";
 import { getTranslator } from "@/utils/i18n";
-import { RotateCw, Trash2, X, Download, Info } from "lucide-react";
 import useImage from "use-image";
 import ExportPNG from "@/components/ExportPNG";
+import ShareBoard from "@/components/ShareBoard";
 
 type AnyRow = Record<string, any>;
 
@@ -20,6 +20,8 @@ type Background = {
 };
 
 type Props = {
+viewer?: boolean;
+
 activeProject: {
   name?: string;
   boardPedals: AnyRow[];
@@ -159,6 +161,7 @@ export default function BoardCanvas({
   getCenterRef,
   setMobileSidebarOpen,
   setSpecsOpen,
+  viewer = false,
 }: Props) {
 
   const t = getTranslator(language);
@@ -208,6 +211,80 @@ const zoomIn = () => {
   if (zoomPercent >= MAX_ZOOM) return;
   const newZoom = Math.min(MAX_ZOOM, zoomPercent + ZOOM_STEP);
   applyZoom(newZoom);
+};
+
+const handleWheel = (e: any) => {
+  e.evt.preventDefault();
+
+  const stage = stageRef.current;
+  if (!stage) return;
+
+  const oldScale = stage.scaleX();
+
+  const scaleBy = 1.05;
+  const direction = e.evt.deltaY > 0 ? -1 : 1;
+
+  const newScale =
+    direction > 0
+      ? oldScale * scaleBy
+      : oldScale / scaleBy;
+
+  const clampedScale = Math.max(0.5, Math.min(2, newScale));
+
+  if (viewer) {
+    // 🔥 ZOOM CENTRÉ ÉCRAN
+    const center = {
+      x: stageSize.width / 2,
+      y: stageSize.height / 2,
+    };
+
+    const pointTo = {
+      x: (center.x - stage.x()) / oldScale,
+      y: (center.y - stage.y()) / oldScale,
+    };
+
+    stage.scale({ x: clampedScale, y: clampedScale });
+
+    const newPos = {
+      x: center.x - pointTo.x * clampedScale,
+      y: center.y - pointTo.y * clampedScale,
+    };
+
+    stage.position(newPos);
+    stage.batchDraw();
+
+updateActiveProject({
+  zoom: clampedScale * 100,
+  stageX: newPos.x,
+  stageY: newPos.y,
+});
+
+  } else {
+    // zoom classique
+    const pointer = stage.getPointerPosition();
+    if (!pointer) return;
+
+    const mousePointTo = {
+      x: (pointer.x - stage.x()) / oldScale,
+      y: (pointer.y - stage.y()) / oldScale,
+    };
+
+    stage.scale({ x: clampedScale, y: clampedScale });
+
+    const newPos = {
+      x: pointer.x - mousePointTo.x * clampedScale,
+      y: pointer.y - mousePointTo.y * clampedScale,
+    };
+
+    stage.position(newPos);
+    stage.batchDraw();
+
+    updateActiveProject({
+      zoom: clampedScale * 100,
+      stageX: newPos.x,
+      stageY: newPos.y,
+    });
+  }
 };
 
 const zoomOut = () => {
@@ -284,6 +361,8 @@ const zoomOut = () => {
 
   const [hoveredPedalId, setHoveredPedalId] = useState<number | null>(null);
   const [showExport, setShowExport] = useState(false);
+  const [showShare, setShowShare] = useState(false);
+  const [showList, setShowList] = useState(false);
   const [hoveredBoardId, setHoveredBoardId] = useState<number | null>(null);
   const [overlayPosition, setOverlayPosition] = useState<{
   x: number;
@@ -297,34 +376,85 @@ const zoomOut = () => {
   const [isStageDragging, setIsStageDragging] = useState(false);
 
   /* ================= MEASURE STAGE ================= */
-  useLayoutEffect(() => {
+useLayoutEffect(() => {
+  if (!containerRef.current) return;
+
+  const measure = () => {
     if (!containerRef.current) return;
 
-    const measure = () => {
-      if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
 
-      const rect = containerRef.current.getBoundingClientRect();
+    setStageSize({
+      width: rect.width,
+      height: rect.height,
+    });
 
-      setStageSize({
+    if (onStageSizeChange) {
+      onStageSizeChange({
         width: rect.width,
         height: rect.height,
       });
+    }
+  };
 
-      if (onStageSizeChange) {
-        onStageSizeChange({
-          width: rect.width,
-          height: rect.height,
-        });
-      }
-    };
+  measure();
+  window.addEventListener("resize", measure);
 
-    measure();
-    window.addEventListener("resize", measure);
-
-    return () => window.removeEventListener("resize", measure);
-  }, []);
+  return () => window.removeEventListener("resize", measure);
+}, []);
 
 
+/* ================= AUTO FIT + CENTER VIEWER ================= */
+useEffect(() => {
+  if (!viewer) return;
+  if (!stageRef.current) return;
+  if (!activeProject.boardPedals?.length) return;
+  if (stageSize.width === 0) return;
+
+  const stage = stageRef.current;
+
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+
+  activeProject.boardPedals.forEach((p: any) => {
+    const w = Number(p.width) || 80;
+    const h = Number(p.depth) || 120;
+
+    minX = Math.min(minX, p.x - w / 2);
+    minY = Math.min(minY, p.y - h / 2);
+    maxX = Math.max(maxX, p.x + w / 2);
+    maxY = Math.max(maxY, p.y + h / 2);
+  });
+
+  if (!isFinite(minX)) return;
+
+  const boardWidth = maxX - minX;
+  const boardHeight = maxY - minY;
+
+  const scaleX = stageSize.width / boardWidth;
+  const scaleY = stageSize.height / boardHeight;
+
+  const scale = Math.min(scaleX, scaleY) * 0.8;
+
+  stage.scale({ x: scale, y: scale });
+
+  const boardCenterX = (minX + maxX) / 2;
+  const boardCenterY = (minY + maxY) / 2;
+
+  const newX = stageSize.width / 2 - boardCenterX * scale;
+  const newY = stageSize.height / 2 - boardCenterY * scale;
+
+  stage.position({ x: newX, y: newY });
+  stage.batchDraw();
+
+}, [
+  viewer,
+  stageSize.width,
+  stageSize.height,
+  activeProject.boardPedals.length
+]);
 
 
 /* ================= OVERLAY POSITION ================= */
@@ -494,36 +624,34 @@ const getVisibleBounds = () => {
   };
 
   return (
-    <div
-  ref={containerRef}
-  className={`
-    relative w-full h-full overflow-hidden
-    ${isMobile ? "pb-6" : "pb-20"}
-    ${canvasBg === "neutral" ? "bg-canvas" : ""}
-  `}
-      style={
-        canvasBg === "neutral"
-          ? undefined
-          : {
-              backgroundImage: `url(${
-                BACKGROUNDS.find((b) => b.id === canvasBg)?.src
-              })`,
-              backgroundSize: "auto 100%",
-              backgroundPosition: "center",
-              backgroundRepeat: "no-repeat",
-            }
-      }
-    >
-      {!(isMobile && mobileSidebarOpen) && (
-  <div className="absolute bottom-6 left-6 flex items-center gap-4 z-50">
+  <div
+    ref={containerRef}
+    className={`
+      relative w-full h-full overflow-hidden
+      ${isMobile ? "pb-6" : "pb-20"}
+      ${canvasBg === "neutral" ? "bg-canvas" : ""}
+    `}
+    style={
+      canvasBg === "neutral"
+        ? undefined
+        : {
+            backgroundImage: `url(${
+              BACKGROUNDS.find((b) => b.id === canvasBg)?.src
+            })`,
+            backgroundSize: "auto 100%",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+          }
+    }
+  >
 
-  {/* Desktop uniquement */}
-    <>
+{viewer && (
+  <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4 z-50">
 
     {/* ZOOM */}
-<div className="relative flex items-center justify-center h-9 w-24 md:h-10 md:w-28 bg-zinc-900 backdrop-blur-md border border-zinc-800 rounded-2xl shadow-2xl">
+    <div className="relative flex items-center justify-center h-9 w-24 md:h-10 md:w-28 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl">
 
-  {/* LEFT BUTTON */}
+  {/* MINUS */}
   <button
     onClick={zoomOut}
     disabled={isMinZoom}
@@ -536,12 +664,12 @@ const getVisibleBounds = () => {
     )}
   </button>
 
-  {/* % CENTER */}
-  <span className="text-[12px] font-black font-mono tabular-nums">
+  {/* % */}
+  <span className="text-[12px] font-black font-mono tabular-nums text-white">
     {zoomPercent}%
   </span>
 
-  {/* RIGHT BUTTON */}
+  {/* PLUS */}
   <button
     onClick={zoomIn}
     disabled={isMaxZoom}
@@ -556,63 +684,246 @@ const getVisibleBounds = () => {
 
 </div>
 
+    {/* TOTAL DRAW */}
+    <div className="relative flex items-center justify-center h-9 w-24 md:h-10 md:w-28 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl">
+      <Zap className="absolute left-3 size-4 text-yellow-500" />
+      <span className="text-[12px] font-black font-mono tabular-nums text-white">
+        {totalDraw}
+      </span>
+      <span className="absolute right-3 text-[10px] text-zinc-500">
+        mA
+      </span>
+    </div>
 
-      {/* TOTAL DRAW */}
-      <div className="relative flex items-center justify-center h-9 w-24 md:h-10 md:w-28 bg-zinc-900 backdrop-blur-md border border-zinc-800 rounded-2xl shadow-2xl pointer-events-none">
-        <Zap className="absolute left-3 size-4 text-yellow-500" />
-        <span className="text-[12px] font-black font-mono tabular-nums">
-          {totalDraw}
-        </span>
-        <span className="absolute right-3 text-[10px] text-zinc-500">
-          mA
-        </span>
-      </div>
+    {/* TOTAL WEIGHT */}
+    <div className="relative flex items-center justify-center h-9 w-24 md:h-10 md:w-28 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl">
+      <Weight className="absolute left-3 size-4 text-zinc-400" />
+      <span className="text-[12px] font-black font-mono tabular-nums text-white">
+        {weightValue}
+      </span>
+      <span className="absolute right-3 text-[10px] text-zinc-500">
+        {weightUnit}
+      </span>
+    </div>
 
-      {/* TOTAL WEIGHT */}
-      <div className="relative flex items-center justify-center h-9 w-24 md:h-10 md:w-28 bg-zinc-900 backdrop-blur-md border border-zinc-800 rounded-2xl shadow-2xl pointer-events-none">
-        <Weight className="absolute left-3 size-4 text-blue-500" />
-        <span className="text-[12px] font-black font-mono tabular-nums">
-          {weightValue}
-        </span>
-        <span className="absolute right-3 text-[10px] text-zinc-500">
-          {weightUnit}
-        </span>
-      </div>
-    </>
-
-    {/* EXPORT */}
+{/* LIST */}
 <div className="relative">
 
   <button
-  onClick={() => setShowExport((v) => !v)}
-  className="
-    relative flex items-center justify-center gap-2
-    h-9 w-24 md:h-10 md:w-28
-    bg-zinc-900 backdrop-blur-md border border-zinc-800
-    rounded-2xl shadow-2xl
-    text-[12px] font-mono font-bold text-white uppercase
-    transition-all duration-150
-    hover:border-blue-500 hover:scale-[1.02]
-    active:scale-95
-  "
->
-  <Download size={16} className="text-green-600" />
-  {t("export.button")}
-</button>
+    onClick={() => {
+      setShowList((v) => !v);
+      setShowExport(false);
+      setShowShare(false);
+    }}
+    className="
+      relative flex items-center justify-center gap-2
+      h-9 w-24 md:h-10 md:w-28
+      bg-zinc-900 border border-zinc-800
+      rounded-2xl shadow-2xl
+      text-[16px] font-mono font-bold text-white uppercase
+      transition-all duration-150
+      hover:border-blue-500 hover:scale-[1.02]
+      active:scale-95
+    "
+  >
+    <List size={16} className="text-blue-400" />
+    SETUP
+  </button>
 
-  {showExport && (
+{showList && (
+  <>
+    {/* OVERLAY */}
+    <div
+      className="fixed inset-0 z-40"
+      onClick={() => setShowList(false)}
+    />
+
+    {/* POPUP */}
     <div className="absolute bottom-12 left-0 z-50">
-<ExportPNG
-  boardPedals={activeProject.boardPedals}
-  selectedBoards={activeProject.selectedBoards}
-  displaySizes={displaySizes}
-  boardName={activeProject.name}
-/>
+
+      <div
+        className="w-72 max-h-80 overflow-y-auto bg-zinc-900 border border-zinc-800 rounded-xl shadow-2xl p-4 space-y-3"
+        onClick={(e) => e.stopPropagation()} // 🔥 IMPORTANT
+      >
+
+        <div className="text-xs uppercase tracking-wider text-white font-bold">
+          PEDALBOARD
+        </div>
+
+        {/* PEDALS TRI ALPHABÉTIQUE */}
+        {[...activeProject.boardPedals]
+          .sort((a, b) => {
+            const nameA = `${a.brand || ""} ${a.name || ""}`.toLowerCase();
+            const nameB = `${b.brand || ""} ${b.name || ""}`.toLowerCase();
+            return nameA.localeCompare(nameB);
+          })
+          .map((p, i) => (
+            <div key={i} className="text-sm text-white">
+              <span className="text-zinc-400">
+                - {p.brand || "Custom"}
+              </span>{" "}
+              {p.name || "Unnamed"}
+            </div>
+          ))}
+
+          {/* BOARD */}
+        {(activeProject.selectedBoards || []).map((b, i) => (
+          <div key={`board-${i}`} className="text-sm text-white">
+            <span className="text-zinc-400">
+              - {b.brand || "Board"}
+            </span>{" "}
+            {b.name || "Custom"}
+          </div>
+        ))}
+
+      </div>
+
     </div>
-  )}
-</div>
-</div>
+  </>
 )}
+
+</div>
+  </div>
+)}
+
+    {/* 🔽 TON CODE EXISTANT — INCHANGÉ */}
+    {!viewer && !(isMobile && mobileSidebarOpen) && (
+      <div className="absolute bottom-6 left-6 flex items-center gap-4 z-50">
+
+        {/* Desktop uniquement */}
+        <>
+
+        {/* ZOOM */}
+        <div className="relative flex items-center justify-center h-9 w-24 md:h-10 md:w-28 bg-zinc-900 backdrop-blur-md border border-zinc-800 rounded-2xl shadow-2xl">
+
+          {/* LEFT BUTTON */}
+          <button
+            onClick={zoomOut}
+            disabled={isMinZoom}
+            className="absolute left-2 flex items-center justify-center w-6 h-6 text-white hover:text-blue-400 disabled:text-zinc-600"
+          >
+            {isMinZoom ? (
+              <span className="text-[9px] tracking-wider text-zinc-500">MIN</span>
+            ) : (
+              <Minus size={14} />
+            )}
+          </button>
+
+          {/* % CENTER */}
+          <span className="text-[12px] font-black font-mono tabular-nums">
+            {zoomPercent}%
+          </span>
+
+          {/* RIGHT BUTTON */}
+          <button
+            onClick={zoomIn}
+            disabled={isMaxZoom}
+            className="absolute right-2 flex items-center justify-center w-6 h-6 text-white hover:text-blue-400 disabled:text-zinc-600"
+          >
+            {isMaxZoom ? (
+              <span className="text-[9px] tracking-wider text-zinc-500">MAX</span>
+            ) : (
+              <Plus size={14} />
+            )}
+          </button>
+
+        </div>
+
+        {/* TOTAL DRAW */}
+        <div className="relative flex items-center justify-center h-9 w-24 md:h-10 md:w-28 bg-zinc-900 backdrop-blur-md border border-zinc-800 rounded-2xl shadow-2xl pointer-events-none">
+          <Zap className="absolute left-3 size-4 text-yellow-500" />
+          <span className="text-[12px] font-black font-mono tabular-nums">
+            {totalDraw}
+          </span>
+          <span className="absolute right-3 text-[10px] text-zinc-500">
+            mA
+          </span>
+        </div>
+
+        {/* TOTAL WEIGHT */}
+        <div className="relative flex items-center justify-center h-9 w-24 md:h-10 md:w-28 bg-zinc-900 backdrop-blur-md border border-zinc-800 rounded-2xl shadow-2xl pointer-events-none">
+          <Weight className="absolute left-3 size-4 text-zinc-400" />
+          <span className="text-[12px] font-black font-mono tabular-nums">
+            {weightValue}
+          </span>
+          <span className="absolute right-3 text-[10px] text-zinc-500">
+            {weightUnit}
+          </span>
+        </div>
+
+        </>
+
+        {/* EXPORT */}
+        <div className="relative">
+
+          <button
+            onClick={() => setShowExport((v) => !v)}
+            className="
+              relative flex items-center justify-center gap-2
+              h-9 w-24 md:h-10 md:w-28
+              bg-zinc-900 backdrop-blur-md border border-zinc-800
+              rounded-2xl shadow-2xl
+              text-[12px] font-mono font-bold text-white uppercase
+              transition-all duration-150
+              hover:border-blue-500 hover:scale-[1.02]
+              active:scale-95
+            "
+          >
+            <Download size={16} className="text-green-600" />
+            {t("export.button")}
+          </button>
+
+          {showExport && (
+            <div className="absolute bottom-12 left-0 z-50">
+              <ExportPNG
+                boardPedals={activeProject.boardPedals}
+                selectedBoards={activeProject.selectedBoards}
+                displaySizes={displaySizes}
+                boardName={activeProject.name}
+              />
+            </div>
+          )}
+        </div>
+
+        {/* SHARE */}
+        <div className="relative">
+
+          <button
+            onClick={() => {
+              setShowShare((v) => !v);
+              setShowExport(false);
+            }}
+            className="
+              relative flex items-center justify-center gap-2
+              h-9 w-24 md:h-10 md:w-28
+              bg-zinc-900 backdrop-blur-md border border-zinc-800
+              rounded-2xl shadow-2xl
+              text-[12px] font-mono font-bold text-white uppercase
+              transition-all duration-150
+              hover:border-blue-500 hover:scale-[1.02] transform-gpu
+              active:scale-95
+            "
+          >
+            <Upload size={16} className="text-blue-500" />
+            {t("share.button")}
+          </button>
+
+          {showShare && (
+            <div className="absolute bottom-12 left-0 z-50">
+              <ShareBoard
+                boardPedals={activeProject.boardPedals}
+                selectedBoards={activeProject.selectedBoards}
+                displaySizes={displaySizes}
+                boardName={activeProject.name}
+                onClose={() => setShowShare(false)}
+              />
+            </div>
+          )}
+
+        </div>
+
+      </div>
+    )}
 
       {stageSize.width > 0 && stageSize.height > 0 && (
 
@@ -620,7 +931,8 @@ const getVisibleBounds = () => {
   ref={stageRef}
   width={stageSize.width}
   height={stageSize.height}
-  draggable={false}
+  draggable={!viewer}
+  onWheel={handleWheel}
 
   onDragStart={() => {
   setIsStageDragging(true);
@@ -632,76 +944,49 @@ const getVisibleBounds = () => {
   scaleX={(activeProject.zoom || 100) / 100}
   scaleY={(activeProject.zoom || 100) / 100}
 
-  onMouseDown={(e) => {
-    const stage = stageRef.current;
-    if (!stage) return;
+onMouseDown={(e) => {
+  if (viewer) return;
 
-    if (e.target === stage) {
-      stage.draggable(true);
-    }
-  }}
+  const stage = stageRef.current;
+  if (!stage) return;
 
-  onMouseUp={() => {
-    const stage = stageRef.current;
-    if (!stage) return;
-    stage.draggable(false);
-  }}
+  if (e.target === stage) {
+    stage.draggable(true);
+  }
+}}
+
+onMouseUp={() => {
+  if (viewer) return;
+
+  const stage = stageRef.current;
+  if (!stage) return;
+  stage.draggable(false);
+}}
 
   onDragEnd={(e) => {
   const stage = e.target.getStage();
   if (!stage) return;
 
+if (!viewer) {
   updateActiveProject({
     stageX: stage.x(),
     stageY: stage.y(),
   });
+}
 
   setIsStageDragging(false);
 }}
 
   onClick={handleStageClick}
 
-  onWheel={(e: any) => {
-    e.evt.preventDefault();
 
-    const stage = stageRef.current;
-    if (!stage) return;
+  
 
-    const oldScale = stage.scaleX();
-    const pointer = stage.getPointerPosition();
-    if (!pointer) return;
+  
 
-    const scaleBy = 1.05;
-    const direction = e.evt.deltaY > 0 ? -1 : 1;
 
-    const newScale =
-      direction > 0
-        ? oldScale * scaleBy
-        : oldScale / scaleBy;
 
-    const clampedScale = Math.max(0.5, Math.min(2, newScale));
-
-    const mousePointTo = {
-      x: (pointer.x - stage.x()) / oldScale,
-      y: (pointer.y - stage.y()) / oldScale,
-    };
-
-    stage.scale({ x: clampedScale, y: clampedScale });
-
-    const newPos = {
-      x: pointer.x - mousePointTo.x * clampedScale,
-      y: pointer.y - mousePointTo.y * clampedScale,
-    };
-
-    stage.position(newPos);
-    stage.batchDraw();
-
-    updateActiveProject({
-      zoom: clampedScale * 100,
-      stageX: newPos.x,
-      stageY: newPos.y,
-    });
-  }}
+  
 
   onTouchMove={(e: any) => {
   const stage = stageRef.current;
@@ -757,11 +1042,12 @@ const getVisibleBounds = () => {
   stage.position(newPos);
   stage.batchDraw();
 
+  if (!viewer) {
   updateActiveProject({
     zoom: clampedScale * 100,
     stageX: newPos.x,
     stageY: newPos.y,
-  });
+  });}
 
   lastDist.current = dist;
   lastCenter.current = center;
@@ -777,7 +1063,7 @@ const getVisibleBounds = () => {
     key={b.instanceId}
     x={b.x}
     y={b.y}
-    draggable
+    draggable={!viewer}
     rotation={b.rotation || 0}
 
     onDragStart={() => {
@@ -793,6 +1079,7 @@ const getVisibleBounds = () => {
     }}
 
     onClick={(e) => {
+      if (viewer) return;
   e.cancelBubble = true;
 
   setSelectedBoardInstanceId(b.instanceId);
@@ -800,6 +1087,7 @@ const getVisibleBounds = () => {
 }}
 
 onTap={(e) => {
+  if (viewer) return;
   e.cancelBubble = true;
 
   setSelectedBoardInstanceId(b.instanceId);
@@ -849,6 +1137,7 @@ onDragEnd={(e) => {
     setIsDragging(false);
   }, 0);
 
+  if (!viewer) {
   updateActiveProject({
     selectedBoards: (activeProject.selectedBoards || []).map(
       (x: AnyRow) =>
@@ -861,24 +1150,22 @@ onDragEnd={(e) => {
           : x
     ),
   });
-}}
+}}}
 
 
 
   >
-          <PedalImage
-          
-            url={b.image || b.image_url || b.photo || null}
-            width={b.width}
-            depth={b.depth}
-            color={b.color}
-            isBoard
-            rotation={0}
-            onSizeReady={(w, h) =>
-              handleSizeUpdate(b.instanceId, w, h)
-            }
-            
-          />
+<PedalImage
+  url={b.image || b.image_url || b.photo || null}
+  width={b.width}
+  depth={b.depth}
+  color={b.color}
+  isBoard
+  rotation={0}
+  onSizeReady={(w, h) =>
+    handleSizeUpdate?.(b.instanceId, w, h)
+  }
+/>
 
 {/* 💎 Hover halo (desktop only) */}
 
@@ -943,7 +1230,7 @@ onDragEnd={(e) => {
     x={p.x}
     y={p.y}
     rotation={p.rotation || 0}
-    draggable
+    draggable={!viewer}
     instanceId={p.instanceId}
 
 onDragStart={(e) => {
@@ -964,6 +1251,7 @@ onDragStart={(e) => {
     }}
 
     onClick={(e) => {
+      if (viewer) return;
   e.cancelBubble = true;
 
   setSelectedInstanceId(p.instanceId);
@@ -971,6 +1259,7 @@ onDragStart={(e) => {
 }}
 
 onTap={(e) => {
+  if (viewer) return;
   e.cancelBubble = true;
 
   setSelectedInstanceId(p.instanceId);
@@ -1024,6 +1313,7 @@ onDragEnd={(e) => {
 
   lastRenderedPos.current = null;
 
+  if (!viewer) {
   updateActiveProject({
     boardPedals: activeProject.boardPedals.map((x: AnyRow) =>
       x.instanceId === p.instanceId
@@ -1035,7 +1325,7 @@ onDragEnd={(e) => {
         : x
     ),
   });
-}}
+}}}
 >
 <PedalImage
   url={p.image || p.image_url || p.photo || null}
@@ -1043,9 +1333,7 @@ onDragEnd={(e) => {
   depth={p.depth}
   color={p.color}
   rotation={0}
-  onSizeReady={(nw, nh) =>
-    handleSizeUpdate(p.instanceId, nw, nh)
-  }
+onSizeReady={(nw, nh) => handleSizeUpdate?.(p.instanceId, nw, nh)}
 />
 
 {/* 🎛 CUSTOM CONTROLS */}
@@ -1171,7 +1459,7 @@ onDragEnd={(e) => {
   </Stage>
 )}
 
-{overlayPosition && !isDragging && !isStageDragging && (
+{!viewer && overlayPosition && !isDragging && !isStageDragging && (
   <div
     style={{
       position: "absolute",

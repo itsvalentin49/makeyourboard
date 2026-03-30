@@ -436,7 +436,7 @@ React.useEffect(() => {
             type="email"
             value={contactEmail}
             onChange={(e) => setContactEmail(e.target.value)}
-            className="bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-[11px] focus:border-blue-500 outline-none"
+            className="bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-[11px] focus:border-blue-500 outline-none"
             placeholder={t("contact.placeholderEmail")}
           />
         </div>
@@ -450,7 +450,7 @@ React.useEffect(() => {
   <button
     type="button"
     onClick={() => setContactTypeOpen((v) => !v)}
-    className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2
+    className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2
                text-[11px] text-left text-zinc-400
                flex items-center justify-between
                hover:border-zinc-600 transition-colors"
@@ -476,7 +476,7 @@ React.useEffect(() => {
             setContactType(type.value);
             setContactTypeOpen(false);
           }}
-          className="w-full px-3 py-2 text-left text-[11px] hover:bg-zinc-800"
+          className="w-full px-3 py-2 text-left text-[11px] hover:bg-canvas"
         >
           {type.label}
         </button>
@@ -494,7 +494,7 @@ React.useEffect(() => {
             value={contactMessage}
             onChange={(e) => setContactMessage(e.target.value)}
             rows={5}
-            className="bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-[11px] focus:border-blue-500 outline-none resize-none"
+            className="bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-[11px] focus:border-blue-500 outline-none resize-none"
             placeholder={t("contact.placeholderMessage")}
           />
         </div>
@@ -568,7 +568,7 @@ React.useEffect(() => {
             ? "bg-emerald-500 text-white animate-in zoom-in duration-300"
             : contactLoading
             ? "bg-zinc-700 text-zinc-400 cursor-not-allowed"
-            : "bg-blue-600 hover:bg-blue-500 text-white"
+            : "bg-blue-600 hover:bg-blue-500 !text-white"
         }`}
         >
           {contactSuccess

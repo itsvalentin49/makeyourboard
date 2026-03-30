@@ -18,38 +18,34 @@ export default function ExportPNG({
   displaySizes,
   boardName,
 }: Props) {
+  const language =
+    typeof window !== "undefined"
+      ? JSON.parse(localStorage.getItem("myb_settings") || "{}")?.language || "en"
+      : "en";
 
-    const language =
-  typeof window !== "undefined"
-    ? JSON.parse(localStorage.getItem("myb_settings") || "{}")?.language || "en"
-    : "en";
-
-    const t = getTranslator(language);
+  const t = getTranslator(language);
 
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState(boardName || "pedalboard");
-
-  // ✅ NEW: background option
   const [background, setBackground] = useState<"transparent" | "white">("transparent");
 
-  // ✅ NEW: preview canvas ref
   const previewRef = useRef<HTMLCanvasElement | null>(null);
 
-  const exportPNG = async (isPreview = false) => {
+  // ===============================
+  // 🖼️ PREVIEW RENDER
+  // ===============================
+  const renderPreview = async () => {
     if (!boardPedals?.length) return;
 
-    if (!isPreview) setLoading(true);
-
     try {
-      const loadImage = (src: string): Promise<HTMLImageElement> => {
-        return new Promise((resolve, reject) => {
+      const loadImage = (src: string): Promise<HTMLImageElement> =>
+        new Promise((resolve, reject) => {
           const img = new Image();
           img.crossOrigin = "anonymous";
           img.src = src;
           img.onload = () => resolve(img);
           img.onerror = reject;
         });
-      };
 
       let minX = Infinity;
       let minY = Infinity;
@@ -58,12 +54,14 @@ export default function ExportPNG({
 
       const allItems = [...boardPedals, ...selectedBoards];
 
-      allItems.forEach((item) => {
-        const size = displaySizes[Number(item.instanceId)];
-        if (!size) return;
+allItems.forEach((item) => {
+  const size = displaySizes[Number(item.instanceId)];
+  if (!size) return;
 
-        const w = size.w;
-        const h = size.h;
+  const isVertical = (item.rotation || 0) % 180 !== 0;
+
+  const w = isVertical ? size.h : size.w;
+  const h = isVertical ? size.w : size.h;
 
         minX = Math.min(minX, item.x - w / 2);
         minY = Math.min(minY, item.y - h / 2);
@@ -71,65 +69,47 @@ export default function ExportPNG({
         maxY = Math.max(maxY, item.y + h / 2);
       });
 
-const PADDING_X = 5;
-const PADDING_TOP = 4;
-const PADDING_BOTTOM = 6;
+      const PADDING = 5;
 
-minX -= PADDING_X;
-maxX += PADDING_X;
-
-minY -= PADDING_TOP;
-maxY += PADDING_BOTTOM;
+      minX -= PADDING;
+      minY -= PADDING;
+      maxX += PADDING;
+      maxY += PADDING;
 
       const width = maxX - minX;
       const height = maxY - minY;
 
-      const loadedImages: Record<number, HTMLImageElement> = {};
-      let maxScale = 1;
-
-      for (const p of boardPedals) {
-        if (!p.image) continue;
-
-        const size = displaySizes[Number(p.instanceId)];
-        if (!size) continue;
-
-        const img = await loadImage(p.image);
-        loadedImages[p.instanceId] = img;
-
-        const ratio = img.naturalWidth / size.w;
-        maxScale = Math.max(maxScale, ratio);
-      }
-
-      let SCALE = Math.min(5, maxScale);
-
-      const MAX_CANVAS = 8000;
-      if (width * SCALE > MAX_CANVAS) {
-        SCALE = MAX_CANVAS / width;
-      }
-
-      const canvas = isPreview
-        ? previewRef.current!
-        : document.createElement("canvas");
-
-      canvas.width = width * SCALE;
-      canvas.height = height * SCALE;
+      const canvas = previewRef.current;
+      if (!canvas) return;
 
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
 
-      ctx.scale(SCALE, SCALE);
-      ctx.imageSmoothingEnabled = true;
-      ctx.imageSmoothingQuality = "high";
+      const SCALE = 2;
 
-      // ✅ NEW: background handling
+      canvas.width = width * SCALE;
+      canvas.height = height * SCALE;
+
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.scale(SCALE, SCALE);
+      ctx.clearRect(0, 0, width, height);
+
+      // background blanc si sélectionné
       if (background === "white") {
         ctx.fillStyle = "#ffffff";
         ctx.fillRect(0, 0, width, height);
       }
 
-      // ===============================
-      // 🟫 DRAW BOARDS
-      // ===============================
+      ctx.imageSmoothingEnabled = true;
+
+      const loadedImages: Record<number, HTMLImageElement> = {};
+
+      for (const p of boardPedals) {
+        if (!p.image) continue;
+        loadedImages[p.instanceId] = await loadImage(p.image);
+      }
+
+      // BOARDS
       for (const b of selectedBoards) {
         if (!b.image) continue;
 
@@ -144,18 +124,10 @@ maxY += PADDING_BOTTOM;
         const drawX = b.x - minX;
         const drawY = b.y - minY;
 
-        ctx.drawImage(
-          img,
-          drawX - w / 2,
-          drawY - h / 2,
-          w,
-          h
-        );
+        ctx.drawImage(img, drawX - w / 2, drawY - h / 2, w, h);
       }
 
-      // ===============================
-      // 🎸 DRAW PEDALS
-      // ===============================
+      // PEDALS
       for (const p of boardPedals) {
         const img = loadedImages[p.instanceId];
         if (!img) continue;
@@ -172,7 +144,6 @@ maxY += PADDING_BOTTOM;
         const rotation = ((p.rotation || 0) * Math.PI) / 180;
 
         ctx.save();
-
         ctx.translate(drawX, drawY);
         ctx.rotate(rotation);
 
@@ -180,57 +151,171 @@ maxY += PADDING_BOTTOM;
         ctx.shadowBlur = 8;
         ctx.shadowOffsetY = 3;
 
-        ctx.drawImage(
-          img,
-          -w / 2,
-          -h / 2,
-          w,
-          h
-        );
+        ctx.drawImage(img, -w / 2, -h / 2, w, h);
 
         ctx.restore();
       }
-
-      // ===============================
-      // 📥 EXPORT
-      // ===============================
-      if (!isPreview) {
-        canvas.toBlob((blob) => {
-          if (!blob) return;
-
-          const url = URL.createObjectURL(blob);
-
-          const link = document.createElement("a");
-          link.href = url;
-          link.download =
-            background === "white" ? `${name}.jpg` : `${name}.png`;
-          link.click();
-
-          URL.revokeObjectURL(url);
-        }, background === "white" ? "image/jpeg" : "image/png", 0.92);
-      }
-
     } catch (e) {
-      console.error("Export error:", e);
-    }
-
-    if (!isPreview) {
-      setTimeout(() => setLoading(false), 300);
+      console.error(e);
     }
   };
 
-  // ✅ NEW: auto preview refresh
+  // ===============================
+  // 📥 EXPORT
+  // ===============================
+const exportPNG = async () => {
+  setLoading(true);
+
+  try {
+    const loadImage = (src: string): Promise<HTMLImageElement> =>
+      new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.src = src;
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+      });
+
+    let minX = Infinity;
+    let minY = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
+
+    const allItems = [...boardPedals, ...selectedBoards];
+
+    allItems.forEach((item) => {
+      const size = displaySizes[Number(item.instanceId)];
+      if (!size) return;
+
+      const w = size.w;
+      const h = size.h;
+
+      minX = Math.min(minX, item.x - w / 2);
+      minY = Math.min(minY, item.y - h / 2);
+      maxX = Math.max(maxX, item.x + w / 2);
+      maxY = Math.max(maxY, item.y + h / 2);
+    });
+
+    const PADDING = 5;
+
+    minX -= PADDING;
+    minY -= PADDING;
+    maxX += PADDING;
+    maxY += PADDING;
+
+    const width = maxX - minX;
+    const height = maxY - minY;
+
+    // 🔥 CANVAS HAUTE QUALITÉ
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const SCALE = 6; // 🔥 🔥 🔥 QUALITÉ MAX
+
+    canvas.width = width * SCALE;
+    canvas.height = height * SCALE;
+
+    ctx.scale(SCALE, SCALE);
+    ctx.imageSmoothingEnabled = true;
+
+    if (background === "white") {
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, width, height);
+    }
+
+    const loadedImages: Record<number, HTMLImageElement> = {};
+
+    for (const p of boardPedals) {
+      if (!p.image) continue;
+      loadedImages[p.instanceId] = await loadImage(p.image);
+    }
+
+    // BOARDS
+    for (const b of selectedBoards) {
+      if (!b.image) continue;
+
+      const size = displaySizes[Number(b.instanceId)];
+      if (!size) continue;
+
+      const img = await loadImage(b.image);
+
+      const w = size.w;
+      const h = size.h;
+
+      const drawX = b.x - minX;
+      const drawY = b.y - minY;
+
+      ctx.drawImage(img, drawX - w / 2, drawY - h / 2, w, h);
+    }
+
+    // PEDALS
+    for (const p of boardPedals) {
+      const img = loadedImages[p.instanceId];
+      if (!img) continue;
+
+      const size = displaySizes[Number(p.instanceId)];
+      if (!size) continue;
+
+      const w = size.w;
+      const h = size.h;
+
+      const drawX = p.x - minX;
+      const drawY = p.y - minY;
+
+      const rotation = ((p.rotation || 0) * Math.PI) / 180;
+
+      ctx.save();
+      ctx.translate(drawX, drawY);
+      ctx.rotate(rotation);
+
+      ctx.shadowColor = "rgba(0,0,0,0.2)";
+      ctx.shadowBlur = 12;
+      ctx.shadowOffsetY = 4;
+
+      ctx.drawImage(img, -w / 2, -h / 2, w, h);
+
+      ctx.restore();
+    }
+
+    canvas.toBlob(
+      (blob) => {
+        if (!blob) return;
+
+        const url = URL.createObjectURL(blob);
+
+        const link = document.createElement("a");
+        link.href = url;
+        link.download =
+          background === "white" ? `${name}.jpg` : `${name}.png`;
+        link.click();
+
+        URL.revokeObjectURL(url);
+        setTimeout(() => setLoading(false), 300);
+      },
+      background === "white" ? "image/jpeg" : "image/png",
+      0.95
+    );
+  } catch (e) {
+    console.error(e);
+    setLoading(false);
+  }
+};
+
+  // ===============================
+  // AUTO PREVIEW
+  // ===============================
   useEffect(() => {
-    exportPNG(true);
-  }, [background, boardPedals]);
+    renderPreview();
+  }, [background, boardPedals, selectedBoards]);
 
   return (
     <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 w-64 shadow-2xl flex flex-col gap-4">
 
-      {/* ✅ TITLE */}
-<div className="text-xs font-bold uppercase text-white tracking-wider">
-  {t("export.title")}
-</div>
+      {/* TITLE */}
+      <div className="text-xs font-bold uppercase text-white tracking-wider">
+        {t("export.title")}
+      </div>
 
       {/* NAME */}
       <div className="flex flex-col gap-1">
@@ -241,15 +326,11 @@ maxY += PADDING_BOTTOM;
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="
-            h-9 px-3 rounded-md bg-zinc-800 border border-zinc-700
-            text-[12px] font-mono text-white
-            focus:outline-none focus:border-blue-500
-          "
+          className="h-9 px-3 rounded-md bg-zinc-800 border border-zinc-700 text-[12px] font-mono text-white focus:outline-none focus:border-blue-500"
         />
       </div>
 
-      {/* ✅ BACKGROUND */}
+      {/* BACKGROUND */}
       <div className="flex flex-col gap-2">
         <label className="text-[10px] uppercase tracking-wider text-white font-bold">
           {t("export.background")}
@@ -276,46 +357,37 @@ maxY += PADDING_BOTTOM;
         </div>
       </div>
 
-      {/* ✅ PREVIEW */}
+      {/* PREVIEW */}
       <div className="flex flex-col gap-2">
         <label className="text-[10px] uppercase tracking-wider text-white font-bold">
           {t("export.preview")}
         </label>
 
         <div className="bg-zinc-800 rounded-md p-2 flex items-center justify-center">
-          <canvas
-            ref={previewRef}
-            className="max-w-full max-h-40"
-          />
+          <canvas ref={previewRef} className="max-w-full max-h-40" />
         </div>
       </div>
 
+      {/* DOWNLOAD */}
       <button
-  onClick={() => exportPNG(false)}
-  className="
-    w-full h-10
-    bg-blue-500
-    !text-white
-    text-[12px] uppercase font-mono font-bold
-    rounded-md
-    flex items-center justify-center
-    transition-all duration-150
-    hover:bg-blue-600 hover:scale-[1.02] transform-gpu
-    active:scale-95
-  "
+  onClick={() => exportPNG()}
+  className="w-full bg-blue-500 !text-white text-[11px] uppercase font-mono font-bold rounded-lg py-2 flex items-center justify-center transition-all duration-150 hover:bg-blue-600 hover:scale-[1.02] active:scale-95 transform-gpu"
 >
   <div className="relative flex items-center justify-center w-full">
-    
-    {/* TEXTE (toujours présent mais invisible en loading) */}
-    <span className={loading ? "opacity-0" : "opacity-100"}>
+    <span
+      className={loading ? "opacity-0" : "opacity-100"}
+      style={{
+        transform: "translateZ(0)",
+        backfaceVisibility: "hidden",
+        WebkitFontSmoothing: "antialiased",
+      }}
+    >
       {t("export.download")}
     </span>
 
-    {/* SPINNER (position absolue) */}
     {loading && (
       <div className="absolute w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
     )}
-
   </div>
 </button>
     </div>

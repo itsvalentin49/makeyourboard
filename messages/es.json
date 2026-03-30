@@ -230,15 +230,27 @@
     }
   },
 
-  "export": {
-    "button": "Exportar",
-    "title": "Exportar imagen",
-    "name": "Nombre",
-    "background": "Fondo",
-    "preview": "Vista previa",
-    "transparent": "Transparente (PNG)",
-    "white": "Blanco (JPG)",
-    "download": "Descargar"
-  }
+"export": {
+  "button": "Exportar",
+  "title": "Exportar imagen",
+  "name": "Nombre",
+  "background": "Fondo",
+  "preview": "Vista previa",
+  "transparent": "Transparente (PNG)",
+  "white": "Blanco (JPG)",
+  "download": "Descargar"
+},
+"share": {
+  "button": "Compartir",
+  "title": "Compartir tu pedalboard",
+  "preview": "Vista previa",
+  "social": "Compartir vía",
+  "copy": "Copiar enlace",
+  "copied": "Copiado"
+},
+"list": {
+  "button": "Lista",
+  "title": "Pedalboard"
+}
 
 }

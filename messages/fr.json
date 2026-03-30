@@ -232,14 +232,25 @@
 
   "export": {
     "button": "Exporter",
-    "title": "Exporter l'image",
+    "title": "Exporter l’image",
     "name": "Nom",
     "background": "Fond",
     "preview": "Aperçu",
     "transparent": "Transparent (PNG)",
     "white": "Blanc (JPG)",
     "download": "Télécharger"
+  },
+  "share": {
+    "button": "Partager",
+    "title": "Partager votre board",
+    "preview": "Aperçu",
+    "social": "Partager via",
+    "copy": "Copier le lien",
+    "copied": "Copié"
+  },
+  "list": {
+    "button": "Liste",
+    "title": "Pedalboard"
   }
-
 
 }

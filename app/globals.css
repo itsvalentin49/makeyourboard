@@ -226,3 +226,15 @@ html:not(.light) .pill-ui-sm {
 .light .bg-tab {
   background-color: var(--zinc-200); /* light */
 }
+
+/* =========================
+   HOVER CANVAS
+   ========================= */
+
+.hover\:bg-canvas:hover {
+  background-color: var(--zinc-600) !important;
+}
+
+.light .hover\:bg-canvas:hover {
+  background-color: var(--zinc-200) !important;
+}

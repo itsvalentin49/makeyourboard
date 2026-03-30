@@ -142,13 +142,14 @@ useEffect(() => {
     }
 
     // ✅ THEME (AJOUT)
-    const savedTheme = localStorage.getItem("theme");
+const savedTheme = localStorage.getItem("theme");
 
-    if (savedTheme === "light") {
-      document.documentElement.classList.add("light");
-    } else {
-      document.documentElement.classList.remove("light");
-    }
+// ✅ DEFAULT = LIGHT
+if (!savedTheme || savedTheme === "light") {
+  document.documentElement.classList.add("light");
+} else {
+  document.documentElement.classList.remove("light");
+}
 
   } catch {
     // storage corrompu → on ignore
@@ -214,7 +215,7 @@ useEffect(() => {
     setProjects([firstProject]);
     setActiveProjectId(firstProject.id);
   }
-}, [projects, hydrated]);
+}, [projects.length, hydrated]);
 
 
   // Custom item
@@ -327,11 +328,23 @@ useEffect(() => {
    * Save localStorage (safe)
    */
   useEffect(() => {
-    if (!hydrated) return;
+  if (!hydrated) return;
 
-    const dataToSave = JSON.stringify({ projects, activeProjectId, workingBoard });
-    localStorage.setItem(STORAGE_KEY, dataToSave);
-  }, [hydrated, projects, activeProjectId, workingBoard,]);
+  const dataToSave = JSON.stringify({
+    projects,
+    activeProjectId,
+    workingBoard,
+  });
+
+  localStorage.setItem(STORAGE_KEY, dataToSave);
+
+}, [
+  hydrated,
+  projects.length,
+  activeProjectId,
+  workingBoard.boardPedals.length,
+  workingBoard.selectedBoards.length
+]);
 
   /**
    * Sélections (safe)
@@ -1018,7 +1031,7 @@ return (
         className="flex-1 bg-black/40 backdrop-blur-sm"
         onClick={() => setSettingsOpen(false)}
       />
-      <div className="w-[85%] max-w-[420px] bg-zinc-950 border-l border-zinc-800 p-6 shadow-2xl overflow-y-auto">
+      <div className="w-[85%] max-w-[420px] bg-zinc-900 border-l border-zinc-800 p-6 shadow-2xl overflow-y-auto">
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-[16px] font-black uppercase tracking-wider text-white">
             {t("settings.title")}
