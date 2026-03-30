@@ -408,7 +408,6 @@ useLayoutEffect(() => {
 useEffect(() => {
   if (!viewer) return;
   if (!stageRef.current) return;
-  if (!activeProject.boardPedals?.length) return;
   if (stageSize.width === 0) return;
 
   const stage = stageRef.current;
@@ -418,9 +417,21 @@ useEffect(() => {
   let maxX = -Infinity;
   let maxY = -Infinity;
 
-  activeProject.boardPedals.forEach((p: any) => {
-    const w = Number(p.width) || 80;
-    const h = Number(p.depth) || 120;
+  const allItems = [
+    ...(activeProject.boardPedals || []),
+    ...(activeProject.selectedBoards || [])
+  ];
+
+  if (!allItems.length) return;
+
+  allItems.forEach((p: any) => {
+    const size = displaySizes[p.instanceId];
+    if (!size) return;
+
+    const isVertical = (p.rotation || 0) % 180 !== 0;
+
+    const w = isVertical ? size.h : size.w;
+    const h = isVertical ? size.w : size.h;
 
     minX = Math.min(minX, p.x - w / 2);
     minY = Math.min(minY, p.y - h / 2);
@@ -428,15 +439,17 @@ useEffect(() => {
     maxY = Math.max(maxY, p.y + h / 2);
   });
 
-  if (!isFinite(minX)) return;
+  if (!isFinite(minX) || !isFinite(minY)) return;
 
   const boardWidth = maxX - minX;
   const boardHeight = maxY - minY;
 
+  if (boardWidth === 0 || boardHeight === 0) return;
+
   const scaleX = stageSize.width / boardWidth;
   const scaleY = stageSize.height / boardHeight;
 
-  const scale = Math.min(scaleX, scaleY) * 0.8;
+  const scale = Math.min(scaleX, scaleY) * 0.75; // 🔥 un peu plus clean que 0.8
 
   stage.scale({ x: scale, y: scale });
 
@@ -453,9 +466,10 @@ useEffect(() => {
   viewer,
   stageSize.width,
   stageSize.height,
-  activeProject.boardPedals.length
+  activeProject.boardPedals,
+  activeProject.selectedBoards,
+  displaySizes
 ]);
-
 
 /* ================= OVERLAY POSITION ================= */
 useEffect(() => {
@@ -720,7 +734,7 @@ const getVisibleBounds = () => {
       h-9 w-24 md:h-10 md:w-28
       bg-zinc-900 border border-zinc-800
       rounded-2xl shadow-2xl
-      text-[16px] font-mono font-bold text-white uppercase
+      text-[11px] md:text-[12px] font-mono font-bold text-white uppercase
       transition-all duration-150
       hover:border-blue-500 hover:scale-[1.02]
       active:scale-95
@@ -938,11 +952,11 @@ const getVisibleBounds = () => {
   setIsStageDragging(true);
 }}
 
-  x={activeProject.stageX || 0}
-  y={activeProject.stageY || 0}
+x={viewer ? 0 : activeProject.stageX || 0}
+y={viewer ? 0 : activeProject.stageY || 0}
 
-  scaleX={(activeProject.zoom || 100) / 100}
-  scaleY={(activeProject.zoom || 100) / 100}
+scaleX={viewer ? 1 : (activeProject.zoom || 100) / 100}
+scaleY={viewer ? 1 : (activeProject.zoom || 100) / 100}
 
 onMouseDown={(e) => {
   if (viewer) return;
