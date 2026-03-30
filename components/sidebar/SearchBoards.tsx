@@ -112,7 +112,7 @@ export default function SearchBoards({
                     <button
   key={b.id}
   onClick={() => {
-    setBoardSearch(`${b.brand} ${b.name}`);
+    setBoardSearch(b.brand);
     selectBoard(b);
     setShowBoardResults(false);
   }}

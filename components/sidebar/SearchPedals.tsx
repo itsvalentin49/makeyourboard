@@ -112,7 +112,7 @@ export default function SearchPedals({
                     <button
                       key={p.id}
                       onClick={() => {
-  setPedalSearch(`${p.brand} ${p.name}`);
+setPedalSearch(p.brand);
   addPedal(p);
   setShowPedalResults(false);
 }}

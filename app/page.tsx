@@ -324,10 +324,9 @@ useEffect(() => {
   return () => window.removeEventListener("resize", check);
 }, []);
 
-  /**
-   * Save localStorage (safe)
-   */
-  useEffect(() => {
+  //Save localStorage
+   
+ useEffect(() => {
   if (!hydrated) return;
 
   const dataToSave = JSON.stringify({
@@ -340,10 +339,9 @@ useEffect(() => {
 
 }, [
   hydrated,
-  projects.length,
   activeProjectId,
-  workingBoard.boardPedals.length,
-  workingBoard.selectedBoards.length
+  projects,
+  workingBoard
 ]);
 
   /**

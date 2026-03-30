@@ -1415,19 +1415,23 @@ onSizeReady={(nw, nh) => handleSizeUpdate?.(p.instanceId, nw, nh)}
     );
 })()}
 
-          {p.slug === "custom" && p.name && displaySizes[p.instanceId] && (
-<Text
-  text={p.name}
-  fontSize={12}
-  fill="#000000"
-  align="center"
-  verticalAlign="middle" 
-  width={displaySizes[p.instanceId].w}
-  height={displaySizes[p.instanceId].h}
-  x={-displaySizes[p.instanceId].w / 2}
-  y={-displaySizes[p.instanceId].h / 2}
-  listening={false}
-/>
+{p.slug === "custom" && p.name && displaySizes[p.instanceId] && (
+  <Text
+    text={p.name.toUpperCase()}
+    fontSize={12}    
+    fill="#000000"
+    align="center"
+    verticalAlign="middle"
+    width={displaySizes[p.instanceId].w}
+    height={displaySizes[p.instanceId].h}
+    x={-displaySizes[p.instanceId].w / 2}
+    y={-displaySizes[p.instanceId].h / 2}
+    fontStyle="bold"      
+    stroke="#000000"       
+    strokeWidth={0.8}   
+    letterSpacing={1}        
+    listening={false}
+  />
 )}
 
          {/* 💎 Hover halo (desktop only) */}

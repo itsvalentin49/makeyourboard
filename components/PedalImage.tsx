@@ -32,7 +32,6 @@ export default function PedalImage({
   const imageRef = useRef<any>(null);
   const lastSize = useRef({ w: 0, h: 0 });
 
-  // applique la rotation si on l’utilise (optionnel)
   useEffect(() => {
     if (imageRef.current) {
       imageRef.current.rotation(rotation);
@@ -52,7 +51,6 @@ export default function PedalImage({
 
     setProportionalHeight(finalH);
 
-    // pas d’URL → fallback rectangle + texte
     if (!url) {
       setImg(null);
       notifySize();
@@ -102,8 +100,10 @@ export default function PedalImage({
             align="center"
             verticalAlign="middle"
             fill="white"
-            fontSize={10}
+            fontSize={14}
             fontStyle="bold"
+            stroke="white"
+            strokeWidth={0.5}
             padding={5}
             wrap="char"
           />
@@ -116,24 +116,23 @@ export default function PedalImage({
   return (
     <Group offsetX={scaledWidth / 2} offsetY={proportionalHeight / 2} rotation={rotation}>
       <KonvaImage
-  image={img}
-  width={scaledWidth}
-  height={proportionalHeight}
-  ref={imageRef}
-  cornerRadius={6}
-/>
+        image={img}
+        width={scaledWidth}
+        height={proportionalHeight}
+        ref={imageRef}
+        cornerRadius={6}
+      />
 
-{/* 🎨 COLOR OVERLAY (AJOUT) */}
-{color && (
-  <Rect
-    width={scaledWidth}
-    height={proportionalHeight}
-    fill={color}
-    opacity={0.7}
-    cornerRadius={6}
-    listening={false}
-  />
-)}
+      {color && (
+        <Rect
+          width={scaledWidth}
+          height={proportionalHeight}
+          fill={color}
+          opacity={0.7}
+          cornerRadius={6}
+          listening={false}
+        />
+      )}
     </Group>
   );
 }
