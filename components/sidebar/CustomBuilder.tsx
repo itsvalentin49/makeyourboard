@@ -64,6 +64,7 @@ export default function CustomBuilder({
 }: Props) {
 
   const [showPicker, setShowPicker] = useState(false);
+  const [focusedField, setFocusedField] = useState<string | null>(null);
 
   useEffect(() => {
     const close = () => setShowPicker(false);
@@ -153,27 +154,37 @@ export default function CustomBuilder({
 
                 <div className="grid grid-cols-2 gap-2">
 
-                  <input
+                  {/* WIDTH PEDAL */}
+                    <input
                     type="number"
                     min={minValue}
                     max={maxValue}
                     step={units === "metric" ? 1 : 0.1}
-                    placeholder={withUnit(t("custom.width"))}
+                    placeholder={focusedField === "width" ? "" : withUnit(t("custom.width"))}
                     value={customWidth}
+                    onFocus={() => {
+                      setFocusedField("width");
+                    }}
+                    onBlur={() => {
+                      setFocusedField(null);
+                    }}
                     onChange={(e) => setCustomWidth(e.target.value)}
                     className="w-full bg-zinc-950 border border-zinc-700 rounded-md py-2 px-3 text-[10px] outline-none focus:border-zinc-600"
                   />
 
+                  {/* DEPTH PEDAL */}
                   <input
-                    type="number"
-                    min={minValue}
-                    max={maxValue}
-                    step={units === "metric" ? 1 : 0.1}
-                    placeholder={withUnit(t("custom.depth"))}
-                    value={customDepth}
-                    onChange={(e) => setCustomDepth(e.target.value)}
-                    className="w-full bg-zinc-950 border border-zinc-700 rounded-md py-2 px-3 text-[10px] outline-none focus:border-zinc-600"
-                  />
+                  type="number"
+                  min={minValue}
+                  max={maxValue}
+                  step={units === "metric" ? 1 : 0.1}
+                  placeholder={focusedField === "depth" ? "" : withUnit(t("custom.depth"))}
+                  value={customDepth}
+                  onFocus={() => setFocusedField("depth")}
+                  onBlur={() => setFocusedField(null)}
+                  onChange={(e) => setCustomDepth(e.target.value)}
+                  className="w-full bg-zinc-950 border border-zinc-700 rounded-md py-2 px-3 text-[10px] outline-none focus:border-zinc-600"
+                />
 
                 </div>
 
@@ -191,12 +202,14 @@ export default function CustomBuilder({
     </span>
 
     <input
-      type="text"
-      placeholder={t("custom.namePlaceholder")}
-      value={customName}
-      onChange={(e) => setCustomName(e.target.value)}
-      className="w-full bg-zinc-950 border border-zinc-700 rounded-md py-2 px-3 text-[10px] outline-none focus:border-zinc-600"
-    />
+    type="text"
+    placeholder={focusedField === "name" ? "" : t("custom.namePlaceholder")}
+    value={customName}
+    onFocus={() => setFocusedField("name")}
+    onBlur={() => setFocusedField(null)}
+    onChange={(e) => setCustomName(e.target.value)}
+    className="w-full bg-zinc-950 border border-zinc-700 rounded-md py-2 px-3 text-[10px] outline-none focus:border-zinc-600"
+  />
 
   </div>
 
@@ -275,27 +288,37 @@ export default function CustomBuilder({
 
                 <div className="grid grid-cols-2 gap-2">
 
+                {/* WIDTH BOARD */}
                   <input
-                    type="number"
-                    min={minValue}
-                    max={maxValue}
-                    step={units === "metric" ? 1 : 0.1}
-                    placeholder={withUnit(t("custom.width"))}
-                    value={customWidth}
-                    onChange={(e) => setCustomWidth(e.target.value)}
-                    className="w-full bg-zinc-950 border border-zinc-700 rounded-md py-2 px-3 text-[10px] outline-none focus:border-zinc-600"
-                  />
+                  type="number"
+                  min={minValue}
+                  max={maxValue}
+                  step={units === "metric" ? 1 : 0.1}
+                  placeholder={focusedField === "width" ? "" : withUnit(t("custom.width"))}
+                  value={customWidth}
+                  onFocus={() => {
+                    setFocusedField("width");
+                  }}
+                  onBlur={() => {
+                    setFocusedField(null);
+                  }}
+                  onChange={(e) => setCustomWidth(e.target.value)}
+                  className="w-full bg-zinc-950 border border-zinc-700 rounded-md py-2 px-3 text-[10px] outline-none focus:border-zinc-600"
+                />
 
+                {/* DEPTH BOARD */}
                   <input
-                    type="number"
-                    min={minValue}
-                    max={maxValue}
-                    step={units === "metric" ? 1 : 0.1}
-                    placeholder={withUnit(t("custom.depth"))}
-                    value={customDepth}
-                    onChange={(e) => setCustomDepth(e.target.value)}
-                    className="w-full bg-zinc-950 border border-zinc-700 rounded-md py-2 px-3 text-[10px] outline-none focus:border-zinc-600"
-                  />
+                  type="number"
+                  min={minValue}
+                  max={maxValue}
+                  step={units === "metric" ? 1 : 0.1}
+                  placeholder={focusedField === "depth" ? "" : withUnit(t("custom.depth"))}
+                  value={customDepth}
+                  onFocus={() => setFocusedField("depth")}
+                  onBlur={() => setFocusedField(null)}
+                  onChange={(e) => setCustomDepth(e.target.value)}
+                  className="w-full bg-zinc-950 border border-zinc-700 rounded-md py-2 px-3 text-[10px] outline-none focus:border-zinc-600"
+                />
 
                 </div>
 

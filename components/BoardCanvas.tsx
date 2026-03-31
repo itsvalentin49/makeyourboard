@@ -715,7 +715,7 @@ const getVisibleBounds = () => {
 
     {/* TOTAL WEIGHT */}
     <div className="relative flex items-center justify-center h-9 w-24 md:h-10 md:w-28 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl">
-      <Weight className="absolute left-3 size-4 text-zinc-400" />
+      <Weight className="absolute left-3 size-4 text-red-500" />
       <span className="text-[12px] font-black font-mono tabular-nums text-white">
         {weightValue}
       </span>

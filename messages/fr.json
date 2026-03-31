@@ -5,6 +5,10 @@
   "buyOnline": "Acheter en ligne",
   "addPedal": "Ajouter une pédale",
   "addBoard": "Ajouter un pedalboard",
+  "addPedalTitle": "Pédales",
+  "addPedalButton": "Ajouter",
+  "addBoardTitle": "Pedalboard",
+  "addBoardButton": "Ajouter",
   "back": "Retour"
   },
 
@@ -150,7 +154,7 @@
   },
 
 "custom": {
-  "title": "Ajouter un custom",
+  "title": "Custom",
   "selectType": "Sélectionner pédale ou board",
   "pedal": "Pédale",
   "board": "Board",
@@ -160,8 +164,8 @@
   "width": "Largeur",
   "depth": "Profondeur",
   "color": "Couleur",
-  "addPedal": "Ajouter une pédale custom",
-  "addBoard": "Ajouter un board custom"
+  "addPedal": "Ajouter",
+  "addBoard": "Ajouter"
   }, 
 
 "settings": {
@@ -198,7 +202,7 @@
 
   "footer": {
     "feedback": "Contact",
-    "donate": "Offrez-moi un café"
+    "donate": "Soutenir le projet"
   },
 
   "tabs": {

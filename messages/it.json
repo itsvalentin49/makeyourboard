@@ -1,11 +1,15 @@
 {
-"sidebar": {
-  "searchPedal": "Cerca pedal",
-  "searchBoard": "Cerca pedalboard",
-  "buyOnline": "Acquista online",
-  "addPedal": "Aggiungi pedale",
-  "addBoard": "Aggiungi pedalboard",
-  "back": "Indietro"
+  "sidebar": {
+    "searchPedal": "Cerca un pedale",
+    "searchBoard": "Cerca una pedalboard",
+    "buyOnline": "Acquista online",
+    "addPedal": "Aggiungi pedale",
+    "addBoard": "Aggiungi pedalboard",
+    "addPedalTitle": "Pedali",
+    "addPedalButton": "Aggiungi",
+    "addBoardTitle": "Pedalboard",
+    "addBoardButton": "Aggiungi",
+    "back": "Indietro"
   },
 
   "canvasIntro": {
@@ -150,7 +154,7 @@
   },
 
 "custom": {
-  "title": "Aggiungi custom",
+  "title": "Custom",
   "selectType": "Seleziona pedal o board",
   "pedal": "Pedale",
   "board": "Board",
@@ -160,8 +164,8 @@
   "width": "Larghezza",
   "depth": "Profondità",
   "color": "Colore",
-  "addPedal": "Aggiungi pedale custom",
-  "addBoard": "Aggiungi board custom"
+  "addPedal": "Aggiungi",
+  "addBoard": "Aggiungi"
   },
 
 "settings": {
@@ -198,7 +202,7 @@
 
   "footer": {
     "feedback": "Contatto",
-    "donate": "Offrimi un caffè"
+    "donate": "Supporta il progetto"
   },
 
   "tabs": {

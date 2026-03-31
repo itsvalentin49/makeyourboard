@@ -1,27 +1,21 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { ChevronDown } from "lucide-react";
+
 
 type AnyRow = Record<string, any>;
 
 type Props = {
   pedalsLibrary: AnyRow[];
-
   pedalSearch: string;
   setPedalSearch: (v: string) => void;
-
   showPedalResults: boolean;
   setShowPedalResults: (v: boolean) => void;
-
   setShowBoardResults: (v: boolean) => void;
-
   addPedal: (p: AnyRow) => void;
-
   pedalInputRef: React.RefObject<HTMLInputElement | null>;
-
   t: (key: string) => string;
-
   groupItems: (items: AnyRow[], filter: string) => Record<string, AnyRow[]>;
 };
 
@@ -38,13 +32,24 @@ export default function SearchPedals({
   groupItems,
 }: Props) {
 
+  const prevOpen = useRef(false);
+
+  useEffect(() => {
+    if (showPedalResults && !prevOpen.current) {
+      setPedalSearch(""); // 🔥 vide le champ
+      pedalInputRef.current?.focus(); // 🔥 focus direct
+    }
+
+    prevOpen.current = showPedalResults;
+  }, [showPedalResults]);
+
   return (
     <div className="flex flex-col gap-2">
 
       <div className="mt-3 flex items-center gap-3">
 
         <span className="text-[12px] uppercase font-bold tracking-[0.18em] text-white">
-          {t("sidebar.addPedal")}
+          {t("sidebar.addPedalTitle")}
         </span>
       </div>
 
@@ -59,7 +64,7 @@ export default function SearchPedals({
             autoCorrect="off"
             autoCapitalize="off"
             spellCheck={false}
-            placeholder={`${t("sidebar.searchPedal")}...`}
+            placeholder={showPedalResults ? "" : `${t("sidebar.searchPedal")}...`} // 🔥 cache placeholder quand ouvert
             className={`w-full bg-zinc-950 border rounded-lg py-2 pl-4 pr-10 text-[11px] text-white placeholder:text-zinc-500 outline-none transition-all ${
               showPedalResults
                 ? "border-zinc-500"
@@ -80,8 +85,8 @@ export default function SearchPedals({
           <ChevronDown
             onClick={(e) => {
               e.stopPropagation();
-              setShowPedalResults(!showPedalResults);
               setShowBoardResults(false);
+              setShowPedalResults(!showPedalResults);
             }}
             className={`absolute right-3 size-4 cursor-pointer transition-transform ${
               showPedalResults
@@ -112,10 +117,10 @@ export default function SearchPedals({
                     <button
                       key={p.id}
                       onClick={() => {
-setPedalSearch(p.brand);
-  addPedal(p);
-  setShowPedalResults(false);
-}}
+                        setPedalSearch(""); // 🔥 évite que le texte reste
+                        addPedal(p);
+                        setShowPedalResults(false);
+                      }}
                       className="w-full px-5 py-2 text-left hover:bg-zinc-700 text-zinc-300 text-[12px] transition-colors"
                     >
                       <span className="font-semibold mr-2 text-zinc-500">

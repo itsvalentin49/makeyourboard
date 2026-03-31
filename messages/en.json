@@ -1,10 +1,14 @@
 {
   "sidebar": {
-    "searchPedal": "Search a pedal",
-    "searchBoard": "Search a pedalboard",
+    "searchPedal": "Search for a pedal",
+    "searchBoard": "Search for a pedalboard",
     "buyOnline": "Buy online",
-    "addPedal": "Add a Pedal",
-    "addBoard": "Add a Pedalboard",
+    "addPedal": "Add a pedal",
+    "addBoard": "Add a pedalboard",
+    "addPedalTitle": "Pedals",
+    "addPedalButton": "Add",
+    "addBoardTitle": "Pedalboards",
+    "addBoardButton": "Add",
     "back": "Back"
   },
 
@@ -148,7 +152,7 @@
   },
 
 "custom": {
-  "title": "Add Custom Item",
+  "title": "Custom",
   "selectType": "Select pedal or board",
   "pedal": "Pedal",
   "board": "Board",
@@ -158,8 +162,8 @@
   "width": "Width",
   "depth": "Depth",
   "color": "Color",
-  "addPedal": "Add custom pedal",
-  "addBoard": "Add custom board"
+  "addPedal": "Add",
+  "addBoard": "Add"
   },
 
 "settings": {
@@ -198,7 +202,7 @@
 
   "footer": {
     "feedback": "Contact",
-    "donate": "Support Us"
+    "donate": "Support the project"
   },
 
   "tabs": {

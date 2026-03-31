@@ -648,7 +648,7 @@ React.useEffect(() => {
     cursor-pointer
   "
 >
-  {t("sidebar.addPedal")}
+  {t("sidebar.addPedalButton")}
 </button>
 
 <SearchBoards
@@ -680,7 +680,7 @@ React.useEffect(() => {
     cursor-pointer
   "
 >
-  {t("sidebar.addBoard")}
+  {t("sidebar.addBoardButton")}
 </button>
 
 

@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { ChevronDown } from "lucide-react";
 
 type AnyRow = Record<string, any>;
@@ -38,13 +38,24 @@ export default function SearchBoards({
   groupItems,
 }: Props) {
 
+  const prevOpen = useRef(false);
+
+  useEffect(() => {
+    if (showBoardResults && !prevOpen.current) {
+      setBoardSearch(""); // 🔥 reset à l'ouverture
+      boardInputRef.current?.focus(); // 🔥 focus
+    }
+
+    prevOpen.current = showBoardResults;
+  }, [showBoardResults]);
+
   return (
     <div className="flex flex-col gap-2 mt-8">
 
       <div className="flex items-center gap-3">
 
         <span className="text-[12px] uppercase font-bold tracking-[0.18em] text-white">
-          {t("sidebar.addBoard")}
+          {t("sidebar.addBoardTitle")}
         </span>
       </div>
 
@@ -59,7 +70,7 @@ export default function SearchBoards({
             autoCorrect="off"
             autoCapitalize="off"
             spellCheck={false}
-            placeholder={`${t("sidebar.searchBoard")}...`}
+            placeholder={showBoardResults ? "" : `${t("sidebar.searchBoard")}...`} // 🔥 cache placeholder
             className={`w-full bg-zinc-950 border rounded-lg py-2 pl-4 pr-10 text-[11px] text-white placeholder:text-zinc-500 outline-none transition-all ${
               showBoardResults
                 ? "border-zinc-500"
@@ -80,8 +91,8 @@ export default function SearchBoards({
           <ChevronDown
             onClick={(e) => {
               e.stopPropagation();
-              setShowBoardResults(!showBoardResults);
               setShowPedalResults(false);
+              setShowBoardResults(!showBoardResults);
             }}
             className={`absolute right-3 size-4 cursor-pointer transition-transform ${
               showBoardResults
@@ -110,20 +121,20 @@ export default function SearchBoards({
                   {groupItems(boardsLibrary, boardSearch)[brand].map((b) => (
 
                     <button
-  key={b.id}
-  onClick={() => {
-    setBoardSearch(b.brand);
-    selectBoard(b);
-    setShowBoardResults(false);
-  }}
-  className="w-full px-5 py-2 text-left hover:bg-zinc-700 text-zinc-300 text-[12px] transition-colors"
->
-  <span className="font-semibold mr-2 text-zinc-500">
-    {brand}
-  </span>
+                      key={b.id}
+                      onClick={() => {
+                        setBoardSearch(""); // 🔥 évite texte restant
+                        selectBoard(b);
+                        setShowBoardResults(false);
+                      }}
+                      className="w-full px-5 py-2 text-left hover:bg-zinc-700 text-zinc-300 text-[12px] transition-colors"
+                    >
+                      <span className="font-semibold mr-2 text-zinc-500">
+                        {brand}
+                      </span>
 
-  {b.name}
-</button>
+                      {b.name}
+                    </button>
 
                   ))}
 
