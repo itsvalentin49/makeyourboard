@@ -209,22 +209,29 @@ export default function Sidebar({
 React.useEffect(() => {
   let cancelled = false;
 
-  fetch("https://ipapi.co/json/")
-    .then((res) => res.json())
-    .then((data) => {
+  const loadCountry = async () => {
+    try {
+      const res = await fetch("https://ipapi.co/json/");
+
+      if (!res.ok) throw new Error("ipapi failed");
+
+      const data = await res.json();
+
       if (!cancelled && data?.country) {
         setCountry(data.country);
       }
-    })
-    .catch(() => {
-      setCountry("DE");
-    });
+    } catch (err) {
+      console.warn("Geo lookup failed, fallback to DE");
+      if (!cancelled) setCountry("DE");
+    }
+  };
+
+  loadCountry();
 
   return () => {
     cancelled = true;
   };
 }, []);
-
   
   const [bgOpen, setBgOpen] = React.useState(false);
   const bgRef = React.useRef<HTMLDivElement>(null);
@@ -726,7 +733,7 @@ React.useEffect(() => {
   }}
   className="flex items-center gap-2 group"
   >
-      <span className="text-[12px]">💬</span>
+      <span className="text-[12px]">✉️</span>
       <span className="text-[10px] font-black uppercase text-white transition-colors duration-200">
         {t("footer.feedback")}
       </span>
@@ -739,7 +746,7 @@ React.useEffect(() => {
       rel="noopener noreferrer"
       className="flex items-center gap-2 group"
     >
-      <span className="text-[12px]">☕️</span>
+      <span className="text-[12px]">❤️</span>
       <span className="text-[10px] font-black uppercase text-zinc-500 group-hover:text-white transition-colors duration-200">
         {t("footer.donate")}
       </span>
@@ -765,7 +772,7 @@ React.useEffect(() => {
   }}
   className="flex items-center gap-2 group"
 >
-  <span className="text-[12px]">💬</span>
+  <span className="text-[12px]">✉️</span>
   <span className="text-[10px] font-black uppercase text-white transition-all duration-200 group-hover:text-white group-hover:-translate-y-[1px] group-hover:scale-[1.03]">
     {t("footer.feedback")}
   </span>
@@ -778,7 +785,7 @@ React.useEffect(() => {
   rel="noopener noreferrer"
   className="flex items-center gap-2 group cursor-pointer"
 >
-  <span className="text-[12px]">☕️</span>
+  <span className="text-[12px]">❤️</span>
   <span className="text-[10px] font-black uppercase text-white transition-all duration-200 group-hover:text-white group-hover:-translate-y-[1px] group-hover:scale-[1.03]">
     {t("footer.donate")}
   </span>

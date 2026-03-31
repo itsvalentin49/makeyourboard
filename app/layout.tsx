@@ -96,10 +96,22 @@ export default function RootLayout({
       "Build and design your guitar pedalboard online. Add pedals, boards, customize layout, calculate power consumption and visualize your setup in real time.",
   };
 
-  return (
-    <html lang="en" className="light">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[var(--background)] text-[var(--foreground)]`}
+return (
+  <html lang="en" className="light">
+
+
+    <head>
+      <link rel="preload" as="image" href="/backgrounds/wood.png" />
+      <link rel="preload" as="image" href="/backgrounds/carpet.png" />
+      <link rel="preload" as="image" href="/backgrounds/stripes.png" />
+      <link rel="preload" as="image" href="/backgrounds/fabric.png" />
+      <link rel="preload" as="image" href="/backgrounds/houndstooth.png" />
+      <link rel="preload" as="image" href="/backgrounds/steel.png" />
+      <link rel="preload" as="image" href="/backgrounds/coast.png" />
+    </head>
+
+    <body
+      className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[var(--background)] text-[var(--foreground)]`}
         style={{
           paddingTop: "env(safe-area-inset-top)",
           paddingBottom: "env(safe-area-inset-bottom)",

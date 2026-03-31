@@ -3,6 +3,13 @@
 import React from "react";
 import { ChevronDown } from "lucide-react";
 
+type Background = {
+  id: string;
+  label: string;
+  type: "css" | "image";
+  src?: string;
+};
+
 type Props = {
   t: (key: string) => string;
 
@@ -14,6 +21,8 @@ type Props = {
 
   units: "metric" | "imperial";
   setUnits: (v: "metric" | "imperial") => void;
+
+  backgrounds: Background[];
 };
 
 export default function SettingsPanel({
@@ -24,6 +33,8 @@ export default function SettingsPanel({
   setLanguage,
   units,
   setUnits,
+  backgrounds,
+  
 }: Props) {
   const [bgOpen, setBgOpen] = React.useState(false);
   const [langOpen, setLangOpen] = React.useState(false);
@@ -207,48 +218,61 @@ if (value === "light") {
   </div>
 </div>
 
-   {/* BACKGROUND TEMP DISABLED */}
-{false && (
-  <div className="flex items-center gap-4 pt-5 border-t border-zinc-800/60">
-    <span className="w-28 text-[10px] text-white uppercase font-black tracking-widest">
-      {t("settings.background")}
-    </span>
+{/* BACKGROUND */}
+<div className="flex items-start gap-4 pt-5 border-t border-zinc-800/60">
 
-    <div ref={bgRef} className="relative flex-1">
-      <button
-        type="button"
-        onClick={() => setBgOpen((v) => !v)}
-        className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2 text-[11px] text-left text-white flex items-center justify-between hover:border-zinc-600 transition-colors"
-      >
-        <span>{t(`backgrounds.${canvasBg}`)}</span>
-        <ChevronDown
-          className={`size-3 transition-transform ${
-            bgOpen ? "rotate-180" : ""
-          }`}
-        />
-      </button>
+  <span className="w-28 text-[10px] text-white uppercase font-black tracking-widest">
+    {t("settings.background")}
+  </span>
 
-      {bgOpen && (
-        <div className="absolute z-50 mt-1 w-full bg-zinc-950 border border-zinc-800 rounded-lg overflow-hidden">
-          {["neutral", "wood", "marble", "rug", "stage", "flightcase"].map(
-            (bg) => (
-              <button
-                key={bg}
-                onClick={() => {
-                  setCanvasBg(bg);
-                  setBgOpen(false);
-                }}
-                className="w-full px-4 py-2 text-left text-[11px] hover:bg-zinc-800"
-              >
-                {t(`backgrounds.${bg}`)}
-              </button>
-            )
-          )}
-        </div>
-      )}
+  <div className="flex-1">
+    <div className="grid grid-cols-2 gap-3">
+
+      {(backgrounds ?? []).map((bg) => {
+        const isActive = canvasBg === bg.id;
+
+        return (
+          <button
+            key={bg.id}
+            onClick={() => setCanvasBg(bg.id)}
+            className={`
+              relative
+              w-full
+              h-[80px]
+              rounded-lg
+              overflow-hidden
+              border
+              transition-all
+              duration-200
+              cursor-pointer
+              ${isActive 
+                ? "border-blue-500" 
+                : "border-[var(--zinc-600)] hover:border-[var(--zinc-400)]"
+              }
+            `}
+          >
+
+            {/* IMAGE */}
+            {bg.type === "image" ? (
+              <img
+                src={bg.src}
+                alt={bg.label}
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+            ) : (
+              <div className="absolute inset-0 bg-canvas" />
+            )}
+
+            {/* OVERLAY */}
+            <div className="absolute inset-0 bg-black/20" />
+
+          </button>
+        );
+      })}
+
     </div>
   </div>
-)}
+</div>
 
   </div>
 );

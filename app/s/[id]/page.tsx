@@ -122,33 +122,43 @@ export default function SharedBoardPage() {
 
   const Canvas = BoardCanvas as any;
 
-  return (
-    <div className="h-screen w-full">
-      <Canvas
-        viewer
-        activeProject={viewerProject}
-        displaySizes={{}}
-        handleSizeUpdate={() => {}}
-        updateActiveProject={(updates: any) =>
-          setViewerProject((prev) => ({ ...prev, ...updates }))
-        }
-        setMobileSidebarOpen={() => {}}
-        setSpecsOpen={() => {}}
-        setSelectedInstanceId={() => {}}
-        setSelectedBoardInstanceId={() => {}}
-        deletePedal={() => {}}
-        rotatePedal={() => {}}
-        deleteBoard={() => {}}
-        rotateBoard={() => {}}
-        closeSearchMenus={() => {}}
-        setContactOpen={() => {}}
-        selectedInstanceId={null}
-        selectedBoardInstanceId={null}
-        BACKGROUNDS={[]}
-        canvasBg="neutral"
-        units="metric"
-        language="en"
-      />
+return (
+  <div className="h-screen w-full relative">
+
+    {/* TITLE (overlay, ne pousse rien) */}
+    <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 pointer-events-none">
+      <h1 className="text-[20px] md:text-[24px] font-black tracking-tight text-white">
+        {viewerProject.name}
+      </h1>
     </div>
-  );
+
+    {/* CANVAS FULL HEIGHT */}
+    <Canvas
+      viewer
+      activeProject={viewerProject}
+      displaySizes={{}}
+      handleSizeUpdate={() => {}}
+      updateActiveProject={(updates: any) =>
+        setViewerProject((prev) => ({ ...prev, ...updates }))
+      }
+      setMobileSidebarOpen={() => {}}
+      setSpecsOpen={() => {}}
+      setSelectedInstanceId={() => {}}
+      setSelectedBoardInstanceId={() => {}}
+      deletePedal={() => {}}
+      rotatePedal={() => {}}
+      deleteBoard={() => {}}
+      rotateBoard={() => {}}
+      closeSearchMenus={() => {}}
+      setContactOpen={() => {}}
+      selectedInstanceId={null}
+      selectedBoardInstanceId={null}
+      BACKGROUNDS={[]}
+      canvasBg="neutral"
+      units="metric"
+      language="en"
+    />
+
+  </div>
+);
 }

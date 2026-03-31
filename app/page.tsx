@@ -9,7 +9,7 @@ import SettingsPanel from "@/components/SettingsPanel";
 import { useLibrary } from "@/hooks/useLibrary";
 import type { AnyRow, BoardItem, Project } from "@/types/project";
 import { getTranslator, type Language } from "@/utils/i18n";
-import { Settings, Plus, Minus, RotateCw, Trash2 } from "lucide-react";
+import { Settings, Plus, Minus, RotateCw, X, Trash2 } from "lucide-react";
 import { useRef } from "react";
 
 type Units = "metric" | "imperial";
@@ -62,7 +62,8 @@ export default function PedalBoardApp() {
   const canvasContainerRef = useRef<HTMLDivElement | null>(null);
   const { pedalsLibrary, boardsLibrary } = useLibrary();
 
-const BACKGROUNDS = [
+const BACKGROUNDS = React.useMemo(() => [
+  
   {
     id: "neutral",
     label: "Neutral",
@@ -72,33 +73,56 @@ const BACKGROUNDS = [
     id: "wood",
     label: "Wood",
     type: "image" as const,
-    src: "/backgrounds/wood.webp",
+    src: "/backgrounds/wood.png",
   },
   {
-    id: "marble",
-    label: "Marble",
+    id: "carpet",
+    label: "Carpet",
     type: "image" as const,
-    src: "/backgrounds/marble.webp",
+    src: "/backgrounds/carpet.png",
   },
   {
-    id: "rug",
-    label: "Rug",
+    id: "stripes",
+    label: "Stripes",
     type: "image" as const,
-    src: "/backgrounds/rug.webp",
+    src: "/backgrounds/stripes.png",
   },
   {
-    id: "stage",
-    label: "Stage",
+    id: "fabric",
+    label: "fabric",
     type: "image" as const,
-    src: "/backgrounds/stage.webp",
+    src: "/backgrounds/fabric.png",
   },
   {
-    id: "flightcase",
-    label: "Flightcase",
+    id: "houndstooth",
+    label: "Houndstooth",
     type: "image" as const,
-    src: "/backgrounds/flightcase.webp",
+    src: "/backgrounds/houndstooth.png",
   },
-];
+  {
+    id: "steel",
+    label: "Steel",
+    type: "image" as const,
+    src: "/backgrounds/steel.png",
+  },
+  {
+    id: "coast",
+    label: "Coast",
+    type: "image" as const,
+    src: "/backgrounds/coast.png",
+  },
+
+], []);
+
+// ✅ PRELOAD DES IMAGES (ULTRA IMPORTANT)
+  useEffect(() => {
+    BACKGROUNDS.forEach((bg) => {
+      if (bg.type === "image" && bg.src) {
+        const img = new Image();
+        img.src = bg.src;
+      }
+    });
+  }, [BACKGROUNDS]);
 
 
 const [projects, setProjects] = useState<Project[]>([]);
@@ -1035,11 +1059,16 @@ return (
             {t("settings.title")}
           </h2>
           <button
-            onClick={() => setSettingsOpen(false)}
-            className="text-zinc-500 hover:text-white transition-colors"
-          >
-            ✕
-          </button>
+  onClick={() => setSettingsOpen(false)}
+  className="
+    flex items-center justify-center
+    transition-all duration-200
+    hover:scale-110 hover:rotate-6
+    active:scale-95
+  "
+>
+  <X className="size-4 text-[var(--foreground)]" />
+</button>
         </div>
 
         <SettingsPanel
@@ -1050,6 +1079,7 @@ return (
           setLanguage={setLanguage}
           units={units}
           setUnits={setUnits}
+          backgrounds={BACKGROUNDS}
         />
       </div>
     </div>
@@ -1095,6 +1125,7 @@ return (
             setLanguage={setLanguage}
             units={units}
             setUnits={setUnits}
+            backgrounds={BACKGROUNDS}
           />
         </div>
       </div>

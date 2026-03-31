@@ -10,6 +10,12 @@ type Props = {
   selectedBoards?: AnyRow[];
   displaySizes: Record<number, { w: number; h: number }>;
   boardName?: string;
+  canvasBg: string;
+
+  currentBackground?: {
+    type: "css" | "image";
+    src?: string;
+  };
 };
 
 export default function ExportPNG({
@@ -17,6 +23,9 @@ export default function ExportPNG({
   selectedBoards = [],
   displaySizes,
   boardName,
+  currentBackground,
+  canvasBg,
+  
 }: Props) {
   const language =
     typeof window !== "undefined"
@@ -27,7 +36,9 @@ export default function ExportPNG({
 
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState(boardName || "pedalboard");
-  const [background, setBackground] = useState<"transparent" | "white">("transparent");
+  const [background, setBackground] = useState<
+  "transparent" | "white" | "current"
+>("transparent");
 
   const previewRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -94,11 +105,24 @@ allItems.forEach((item) => {
       ctx.scale(SCALE, SCALE);
       ctx.clearRect(0, 0, width, height);
 
-      // background blanc si sélectionné
-      if (background === "white") {
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(0, 0, width, height);
-      }
+      // 🎨 BACKGROUND
+if (background === "white") {
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, width, height);
+}
+
+if (background === "current" && currentBackground) {
+  if (currentBackground.type === "css") {
+    ctx.fillStyle = getComputedStyle(document.documentElement)
+      .getPropertyValue("--zinc-600");
+    ctx.fillRect(0, 0, width, height);
+  }
+
+  if (currentBackground.type === "image" && currentBackground.src) {
+    const bgImg = await loadImage(currentBackground.src);
+    ctx.drawImage(bgImg, 0, 0, width, height);
+  }
+}
 
       ctx.imageSmoothingEnabled = true;
 
@@ -183,18 +207,20 @@ const exportPNG = async () => {
 
     const allItems = [...boardPedals, ...selectedBoards];
 
-    allItems.forEach((item) => {
-      const size = displaySizes[Number(item.instanceId)];
-      if (!size) return;
+allItems.forEach((item) => {
+  const size = displaySizes[Number(item.instanceId)];
+  if (!size) return;
 
-      const w = size.w;
-      const h = size.h;
+  const isVertical = (item.rotation || 0) % 180 !== 0;
 
-      minX = Math.min(minX, item.x - w / 2);
-      minY = Math.min(minY, item.y - h / 2);
-      maxX = Math.max(maxX, item.x + w / 2);
-      maxY = Math.max(maxY, item.y + h / 2);
-    });
+  const w = isVertical ? size.h : size.w;
+  const h = isVertical ? size.w : size.h;
+
+  minX = Math.min(minX, item.x - w / 2);
+  minY = Math.min(minY, item.y - h / 2);
+  maxX = Math.max(maxX, item.x + w / 2);
+  maxY = Math.max(maxY, item.y + h / 2);
+});
 
     const PADDING = 5;
 
@@ -219,10 +245,24 @@ const exportPNG = async () => {
     ctx.scale(SCALE, SCALE);
     ctx.imageSmoothingEnabled = true;
 
-    if (background === "white") {
-      ctx.fillStyle = "#ffffff";
-      ctx.fillRect(0, 0, width, height);
-    }
+    // 🎨 BACKGROUND EXPORT
+if (background === "white") {
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, width, height);
+}
+
+if (background === "current" && currentBackground) {
+  if (currentBackground.type === "css") {
+    ctx.fillStyle = getComputedStyle(document.documentElement)
+      .getPropertyValue("--zinc-600");
+    ctx.fillRect(0, 0, width, height);
+  }
+
+  if (currentBackground.type === "image" && currentBackground.src) {
+    const bgImg = await loadImage(currentBackground.src);
+    ctx.drawImage(bgImg, 0, 0, width, height);
+  }
+}
 
     const loadedImages: Record<number, HTMLImageElement> = {};
 
@@ -330,46 +370,58 @@ const exportPNG = async () => {
         />
       </div>
 
-      {/* BACKGROUND */}
-      <div className="flex flex-col gap-2">
-        <label className="text-[10px] uppercase tracking-wider text-white font-bold">
-          {t("export.background")}
-        </label>
+{/* BACKGROUND */}
+<div className="flex flex-col gap-2">
+  <label className="text-[10px] uppercase tracking-wider text-white font-bold">
+    {t("export.background")}
+  </label>
 
-        <div className="flex flex-col gap-1 text-xs text-white">
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="radio"
-              checked={background === "transparent"}
-              onChange={() => setBackground("transparent")}
-            />
-            {t("export.transparent")}
-          </label>
+  {/* ✅ TOUT DANS LE MÊME BLOC */}
+  <div className="flex flex-col gap-1 text-xs text-white">
 
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="radio"
-              checked={background === "white"}
-              onChange={() => setBackground("white")}
-            />
-            {t("export.white")}
-          </label>
-        </div>
-      </div>
+    <label className="flex items-center gap-2 cursor-pointer">
+      <input
+        type="radio"
+        checked={background === "transparent"}
+        onChange={() => setBackground("transparent")}
+      />
+      {t("export.transparent")}
+    </label>
 
-      {/* PREVIEW */}
-      <div className="flex flex-col gap-2">
-        <label className="text-[10px] uppercase tracking-wider text-white font-bold">
-          {t("export.preview")}
-        </label>
+    <label className="flex items-center gap-2 cursor-pointer">
+      <input
+        type="radio"
+        checked={background === "white"}
+        onChange={() => setBackground("white")}
+      />
+      {t("export.white")}
+    </label>
 
-        <div className="bg-zinc-800 rounded-md p-2 flex items-center justify-center">
-          <canvas ref={previewRef} className="max-w-full max-h-40" />
-        </div>
-      </div>
+    <label className="flex items-center gap-2 cursor-pointer">
+      <input
+        type="radio"
+        checked={background === "current"}
+        onChange={() => setBackground("current")}
+      />
+      Canvas (PNG)
+    </label>
 
-      {/* DOWNLOAD */}
-      <button
+  </div>
+</div>
+
+{/* PREVIEW */}
+<div className="flex flex-col gap-2">
+  <label className="text-[10px] uppercase tracking-wider text-white font-bold">
+    {t("export.preview")}
+  </label>
+
+  <div className="bg-zinc-800 rounded-md p-2 flex items-center justify-center">
+    <canvas ref={previewRef} className="max-w-full max-h-40" />
+  </div>
+</div>
+
+{/* DOWNLOAD */}
+<button
   onClick={() => exportPNG()}
   className="w-full bg-blue-500 !text-white text-[11px] uppercase font-mono font-bold rounded-lg py-2 flex items-center justify-center transition-all duration-150 hover:bg-blue-600 hover:scale-[1.02] active:scale-95 transform-gpu"
 >

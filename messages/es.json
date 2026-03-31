@@ -172,8 +172,8 @@
   "theme": "Tema",
 
   "unitsOptions": {
-    "metric": "MÉTRICO",
-    "imperial": "IMPERIAL"
+    "metric": "Métrico",
+    "imperial": "Imperial"
   },
   
   "themeOptions": {

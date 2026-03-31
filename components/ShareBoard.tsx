@@ -32,12 +32,13 @@ export default function ShareBoard({
   const [generatedUrl, setGeneratedUrl] = useState<string | null>(null);
   const previewRef = useRef<HTMLCanvasElement | null>(null);
   const [manualCopyUrl, setManualCopyUrl] = useState<string | null>(null);
+  const [name, setName] = useState(boardName || "pedalboard");
   const createShareLink = async (): Promise<string | null> => {
   const { data } = await supabase
     .from("shared_boards")
     .insert([
       {
-        name: boardName || "My pedalboard",
+        name: name || "My pedalboard", // ✅ UTILISE LE STATE
         data: {
           pedals: boardPedals,
           boards: selectedBoards,
@@ -220,20 +221,20 @@ for (const p of itemsToRender) {
 
   ctx.drawImage(img, -size.w / 2, -size.h / 2, size.w, size.h);
 
-  ctx.restore();
-}
+  ctx.restore();  
+  }
     } catch (e) {
       console.error(e);
     }
   };
 
-useEffect(() => {
-  renderPreview();
-}, [boardPedals, displaySizes]);
+  useEffect(() => {
+    renderPreview();
+  }, [boardPedals, displaySizes]);
 
 
   // 📋 COPY LINK
-const copyLink = async () => {
+  const copyLink = async () => {
   const url = generatedUrl || await createShareLink();
   if (!url) return;
 
@@ -280,7 +281,7 @@ const copyLink = async () => {
   // ✅ UX
   setCopied(true);
   setTimeout(() => setCopied(false), 2000);
-};
+  };
 
 
   // ===============================
@@ -302,153 +303,154 @@ const copyLink = async () => {
   };
 
   return (
-    <div
-      ref={containerRef} // ✅ NEW
-      className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 w-64 shadow-2xl flex flex-col gap-4"
-    >
+  <div
+    ref={containerRef}
+    className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 w-64 shadow-2xl flex flex-col gap-4"
+  >
 
-      {/* TITLE */}
-      <div className="text-xs font-bold uppercase tracking-wider text-white">
-        {t("share.title")}
+    {/* TITLE */}
+    <div className="text-xs font-bold uppercase tracking-wider text-white">
+      {t("share.title")}
+    </div>
+
+    {/* NAME (EDITABLE) */}
+    <div className="flex flex-col gap-1">
+      <label className="text-[10px] uppercase tracking-wider text-white font-bold">
+        {t("export.name")}
+      </label>
+
+<input
+  value={name}
+  onChange={(e) => setName(e.target.value)}
+  className="h-9 px-3 rounded-md bg-zinc-800 border border-zinc-700 text-[12px] font-mono text-white focus:outline-none focus:border-blue-500"
+/>
+    </div>
+
+    {/* SHARE VIA */}
+    <div className="flex flex-col gap-2">
+
+      <label className="text-[10px] uppercase tracking-wider text-white font-bold">
+        {t("share.social")}
+      </label>
+
+      <div className="grid grid-cols-2 gap-2">
+
+        {[
+          { key: "discord", label: "Discord", logo: "/logos/discord.png" },
+          { key: "facebook", label: "Facebook", logo: "/logos/facebook.png" },
+          { key: "instagram", label: "Instagram", logo: "/logos/instagram.png" },
+          { key: "mail", label: "Mail", logo: "/logos/mail.png" },
+          { key: "messenger", label: "Messenger", logo: "/logos/messenger.png" },
+          { key: "reddit", label: "Reddit", logo: "/logos/reddit.png" },
+          { key: "whatsapp", label: "WhatsApp", logo: "/logos/whatsapp.png" },
+          { key: "x", label: "X", logo: "/logos/twitter.png" },
+        ].map((item) => (
+          <a
+            key={item.key}
+            href="#"
+            onClick={async (e) => {
+              e.preventDefault();
+
+              const url = generatedUrl || await createShareLink();
+              if (!url) return;
+
+              const encodedUrl = encodeURIComponent(url);
+              const encodedText = encodeURIComponent(name || "My pedalboard");
+
+              let finalLink = "";
+
+              switch (item.key) {
+                case "facebook":
+                  finalLink = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
+                  break;
+                case "x":
+                  finalLink = `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedText}`;
+                  break;
+                case "reddit":
+                  finalLink = `https://www.reddit.com/submit?url=${encodedUrl}&title=${encodedText}`;
+                  break;
+                case "whatsapp":
+                  finalLink = `https://wa.me/?text=${encodedText}%20${encodedUrl}`;
+                  break;
+                case "messenger":
+                  finalLink = `https://www.facebook.com/dialog/send?link=${encodedUrl}&app_id=123456789`;
+                  break;
+                case "mail": {
+                  const link = document.createElement("a");
+                  link.href = `mailto:?subject=${encodedText}&body=${url}`;
+                  link.click();
+                  return;
+                }
+                case "discord":
+                  window.open("https://discord.com/channels/@me", "_blank");
+                  return;
+                case "instagram":
+                  try {
+                    await navigator.clipboard.writeText(url);
+                  } catch {}
+                  window.open("https://www.instagram.com/", "_blank");
+                  return;
+              }
+
+              window.open(finalLink, "_blank");
+            }}
+            className="
+              flex items-center gap-2
+              px-2 py-2
+              rounded-lg
+              transition-all duration-200 ease-out
+              hover:bg-canvas
+              hover:scale-[1.02]
+              active:scale-[0.98]
+              group
+            "
+          >
+            <img
+              src={item.logo}
+              alt={item.label}
+              className="w-5 h-5 object-contain transition-transform duration-200 group-hover:scale-110"
+            />
+
+            <span className="
+              text-[11px] font-semibold text-zinc-300
+              transition-all duration-200
+              group-hover:text-white
+              group-hover:translate-x-1
+            ">
+              {item.label}
+            </span>
+          </a>
+        ))}
       </div>
 
-      {/* PREVIEW */}
-<div className="flex flex-col gap-2">
+      
 
-  <label className="text-[10px] uppercase tracking-wider text-white font-bold">
-    {t("share.preview")}
-  </label>
+    {/* PREVIEW */}
+    <div className="flex flex-col gap-2">
+      <label className="text-[10px] uppercase tracking-wider text-white font-bold">
+        {t("share.preview")}
+      </label>
 
-  <div className="bg-zinc-800 rounded-md p-2 flex items-center justify-center">
-    <canvas
-      ref={previewRef}
-      className="max-w-full max-h-40"
-    />
-  </div>
+      <div className="bg-zinc-800 rounded-md p-2 flex items-center justify-center">
+        <canvas
+          ref={previewRef}
+          className="max-w-full max-h-40"
+        />
+      </div>
 
-</div>
+      {/* COPY */}
+      <button
+        onClick={copyLink}
+        className="w-full bg-blue-500 !text-white text-[11px] uppercase font-mono font-bold rounded-lg py-2 flex items-center justify-center transition-all duration-150 hover:bg-blue-600 hover:scale-[1.02] active:scale-95 transform-gpu"
+      >
+        <span>
+          {copied ? t("share.copied") : t("share.copy")}
+        </span>
+      </button>
 
-{/* ACTIONS */}
-<div className="flex flex-col gap-2">
-
-  {/* SOCIAL LIST */}
-  <div className="flex flex-col gap-2">
-
-    <label className="text-[10px] uppercase tracking-wider text-white font-bold">
-      {t("share.social")}
-    </label>
-
-    <div className="grid grid-cols-2 gap-2">
-
-      {[
-        { key: "discord", label: "Discord", logo: "/logos/discord.png" },
-        { key: "facebook", label: "Facebook", logo: "/logos/facebook.png" },
-        { key: "instagram", label: "Instagram", logo: "/logos/instagram.png" },
-        { key: "mail", label: "Mail", logo: "/logos/mail.png" },
-        { key: "messenger", label: "Messenger", logo: "/logos/messenger.png" },
-        { key: "reddit", label: "Reddit", logo: "/logos/reddit.png" },
-        { key: "whatsapp", label: "WhatsApp", logo: "/logos/whatsapp.png" },
-        { key: "x", label: "X", logo: "/logos/twitter.png" },
-      ].map((item) => (
-        <a
-          key={item.key}
-          href="#"
-          onClick={async (e) => {
-            e.preventDefault();
-
-            const url = generatedUrl || await createShareLink();
-            if (!url) return;
-
-            const encodedUrl = encodeURIComponent(url);
-            const encodedText = encodeURIComponent(boardName || "My pedalboard");
-
-            let finalLink = "";
-
-            switch (item.key) {
-              case "facebook":
-                finalLink = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
-                break;
-              case "x":
-                finalLink = `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedText}`;
-                break;
-              case "reddit":
-                finalLink = `https://www.reddit.com/submit?url=${encodedUrl}&title=${encodedText}`;
-                break;
-              case "whatsapp":
-                finalLink = `https://wa.me/?text=${encodedText}%20${encodedUrl}`;
-                break;
-              case "messenger":
-                finalLink = `https://www.facebook.com/dialog/send?link=${encodedUrl}&app_id=123456789`;
-                break;
-              case "pinterest":
-                finalLink = `https://pinterest.com/pin/create/button/?url=${encodedUrl}&description=${encodedText}`;
-                break;
-case "mail": {
-  const link = document.createElement("a");
-  link.href = `mailto:?subject=${encodedText}&body=${url}`;
-  link.click();
-  return;
-}
-              case "discord":
-                window.open("https://discord.com/channels/@me", "_blank");
-                return;
-              case "instagram":
-                try {
-                  await navigator.clipboard.writeText(url);
-                } catch {}
-                window.open("https://www.instagram.com/", "_blank");
-                return;
-            }
-
-            window.open(finalLink, "_blank");
-          }}
-          className="
-            flex items-center gap-2
-            px-2 py-2
-            rounded-lg
-            transition-all duration-200 ease-out
-            hover:bg-canvas
-            hover:scale-[1.02]
-            active:scale-[0.98]
-            group
-          "
-        >
-          <img
-            src={item.logo}
-            alt={item.label}
-            className="w-5 h-5 object-contain transition-transform duration-200 group-hover:scale-110"
-          />
-
-          <span className="
-            text-[11px] font-semibold text-zinc-300
-            transition-all duration-200
-            group-hover:text-white
-            group-hover:translate-x-1
-          ">
-            {item.label}
-          </span>
-        </a>
-      ))}
     </div>
+    </div>
+
   </div>
-
-  {/* COPY */}
-  <button
-  onClick={copyLink}
-  className="w-full bg-blue-500 !text-white text-[11px] uppercase font-mono font-bold rounded-lg py-2 flex items-center justify-center transition-all duration-150 hover:bg-blue-600 hover:scale-[1.02] active:scale-95 transform-gpu"
->
-  <span
-    style={{
-      transform: "translateZ(0)",
-      backfaceVisibility: "hidden",
-      WebkitFontSmoothing: "antialiased",
-    }}
-  >
-    {copied ? t("share.copied") : t("share.copy")}
-  </span>
-</button>
-
-</div>
-</div>
 );
 }

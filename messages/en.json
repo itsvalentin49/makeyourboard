@@ -170,8 +170,8 @@
   "theme": "Theme",
 
   "unitsOptions": {
-    "metric": "METRIC",
-    "imperial": "IMPERIAL"
+    "metric": "Metric",
+    "imperial": "Imperial"
   },
   
   "themeOptions": {
@@ -182,11 +182,13 @@
 
   "backgrounds": {
     "neutral": "Neutral",
-    "wood": "Parquet Floor",
-    "marble": "Marble",
-    "rug": "Rug",
-    "stage": "Stage",
-    "flightcase": "Flightcase"
+    "wood": "Herringbone Wood",
+    "carpet": "Blue Damask",
+    "steel": "Iron Steel",
+    "fabric": "Cotton Fabric",
+    "stripes": "Blue Stripes",
+    "coast": "Summer Vibes",
+    "houndstooth": "Houndstooth"
   },
 
   "canvas": {
@@ -196,7 +198,7 @@
 
   "footer": {
     "feedback": "Contact",
-    "donate": "Buy me a coffee"
+    "donate": "Support Us"
   },
 
   "tabs": {

@@ -172,8 +172,8 @@
   "theme": "Design",
 
   "unitsOptions": {
-    "metric": "METRISCH",
-    "imperial": "IMPERIAL"
+    "metric": "Metrisch",
+    "imperial": "Imperial"
   },
   
   "themeOptions": {

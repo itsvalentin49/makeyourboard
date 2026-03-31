@@ -213,6 +213,10 @@ const zoomIn = () => {
   applyZoom(newZoom);
 };
 
+const currentBackground = BACKGROUNDS.find(
+  (b) => b.id === canvasBg
+);
+
 const handleWheel = (e: any) => {
   e.evt.preventDefault();
 
@@ -734,7 +738,7 @@ const getVisibleBounds = () => {
       h-9 w-24 md:h-10 md:w-28
       bg-zinc-900 border border-zinc-800
       rounded-2xl shadow-2xl
-      text-[11px] md:text-[12px] font-mono font-bold text-white uppercase
+      text-[11px] md:text-[11px] font-mono font-bold text-white uppercase
       transition-all duration-150
       hover:border-blue-500 hover:scale-[1.02]
       active:scale-95
@@ -877,7 +881,7 @@ const getVisibleBounds = () => {
               h-9 w-24 md:h-10 md:w-28
               bg-zinc-900 backdrop-blur-md border border-zinc-800
               rounded-2xl shadow-2xl
-              text-[12px] font-mono font-bold text-white uppercase
+              text-[11px] font-mono font-bold text-white uppercase
               transition-all duration-150
               hover:border-blue-500 hover:scale-[1.02]
               active:scale-95
@@ -887,16 +891,19 @@ const getVisibleBounds = () => {
             {t("export.button")}
           </button>
 
-          {showExport && (
-            <div className="absolute bottom-12 left-0 z-50">
-              <ExportPNG
-                boardPedals={activeProject.boardPedals}
-                selectedBoards={activeProject.selectedBoards}
-                displaySizes={displaySizes}
-                boardName={activeProject.name}
-              />
-            </div>
-          )}
+
+{showExport && (
+  <div className="absolute bottom-12 left-0 z-50">
+    <ExportPNG
+      boardPedals={activeProject.boardPedals}
+      selectedBoards={activeProject.selectedBoards}
+      displaySizes={displaySizes}
+      boardName={activeProject.name}
+      canvasBg={canvasBg}
+      currentBackground={currentBackground}
+    />
+  </div>
+)}
         </div>
 
         {/* SHARE */}
@@ -912,7 +919,7 @@ const getVisibleBounds = () => {
               h-9 w-24 md:h-10 md:w-28
               bg-zinc-900 backdrop-blur-md border border-zinc-800
               rounded-2xl shadow-2xl
-              text-[12px] font-mono font-bold text-white uppercase
+              text-[11px] font-mono font-bold text-white uppercase
               transition-all duration-150
               hover:border-blue-500 hover:scale-[1.02] transform-gpu
               active:scale-95
