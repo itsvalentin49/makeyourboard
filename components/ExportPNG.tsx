@@ -48,22 +48,25 @@ export default function ExportPNG({
   const renderPreview = async () => {
     if (!boardPedals?.length) return;
 
-    try {
-      const loadImage = (src: string): Promise<HTMLImageElement> =>
-        new Promise((resolve, reject) => {
-          const img = new Image();
-          img.crossOrigin = "anonymous";
-          img.src = src;
-          img.onload = () => resolve(img);
-          img.onerror = reject;
-        });
+try {
+  const loadImage = (src: string): Promise<HTMLImageElement> =>
+    new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.src = src;
+      img.onload = () => resolve(img);
+      img.onerror = reject;
+    });
+
+  const knobImg = await loadImage("/images/knob.png");
+  const footswitchImg = await loadImage("/images/footswitch.png");
 
       let minX = Infinity;
       let minY = Infinity;
       let maxX = -Infinity;
       let maxY = -Infinity;
 
-      const allItems = [...boardPedals, ...selectedBoards];
+  const allItems = [...boardPedals, ...selectedBoards];
 
 allItems.forEach((item) => {
   const size = displaySizes[Number(item.instanceId)];
@@ -152,33 +155,115 @@ if (background === "current" && currentBackground) {
       }
 
       // PEDALS
-      for (const p of boardPedals) {
-        const img = loadedImages[p.instanceId];
-        if (!img) continue;
+for (const p of boardPedals) {
+  const size = displaySizes[Number(p.instanceId)];
+  if (!size) continue;
 
-        const size = displaySizes[Number(p.instanceId)];
-        if (!size) continue;
+  const w = size.w;
+  const h = size.h;
 
-        const w = size.w;
-        const h = size.h;
+  const drawX = p.x - minX;
+  const drawY = p.y - minY;
 
-        const drawX = p.x - minX;
-        const drawY = p.y - minY;
+  const rotation = ((p.rotation || 0) * Math.PI) / 180;
 
-        const rotation = ((p.rotation || 0) * Math.PI) / 180;
+  ctx.save();
+  ctx.translate(drawX, drawY);
+  ctx.rotate(rotation);
 
-        ctx.save();
-        ctx.translate(drawX, drawY);
-        ctx.rotate(rotation);
+  ctx.shadowColor = "rgba(0,0,0,0.2)";
+  ctx.shadowBlur = 8;
+  ctx.shadowOffsetY = 3;
 
-        ctx.shadowColor = "rgba(0,0,0,0.2)";
-        ctx.shadowBlur = 8;
-        ctx.shadowOffsetY = 3;
+  // 🎨 CUSTOM BACKGROUND
+if (p.slug === "custom") {
+  const radius = 12;
 
-        ctx.drawImage(img, -w / 2, -h / 2, w, h);
+  ctx.beginPath();
+  ctx.moveTo(-w / 2 + radius, -h / 2);
+  ctx.lineTo(w / 2 - radius, -h / 2);
+  ctx.quadraticCurveTo(w / 2, -h / 2, w / 2, -h / 2 + radius);
+  ctx.lineTo(w / 2, h / 2 - radius);
+  ctx.quadraticCurveTo(w / 2, h / 2, w / 2 - radius, h / 2);
+  ctx.lineTo(-w / 2 + radius, h / 2);
+  ctx.quadraticCurveTo(-w / 2, h / 2, -w / 2, h / 2 - radius);
+  ctx.lineTo(-w / 2, -h / 2 + radius);
+  ctx.quadraticCurveTo(-w / 2, -h / 2, -w / 2 + radius, -h / 2);
+  ctx.closePath();
+  ctx.clip();
 
-        ctx.restore();
-      }
+  // 🎨 couleur
+  ctx.fillStyle = p.color || "#888";
+  ctx.fill();
+
+  // 🧱 texture par-dessus
+  const img = loadedImages[p.instanceId];
+  if (img) {
+    ctx.globalAlpha = 0.25; // 🔥 ajuste ici (0.2 → 0.4)
+    ctx.drawImage(img, -w / 2, -h / 2, w, h);
+    ctx.globalAlpha = 1;
+  }
+}
+
+  // IMAGE
+if (p.slug !== "custom") {
+  const img = loadedImages[p.instanceId];
+  if (img) {
+    ctx.drawImage(img, -w / 2, -h / 2, w, h);
+  }
+}
+
+  // CUSTOM CONTROLS
+  if (p.slug === "custom") {
+    const knobSize =
+      p.width < 50 ? 30 :
+      p.width <= 100 ? 32 :
+      40;
+
+    const footswitchSize = 25;
+
+    const knobCount =
+      p.width < 50 ? 1 :
+      p.width <= 100 ? 2 :
+      3;
+
+    const knobY = -h / 2 + 20;
+    const spacing = w / (knobCount + 1);
+    const spread = 1.25;
+
+    for (let i = 0; i < knobCount; i++) {
+      const offset =
+        (i - (knobCount - 1) / 2) * spacing * spread;
+
+      ctx.drawImage(
+        knobImg,
+        offset - knobSize / 2,
+        knobY,
+        knobSize,
+        knobSize
+      );
+    }
+
+    ctx.drawImage(
+      footswitchImg,
+      -footswitchSize / 2,
+      h / 2 - 35,
+      footswitchSize,
+      footswitchSize
+    );
+
+    if (p.name) {
+      ctx.fillStyle = "#000";
+      ctx.font = "bold 10px Arial";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+
+      ctx.fillText(p.name.toUpperCase(), 0, 0);
+    }
+  }
+
+  ctx.restore();
+}
     } catch (e) {
       console.error(e);
     }
@@ -204,7 +289,8 @@ const exportPNG = async () => {
     let minY = Infinity;
     let maxX = -Infinity;
     let maxY = -Infinity;
-
+const knobImg = await loadImage("/images/knob.png");
+const footswitchImg = await loadImage("/images/footswitch.png");
     const allItems = [...boardPedals, ...selectedBoards];
 
 allItems.forEach((item) => {
@@ -290,33 +376,118 @@ if (background === "current" && currentBackground) {
     }
 
     // PEDALS
-    for (const p of boardPedals) {
-      const img = loadedImages[p.instanceId];
-      if (!img) continue;
+for (const p of boardPedals) {
+  const size = displaySizes[Number(p.instanceId)];
+  if (!size) continue;
 
-      const size = displaySizes[Number(p.instanceId)];
-      if (!size) continue;
+  const w = size.w;
+  const h = size.h;
 
-      const w = size.w;
-      const h = size.h;
+  const drawX = p.x - minX;
+  const drawY = p.y - minY;
 
-      const drawX = p.x - minX;
-      const drawY = p.y - minY;
+  const rotation = ((p.rotation || 0) * Math.PI) / 180;
 
-      const rotation = ((p.rotation || 0) * Math.PI) / 180;
+  ctx.save();
+  ctx.translate(drawX, drawY);
+  ctx.rotate(rotation);
 
-      ctx.save();
-      ctx.translate(drawX, drawY);
-      ctx.rotate(rotation);
+  ctx.shadowColor = "rgba(0,0,0,0.2)";
+  ctx.shadowBlur = 12;
+  ctx.shadowOffsetY = 4;
 
-      ctx.shadowColor = "rgba(0,0,0,0.2)";
-      ctx.shadowBlur = 12;
-      ctx.shadowOffsetY = 4;
+  // 🎨 CUSTOM BACKGROUND
+if (p.slug === "custom") {
+  const radius = 12;
 
-      ctx.drawImage(img, -w / 2, -h / 2, w, h);
+  ctx.beginPath();
+  ctx.moveTo(-w / 2 + radius, -h / 2);
+  ctx.lineTo(w / 2 - radius, -h / 2);
+  ctx.quadraticCurveTo(w / 2, -h / 2, w / 2, -h / 2 + radius);
+  ctx.lineTo(w / 2, h / 2 - radius);
+  ctx.quadraticCurveTo(w / 2, h / 2, w / 2 - radius, h / 2);
+  ctx.lineTo(-w / 2 + radius, h / 2);
+  ctx.quadraticCurveTo(-w / 2, h / 2, -w / 2, h / 2 - radius);
+  ctx.lineTo(-w / 2, -h / 2 + radius);
+  ctx.quadraticCurveTo(-w / 2, -h / 2, -w / 2 + radius, -h / 2);
+  ctx.closePath();
+  ctx.clip();
 
-      ctx.restore();
+  // 🎨 couleur
+  ctx.fillStyle = p.color || "#888";
+  ctx.fill();
+
+  // 🧱 texture par-dessus
+  const img = loadedImages[p.instanceId];
+  if (img) {
+    ctx.globalAlpha = 0.25; // 🔥 ajuste ici (0.2 → 0.4)
+    ctx.drawImage(img, -w / 2, -h / 2, w, h);
+    ctx.globalAlpha = 1;
+  }
+}
+
+  // IMAGE
+if (p.slug !== "custom") {
+  const img = loadedImages[p.instanceId];
+  if (img) {
+    ctx.drawImage(img, -w / 2, -h / 2, w, h);
+  }
+}
+
+  // 🎛 CUSTOM CONTROLS
+  if (p.slug === "custom") {
+    const knobSize =
+      p.width < 50 ? 30 :
+      p.width <= 100 ? 32 :
+      40;
+
+    const footswitchSize = 25;
+
+    const knobCount =
+      p.width < 50 ? 1 :
+      p.width <= 100 ? 2 :
+      3;
+
+    const knobY = -h / 2 + 20;
+    const spacing = w / (knobCount + 1);
+    const spread = 1.25;
+
+    // KNOBS
+    for (let i = 0; i < knobCount; i++) {
+      const offset =
+        (i - (knobCount - 1) / 2) * spacing * spread;
+
+      ctx.drawImage(
+        knobImg,
+        offset - knobSize / 2,
+        knobY,
+        knobSize,
+        knobSize
+      );
     }
+
+    // FOOTSWITCH
+    ctx.drawImage(
+      footswitchImg,
+      -footswitchSize / 2,
+      h / 2 - 35,
+      footswitchSize,
+      footswitchSize
+    );
+
+    // TEXT
+    if (p.name) {
+      ctx.fillStyle = "#000";
+      ctx.font = "bold 12px Arial";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+
+      ctx.fillText(p.name.toUpperCase(), 0, 0);
+    }
+  }
+
+  ctx.restore();
+}
 
     canvas.toBlob(
       (blob) => {

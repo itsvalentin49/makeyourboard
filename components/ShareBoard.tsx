@@ -120,7 +120,8 @@ if (!displaySizes || Object.keys(displaySizes).length === 0) return;
           img.onload = () => resolve(img);
           img.onerror = reject;
         });
-
+const knobImg = await loadImage("/images/knob.png");
+const footswitchImg = await loadImage("/images/footswitch.png");
       let minX = Infinity;
       let minY = Infinity;
       let maxX = -Infinity;
@@ -196,7 +197,6 @@ for (const p of itemsToRender) {
 // DRAW
 for (const p of itemsToRender) {
   const img = loadedImages[p.instanceId];
-  if (!img) continue;
 
   const size = displaySizes[Number(p.instanceId)];
   if (!size) continue;
@@ -219,14 +219,104 @@ for (const p of itemsToRender) {
   ctx.shadowBlur = 8;
   ctx.shadowOffsetY = 3;
 
-  ctx.drawImage(img, -size.w / 2, -size.h / 2, size.w, size.h);
+  // ================= CUSTOM PEDAL =================
+  if (p.slug === "custom") {
+    const radius = 12;
 
-  ctx.restore();  
+    // 🔥 BODY uniquement (clip isolé)
+    ctx.save();
+
+    ctx.beginPath();
+    ctx.moveTo(-w / 2 + radius, -h / 2);
+    ctx.lineTo(w / 2 - radius, -h / 2);
+    ctx.quadraticCurveTo(w / 2, -h / 2, w / 2, -h / 2 + radius);
+    ctx.lineTo(w / 2, h / 2 - radius);
+    ctx.quadraticCurveTo(w / 2, h / 2, w / 2 - radius, h / 2);
+    ctx.lineTo(-w / 2 + radius, h / 2);
+    ctx.quadraticCurveTo(-w / 2, h / 2, -w / 2, h / 2 - radius);
+    ctx.lineTo(-w / 2, -h / 2 + radius);
+    ctx.quadraticCurveTo(-w / 2, -h / 2, -w / 2 + radius, -h / 2);
+    ctx.closePath();
+    ctx.clip();
+
+    // couleur
+    ctx.fillStyle = p.color || "#888";
+    ctx.fillRect(-w / 2, -h / 2, w, h);
+
+    // texture
+    if (img) {
+      ctx.globalAlpha = 0.25;
+      ctx.drawImage(img, -w / 2, -h / 2, w, h);
+      ctx.globalAlpha = 1;
+    }
+
+    ctx.restore(); // ✅ IMPORTANT
+
+    // ================= KNOBS =================
+    const knobSize =
+      p.width < 50 ? 30 :
+      p.width <= 100 ? 32 :
+      40;
+
+    const knobCount =
+      p.width < 50 ? 1 :
+      p.width <= 100 ? 2 :
+      3;
+
+    const spacing = w / (knobCount + 1);
+    const spread = 1.25;
+    const knobY = -h / 2 + 20;
+
+    for (let i = 0; i < knobCount; i++) {
+      const offset =
+        (i - (knobCount - 1) / 2) * spacing * spread;
+
+      ctx.drawImage(
+        knobImg,
+        offset - knobSize / 2,
+        knobY,
+        knobSize,
+        knobSize
+      );
+    }
+
+    // ================= FOOTSWITCH =================
+    const footswitchSize = 25;
+
+    ctx.drawImage(
+      footswitchImg,
+      -footswitchSize / 2,
+      h / 2 - 35,
+      footswitchSize,
+      footswitchSize
+    );
+
+    // ================= TEXT =================
+    if (p.name) {
+      ctx.fillStyle = "#000";
+      ctx.font = "bold 10px Arial";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+
+      ctx.fillText(p.name.toUpperCase(), 0, 0);
+    }
   }
+
+  // ================= NORMAL PEDAL =================
+  else {
+    if (img) {
+      ctx.drawImage(img, -w / 2, -h / 2, w, h);
+    }
+  }
+
+  ctx.restore();
+}
     } catch (e) {
       console.error(e);
     }
   };
+
+  
 
   useEffect(() => {
     renderPreview();

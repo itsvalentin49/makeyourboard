@@ -7,7 +7,7 @@
   "addBoard": "Ajouter un pedalboard",
   "addPedalTitle": "Pédales",
   "addPedalButton": "Ajouter",
-  "addBoardTitle": "Pedalboard",
+  "addBoardTitle": "Pedalboards",
   "addBoardButton": "Ajouter",
   "back": "Retour"
   },
@@ -246,7 +246,7 @@
   },
   "share": {
     "button": "Partager",
-    "title": "Partager votre board",
+    "title": "Partager votre pedalboard",
     "preview": "Aperçu",
     "social": "Partager via",
     "copy": "Copier le lien",

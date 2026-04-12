@@ -327,7 +327,7 @@ export default function CustomBuilder({
             <button
               onClick={() => addCustomItem({ name: customName })}
               disabled={!isBoardValid}
-              className="w-full mt-2 text-[10px] font-black uppercase py-2 rounded-md bg-blue-500 hover:bg-blue-400 text-white disabled:cursor-not-allowed"
+              className="w-full mt-2 text-[10px] font-black uppercase py-2 rounded-md bg-blue-500 hover:bg-blue-400 !text-white disabled:cursor-not-allowed"
             >
               {t("custom.addBoard")}
             </button>
