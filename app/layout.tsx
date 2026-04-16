@@ -23,12 +23,12 @@ export const metadata: Metadata = {
   },
 
   title: {
-    default: "Make Your Board – Guitar Pedalboard Builder Online",
+    default: "Free Pedalboard Builder Online – Design Your Guitar Setup | Make Your Board",
     template: "%s | Make Your Board",
   },
 
   description:
-    "Build and design your guitar pedalboard online. Add pedals, boards, customize layout, calculate power consumption and visualize your setup in real time.",
+    "Create your guitar pedalboard online with real pedal sizes. Drag & drop builder, power calculator, and high quality export. Free and easy to use.",
 
   keywords: [
     "guitar pedalboard builder",
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
   ],
 
   openGraph: {
-    title: "Make Your Board – Guitar Pedalboard Builder",
+    title: "Free Pedalboard Builder Online – Make Your Board",
     description:
       "Build and design your guitar pedalboard online. Add pedals, boards, customize layout, calculate power consumption and visualize your setup in real time.",
     url: "https://makeyourboard.com",
@@ -58,7 +58,7 @@ export const metadata: Metadata = {
 
   twitter: {
     card: "summary_large_image",
-    title: "Make Your Board – Guitar Pedalboard Builder Online",
+    title: "Free Pedalboard Builder Online – Design Your Setup",
     description:
       "Build and design your guitar pedalboard online. Add pedals, boards, customize layout, calculate power consumption and visualize your setup in real time.",
     images: ["https://makeyourboard.com/og-image.png"],
@@ -101,14 +101,14 @@ return (
 
 
     <head>
-      <link rel="preload" as="image" href="/backgrounds/wood.png" />
-      <link rel="preload" as="image" href="/backgrounds/carpet.png" />
-      <link rel="preload" as="image" href="/backgrounds/stripes.png" />
-      <link rel="preload" as="image" href="/backgrounds/fabric.png" />
-      <link rel="preload" as="image" href="/backgrounds/houndstooth.png" />
-      <link rel="preload" as="image" href="/backgrounds/steel.png" />
-      <link rel="preload" as="image" href="/backgrounds/coast.png" />
-    </head>
+  <link rel="preload" as="image" href="/backgrounds/wood.webp" />
+  <link rel="preload" as="image" href="/backgrounds/carpet.webp" />
+  <link rel="preload" as="image" href="/backgrounds/stripes.webp" />
+  <link rel="preload" as="image" href="/backgrounds/fabric.webp" />
+  <link rel="preload" as="image" href="/backgrounds/houndstooth.webp" />
+  <link rel="preload" as="image" href="/backgrounds/steel.webp" />
+  <link rel="preload" as="image" href="/backgrounds/coast.webp" />
+</head>
 
     <body
       className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[var(--background)] text-[var(--foreground)]`}
