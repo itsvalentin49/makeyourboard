@@ -1757,7 +1757,7 @@ onDragEnd={(e) => {
       stroke="white"
       strokeWidth={1}
       opacity={0.25}
-      cornerRadius={6}
+      cornerRadius={3}
       listening={false}
     />
 )}
@@ -1773,7 +1773,7 @@ onDragEnd={(e) => {
       height={displaySizes[b.instanceId].h}
       stroke="white"
       strokeWidth={1}
-      cornerRadius={6}
+      cornerRadius={3}
       listening={false}
     />
 )}
@@ -1791,7 +1791,7 @@ onDragEnd={(e) => {
       height={displaySizes[b.instanceId].h}
       stroke="white"
       strokeWidth={1}
-      cornerRadius={6}
+      cornerRadius={3}
       listening={false}
     />
 )}
@@ -2027,7 +2027,7 @@ const LARGE_KNOB = 25;
       stroke="white"
       strokeWidth={1}
       opacity={0.25}
-      cornerRadius={6}
+      cornerRadius={3}
       listening={false}
     />
 )}
@@ -2043,7 +2043,7 @@ const LARGE_KNOB = 25;
     height={displaySizes[p.instanceId].h}
     stroke="white"
     strokeWidth={1}
-    cornerRadius={6}
+    cornerRadius={3}
     listening={false}
   />
 )}
