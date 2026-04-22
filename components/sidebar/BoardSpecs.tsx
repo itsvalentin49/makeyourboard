@@ -55,7 +55,7 @@ export default function BoardSpecs({
 
 {/* STATUT */}
 {!isCustomBoard && (
-  <div className="flex items-center py-2 border-b border-zinc-900">
+  <div className="flex items-center py-1 border-b border-zinc-900">
 
     <span className="text-[10px] text-white uppercase font-bold tracking-wider whitespace-nowrap">
       {t("board.status.label")}
@@ -82,7 +82,7 @@ export default function BoardSpecs({
 
 {/* MARQUE */}
 {!isCustomBoard && (
-  <div className="flex items-center py-2 border-b border-zinc-900">
+  <div className="flex items-center py-1 border-b border-zinc-900">
 
     <span className="text-[10px] text-white uppercase font-bold tracking-wider whitespace-nowrap">
       {t("board.brand")}
@@ -99,7 +99,7 @@ export default function BoardSpecs({
 
 {/* MODÈLE */}
 {!isCustomBoard && (
-  <div className="flex items-center py-2 border-b border-zinc-900">
+  <div className="flex items-center py-1 border-b border-zinc-900">
 
     <span className="text-[10px] text-white uppercase font-bold tracking-wider whitespace-nowrap">
       {t("board.model")}
@@ -116,7 +116,7 @@ export default function BoardSpecs({
 
 {/* YEAR */}
 {!isCustomBoard && (
-  <div className="flex items-center py-2 border-b border-zinc-900">
+  <div className="flex items-center py-1 border-b border-zinc-900">
 
     <span className="text-[10px] text-white uppercase font-bold tracking-wider whitespace-nowrap">
       {t("board.year")}
@@ -133,7 +133,7 @@ export default function BoardSpecs({
 
 {/* MATÉRIAU */}
 {!isCustomBoard && (
-  <div className="flex items-center py-2 border-b border-zinc-900">
+  <div className="flex items-center py-1 border-b border-zinc-900">
 
     <span className="text-[10px] text-white uppercase font-bold tracking-wider whitespace-nowrap">
       {t("board.material.label")}
@@ -152,7 +152,7 @@ export default function BoardSpecs({
 
 {/* PROFIL */}
 {!isCustomBoard && (
-  <div className="flex items-center py-2 border-b border-zinc-900">
+  <div className="flex items-center py-1 border-b border-zinc-900">
 
     <span className="text-[10px] text-white uppercase font-bold tracking-wider whitespace-nowrap">
       {t("board.profile.label")}
@@ -170,7 +170,7 @@ export default function BoardSpecs({
 )}
 
 {/* DIMENSIONS */}
-<div className="flex items-center py-2 border-b border-zinc-900">
+<div className="flex items-center py-1 border-b border-zinc-900">
 
   <span className="text-[10px] text-white uppercase font-bold tracking-wider whitespace-nowrap">
     {t("board.dimensions")}
@@ -190,7 +190,7 @@ export default function BoardSpecs({
 
 {/* POIDS */}
 {!isCustomBoard && (
-  <div className="flex items-center py-2 border-b border-zinc-900">
+  <div className="flex items-center py-1 border-b border-zinc-900">
 
     <span className="text-[10px] text-white uppercase font-bold tracking-wider whitespace-nowrap">
       {t("board.weight")}
@@ -207,7 +207,7 @@ export default function BoardSpecs({
 
 {/* ORIGINE */}
 {!isCustomBoard && (
-  <div className="flex items-center py-2 border-zinc-900">
+  <div className="flex items-center py-1 border-zinc-900">
 
     <span className="text-[10px] text-white uppercase font-bold tracking-wider whitespace-nowrap">
       {t("board.origin")}

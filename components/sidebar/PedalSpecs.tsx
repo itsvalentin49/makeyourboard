@@ -32,7 +32,7 @@ export default function PedalSpecs({
   if (!selectedPedal) return null;
 
   return (
-    <div className="flex flex-col gap-6 animate-in slide-in-from-left duration-300 px-1">
+    <div className="flex flex-col gap-4 animate-in slide-in-from-left duration-300 px-1">
 
       {/* PEDAL INFO */}
       <div className="space-y-0.5 border-zinc-900">
@@ -54,7 +54,7 @@ export default function PedalSpecs({
 
         {/* STATUT */}
 {!isCustomPedal && (
-  <div className="flex items-center py-2 border-b border-zinc-900">
+  <div className="flex items-center py-1 border-b border-zinc-900">
 
     {/* LABEL */}
     <span className="text-[10px] text-white uppercase font-bold tracking-wider whitespace-nowrap">
@@ -82,7 +82,7 @@ export default function PedalSpecs({
 
   {/* MARQUE */}
 {!isCustomPedal && (
-  <div className="flex items-center py-2 border-b border-zinc-900">
+  <div className="flex items-center py-1 border-b border-zinc-900">
 
     {/* LABEL */}
     <span className="text-[10px] text-white uppercase font-bold tracking-wider whitespace-nowrap">
@@ -102,7 +102,7 @@ export default function PedalSpecs({
 
 {/* MODÈLE */}
 {!isCustomPedal && (
-  <div className="flex items-center py-2 border-b border-zinc-900">
+  <div className="flex items-center py-1 border-b border-zinc-900">
 
     {/* LABEL */}
     <span className="text-[10px] text-white uppercase font-bold tracking-wider whitespace-nowrap">
@@ -122,7 +122,7 @@ export default function PedalSpecs({
 
 {/* ANNÉE */}
 {!isCustomPedal && (
-  <div className="flex items-center py-2 border-b border-zinc-900">
+  <div className="flex items-center py-1 border-b border-zinc-900">
 
     <span className="text-[10px] text-white uppercase font-bold tracking-wider whitespace-nowrap">
       {t("pedal.year")}
@@ -139,7 +139,7 @@ export default function PedalSpecs({
 
 {/* TYPE */}
 {!isCustomPedal && (
-  <div className="flex items-center py-2 border-b border-zinc-900">
+  <div className="flex items-center py-1 border-b border-zinc-900">
 
     <span className="text-[10px] text-white uppercase font-bold tracking-wider whitespace-nowrap">
       {t("pedal.type.label")}
@@ -158,7 +158,7 @@ export default function PedalSpecs({
 
 {/* CIRCUIT */}
 {!isCustomPedal && (
-  <div className="flex items-center py-2 border-b border-zinc-900">
+  <div className="flex items-center py-1 border-b border-zinc-900">
 
     <span className="text-[10px] text-white uppercase font-bold tracking-wider whitespace-nowrap">
       {t("pedal.circuit.label")}
@@ -177,7 +177,7 @@ export default function PedalSpecs({
 
 {/* BYPASS */}
 {!isCustomPedal && (
-  <div className="flex items-center py-2 border-b border-zinc-900">
+  <div className="flex items-center py-1 border-b border-zinc-900">
 
     <span className="text-[10px] text-white uppercase font-bold tracking-wider whitespace-nowrap">
       {t("pedal.bypass.label")}
@@ -196,7 +196,7 @@ export default function PedalSpecs({
 
 {/* POWER */}
 {!isCustomPedal && (
-  <div className="flex items-center py-2 border-b border-zinc-900">
+  <div className="flex items-center py-1 border-b border-zinc-900">
 
     <span className="text-[10px] text-white uppercase font-bold tracking-wider whitespace-nowrap">
       {t("pedal.power.label")}
@@ -215,7 +215,7 @@ export default function PedalSpecs({
 
 {/* DRAW */}
 {!isCustomPedal && (
-  <div className="flex items-center py-2 border-b border-zinc-900">
+  <div className="flex items-center py-1 border-b border-zinc-900">
 
     <span className="text-[10px] text-white uppercase font-bold tracking-wider whitespace-nowrap">
       {t("pedal.draw")}
@@ -231,7 +231,7 @@ export default function PedalSpecs({
 )}
 
 {/* DIMENSIONS */}
-<div className="flex items-center py-2 border-b border-zinc-900">
+<div className="flex items-center py-1 border-b border-zinc-900">
 
   {/* LABEL */}
   <span className="text-[10px] text-white uppercase font-bold tracking-wider whitespace-nowrap">
@@ -254,7 +254,7 @@ export default function PedalSpecs({
 
 {/* POIDS */}
 {!isCustomPedal && (
-  <div className="flex items-center py-2 border-b border-zinc-900">
+  <div className="flex items-center py-1 border-b border-zinc-900">
 
     <span className="text-[10px] text-white uppercase font-bold tracking-wider whitespace-nowrap">
       {t("pedal.weight")}
@@ -271,7 +271,7 @@ export default function PedalSpecs({
 
 {/* ORIGIN */}
 {!isCustomPedal && (
-  <div className="flex items-center py-2 border-b border-zinc-900">
+  <div className="flex items-center py-1 border-b border-zinc-900">
 
     <span className="text-[10px] text-white uppercase font-bold tracking-wider whitespace-nowrap">
       {t("pedal.origin")}
