@@ -802,7 +802,7 @@ const addPower = (p: any) => {
 {/* ================= MOBILE FOOTER ================= */}
 {!selectedPedal && !selectedBoardDetails && !contactOpen && (
 <div className="lg:hidden mt-6 px-6">
-  <div className="sidebar-footer flex items-center justify-between ...">
+  <div className="sidebar-footer flex items-center justify-center">
 
     {/* FEEDBACK */}
     <button
@@ -823,25 +823,12 @@ const addPower = (p: any) => {
       </span>
     </button>
 
-    {/* DONATE */}
-    <a
-      href="https://buy.stripe.com/14A8wPeGZ8uQ0tQ96I8Zq00"
-      target="_blank"
-      rel="noopener noreferrer"
-      className="flex items-center gap-2 group"
-    >
-      <span className="text-[12px]">❤️</span>
-      <span className="text-[10px] font-black uppercase text-zinc-500 group-hover:text-white transition-colors duration-200">
-        {t("footer.donate")}
-      </span>
-    </a>
-
   </div>
 </div>
 )}
 
 {/* ================= DESKTOP FOOTER ================= */}
-<div className="hidden lg:flex mt-4 px-1 items-center justify-between">
+<div className="hidden lg:flex mt-4 px-1 items-center justify-center -translate-y-4.5">
   
 {/* FEEDBACK */}
 <button
@@ -861,19 +848,6 @@ const addPower = (p: any) => {
     {t("footer.feedback")}
   </span>
 </button>
-
-{/* DONATE */}
-<a
-  href="https://buy.stripe.com/14A8wPeGZ8uQ0tQ96I8Zq00"
-  target="_blank"
-  rel="noopener noreferrer"
-  className="flex items-center gap-2 group cursor-pointer"
->
-  <span className="text-[12px]">❤️</span>
-  <span className="text-[10px] font-black uppercase text-white transition-all duration-200 group-hover:text-white group-hover:-translate-y-[1px] group-hover:scale-[1.03]">
-    {t("footer.donate")}
-  </span>
-</a>
 
 </div>
 

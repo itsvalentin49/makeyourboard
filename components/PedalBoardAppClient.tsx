@@ -76,22 +76,10 @@ const BACKGROUNDS = React.useMemo(() => [
     src: "/backgrounds/wood.webp",
   },
   {
-    id: "carpet",
-    label: "Carpet",
-    type: "image" as const,
-    src: "/backgrounds/carpet.webp",
-  },
-  {
     id: "stripes",
     label: "Stripes",
     type: "image" as const,
     src: "/backgrounds/stripes.webp",
-  },
-  {
-    id: "fabric",
-    label: "fabric",
-    type: "image" as const,
-    src: "/backgrounds/fabric.webp",
   },
   {
     id: "houndstooth",
@@ -1138,6 +1126,7 @@ setLastSelectedPower={setLastSelectedPower}
           units={units}
           setUnits={setUnits}
           backgrounds={BACKGROUNDS}
+          setContactOpen={setContactOpen}
         />
       </div>
     </div>
@@ -1184,6 +1173,7 @@ setLastSelectedPower={setLastSelectedPower}
             units={units}
             setUnits={setUnits}
             backgrounds={BACKGROUNDS}
+            setContactOpen={setContactOpen}
           />
         </div>
       </div>

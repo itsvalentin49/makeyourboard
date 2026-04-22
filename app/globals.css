@@ -20,8 +20,9 @@
 
   /* semantic */
   --blue: #3b82f6;
-  --green: #22c55e
+  --green: #22c55e;
   --red: #ef4444;
+  --yellow: #eab308;
 }
 
 /* =========================
@@ -44,6 +45,7 @@
   --blue: #2563eb;
   --green: #16a34a;
   --red: #dc2626;
+  --yellow: #ca8a04;
 }
 
 /* =========================
@@ -73,6 +75,8 @@ body {
 
 .text-blue-400,
 .text-blue-500 { color: var(--blue) !important; }
+
+
 
 
 

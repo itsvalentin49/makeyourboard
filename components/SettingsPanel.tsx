@@ -23,6 +23,7 @@ type Props = {
   setUnits: (v: "metric" | "imperial") => void;
 
   backgrounds: Background[];
+  setContactOpen: (v: boolean) => void;
 };
 
 export default function SettingsPanel({
@@ -34,6 +35,7 @@ export default function SettingsPanel({
   units,
   setUnits,
   backgrounds,
+  setContactOpen,
   
 }: Props) {
   const [bgOpen, setBgOpen] = React.useState(false);
@@ -109,7 +111,7 @@ if (value === "light") {
   <div className="space-y-6">
 
    {/* LANGUAGE */}
-<div className="flex items-center gap-4">
+  <div className="flex items-center gap-4">
   <span className="w-28 text-[10px] text-white uppercase font-black tracking-widest">
     {t("settings.language")}
   </span>
@@ -272,6 +274,21 @@ if (value === "light") {
 
     </div>
   </div>
+</div>
+
+{/* ================= CONTACT / SUPPORT ================= */}
+<div className="pt-6 border-t border-zinc-800/60 flex justify-start">
+
+  <a
+    href="https://buy.stripe.com/14A8wPeGZ8uQ0tQ96I8Zq00"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="flex items-center gap-2 text-[10px] font-black uppercase text-white hover:opacity-80 transition"
+  >
+    <span>❤️</span>
+<span>{t("footer.donate")}</span>
+  </a>
+
 </div>
 
   </div>

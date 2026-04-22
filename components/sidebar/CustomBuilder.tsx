@@ -64,6 +64,10 @@ export default function CustomBuilder({
 }: Props) {
 
   const [showPicker, setShowPicker] = useState(false);
+  const PRESET_COLORS = [
+  "#111111", "#ffffff", "#b91c1c", "#92400e", "#065f46", "#1e3a8a",
+  "#6b21a8", "#374151", "#facc15", "#ea580c", "#be185d", "#0f172a"
+];
   const [focusedField, setFocusedField] = useState<string | null>(null);
 
   useEffect(() => {
@@ -241,18 +245,25 @@ onClick={(e) => {
 </div>
 
 {showPicker && (
-  <div
-    className="mt-2 p-3 bg-zinc-900 border border-zinc-700 rounded-lg"
-    onClick={(e) => e.stopPropagation()}
-  >
 
-    <HexColorPicker
-      color={customColor || "#ffffff"}
-      onChange={setCustomColor}
-      style={{ width: "100%" }}
+  
+<div className="grid grid-cols-6 gap-2 mt-2">
+  {PRESET_COLORS.map((color) => (
+    <button
+      key={color}
+      onClick={() => setCustomColor(color)}
+      className={`
+  w-6 h-6 rounded-md
+  transition-all duration-150
+  ${customColor === color 
+    ? "scale-110 ring-2 ring-white" 
+    : "hover:scale-105"
+  }
+`}
+      style={{ background: color }}
     />
-
-  </div>
+  ))}
+</div>
 )}
 
 

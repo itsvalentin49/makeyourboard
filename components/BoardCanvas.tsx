@@ -1383,7 +1383,7 @@ const pairs = o.voltages.map((v, idx) => ({
 
           {shouldShowDaisy && (
             <div>
-              <div className="text-yellow-400">
+              <div className="text-yellow-500">
                 {t("powerSetup.recommendation.daisy")}
               </div>
               <div className="text-zinc-400">
