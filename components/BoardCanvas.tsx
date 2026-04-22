@@ -1112,7 +1112,7 @@ const getVisibleBounds = () => {
       hover:scale-105 hover:border-blue-500 active:scale-95
       cursor-pointer
 
-      ${hasPowerIssue ? "border-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.4)]" : ""}
+      
     `}
   >
     <Zap size={16} className="text-yellow-500" />

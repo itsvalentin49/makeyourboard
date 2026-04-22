@@ -323,5 +323,10 @@
       "upgrade": "Use a suitable power supply or plug the incompatible pedal into a dedicated wall adapter.",
       "tuner": "Your tuner can power multiple pedals using a daisy chain 🤘"
     }
+  },
+
+  "search": {
+    "noResults": "No results"
   }
+
 }

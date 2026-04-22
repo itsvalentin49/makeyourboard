@@ -172,7 +172,7 @@
 
   "settings": {
     "title": "Impostazioni",
-    "background": "Sfondo",
+    "background": "Fondo",
     "language": "Lingua",
     "units": "Unità",
     "theme": "Tema",
@@ -323,5 +323,9 @@
       "upgrade": "Usa un alimentatore adeguato o collega il pedale incompatibile a un alimentatore dedicato.",
       "tuner": "Il tuo accordatore può alimentare più pedali con un daisy chain 🤘"
     }
+  },
+
+  "search": {
+    "noResults": "Nessun risultato"
   }
 }

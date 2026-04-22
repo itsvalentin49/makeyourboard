@@ -319,6 +319,10 @@
       "upgrade": "Utilisez une alimentation plus puissante ou une prise secteur dédiée pour la pédale incompatible.",
       "tuner": "Votre accordeur peut alimenter des pédales avec une daisy chain 🤘"
     }
+  },
+
+  "search": {
+    "noResults": "Aucun résultat"
   }
 
 }

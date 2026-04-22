@@ -323,5 +323,9 @@
       "upgrade": "Use uma fonte adequada ou ligue o pedal incompatível a um adaptador dedicado.",
       "tuner": "O seu afinador pode alimentar vários pedais com um daisy chain 🤘"
     }
+  },
+
+  "search": {
+    "noResults": "Sem resultados"
   }
 }

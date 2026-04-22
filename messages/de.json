@@ -323,5 +323,9 @@
       "upgrade": "Verwende ein geeignetes Netzteil oder schließe das inkompatible Pedal an ein separates Netzteil an.",
       "tuner": "Dein Tuner kann mehrere Pedale über eine Daisy-Chain versorgen 🤘"
     }
+  },
+
+  "search": {
+    "noResults": "Keine Ergebnisse"
   }
 }

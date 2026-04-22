@@ -146,20 +146,18 @@ export default function TopBarTabs({
             {/* + Onglet */}
             {projects.length < MAX_TABS && (
               <button
-                type="button"
-                onClick={createNewProject}
-                className="px-6 h-full flex items-center justify-center shrink-0 text-white"
-                aria-label="Create project"
-              >
-                <span className="
-                  flex items-center justify-center
-                  transition-transform duration-200
-                  hover:scale-110 hover:rotate-6
-                  active:scale-95
-                ">
-                  <Plus className="size-4" />
-                </span>
-              </button>
+  type="button"
+  onClick={createNewProject}
+  className="px-6 h-full flex items-center justify-center shrink-0"
+  aria-label="Create project"
+>
+  <Plus
+    size={16}
+    style={{ color: "#71717a", cursor: "pointer" }}
+    onMouseEnter={(e) => (e.currentTarget.style.color = "#ffffff")}
+    onMouseLeave={(e) => (e.currentTarget.style.color = "#71717a")}
+  />
+</button>
             )}
 
             <DragOverlay>
@@ -178,20 +176,18 @@ export default function TopBarTabs({
 
       {/* SETTINGS BUTTON */}
       <button
-        type="button"
-        onClick={() => setSettingsOpen(true)}
-        className="
-          flex shrink-0 px-6 h-full
-          items-center justify-center
-          text-white
-          transition-all duration-200
-          hover:scale-110 hover:rotate-6
-          active:scale-95
-        "
-        aria-label="Settings"
-      >
-        <Settings className="size-5" />
-      </button>
+  type="button"
+  onClick={() => setSettingsOpen(true)}
+  className="flex shrink-0 px-6 h-full items-center justify-center"
+  aria-label="Settings"
+>
+  <Settings
+    size={20}
+    style={{ color: "#71717a", cursor: "pointer" }}
+    onMouseEnter={(e) => (e.currentTarget.style.color = "#ffffff")}
+    onMouseLeave={(e) => (e.currentTarget.style.color = "#71717a")}
+  />
+</button>
 
     </div>
   );

@@ -143,7 +143,7 @@ onClick={() => {
             ) : (
 
               <div className="p-4 text-center text-[10px] text-zinc-500 uppercase font-semibold tracking-widest">
-                No power supplies found
+                {t("search.noResults")}
               </div>
 
             )}

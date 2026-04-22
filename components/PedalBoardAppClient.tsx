@@ -1104,16 +1104,13 @@ setLastSelectedPower={setLastSelectedPower}
           <h2 className="text-[16px] font-black uppercase tracking-wider text-white">
             {t("settings.title")}
           </h2>
-          <button
-  onClick={() => setSettingsOpen(false)}
-  className="
-    flex items-center justify-center
-    transition-all duration-200
-    hover:scale-110 hover:rotate-6
-    active:scale-95
-  "
->
-  <X className="size-4 text-[var(--foreground)]" />
+          <button onClick={() => setSettingsOpen(false)} className="p-1">
+  <X
+    size={18}
+    style={{ color: "#71717a", cursor: "pointer" }}
+    onMouseEnter={(e) => (e.currentTarget.style.color = "#ffffff")}
+    onMouseLeave={(e) => (e.currentTarget.style.color = "#71717a")}
+  />
 </button>
         </div>
 
@@ -1149,12 +1146,14 @@ setLastSelectedPower={setLastSelectedPower}
             {t("settings.title")}
           </h2>
 
-          <button
-            onClick={() => setSettingsOpen(false)}
-            className="text-white text-xl leading-none active:scale-95 transition"
-          >
-            ✕
-          </button>
+          <button onClick={() => setSettingsOpen(false)} className="p-1">
+  <X
+    size={18}
+    style={{ color: "#71717a", cursor: "pointer" }}
+    onMouseEnter={(e) => (e.currentTarget.style.color = "#ffffff")}
+    onMouseLeave={(e) => (e.currentTarget.style.color = "#71717a")}
+  />
+</button>
         </div>
 
         {/* CONTENT */}

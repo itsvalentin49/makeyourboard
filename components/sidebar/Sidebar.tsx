@@ -799,58 +799,6 @@ const addPower = (p: any) => {
              {/* PUSH TO BOTTOM (desktop only) */}
 <div className="mt-auto" />
 
-{/* ================= MOBILE FOOTER ================= */}
-{!selectedPedal && !selectedBoardDetails && !contactOpen && (
-<div className="lg:hidden mt-6 px-6">
-  <div className="sidebar-footer flex items-center justify-center">
-
-    {/* FEEDBACK */}
-    <button
-  onClick={() => {
-    setSelectedInstanceId(null);
-    setSelectedBoardInstanceId(null);
-
-    setShowPedalResults(false);
-    setShowBoardResults(false);
-
-    setContactOpen(true);
-  }}
-  className="flex items-center gap-2 group"
-  >
-      <span className="text-[12px]">✉️</span>
-      <span className="text-[10px] font-black uppercase text-white transition-colors duration-200">
-        {t("footer.feedback")}
-      </span>
-    </button>
-
-  </div>
-</div>
-)}
-
-{/* ================= DESKTOP FOOTER ================= */}
-<div className="hidden lg:flex mt-4 px-1 items-center justify-center -translate-y-4.5">
-  
-{/* FEEDBACK */}
-<button
-  onClick={() => {
-    setSelectedInstanceId(null);
-    setSelectedBoardInstanceId(null);
-
-    setShowPedalResults(false);
-    setShowBoardResults(false);
-
-    setContactOpen(true);
-  }}
-  className="flex items-center gap-2 group"
->
-  <span className="text-[12px]">✉️</span>
-  <span className="text-[10px] font-black uppercase text-white transition-all duration-200 group-hover:text-white group-hover:-translate-y-[1px] group-hover:scale-[1.03]">
-    {t("footer.feedback")}
-  </span>
-</button>
-
-</div>
-
         </div>
   </>
 );
