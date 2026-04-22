@@ -17,35 +17,34 @@
   },
 
   "canvasIntro": {
-    "title": "Make Your Board",
-    "desktopText": "Füge Pedale hinzu, erkunde sie nach Effektart und erstelle dein ideales Pedalboard.",
+    "title": "Baue dein Pedalboard",
+    "desktopText": "Füge Pedale hinzu, entdecke Effekttypen und erstelle dein ideales Pedalboard.",
     "desktopExtra": "Bis zu 5 Boards zum Testen, Vergleichen und Optimieren deiner Setups.",
-    "mobileText": "Füge Pedale hinzu, erkunde sie nach Effektart und erstelle dein ideales Pedalboard.",
-    "text3": "Unlimited setups. Endless tone."
-    },
+    "mobileText": "Füge Pedale hinzu, entdecke Effekttypen und erstelle dein ideales Pedalboard.",
+    "text3": "Unbegrenzte Setups. Endloser Sound."
+  },
 
   "pedal": {
-
-    "features": "Technische Daten",
+    "features": "Spezifikationen",
     "brand": "Marke",
     "model": "Modell",
     "year": "Jahr",
-    
+
     "status": {
       "label": "Status",
-      "active": "In Produktion",
+      "active": "Aktiv",
       "discontinued": "Eingestellt"
     },
 
     "type": {
       "label": "Typ",
-      "A/B Box": "A/B-Box",
+      "A/B Box": "A/B Box",
       "Acoustic": "Akustik",
       "Amp Simulator": "Amp-Simulator",
       "Audio Interface": "Audio-Interface",
       "Boost": "Boost",
       "Buffer": "Buffer",
-      "Cab Simulator": "Lautsprechersimulation",
+      "Cab Simulator": "Cab-Simulator",
       "Chorus": "Chorus",
       "Compressor": "Kompressor",
       "Delay": "Delay",
@@ -56,13 +55,13 @@
       "Expression": "Expression-Pedal",
       "Filter": "Filter",
       "Flanger": "Flanger",
-      "Footswitch": "Footswitch",
+      "Footswitch": "Fußschalter",
       "Fuzz": "Fuzz",
       "Limiter": "Limiter",
       "Lo-Fi": "Lo-Fi",
       "Looper": "Looper",
       "MIDI Controller": "MIDI-Controller",
-      "Multi-FX": "Multi-Effekt",
+      "Multi-FX": "Multi-FX",
       "Noise Gate": "Noise Gate",
       "Octaver": "Octaver",
       "Overdrive": "Overdrive",
@@ -70,7 +69,7 @@
       "Pitch": "Pitch",
       "Power Amp": "Endstufe",
       "Power Supply": "Netzteil",
-      "Preamp": "Vorverstärker",
+      "Preamp": "Preamp",
       "Reverb": "Reverb",
       "Reverb / Tremolo": "Reverb / Tremolo",
       "Ring Modulator": "Ringmodulator",
@@ -120,7 +119,7 @@
       "Battery": "Batterie"
     },
 
-    "draw": "Stromaufnahme",
+    "draw": "Stromverbrauch",
     "dimensions": "Abmessungen",
     "weight": "Gewicht",
     "origin": "Herkunft",
@@ -128,11 +127,10 @@
   },
 
   "board": {
-
     "status": {
       "label": "Status",
-      "active": "In Produktion",
-      "discontinued": "Nicht mehr in Produktion"
+      "active": "Aktiv",
+      "discontinued": "Eingestellt"
     },
 
     "brand": "Marke",
@@ -149,7 +147,7 @@
     "profile": {
       "label": "Profil",
       "Flat": "Flach",
-      "Angled": "Geneigt"
+      "Angled": "Gewinkelt"
     },
 
     "dimensions": "Abmessungen",
@@ -157,46 +155,48 @@
     "origin": "Herkunft"
   },
 
-"custom": {
-  "title": "Custom",
-  "selectType": "Pedal oder Board auswählen",
-  "pedal": "Pedal",
-  "board": "Board",
-  "nameOptional": "Name",
-  "namePlaceholder": "Fuzz",
-  "enterDimensions": "Abmessungen",
-  "width": "Breite",
-  "depth": "Tiefe",
-  "color": "Farbe",
-  "addPedal": "Hinzufügen",
-  "addBoard": "Hinzufügen"
+  "custom": {
+    "title": "Custom",
+    "selectType": "Pedal oder Board auswählen",
+    "pedal": "Pedal",
+    "board": "Pedalboard",
+    "nameOptional": "Name",
+    "namePlaceholder": "Fuzz",
+    "enterDimensions": "Abmessungen",
+    "width": "Breite",
+    "depth": "Tiefe",
+    "color": "Farbe",
+    "addPedal": "Hinzufügen",
+    "addBoard": "Hinzufügen"
   },
 
-"settings": {
-  "title": "Einstellungen",
-  "background": "Hintergrund",
-  "language": "Sprache",
-  "units": "Einheit",
-  "theme": "Design",
+  "settings": {
+    "title": "Einstellungen",
+    "background": "Hintergrund",
+    "language": "Sprache",
+    "units": "Einheit",
+    "theme": "Design",
 
-  "unitsOptions": {
-    "metric": "Metrisch",
-    "imperial": "Imperial"
-  },
-  
-  "themeOptions": {
-    "dark": "Dunkel",
-    "light": "Hell"
-  }
+    "unitsOptions": {
+      "metric": "Metrisch",
+      "imperial": "Imperial"
+    },
+
+    "themeOptions": {
+      "dark": "Dunkel",
+      "light": "Hell"
+    }
   },
 
   "backgrounds": {
     "neutral": "Neutral",
-    "wood": "Parkett",
-    "marble": "Marmor",
-    "rug": "Teppich",
-    "stage": "Bühne",
-    "flightcase": "Flightcase"
+    "wood": "Fischgrät-Holz",
+    "carpet": "Blauer Damast",
+    "steel": "Stahl",
+    "fabric": "Baumwollstoff",
+    "stripes": "Blaue Streifen",
+    "coast": "Sommer-Vibes",
+    "houndstooth": "Hahnentritt"
   },
 
   "canvas": {
@@ -210,76 +210,118 @@
   },
 
   "tabs": {
-    "confirmDelete": "Möchten Sie dieses Projekt wirklich löschen?",
+    "confirmDelete": "Möchtest du dieses Pedalboard wirklich löschen?",
     "yes": "Ja",
     "cancel": "Abbrechen"
   },
 
   "contact": {
     "title": "Kontakt",
-    "subtitle": "Wir antworten normalerweise innerhalb eines Werktages.",
-    "email": "Ihre E-Mail",
+    "subtitle": "Wir antworten in der Regel innerhalb eines Werktages.",
+    "email": "Deine E-Mail",
     "type": "Typ",
     "message": "Nachricht",
-    "placeholderEmail": "sie@email.com",
-    "placeholderMessage": "Schreiben Sie Ihre Nachricht...",
+    "placeholderEmail": "du@email.com",
+    "placeholderMessage": "Schreibe deine Nachricht...",
     "send": "Nachricht senden",
     "sending": "Wird gesendet...",
     "sent": "Nachricht gesendet",
-    "errorRequired": "Bitte füllen Sie alle Felder aus.",
-    "errorInvalidEmail": "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
-    "errorGeneric": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.",
+    "errorRequired": "Bitte fülle alle Felder aus.",
+    "errorInvalidEmail": "Bitte gib eine gültige E-Mail-Adresse ein.",
+    "errorGeneric": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
 
     "types": {
       "question": "Frage",
       "request": "Anfrage",
-      "bug": "Fehler",
+      "bug": "Bug",
       "other": "Sonstiges"
     }
   },
 
-"export": {
-  "button": "Exportieren",
-  "title": "Bild exportieren",
-  "name": "Name",
-  "background": "Hintergrund",
-  "preview": "Vorschau",
-  "transparent": "Transparent (PNG)",
-  "white": "Weiß (JPG)",
-  "download": "Herunterladen"
-},
+  "export": {
+    "button": "Exportieren",
+    "title": "Bild exportieren",
+    "name": "Name",
+    "background": "Hintergrund",
+    "preview": "Vorschau",
+    "transparent": "Transparent (PNG)",
+    "white": "Weiß (JPG)",
+    "download": "Herunterladen"
+  },
 
-"share": {
-  "button": "Teilen",
-  "title": "Pedalboard teilen",
-  "preview": "Vorschau",
-  "social": "Teilen über",
-  "copy": "Link kopieren",
-  "copied": "Kopiert"
-},
+  "share": {
+    "button": "Teilen",
+    "title": "Dein Pedalboard teilen",
+    "preview": "Vorschau",
+    "social": "Teilen über",
+    "copy": "Link kopieren",
+    "copied": "Kopiert"
+  },
 
-"list": {
-  "button": "Liste",
-  "title": "Pedalboard"
-},
+  "list": {
+    "button": "Liste",
+    "title": "Pedalboard"
+  },
 
-"power": {
-  "features": "Eigenschaften",
-  "status": { "label": "Status", "active": "Aktiv", "discontinued": "Eingestellt" },
-  "brand": "Marke",
-  "model": "Modell",
-  "year": "Jahr",
-  "capacity": "Gesamtstrom",
-  "outputs": "Anzahl der Ausgänge",
-  "voltage": "Spannung",
-  "isolated": "Isolierte Ausgänge",
-  "dimensions": "Abmessungen",
-  "weight": "Gewicht",
-  "origin": "Herkunft",
-  "manual": "Handbuch",
-  "yes": "Ja",
-  "no": "Nein"
-}
+  "power": {
+    "button": "Power",
+    "check": "Strom prüfen",
+    "features": "Eigenschaften",
+    "status": {
+      "label": "Status",
+      "active": "Aktiv",
+      "discontinued": "Eingestellt"
+    },
+    "brand": "Marke",
+    "model": "Modell",
+    "year": "Jahr",
+    "capacity": "Gesamtstrom",
+    "outputs": "Ausgänge",
+    "voltage": "Spannung",
+    "isolated": "Isoliert",
+    "dimensions": "Abmessungen",
+    "weight": "Gewicht",
+    "origin": "Herkunft",
+    "manual": "Handbuch",
+    "yes": "Ja",
+    "no": "Nein"
+  },
 
+  "powerSetup": {
+    "title": "Stromversorgung Setup",
 
+    "outputs": {
+      "fixed": "Fester Ausgang",
+      "fixed_plural": "Feste Ausgänge",
+      "switchable": "Umschaltbarer Ausgang",
+      "switchable_plural": "Umschaltbare Ausgänge"
+    },
+
+    "sections": {
+      "pedals": "Pedale",
+      "recommendation": "Empfehlung"
+    },
+
+    "status": {
+      "compatible": "Alle Pedale sind mit deinem Netzteil kompatibel.",
+      "notCompatible": "Dein Netzteil ist nicht mit allen Pedalen kompatibel."
+    },
+
+    "empty": {
+      "title": "Füge dein erstes Pedal hinzu, um zu starten.",
+      "subtitle": "Nutze die Seitenleiste links, um Pedale zu suchen und hinzuzufügen."
+    },
+
+    "recommendation": {
+      "perfect": "Dein Board ist perfekt versorgt. Rock on 🤘",
+      "daisy": "Du kannst mehrere Pedale mit einem Daisy-Chain-Kabel versorgen.",
+      "daisySimple": "Ein Daisy-Chain reicht aus, um deine Pedale zu versorgen.",
+      "daisyHint": "Verwende ein Splitter-Kabel. Funktioniert am besten mit analogen Pedalen. Digitale können Rauschen verursachen.",
+      "isolated": "Du solltest ein isoliertes Netzteil verwenden.",
+      "full": "Dein Netzteil ist ausgelastet.",
+      "fullHint": "Füge ein weiteres Gerät hinzu oder nutze ein Modell mit mehr Ausgängen.",
+      "upgrade": "Verwende ein geeignetes Netzteil oder schließe das inkompatible Pedal an ein separates Netzteil an.",
+      "tuner": "Dein Tuner kann mehrere Pedale über eine Daisy-Chain versorgen 🤘"
+    }
+  }
 }

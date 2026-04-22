@@ -614,7 +614,7 @@ const { x, y } = center;
     brand: "Custom",
     width: widthMm,
     depth: depthMm,
-    color: customType === "pedal" ? (customColor || "#7f1d1d") : "",
+    color: customType === "pedal" ? (customColor || undefined) : "",
     image:
       customType === "pedal"
         ? "/images/custom-pedal.png"

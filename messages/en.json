@@ -155,38 +155,38 @@
     "origin": "Origin"
   },
 
-"custom": {
-  "title": "Custom",
-  "selectType": "Select pedal or board",
-  "pedal": "Pedal",
-  "board": "Board",
-  "nameOptional": "Name",
-  "namePlaceholder": "Fuzz",
-  "enterDimensions": "Dimensions",
-  "width": "Width",
-  "depth": "Depth",
-  "color": "Color",
-  "addPedal": "Add",
-  "addBoard": "Add"
+  "custom": {
+    "title": "Custom",
+    "selectType": "Select pedal or board",
+    "pedal": "Pedal",
+    "board": "Board",
+    "nameOptional": "Name",
+    "namePlaceholder": "Fuzz",
+    "enterDimensions": "Dimensions",
+    "width": "Width",
+    "depth": "Depth",
+    "color": "Color",
+    "addPedal": "Add",
+    "addBoard": "Add"
   },
 
-"settings": {
-  "title": "Settings",
-  "background": "Background",
-  "language": "Language",
-  "units": "Unit",
-  "theme": "Theme",
+  "settings": {
+    "title": "Settings",
+    "background": "Background",
+    "language": "Language",
+    "units": "Unit",
+    "theme": "Theme",
 
-  "unitsOptions": {
-    "metric": "Metric",
-    "imperial": "Imperial"
+    "unitsOptions": {
+      "metric": "Metric",
+      "imperial": "Imperial"
+    },
+
+    "themeOptions": {
+      "dark": "Dark",
+      "light": "Light"
+    }
   },
-  
-  "themeOptions": {
-    "dark": "Dark",
-    "light": "Light"
-  }
-},
 
   "backgrounds": {
     "neutral": "Neutral",
@@ -264,8 +264,14 @@
   },
 
   "power": {
+    "button": "Power",
+    "check": "Check Power",
     "features": "Features",
-    "status": { "label": "Status", "active": "Active", "discontinued": "Discontinued" },
+    "status": {
+      "label": "Status",
+      "active": "Active",
+      "discontinued": "Discontinued"
+    },
     "brand": "Brand",
     "model": "Model",
     "year": "Year",
@@ -279,8 +285,43 @@
     "manual": "Manual",
     "yes": "Yes",
     "no": "No"
+  },
+
+  "powerSetup": {
+    "title": "Power Setup",
+
+    "outputs": {
+      "fixed": "Fixed output",
+      "fixed_plural": "Fixed outputs",
+      "switchable": "Switchable output",
+      "switchable_plural": "Switchable outputs"
+    },
+
+    "sections": {
+      "pedals": "Pedals",
+      "recommendation": "Recommendation"
+    },
+
+    "status": {
+      "compatible": "All pedals are compatible with your power supply.",
+      "notCompatible": "Your power supply is not compatible with all pedals."
+    },
+
+    "empty": {
+      "title": "Add your first pedal to start your setup.",
+      "subtitle": "Use the sidebar on the left to search and add pedals."
+    },
+
+    "recommendation": {
+      "perfect": "Your board is perfectly powered. Rock on 🤘",
+      "daisy": "You can power multiple pedals with a daisy chain.",
+      "daisySimple": "A daisy chain is enough to power your pedals.",
+      "daisyHint": "Use a splitter cable. Works best with analog pedals. Digital ones can get noisy.",
+      "isolated": "You should use an isolated power supply for your board.",
+      "full": "Your power supply is fully loaded.",
+      "fullHint": "Add another unit or upgrade to a model with more outputs.",
+      "upgrade": "Use a suitable power supply or plug the incompatible pedal into a dedicated wall adapter.",
+      "tuner": "Your tuner can power multiple pedals using a daisy chain 🤘"
+    }
   }
-
-
-
 }

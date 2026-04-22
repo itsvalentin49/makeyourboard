@@ -221,17 +221,17 @@ export default function CustomBuilder({
     </span>
 
     <div
-  onClick={(e) => {
-    e.stopPropagation();
-    e.preventDefault();
-    setShowPicker(true);
-  }}
+onClick={(e) => {
+  e.stopPropagation();
+  e.preventDefault();
+  setShowPicker(prev => !prev); // 🔥 toggle
+}}
   className="w-full max-w-[120px] h-[34px] rounded-md border border-zinc-700 cursor-pointer overflow-hidden"
 >
   <div
     className="w-full h-full"
     style={{
-      background: customColor || "#7f1d1d",
+      background: customColor || "linear-gradient(145deg, #bbb, #eee)"
     }}
   />
 </div>
@@ -247,7 +247,7 @@ export default function CustomBuilder({
   >
 
     <HexColorPicker
-      color={customColor || "#7f1d1d"}
+      color={customColor || "#ffffff"}
       onChange={setCustomColor}
       style={{ width: "100%" }}
     />
@@ -257,7 +257,12 @@ export default function CustomBuilder({
 
 
             <button
-              onClick={() => addCustomItem({ name: customName })}
+              onClick={() =>
+  addCustomItem({
+    name: customName,
+    color: customColor ? customColor : undefined,
+  })
+}
               disabled={!isPedalValid}
               className="w-full text-[10px] mt-2 font-black uppercase py-2 rounded-md bg-blue-500 hover:bg-blue-400 !text-white disabled:cursor-not-allowed"
             >

@@ -367,12 +367,14 @@ const isOverloaded = hasPower && totalDraw > totalPowerCapacity;
 
 // pédales uniquement
 const pedals = activeProject.boardPedals
+
   .filter(p => p.type !== "power")
   .sort((a, b) => {
     const nameA = `${a.brand || ""} ${a.name || ""}`.toLowerCase();
     const nameB = `${b.brand || ""} ${b.name || ""}`.toLowerCase();
     return nameA.localeCompare(nameB);
   });
+const hasPedals = pedals.length > 0;
 const powerUnits = activeProject.boardPedals.filter(p => p.type === "power");
 
 const allOutputs = powerUnits.flatMap(p => extractOutputs(p.details));
@@ -416,13 +418,26 @@ const totalOutputs = activeProject.boardPedals
   .filter(p => p.type === "power")
   .reduce((acc, p) => acc + (Number(p.outputs) || 0), 0);
 
-// 🔥 1. séparer digital / analog
+// séparer digital / analog
 const digitalPedals = pedals.filter(p => {
   const circuit = (p.circuit || "").toLowerCase();
   return circuit.includes("digital") || circuit.includes("dsp");
 });
 
 const analogPedals = pedals.filter(p => !digitalPedals.includes(p));
+
+// 🔥 NOUVELLE LOGIQUE SIMPLE (UX PRO)
+
+const pedalCount = pedals.length;
+const digitalCount = digitalPedals.length;
+
+// règles
+const isSinglePedal = pedalCount === 1;
+const isAnalogOnlySmall = pedalCount >= 2 && pedalCount <= 4 && digitalCount === 0;
+const isMixedWithMultipleDigital = pedalCount >= 2 && pedalCount <= 4 && digitalCount >= 2;
+const isLargeBoard = pedalCount >= 5;
+const isMixedWithSingleDigital =
+  pedalCount >= 2 && pedalCount <= 4 && digitalCount === 1;
 
 // 🔥 2. priorité digitale
 const outputsAfterDigital = totalOutputs - digitalPedals.length;
@@ -493,13 +508,13 @@ if (hasPower) {
   const failingPedals = pedalAssignments.filter(a => !a.ok);
 
   if (failingPedals.length > 0) {
-    powerMessage = "→ Your power supply is not compatible with all pedals.";
+    powerMessage = t("powerSetup.status.notCompatible");
     powerMessageColor = "text-red-500";
     powerStatus = "error";
   } 
   else {
     // ✅ TOUJOURS OK ici
-    powerMessage = "✓ All pedals are compatible with your power supply.";
+    powerMessage = t("powerSetup.status.compatible");
     powerMessageColor = "text-green-600 mt-2";
 
     // ⚠️ MAIS état warning si daisy
@@ -541,7 +556,7 @@ const handleStageClick = (e: any) => {
     setShowExport(false);
     setShowShare(false);
     setShowList(false);
-    setShowJacksMargin(false);
+
   }
 };
 
@@ -998,7 +1013,6 @@ const getVisibleBounds = () => {
   setShowList(v => !v);
 
   setShowPower(false);
-  setShowJacksMargin(false);
   setShowExport(false);
   setShowShare(false);
 }} className="relative flex items-center justify-center gap-2 h-9 w-24 md:h-10 md:w-28 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl text-[11px] font-mono font-bold text-white uppercase transition-all hover:border-blue-500">
@@ -1075,7 +1089,7 @@ const getVisibleBounds = () => {
         z-50
       "
     >
-      CHECK POWER
+      {t("power.check")}
     </div>
   )}
 
@@ -1083,7 +1097,7 @@ const getVisibleBounds = () => {
     onClick={() => {
   setShowPower(v => !v);
 
-  setShowJacksMargin(false);
+ 
   setShowExport(false);
   setShowShare(false);
   setShowList(false);
@@ -1117,7 +1131,7 @@ const getVisibleBounds = () => {
 
           <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-white font-bold">
             <Zap size={14} className="text-yellow-500" />
-            POWER SETUP
+            {t("powerSetup.title")}
           </div>
 
 
@@ -1180,8 +1194,12 @@ const pairs = o.voltages.map((v, idx) => ({
                       <div className="text-[10px] text-zinc-500 uppercase tracking-wide">
                         {o.count}{" "}
 {o.isSwitch
-  ? `switchable output${o.count > 1 ? "s" : ""}`
-  : `fixed output${o.count > 1 ? "s" : ""}`}
+  ? t(o.count > 1
+      ? "powerSetup.outputs.switchable_plural"
+      : "powerSetup.outputs.switchable")
+  : t(o.count > 1
+      ? "powerSetup.outputs.fixed_plural"
+      : "powerSetup.outputs.fixed")}
                       </div>
 
                       {/* VALUES */}
@@ -1220,7 +1238,7 @@ const pairs = o.voltages.map((v, idx) => ({
 )}
         {/* PEDALS */}
         <div className="mb-2.5 mt-6 text-[12px] uppercase tracking-wider text-white font-bold">
-  Pedals
+  {t("powerSetup.sections.pedals")}
 </div>
         <div className="mb-5">
 
@@ -1270,82 +1288,116 @@ const pairs = o.voltages.map((v, idx) => ({
 
 {/* RECOMMENDATION */}
 <div className="mb-2 mt-6 text-[12px] uppercase tracking-wider text-white font-bold">
-  Recommendation
+  {t("powerSetup.sections.recommendation")}
 </div>
 
 <div className="space-y-3 text-[12px]">
 
-{/* 🔵 PAS D'ALIM */}
+  {/* 🚀 AUCUNE PEDALE */}
+  {!hasPedals && (
+    <>
+      <div className="text-blue-400">
+        {t("powerSetup.empty.title")}
+      </div>
+      <div className="text-white -mt-3">
+        {t("powerSetup.empty.subtitle")}
+      </div>
+    </>
+  )}
+
+  {/* 🔥 LOGIQUE NORMALE */}
+  {hasPedals && (
+    <>
+      {/* 🔵 PAS D'ALIM */}
 {!hasPower && (
   <>
-    {/* 🟢 DAISY CHAIN SIMPLE */}
-    {pedals.length <= 3 && digitalPedals.length === 0 && (
-      <div className="text-green-500">
-        → You can power your pedals with a daisy chain.
-      </div>
+    {/* ❌ 1 pédale → rien */}
+    {!isSinglePedal && (
+
+      <>
+        {/* 🟢 2–4 analog → daisy OK */}
+        {isAnalogOnlySmall && (
+          <div className="text-green-500">
+            {t("powerSetup.recommendation.daisySimple")}
+          </div>
+        )}
+
+        {isMixedWithSingleDigital && (
+  <div className="text-green-500">
+    {t("powerSetup.recommendation.daisy")}
+  </div>
+)}
+
+        {/* 🟡 2–4 avec ≥2 digital */}
+        {isMixedWithMultipleDigital && (
+          <div className="text-yellow-400">
+            {t("powerSetup.recommendation.isolated")}
+          </div>
+        )}
+
+        {/* 🔴 5+ pédales */}
+        {isLargeBoard && (
+          <div className="text-yellow-400">
+            {t("powerSetup.recommendation.isolated")}
+          </div>
+        )}
+
+      </>
     )}
 
-    {/* 🟡 BESOIN D'ALIM */}
-    {(pedals.length > 3 || digitalPedals.length > 0) && (
-      <div className="text-yellow-400">
-        → You should use an isolated power supply for your board.
-      </div>
-    )}
-
-    {/* 🔥 TIP TUNER (NOUVEAU) */}
-    {hasDaisyChainTuner && (
+    {/* bonus tuner */}
+    {hasDaisyChainTuner && !isSinglePedal && (
       <div className="text-zinc-400 -mt-2">
-        Your tuner can power multiple pedals using a daisy chain 🤘
+        {t("powerSetup.recommendation.tuner")}
       </div>
     )}
   </>
 )}
 
-  {/* 🔴 PRIORITÉ : PEDAL NON COMPATIBLE */}
-{hasPower && hasFailingPedal && (
-  <div className="text-red-500">
-    Upgrade your power supply or power the incompatible pedal separately.
-  </div>
-)}
-
-  {/* ✅ LE RESTE UNIQUEMENT SI TOUT EST OK */}
-  {!hasFailingPedal && (
-    <>
-      {extraPedals === 0 && (
-        <div className="text-green-500">
-          Your board is perfectly powered. Rock on 🤘
+      {/* 🔴 PRIORITÉ : PEDAL NON COMPATIBLE */}
+      {hasPower && hasFailingPedal && (
+        <div className="text-yellow-500">
+          {t("powerSetup.recommendation.upgrade")}
         </div>
       )}
 
-      {/* 🔴 NOT ENOUGH OUTPUTS */}
-{shouldShowNotEnough && (
-<div>
-    <div className="text-red-500">
-      → Your power supply is fully loaded.
-    </div>
-    <div className="text-zinc-400">
-      Add another unit or upgrade to a model with more outputs.
-    </div>
-  </div>
-)}
+      {/* ✅ SI TOUT EST OK */}
+      {!hasFailingPedal && (
+        <>
+          {extraPedals === 0 && (
+            <div className="text-green-500">
+              {t("powerSetup.recommendation.perfect")}
+            </div>
+          )}
 
-{/* 🟡 DAISY CHAIN */}
-{shouldShowDaisy && (
-  <div>
-    <div className="text-yellow-400">
-      → You can power multiple pedals with a daisy chain.
-    </div>
-    <div className="text-zinc-400">
-      Use a splitter cable to power multiple pedals. Works best with analog pedals. Digital ones can get noisy.
-    </div>
-  </div>
-)}
+          {shouldShowNotEnough && (
+            <div>
+              <div className="text-red-500">
+                {t("powerSetup.recommendation.full")}
+              </div>
+              <div className="text-zinc-400">
+                {t("powerSetup.recommendation.fullHint")}
+              </div>
+            </div>
+          )}
 
-      {/* 🟢 TU-3 TIP */}
-      {extraPedals > 0 && hasDaisyChainTuner && (
-        <div className="text-zinc-400 -mt-3">
-          Your tuner can power multiple pedals using a daisy chain 🤘
-        </div>
+          {shouldShowDaisy && (
+            <div>
+              <div className="text-yellow-400">
+                {t("powerSetup.recommendation.daisy")}
+              </div>
+              <div className="text-zinc-400">
+                {t("powerSetup.recommendation.daisyHint")}
+              </div>
+            </div>
+          )}
+
+          {extraPedals > 0 && hasDaisyChainTuner && (
+            <div className="text-zinc-400 -mt-3">
+              {t("powerSetup.recommendation.tuner")}
+            </div>
+          )}
+        </>
       )}
     </>
   )}
@@ -1379,7 +1431,7 @@ const pairs = o.voltages.map((v, idx) => ({
   setShowExport(v => !v);
 
   setShowPower(false);
-  setShowJacksMargin(false);
+
   setShowShare(false);
   setShowList(false);
 }}
@@ -1414,7 +1466,6 @@ const pairs = o.voltages.map((v, idx) => ({
   setShowShare(v => !v);
 
   setShowPower(false);
-  setShowJacksMargin(false);
   setShowExport(false);
   setShowList(false);
 }}
@@ -1872,26 +1923,27 @@ isColliding={
   footswitch && (() => {
 
     const size = displaySizes[p.instanceId];
+    const hasColor = !!p.color;
 
     // 🎛 tailles CUSTOM
-    const SMALL_KNOB = 30;
-    const MEDIUM_KNOB = 32;
-    const LARGE_KNOB = 40;
+const SMALL_KNOB = 25;
+const MEDIUM_KNOB = 25;
+const LARGE_KNOB = 25;
 
     let knobSize =
-      p.width < 50 ? SMALL_KNOB :
+      p.width < 70 ? SMALL_KNOB :
       p.width <= 100 ? MEDIUM_KNOB :
       LARGE_KNOB;
 
-    const footswitchSize = 25;
+    const footswitchSize = 18;
 
     const knobCount =
-      p.width < 50 ? 1 :
+      p.width < 70 ? 1 :
       p.width <= 100 ? 2 :
       3;
 
     // 📍 position verticale
-    const knobY = -size.h / 2 + 20;
+    const knobY = -size.h / 2 + 14;
 
     // 👉 espacement contrôlé (centré)
     const spacing = size.w / (knobCount + 1);
@@ -1899,6 +1951,19 @@ isColliding={
 
     return (
       <>
+
+      {hasColor && (
+  <Rect
+    x={-size.w / 2}
+    y={-size.h / 2}
+    width={size.w}
+    height={size.h}
+    fill={p.color}
+    opacity={0.7}   // 🔥 LA CLE
+    cornerRadius={5}
+  />
+)}
+      
         {/* KNOBS */}
         {Array.from({ length: knobCount }).map((_, i) => {
           const offsetFromCenter =
@@ -1923,7 +1988,7 @@ isColliding={
           width={footswitchSize}
           height={footswitchSize}
           x={-footswitchSize / 2}
-          y={size.h / 2 - 35}
+          y={size.h / 2 - 30}
           listening={false}
         />
       </>
@@ -1933,7 +1998,7 @@ isColliding={
 {p.slug === "custom" && p.name && displaySizes[p.instanceId] && (
   <Text
     text={p.name.toUpperCase()}
-    fontSize={12}    
+    fontSize={8}    
     fill="#000000"
     align="center"
     verticalAlign="middle"
@@ -1943,8 +2008,8 @@ isColliding={
     y={-displaySizes[p.instanceId].h / 2}
     fontStyle="bold"      
     stroke="#000000"       
-    strokeWidth={0.8}   
-    letterSpacing={1}        
+    strokeWidth={0.5}   
+    letterSpacing={0.5}        
     listening={false}
   />
 )}

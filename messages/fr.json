@@ -264,21 +264,61 @@
   },
 
   "power": {
-    "features": "Caractéristiques",
-    "status": { "label": "Statut", "active": "En production", "discontinued": "Arrêté" },
-    "brand": "Marque",
-    "model": "Modèle",
-    "year": "Année",
-    "capacity": "Courant total",
-    "outputs": "Nombre de sorties",
-    "voltage": "Tension",
-    "isolated": "Sorties isolées",
-    "dimensions": "Dimensions",
-    "weight": "Poids",
-    "origin": "Origine",
-    "manual": "Manuel",
-    "yes": "Oui",
-    "no": "Non"
+      "button": "Alimentation",
+      "check": "Vérifier l’alimentation",
+      "features": "Caractéristiques",
+      "status": { "label": "Statut", "active": "En production", "discontinued": "Arrêté" },
+      "brand": "Marque",
+      "model": "Modèle",
+      "year": "Année",
+      "capacity": "Courant total",
+      "outputs": "Nombre de sorties",
+      "voltage": "Tension",
+      "isolated": "Sorties isolées",
+      "dimensions": "Dimensions",
+      "weight": "Poids",
+      "origin": "Origine",
+      "manual": "Manuel",
+      "yes": "Oui",
+      "no": "Non"
+    },
+
+  "powerSetup": {
+    "title": "Alimentation",
+
+    "outputs": {
+      "fixed": "sortie fixe",
+      "fixed_plural": "sorties fixes",
+      "switchable": "sortie commutable",
+      "switchable_plural": "sorties commutables"
+    },
+
+    "sections": {
+      "pedals": "Pédales",
+      "recommendation": "Recommandation"
+    },
+
+    "status": {
+      "compatible": "Toutes les pédales sont compatibles avec votre alimentation.",
+      "notCompatible": "Votre alimentation n'est pas compatible avec toutes les pédales."
+    },
+
+    "empty": {
+      "title": "Ajoutez votre première pédale pour commencer.",
+      "subtitle": "Utilisez la barre latérale pour rechercher et ajouter des pédales."
+    },
+
+    "recommendation": {
+      "perfect": "Votre pedalboard est parfaitement alimenté. Rock on 🤘",
+      "daisy": "Vous pouvez alimenter plusieurs pédales avec une daisy chain.",
+      "daisySimple": "Vous pouvez alimenter vos pédales avec une daisy chain.",
+      "daisyHint": "Utilisez un câble splitter. Fonctionne mieux avec des pédales analogiques. Les pédales digitales peuvent générer du bruit.",
+      "isolated": "Vous devriez utiliser une alimentation isolée pour votre pedalboard.",
+      "full": "Votre alimentation est à pleine capacité.",
+      "fullHint": "Ajoutez une autre alimentation ou choisissez un modèle avec plus de sorties.",
+      "upgrade": "Utilisez une alimentation plus puissante ou une prise secteur dédiée pour la pédale incompatible.",
+      "tuner": "Votre accordeur peut alimenter des pédales avec une daisy chain 🤘"
+    }
   }
 
 }

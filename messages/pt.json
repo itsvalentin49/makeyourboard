@@ -1,7 +1,7 @@
 {
   "sidebar": {
-    "searchPedal": "Procurar um pedal",
-    "searchBoard": "Procurar um pedalboard",
+    "searchPedal": "Pesquisar pedal",
+    "searchBoard": "Pesquisar pedalboard",
     "buyOnline": "Comprar online",
     "addPedal": "Adicionar pedal",
     "addBoard": "Adicionar pedalboard",
@@ -10,42 +10,41 @@
     "addBoardTitle": "Pedalboards",
     "addBoardButton": "Adicionar",
     "addPowerTitle": "Fontes de alimentação",
-    "searchPower": "Buscar uma fonte de alimentação",
+    "searchPower": "Pesquisar fonte de alimentação",
     "addPowerSupplyButton": "Adicionar",
-    "noPowerFound": "Nenhuma fonte de alimentação encontrada",
+    "noPowerFound": "Nenhuma fonte encontrada",
     "back": "Voltar"
   },
 
   "canvasIntro": {
-    "title": "Make Your Board",
-    "desktopText": "Adicione pedais, explore por tipo de efeito e crie seu pedalboard ideal.",
-    "desktopExtra": "Até 5 boards para testar, comparar e aprimorar seus setups.",
-    "mobileText": "Adicione pedais, explore por tipo de efeito e crie seu pedalboard ideal.",
-    "text3": "Unlimited setups. Endless tone."
-    },
+    "title": "Crie o seu pedalboard",
+    "desktopText": "Adicione pedais, explore por tipo de efeito e crie o seu pedalboard ideal.",
+    "desktopExtra": "Até 5 pedalboards para testar, comparar e aperfeiçoar os seus setups.",
+    "mobileText": "Adicione pedais, explore por tipo de efeito e crie o seu pedalboard ideal.",
+    "text3": "Setups ilimitados. Som infinito."
+  },
 
   "pedal": {
-
     "features": "Especificações",
     "brand": "Marca",
     "model": "Modelo",
     "year": "Ano",
-    
+
     "status": {
       "label": "Estado",
-      "active": "Em produção",
+      "active": "Ativo",
       "discontinued": "Descontinuado"
     },
 
     "type": {
       "label": "Tipo",
-      "A/B Box": "Caixa A/B",
+      "A/B Box": "A/B Box",
       "Acoustic": "Acústico",
       "Amp Simulator": "Simulador de amplificador",
       "Audio Interface": "Interface de áudio",
       "Boost": "Boost",
       "Buffer": "Buffer",
-      "Cab Simulator": "Simulador de alto-falante",
+      "Cab Simulator": "Simulador de cab",
       "Chorus": "Chorus",
       "Compressor": "Compressor",
       "Delay": "Delay",
@@ -58,32 +57,32 @@
       "Flanger": "Flanger",
       "Footswitch": "Footswitch",
       "Fuzz": "Fuzz",
-      "Limiter": "Limitador",
+      "Limiter": "Limiter",
       "Lo-Fi": "Lo-Fi",
       "Looper": "Looper",
       "MIDI Controller": "Controlador MIDI",
-      "Multi-FX": "Multi-efeitos",
+      "Multi-FX": "Multi-FX",
       "Noise Gate": "Noise Gate",
       "Octaver": "Octaver",
       "Overdrive": "Overdrive",
       "Phaser": "Phaser",
       "Pitch": "Pitch",
-      "Power Amp": "Amplificador de potência",
+      "Power Amp": "Power Amp",
       "Power Supply": "Fonte de alimentação",
       "Preamp": "Pré-amplificador",
       "Reverb": "Reverb",
       "Reverb / Tremolo": "Reverb / Tremolo",
-      "Ring Modulator": "Modulador de anel",
+      "Ring Modulator": "Ring Modulator",
       "Rotary": "Rotary",
       "Slicer": "Slicer",
       "Sustainer": "Sustainer",
       "Swell": "Swell",
-      "Synth": "Sintetizador",
+      "Synth": "Synth",
       "Tap Tempo": "Tap Tempo",
       "Tremolo": "Tremolo",
       "Tuner": "Afinador",
       "Uni-Vibe": "Uni-Vibe",
-      "Utility": "Utilitário",
+      "Utility": "Utility",
       "Vibrato": "Vibrato",
       "Vocal": "Vocal",
       "Volume": "Volume",
@@ -128,11 +127,10 @@
   },
 
   "board": {
-
     "status": {
       "label": "Estado",
-      "active": "Em produção",
-      "discontinued": "Fora de produção"
+      "active": "Ativo",
+      "discontinued": "Descontinuado"
     },
 
     "brand": "Marca",
@@ -157,46 +155,48 @@
     "origin": "Origem"
   },
 
-"custom": {
-  "title": "Custom",
-  "selectType": "Selecionar pedal ou board",
-  "pedal": "Pedal",
-  "board": "Board",
-  "nameOptional": "Nome",
-  "namePlaceholder": "Fuzz",
-  "enterDimensions": "Dimensões",
-  "width": "Largura",
-  "depth": "Profundidade",
-  "color": "Cor",
-  "addPedal": "Adicionar",
-  "addBoard": "Adicionar"
+  "custom": {
+    "title": "Custom",
+    "selectType": "Selecionar pedal ou pedalboard",
+    "pedal": "Pedal",
+    "board": "Pedalboard",
+    "nameOptional": "Nome",
+    "namePlaceholder": "Fuzz",
+    "enterDimensions": "Dimensões",
+    "width": "Largura",
+    "depth": "Profundidade",
+    "color": "Cor",
+    "addPedal": "Adicionar",
+    "addBoard": "Adicionar"
   },
 
-"settings": {
-  "title": "Configurações",
-  "background": "Fundo",
-  "language": "Idioma",
-  "units": "Unidade",
-  "theme": "Tema",
+  "settings": {
+    "title": "Definições",
+    "background": "Fundo",
+    "language": "Idioma",
+    "units": "Unidade",
+    "theme": "Tema",
 
-  "unitsOptions": {
-    "metric": "Métrico",
-    "imperial": "Imperial"
+    "unitsOptions": {
+      "metric": "Métrico",
+      "imperial": "Imperial"
+    },
+
+    "themeOptions": {
+      "dark": "Escuro",
+      "light": "Claro"
+    }
   },
-  
-  "themeOptions": {
-    "dark": "Escuro",
-    "light": "Claro"
-  }
-},
 
   "backgrounds": {
     "neutral": "Neutro",
-    "wood": "Parquet",
-    "marble": "Mármore",
-    "rug": "Tapete",
-    "stage": "Palco",
-    "flightcase": "Flightcase"
+    "wood": "Madeira espinha de peixe",
+    "carpet": "Damasco azul",
+    "steel": "Aço",
+    "fabric": "Tecido de algodão",
+    "stripes": "Riscas azuis",
+    "coast": "Vibes de verão",
+    "houndstooth": "Pied-de-poule"
   },
 
   "canvas": {
@@ -210,30 +210,30 @@
   },
 
   "tabs": {
-    "confirmDelete": "Tem a certeza que deseja eliminar este pedalboard?",
+    "confirmDelete": "Tem a certeza que quer apagar este pedalboard?",
     "yes": "Sim",
     "cancel": "Cancelar"
   },
 
   "contact": {
-    "title": "Contato",
-    "subtitle": "Normalmente respondemos dentro de um dia útil.",
-    "email": "Seu email",
+    "title": "Contacto",
+    "subtitle": "Normalmente respondemos em até um dia útil.",
+    "email": "O seu email",
     "type": "Tipo",
     "message": "Mensagem",
     "placeholderEmail": "voce@email.com",
-    "placeholderMessage": "Escreva sua mensagem...",
+    "placeholderMessage": "Escreva a sua mensagem...",
     "send": "Enviar mensagem",
-    "sending": "Enviando...",
+    "sending": "A enviar...",
     "sent": "Mensagem enviada",
     "errorRequired": "Por favor preencha todos os campos.",
     "errorInvalidEmail": "Por favor insira um email válido.",
-    "errorGeneric": "Algo deu errado. Tente novamente.",
+    "errorGeneric": "Algo correu mal. Tente novamente.",
 
     "types": {
       "question": "Pergunta",
       "request": "Pedido",
-      "bug": "Erro",
+      "bug": "Bug",
       "other": "Outro"
     }
   },
@@ -246,13 +246,14 @@
     "preview": "Pré-visualização",
     "transparent": "Transparente (PNG)",
     "white": "Branco (JPG)",
-    "download": "Baixar"
+    "download": "Download"
   },
 
   "share": {
     "button": "Partilhar",
-    "title": "Partilhar o pedalboard",
-    "share": "Partilhar",
+    "title": "Partilhe o seu pedalboard",
+    "preview": "Pré-visualização",
+    "social": "Partilhar via",
     "copy": "Copiar link",
     "copied": "Copiado"
   },
@@ -263,22 +264,64 @@
   },
 
   "power": {
-  "features": "Características",
-  "status": { "label": "Status", "active": "Em produção", "discontinued": "Descontinuado" },
-  "brand": "Marca",
-  "model": "Modelo",
-  "year": "Ano",
-  "capacity": "Corrente total",
-  "outputs": "Número de saídas",
-  "voltage": "Tensão",
-  "isolated": "Saídas isoladas",
-  "dimensions": "Dimensões",
-  "weight": "Peso",
-  "origin": "Origem",
-  "manual": "Manual",
-  "yes": "Sim",
-  "no": "Não"
-}
+    "button": "Power",
+    "check": "Verificar alimentação",
+    "features": "Características",
+    "status": {
+      "label": "Estado",
+      "active": "Ativo",
+      "discontinued": "Descontinuado"
+    },
+    "brand": "Marca",
+    "model": "Modelo",
+    "year": "Ano",
+    "capacity": "Corrente total",
+    "outputs": "Saídas",
+    "voltage": "Tensão",
+    "isolated": "Isolado",
+    "dimensions": "Dimensões",
+    "weight": "Peso",
+    "origin": "Origem",
+    "manual": "Manual",
+    "yes": "Sim",
+    "no": "Não"
+  },
 
+  "powerSetup": {
+    "title": "Configuração de alimentação",
 
+    "outputs": {
+      "fixed": "Saída fixa",
+      "fixed_plural": "Saídas fixas",
+      "switchable": "Saída comutável",
+      "switchable_plural": "Saídas comutáveis"
+    },
+
+    "sections": {
+      "pedals": "Pedais",
+      "recommendation": "Recomendação"
+    },
+
+    "status": {
+      "compatible": "Todos os pedais são compatíveis com a sua fonte de alimentação.",
+      "notCompatible": "A sua fonte de alimentação não é compatível com todos os pedais."
+    },
+
+    "empty": {
+      "title": "Adicione o seu primeiro pedal para começar.",
+      "subtitle": "Use a barra lateral à esquerda para procurar e adicionar pedais."
+    },
+
+    "recommendation": {
+      "perfect": "O seu pedalboard está perfeitamente alimentado. Rock on 🤘",
+      "daisy": "Pode alimentar vários pedais com um cabo daisy chain.",
+      "daisySimple": "Um daisy chain é suficiente para alimentar os seus pedais.",
+      "daisyHint": "Use um cabo splitter. Funciona melhor com pedais analógicos. Os digitais podem gerar ruído.",
+      "isolated": "Deve usar uma fonte de alimentação isolada.",
+      "full": "A sua fonte de alimentação está no limite.",
+      "fullHint": "Adicione outra unidade ou atualize para um modelo com mais saídas.",
+      "upgrade": "Use uma fonte adequada ou ligue o pedal incompatível a um adaptador dedicado.",
+      "tuner": "O seu afinador pode alimentar vários pedais com um daisy chain 🤘"
+    }
+  }
 }
