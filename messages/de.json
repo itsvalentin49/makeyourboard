@@ -9,6 +9,10 @@
     "addPedalButton": "Hinzufügen",
     "addBoardTitle": "Pedalboards",
     "addBoardButton": "Hinzufügen",
+    "addPowerTitle": "Netzteile",
+    "searchPower": "Netzteil suchen",
+    "addPowerSupplyButton": "Hinzufügen",
+    "noPowerFound": "Keine Netzteile gefunden",
     "back": "Zurück"
   },
 
@@ -244,6 +248,7 @@
   "white": "Weiß (JPG)",
   "download": "Herunterladen"
 },
+
 "share": {
   "button": "Teilen",
   "title": "Pedalboard teilen",
@@ -252,9 +257,28 @@
   "copy": "Link kopieren",
   "copied": "Kopiert"
 },
+
 "list": {
   "button": "Liste",
   "title": "Pedalboard"
+},
+
+"power": {
+  "features": "Eigenschaften",
+  "status": { "label": "Status", "active": "Aktiv", "discontinued": "Eingestellt" },
+  "brand": "Marke",
+  "model": "Modell",
+  "year": "Jahr",
+  "capacity": "Gesamtstrom",
+  "outputs": "Anzahl der Ausgänge",
+  "voltage": "Spannung",
+  "isolated": "Isolierte Ausgänge",
+  "dimensions": "Abmessungen",
+  "weight": "Gewicht",
+  "origin": "Herkunft",
+  "manual": "Handbuch",
+  "yes": "Ja",
+  "no": "Nein"
 }
 
 

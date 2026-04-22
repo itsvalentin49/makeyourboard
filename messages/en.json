@@ -9,6 +9,10 @@
     "addPedalButton": "Add",
     "addBoardTitle": "Pedalboards",
     "addBoardButton": "Add",
+    "addPowerTitle": "Power Supplies",
+    "searchPower": "Search for a power supply",
+    "addPowerSupplyButton": "Add",
+    "noPowerFound": "No power supplies found",
     "back": "Back"
   },
 
@@ -257,6 +261,24 @@
   "list": {
     "button": "List",
     "title": "Pedalboard"
+  },
+
+  "power": {
+    "features": "Features",
+    "status": { "label": "Status", "active": "Active", "discontinued": "Discontinued" },
+    "brand": "Brand",
+    "model": "Model",
+    "year": "Year",
+    "capacity": "Total Current",
+    "outputs": "Outputs",
+    "voltage": "Voltage",
+    "isolated": "Isolated",
+    "dimensions": "Dimensions",
+    "weight": "Weight",
+    "origin": "Origin",
+    "manual": "Manual",
+    "yes": "Yes",
+    "no": "No"
   }
 
 

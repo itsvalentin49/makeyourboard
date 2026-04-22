@@ -17,9 +17,11 @@ import { mmToIn, formatWeight } from "@/utils/units";
 import { getTranslator } from "@/utils/i18n";
 import PedalSpecs from "@/components/sidebar/PedalSpecs";
 import BoardSpecs from "@/components/sidebar/BoardSpecs";
+import PowerSpecs from "@/components/sidebar/PowerSpecs";
 import SearchPedals from "@/components/sidebar/SearchPedals";
 import SearchBoards from "@/components/sidebar/SearchBoards";
 import CustomBuilder from "@/components/sidebar/CustomBuilder";
+import SearchPower from "@/components/sidebar/SearchPower";
 
 
 type AnyRow = Record<string, any>;
@@ -28,8 +30,12 @@ type Props = {
   // Data
   pedalsLibrary: AnyRow[];
   boardsLibrary: AnyRow[];
+  powerLibrary: AnyRow[];
   lastSelectedPedal: AnyRow | null;
   lastSelectedBoard: AnyRow | null;
+  lastSelectedPower: AnyRow | null;
+  setLastSelectedPower: (p: AnyRow) => void;
+  setLastSelectedPedal: (p: AnyRow) => void;
 
   // UI state
   showPedalResults: boolean;
@@ -92,6 +98,7 @@ type Props = {
 export default function Sidebar({
   pedalsLibrary,
   boardsLibrary,
+  powerLibrary, 
   showPedalResults,
   setShowPedalResults,
   showBoardResults,
@@ -136,6 +143,9 @@ export default function Sidebar({
   hideLogo = false,
   lastSelectedPedal,
   lastSelectedBoard,
+  setLastSelectedPedal,
+  lastSelectedPower,
+  setLastSelectedPower,
 }: Props) {
 
   const t = getTranslator(language);
@@ -240,9 +250,13 @@ React.useEffect(() => {
   const [settingsOpen, setSettingsOpen] = React.useState(false);
   const pedalDropdownRef = React.useRef<HTMLDivElement>(null);
   const boardDropdownRef = React.useRef<HTMLDivElement>(null);
+  const powerDropdownRef = React.useRef<HTMLDivElement>(null);
   const pedalInputRef = React.useRef<HTMLInputElement>(null);
   const boardInputRef = React.useRef<HTMLInputElement>(null);
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [powerSearch, setPowerSearch] = React.useState("");
+  const [showPowerResults, setShowPowerResults] = React.useState(false);
+  const powerInputRef = React.useRef<HTMLInputElement>(null);
   const [formatOpen, setFormatOpen] = React.useState(false);
   const [contactEmail, setContactEmail] = React.useState("");
   const [contactType, setContactType] = React.useState("question");
@@ -355,9 +369,12 @@ React.useEffect(() => {
       setLangOpen(false);
     }
 
-
     if (contactTypeRef.current && !contactTypeRef.current.contains(target)) {
       setContactTypeOpen(false);
+    }
+
+    if (powerDropdownRef.current && !powerDropdownRef.current.contains(target)) {
+      setShowPowerResults(false);
     }
   };
 
@@ -368,9 +385,21 @@ React.useEffect(() => {
 }, []);
 
 
+const addPower = (p: any) => {
+  const currentLastPedal = lastSelectedPedal; // On sauvegarde la pédale actuelle
+  const powerItem = { ...p, type: "power" };
 
+  setLastSelectedPower(powerItem); 
+  addPedal(powerItem); 
+
+  // On restaure immédiatement la pédale pour que le bouton bleu Pedal ne change pas
+  if (currentLastPedal) {
+    setTimeout(() => setLastSelectedPedal(currentLastPedal), 0);
+  }
+};
 
   const groupItems = (items: AnyRow[], filter: string) => {
+
   return items.reduce((acc: Record<string, AnyRow[]>, item) => {
     if (filter) {
   const terms = filter
@@ -587,38 +616,52 @@ React.useEffect(() => {
 </>
 </div>
 
+) : selectedPedal && (
+  selectedPedal.type === "power" || selectedPedal.capacity
+) ? (
+
+  <PowerSpecs
+    selectedPower={selectedPedal}
+    units={units}
+    language={language}
+    t={t}
+    isUSA={isUSA}
+    isEurope={isEurope}
+    buildThomannUrl={buildThomannUrl}
+  />
+
 ) : selectedPedal ? (
 
-<PedalSpecs
-  selectedPedal={selectedPedal}
-  units={units}
-  language={language}
-  t={t}
-  isCustomPedal={isCustomPedal}
-  isUSA={isUSA}
-  isEurope={isEurope}
-  buildThomannUrl={buildThomannUrl}
-/>
-
+  <PedalSpecs
+    selectedPedal={selectedPedal}
+    units={units}
+    language={language}
+    t={t}
+    isCustomPedal={isCustomPedal}
+    isUSA={isUSA}
+    isEurope={isEurope}
+    buildThomannUrl={buildThomannUrl}
+  />
 
 ) : selectedBoardDetails ? (
 
-<BoardSpecs
-  selectedBoardDetails={selectedBoardDetails}
-  units={units}
-  language={language}
-  t={t}
-  isCustomBoard={isCustomBoard}
-  buildThomannUrl={buildThomannUrl}
-  getStoresForCountry={getStoresForCountry}
-  hasBoardCommercialLinks={hasBoardCommercialLinks}
-/>
+  <BoardSpecs
+    selectedBoardDetails={selectedBoardDetails}
+    units={units}
+    language={language}
+    t={t}
+    isCustomBoard={isCustomBoard}
+    buildThomannUrl={buildThomannUrl}
+    getStoresForCountry={getStoresForCountry}
+    hasBoardCommercialLinks={hasBoardCommercialLinks}
+  />
 
 ) : (
 
   // LIBRARY (default view)
   <div className="px-1">
 
+{/* ================= PEDALS ================= */}
 <SearchPedals
   pedalsLibrary={pedalsLibrary}
   pedalSearch={pedalSearch}
@@ -626,7 +669,10 @@ React.useEffect(() => {
   showPedalResults={showPedalResults}
   setShowPedalResults={setShowPedalResults}
   setShowBoardResults={setShowBoardResults}
-  addPedal={addPedal}
+  addPedal={(p) => {
+    setLastSelectedPedal(p); // ✅ Enregistre spécifiquement la pédale
+    addPedal(p);
+  }}
   pedalInputRef={pedalInputRef}
   t={t}
   groupItems={groupItems}
@@ -635,7 +681,7 @@ React.useEffect(() => {
 <button
   onClick={() => {
     if (!lastSelectedPedal) return;
-    addPedal(lastSelectedPedal);
+    addPedal(lastSelectedPedal); // ✅ Utilise la mémoire des pédales
   }}
   className="
     w-full mt-2
@@ -651,6 +697,7 @@ React.useEffect(() => {
   {t("sidebar.addPedalButton")}
 </button>
 
+{/* ================= BOARDS ================= */}
 <SearchBoards
   boardsLibrary={boardsLibrary}
   boardSearch={boardSearch}
@@ -681,6 +728,43 @@ React.useEffect(() => {
   "
 >
   {t("sidebar.addBoardButton")}
+</button>
+
+{/* ================= POWER SUPPLIES ================= */}
+<SearchPower
+  powerLibrary={powerLibrary}
+  powerSearch={powerSearch}
+  setPowerSearch={setPowerSearch}
+  showPowerResults={showPowerResults}
+  setShowPowerResults={setShowPowerResults}
+  setShowPedalResults={setShowPedalResults}
+  setShowBoardResults={setShowBoardResults}
+  addPower={(p) => {
+    addPower(p); // ✅ Appelle la fonction addPower qui gère setLastSelectedPower
+  }}
+  powerInputRef={powerInputRef}
+  powerDropdownRef={powerDropdownRef}
+  t={t}
+  groupItems={groupItems}
+/>
+
+<button
+  onClick={() => {
+    if (!lastSelectedPower) return;
+    addPower(lastSelectedPower); // ✅ Utilise la mémoire des alimentations
+  }}
+  className="
+    w-full mt-2
+    text-[10px] font-black uppercase
+    py-2 rounded-md
+    bg-blue-500 !text-white
+    hover:bg-blue-600 hover:brightness-110
+    active:scale-[0.98]
+    transition-all duration-150
+    cursor-pointer
+  "
+>
+  {t("sidebar.addPowerSupplyButton")}
 </button>
 
 

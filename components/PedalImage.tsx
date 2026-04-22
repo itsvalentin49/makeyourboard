@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Group, Rect, Text, Image as KonvaImage } from "react-konva";
 
-const ZOOM_FACTOR = 1.5;
+const MARGIN_SIZE = 10; 
 
 type PedalImageProps = {
   url?: string | null;
@@ -14,6 +14,10 @@ type PedalImageProps = {
   isBoard?: boolean;
   onSizeReady?: (w: number, h: number) => void;
   rotation?: number;
+  showJacksMargin?: boolean;
+  jacksLocation?: string; 
+  isColliding?: boolean;
+  marginRef?: (node: any) => void;
 };
 
 export default function PedalImage({
@@ -25,6 +29,10 @@ export default function PedalImage({
   isBoard = false,
   onSizeReady,
   rotation = 0,
+  showJacksMargin = false,
+  jacksLocation = "",
+  isColliding = false,
+  marginRef,
 }: PedalImageProps) {
   const [img, setImg] = useState<HTMLImageElement | null>(null);
   const [proportionalHeight, setProportionalHeight] = useState(0);
@@ -32,105 +40,105 @@ export default function PedalImage({
   const imageRef = useRef<any>(null);
   const lastSize = useRef({ w: 0, h: 0 });
 
-  useEffect(() => {
-    if (imageRef.current) {
-      imageRef.current.rotation(rotation);
-    }
-  }, [rotation]);
+  const rawData = String(jacksLocation || "").toLowerCase();
+  const hasLeft   = rawData.includes("left") || rawData.includes("side");
+  const hasRight  = rawData.includes("right") || rawData.includes("side");
+  const hasTop    = rawData.includes("top");
+  const hasBottom = rawData.includes("down") || rawData.includes("bottom");
+
+  // ✅ plus de ZOOM_FACTOR ici
+  const scaledWidth = width;
+  const scaledHeight = depth;
+
+  const marginRect = {
+    x: hasLeft ? -MARGIN_SIZE : 0,
+    y: hasTop ? -MARGIN_SIZE : 0,
+    w: scaledWidth + (hasLeft ? MARGIN_SIZE : 0) + (hasRight ? MARGIN_SIZE : 0),
+    h: scaledHeight + (hasTop ? MARGIN_SIZE : 0) + (hasBottom ? MARGIN_SIZE : 0),
+  };
 
   useEffect(() => {
-    const finalW = width * ZOOM_FACTOR;
-    const finalH = depth * ZOOM_FACTOR;
+    const finalW = width;
+    const finalH = depth;
 
-    const notifySize = () => {
-      if (!onSizeReady) return;
-      if (lastSize.current.w === finalW && lastSize.current.h === finalH) return;
+    // ✅ évite spam + stabilise displaySizes
+    if (
+      lastSize.current.w !== finalW ||
+      lastSize.current.h !== finalH
+    ) {
       lastSize.current = { w: finalW, h: finalH };
-      onSizeReady(finalW, finalH);
-    };
+      setProportionalHeight(finalH);
+      if (onSizeReady) onSizeReady(finalW, finalH);
+    }
 
-    setProportionalHeight(finalH);
-
-    if (!url) {
-      setImg(null);
-      notifySize();
-      return;
+    if (!url) { 
+      setImg(null); 
+      return; 
     }
 
     const image = new window.Image();
     image.crossOrigin = "anonymous";
     image.src = url;
+    image.onload = () => setImg(image);
 
-    image.onload = () => {
-      setImg(image);
-      notifySize();
-    };
+  }, [url, width, depth]);
 
-    image.onerror = () => {
-      setImg(null);
-      notifySize();
-    };
+  return (
+    <Group>
+      {/* 1. Rectangle de contour centré */}
+      {showJacksMargin && !isBoard && (
+  <Rect
+    ref={marginRef} // 👈 ICI
+    x={marginRect.x - (scaledWidth / 2)}
+    y={marginRect.y - (proportionalHeight / 2)}
+          width={marginRect.w}
+          height={marginRect.h}
+          stroke={isColliding ? "#ef4444" : "#22c55e"} 
+          strokeWidth={1.5}
+          dash={[4, 2]}
+          cornerRadius={4}
+          listening={false} 
+        />
+      )}
 
-    return () => {
-      image.onload = null;
-      image.onerror = null;
-    };
-  }, [url, width, depth, onSizeReady]);
-
-  const scaledWidth = width * ZOOM_FACTOR;
-
-  // Fallback (rectangle) si pas d’image
-  if (!img) {
-    return (
-      <Group offsetX={scaledWidth / 2} offsetY={proportionalHeight / 2} rotation={rotation}>
+      {/* 2. Image ou Rect centré */}
+      {!img ? (
         <Rect
+          x={-scaledWidth / 2}
+          y={-proportionalHeight / 2}
           width={scaledWidth}
           height={proportionalHeight}
           fill={color || (isBoard ? "#18181b" : "#27272a")}
           stroke={color ? "rgba(255,255,255,0.3)" : "#3f3f46"}
           strokeWidth={1}
-          cornerRadius={6}
+          cornerRadius={3}
         />
-
-        {name && (
-          <Text
-            text={name}
-            width={scaledWidth}
-            height={proportionalHeight}
-            align="center"
-            verticalAlign="middle"
-            fill="white"
-            fontSize={14}
-            fontStyle="bold"
-            stroke="white"
-            strokeWidth={0.5}
-            padding={5}
-            wrap="char"
-          />
-        )}
-      </Group>
-    );
-  }
-
-  // Image OK
-  return (
-    <Group offsetX={scaledWidth / 2} offsetY={proportionalHeight / 2} rotation={rotation}>
-      <KonvaImage
-        image={img}
-        width={scaledWidth}
-        height={proportionalHeight}
-        ref={imageRef}
-        cornerRadius={6}
-      />
-
-      {color && (
-        <Rect
+      ) : (
+        <KonvaImage
+          image={img}
+          x={-scaledWidth / 2}
+          y={-proportionalHeight / 2}
           width={scaledWidth}
           height={proportionalHeight}
-          fill={color}
-          opacity={0.7}
-          cornerRadius={6}
-          listening={false}
+          cornerRadius={3}
+        />
+      )}
+
+      {/* 3. Texte centré */}
+      {!img && name && (
+        <Text
+          x={-scaledWidth / 2}
+          y={-proportionalHeight / 2}
+          text={name}
+          width={scaledWidth}
+          height={proportionalHeight}
+          align="center"
+          verticalAlign="middle"
+          fill="white"
+          fontSize={10}
+          fontStyle="bold"
+          padding={5}
+          wrap="char"
         />
       )}
     </Group>

@@ -16,19 +16,19 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL("https://makeyourboard.com"),
 
-  applicationName: "Make Your Board",
+  applicationName: "MakeYourBoard",
 
   alternates: {
     canonical: "https://makeyourboard.com",
   },
 
   title: {
-    default: "Free Pedalboard Builder Online – Design Your Guitar Setup | Make Your Board",
-    template: "%s | Make Your Board",
+    default: "MakeYourBoard | Guitar Pedalboard Builder",
+    template: "%s | MakeYourBoard",
   },
 
   description:
-    "Create your guitar pedalboard online with real pedal sizes. Drag & drop builder, power calculator, and high quality export. Free and easy to use.",
+  "Design your guitar pedalboard with real pedal sizes, drag-and-drop layout, power calculation, and high-quality export. Free and easy to use.",
 
   keywords: [
     "guitar pedalboard builder",
@@ -38,29 +38,29 @@ export const metadata: Metadata = {
     "guitar pedals layout",
   ],
 
-  openGraph: {
-    title: "Free Pedalboard Builder Online – Make Your Board",
-    description:
-      "Build and design your guitar pedalboard online. Add pedals, boards, customize layout, calculate power consumption and visualize your setup in real time.",
-    url: "https://makeyourboard.com",
-    siteName: "Make Your Board",
-    images: [
-      {
-        url: "https://makeyourboard.com/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "Make Your Board – Guitar Pedalboard Builder",
-      },
-    ],
-    locale: "en_US",
-    type: "website",
-  },
+openGraph: {
+  title: "MakeYourBoard | Guitar Pedalboard Builder",
+  description:
+  "Design your guitar pedalboard with real pedal sizes, drag-and-drop layout, power calculation, and high-quality export. Free and easy to use.",
+  url: "https://makeyourboard.com",
+  siteName: "MakeYourBoard",
+  images: [
+    {
+      url: "https://makeyourboard.com/og-image.png",
+      width: 1200,
+      height: 630,
+      alt: "MakeYourBoard | Guitar Pedalboard Builder",
+    },
+  ],
+  locale: "en_US",
+  type: "website",
+},
 
   twitter: {
     card: "summary_large_image",
-    title: "Free Pedalboard Builder Online – Design Your Setup",
-    description:
-      "Build and design your guitar pedalboard online. Add pedals, boards, customize layout, calculate power consumption and visualize your setup in real time.",
+    title: "MakeYourBoard | Guitar Pedalboard Builder",
+  description:
+  "Design your guitar pedalboard with real pedal sizes, drag-and-drop layout, power calculation, and high-quality export. Free and easy to use.",
     images: ["https://makeyourboard.com/og-image.png"],
   },
 };
@@ -80,20 +80,20 @@ export default function RootLayout({
   const structuredDataWebsite = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: "Make Your Board",
-    alternateName: "MakeYourBoard",
+    name: "MakeYourBoard",
+    alternateName: ["Make Your Board", "Pedalboard Builder"],
     url: "https://makeyourboard.com",
   };
 
   const structuredDataApp = {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    name: "Make Your Board",
+    name: "MakeYourBoard",
     url: "https://makeyourboard.com",
     applicationCategory: "MusicApplication",
     operatingSystem: "All",
     description:
-      "Build and design your guitar pedalboard online. Add pedals, boards, customize layout, calculate power consumption and visualize your setup in real time.",
+  "Design your guitar pedalboard with real pedal sizes, drag-and-drop layout, power calculation, and high-quality export. Free and easy to use.",
   };
 
 return (

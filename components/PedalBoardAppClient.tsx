@@ -31,7 +31,7 @@ const SETTINGS_STORAGE_KEY = "myb_settings";
 const DEFAULT_WORKING_BOARD: Project = {
   id: -1,
   name: "WORKING",
-  zoom: 100,
+  zoom: 200,
   stageX: 0,
   stageY: 0,
   boardPedals: [],
@@ -50,7 +50,7 @@ type ActiveProjectUpdates = Partial<{
 const createEmptyProject = (index: number): Project => ({
   id: Date.now() + index,
   name: `Pedalboard ${index}`,
-  zoom: 100,
+  zoom: 200,
   boardPedals: [],
   selectedBoards: [],
 });
@@ -60,7 +60,7 @@ export default function PedalBoardAppClient() {
   const desktopCanvasRef = useRef<HTMLDivElement | null>(null);
   const mobileCanvasRef = useRef<HTMLDivElement | null>(null);
   const canvasContainerRef = useRef<HTMLDivElement | null>(null);
-  const { pedalsLibrary, boardsLibrary } = useLibrary();
+  const { pedalsLibrary, boardsLibrary, powerLibrary } = useLibrary();
 
 const BACKGROUNDS = React.useMemo(() => [
   
@@ -215,6 +215,7 @@ useEffect(() => {
   const [showPedalResults, setShowPedalResults] = useState<boolean>(false);
   const [showBoardResults, setShowBoardResults] = useState<boolean>(false);
   const [lastSelectedPedal, setLastSelectedPedal] = useState<AnyRow | null>(null);
+  const [lastSelectedPower, setLastSelectedPower] = useState<AnyRow | null>(null);
   const [lastSelectedBoard, setLastSelectedBoard] = useState<AnyRow | null>(null);
   const [contactOpen, setContactOpen] = useState(false);
 
@@ -229,7 +230,7 @@ useEffect(() => {
     const firstProject: Project = {
       id: Date.now(),
       name: "Pedalboard 1",
-      zoom: 100,
+      zoom: 200,
       stageX: 0,
       stageY: 0,
       boardPedals: [],
@@ -405,7 +406,7 @@ useEffect(() => {
     const newProject: Project = {
       id: newId,
       name: `Pedalboard ${projects.length + 1}`,
-      zoom: 100,
+      zoom: 200,
       stageX: 0,
       stageY: 0,
       boardPedals: [],
@@ -448,14 +449,69 @@ useEffect(() => {
   };
 
 const addPedal = (pedal: AnyRow) => {
-  const center = getCenterRef.current?.() ?? { x: 0, y: 0 };
-  const { x, y } = center;
+const center = getCenterRef.current?.() ?? { x: 0, y: 0 };
+
+let newX = center.x;
+let newY = center.y;
+
+// 🔥 CONFIG
+const STEP = 40;
+const MIN_DISTANCE = 80;
+
+// 🔥 OFFSETS SPIRALE
+let xOffset = 0;
+let yOffset = 0;
+
+// 🔥 CONTROLE SPIRALE
+let directionIndex = 0; // 0=right,1=down,2=left,3=up
+let stepsInCurrentDir = 0;
+let stepsLimit = 1;
+let totalSteps = 0;
+
+let isOccupied = true;
+
+while (isOccupied && totalSteps < 200) {
+
+  isOccupied = activeProject.boardPedals.some((p) => {
+    const dx = p.x - (center.x + xOffset);
+    const dy = p.y - (center.y + yOffset);
+
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    return distance < MIN_DISTANCE;
+  });
+
+  if (!isOccupied) break;
+
+  // 👉 mouvement dans la direction
+  if (directionIndex === 0) xOffset += STEP; // droite
+  if (directionIndex === 1) yOffset += STEP; // bas
+  if (directionIndex === 2) xOffset -= STEP; // gauche
+  if (directionIndex === 3) yOffset -= STEP; // haut
+
+  stepsInCurrentDir++;
+  totalSteps++;
+
+  // 👉 changement direction
+  if (stepsInCurrentDir === stepsLimit) {
+    stepsInCurrentDir = 0;
+    directionIndex = (directionIndex + 1) % 4;
+
+    // 👉 agrandir spirale tous les 2 côtés
+    if (directionIndex === 0 || directionIndex === 2) {
+      stepsLimit++;
+    }
+  }
+}
+
+newX = center.x + xOffset;
+newY = center.y + yOffset;
 
   const newPedal: BoardItem = {
     ...pedal,
     instanceId: Date.now(),
-    x,
-    y,
+x: newX,
+y: newY,
     rotation: 0,
     draw: Number(pedal.draw) || 0,
     weight: Number(pedal.weight) || 0,
@@ -633,6 +689,10 @@ return (
         <Sidebar
           pedalsLibrary={pedalsLibrary}
           boardsLibrary={boardsLibrary}
+          powerLibrary={powerLibrary}
+          setLastSelectedPedal={setLastSelectedPedal}
+          lastSelectedPower={lastSelectedPower}
+setLastSelectedPower={setLastSelectedPower}
           showPedalResults={showPedalResults}
           setShowPedalResults={setShowPedalResults}
           showBoardResults={showBoardResults}
@@ -870,6 +930,10 @@ return (
                 <Sidebar
                   pedalsLibrary={pedalsLibrary}
                   boardsLibrary={boardsLibrary}
+                  powerLibrary={powerLibrary}
+                  setLastSelectedPedal={setLastSelectedPedal}
+                  lastSelectedPower={lastSelectedPower}
+                  setLastSelectedPower={setLastSelectedPower}
                   showPedalResults={showPedalResults}
                   setShowPedalResults={setShowPedalResults}
                   showBoardResults={showBoardResults}
@@ -968,6 +1032,10 @@ return (
         <Sidebar
   pedalsLibrary={pedalsLibrary}
   boardsLibrary={boardsLibrary}
+  powerLibrary={powerLibrary}
+  setLastSelectedPedal={setLastSelectedPedal}
+  lastSelectedPower={lastSelectedPower}
+  setLastSelectedPower={setLastSelectedPower}
   showPedalResults={false}
   setShowPedalResults={() => {}}
   showBoardResults={false}

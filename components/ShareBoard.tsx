@@ -136,10 +136,8 @@ allItems.forEach((p: any) => {
   const size = displaySizes[p.instanceId];
   if (!size) return;
 
-const isVertical = (p.rotation || 0) % 180 !== 0;
-
-const w = isVertical ? size.h : size.w;
-const h = isVertical ? size.w : size.h;
+const w = size.w;
+const h = size.h;
 
   minX = Math.min(minX, p.x - w / 2);
   minY = Math.min(minY, p.y - h / 2);
@@ -201,10 +199,8 @@ for (const p of itemsToRender) {
   const size = displaySizes[Number(p.instanceId)];
   if (!size) continue;
 
-  const isVertical = (p.rotation || 0) % 180 !== 0;
-
-  const w = isVertical ? size.h : size.w;
-  const h = isVertical ? size.w : size.h;
+const w = size.w;
+const h = size.h;
 
   const drawX = p.x - minX;
   const drawY = p.y - minY;

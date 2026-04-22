@@ -9,6 +9,10 @@
     "addPedalButton": "Adicionar",
     "addBoardTitle": "Pedalboards",
     "addBoardButton": "Adicionar",
+    "addPowerTitle": "Fontes de alimentação",
+    "searchPower": "Buscar uma fonte de alimentação",
+    "addPowerSupplyButton": "Adicionar",
+    "noPowerFound": "Nenhuma fonte de alimentação encontrada",
     "back": "Voltar"
   },
 
@@ -252,10 +256,29 @@
     "copy": "Copiar link",
     "copied": "Copiado"
   },
+
   "list": {
     "button": "Lista",
     "title": "Pedalboard"
-  }
+  },
+
+  "power": {
+  "features": "Características",
+  "status": { "label": "Status", "active": "Em produção", "discontinued": "Descontinuado" },
+  "brand": "Marca",
+  "model": "Modelo",
+  "year": "Ano",
+  "capacity": "Corrente total",
+  "outputs": "Número de saídas",
+  "voltage": "Tensão",
+  "isolated": "Saídas isoladas",
+  "dimensions": "Dimensões",
+  "weight": "Peso",
+  "origin": "Origem",
+  "manual": "Manual",
+  "yes": "Sim",
+  "no": "Não"
+}
 
 
 }

@@ -9,6 +9,10 @@
     "addPedalButton": "Aggiungi",
     "addBoardTitle": "Pedalboard",
     "addBoardButton": "Aggiungi",
+    "addPowerTitle": "Alimentatori",
+    "searchPower": "Cerca un alimentatore",
+    "addPowerSupplyButton": "Aggiungi",
+    "noPowerFound": "Nessun alimentatore trovato",
     "back": "Indietro"
   },
 
@@ -244,6 +248,7 @@
   "white": "Branco (JPG)",
   "download": "Baixar"
 },
+
 "share": {
   "button": "Partilhar",
   "title": "Partilhar o teu pedalboard",
@@ -252,9 +257,28 @@
   "copy": "Copiar link",
   "copied": "Copiado"
 },
+
 "list": {
   "button": "Lista",
   "title": "Pedalboard"
+},
+
+"power": {
+  "features": "Caratteristiche",
+  "status": { "label": "Stato", "active": "In produzione", "discontinued": "Fuori produzione" },
+  "brand": "Marca",
+  "model": "Modello",
+  "year": "Anno",
+  "capacity": "Corrente totale",
+  "outputs": "Numero di uscite",
+  "voltage": "Voltaggio",
+  "isolated": "Uscite isolate",
+  "dimensions": "Dimensioni",
+  "weight": "Peso",
+  "origin": "Origine",
+  "manual": "Manuale",
+  "yes": "Sì",
+  "no": "No"
 }
 
 

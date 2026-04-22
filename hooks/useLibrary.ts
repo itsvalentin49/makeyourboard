@@ -94,6 +94,7 @@ async function fetchTable(table: string, orderCols: string[] = []) {
 export function useLibrary() {
   const [pedalsLibrary, setPedalsLibrary] = useState<AnyRow[]>([]);
   const [boardsLibrary, setBoardsLibrary] = useState<AnyRow[]>([]);
+  const [powerLibrary, setPowerLibrary] = useState<AnyRow[]>([]);
   const [libraryError, setLibraryError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -116,6 +117,7 @@ export function useLibrary() {
           if (!cancelled) {
             setPedalsLibrary(parsed.pedals || []);
             setBoardsLibrary(parsed.boards || []);
+            setPowerLibrary(parsed.power || []);
             setLoading(false);
           }
 
@@ -125,15 +127,18 @@ export function useLibrary() {
         // ===============================
         // 2️⃣ Fetch from Supabase
         // ===============================
-        const [pedals, boards] = await Promise.all([
+        const [pedals, boards, power] = await Promise.all([
+
           fetchTable("pedals", ["brand", "name"]),
           fetchTable("boards", ["brand", "name"]),
+          fetchTable("power", ["brand", "name"]),
         ]);
 
         if (cancelled) return;
 
         setPedalsLibrary(pedals);
         setBoardsLibrary(boards);
+        setPowerLibrary(power);
 
         // ===============================
         // 3️⃣ Save cache
@@ -143,6 +148,7 @@ export function useLibrary() {
           JSON.stringify({
             pedals,
             boards,
+            power,
           })
         );
 
@@ -163,5 +169,5 @@ export function useLibrary() {
     };
   }, []);
 
-  return { pedalsLibrary, boardsLibrary, libraryError, loading };
+  return { pedalsLibrary, boardsLibrary, powerLibrary, libraryError, loading };
 }

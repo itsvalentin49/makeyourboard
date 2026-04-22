@@ -108,39 +108,48 @@ export default function SearchBoards({
 
             {Object.keys(groupItems(boardsLibrary, boardSearch)).length > 0 ? (
 
-              Object.keys(groupItems(boardsLibrary, boardSearch)).map((brand) => (
-
-                <div key={brand} className="flex flex-col">
-
-                  <div className="px-4 h-10 flex items-center bg-zinc-950">
-                    <span className="text-[11px] font-bold text-zinc-100 uppercase tracking-widest">
-                      {brand}
-                    </span>
+              <>
+                {/* CREDIT */}
+                <div className="px-4 pt-3 pb-2">
+                  <div className="text-[9px] text-white italic">
+                    Some images courtesy of Pedal Playground
                   </div>
-
-                  {groupItems(boardsLibrary, boardSearch)[brand].map((b) => (
-
-                    <button
-                      key={b.id}
-                      onClick={() => {
-                        setBoardSearch(""); // 🔥 évite texte restant
-                        selectBoard(b);
-                        setShowBoardResults(false);
-                      }}
-                      className="w-full px-5 py-2 text-left hover:bg-zinc-700 text-zinc-300 text-[12px] transition-colors"
-                    >
-                      <span className="font-semibold mr-2 text-zinc-500">
-                        {brand}
-                      </span>
-
-                      {b.name}
-                    </button>
-
-                  ))}
-
                 </div>
 
-              ))
+                {Object.keys(groupItems(boardsLibrary, boardSearch)).map((brand) => (
+
+                  <div key={brand} className="flex flex-col">
+
+                    <div className="px-4 h-10 flex items-center bg-zinc-950">
+                      <span className="text-[11px] font-bold text-zinc-100 uppercase tracking-widest">
+                        {brand}
+                      </span>
+                    </div>
+
+                    {groupItems(boardsLibrary, boardSearch)[brand].map((b) => (
+
+                      <button
+                        key={b.id}
+                        onClick={() => {
+                          setBoardSearch(""); // 🔥 évite texte restant
+                          selectBoard(b);
+                          setShowBoardResults(false);
+                        }}
+                        className="w-full px-5 py-2 text-left hover:bg-zinc-700 text-zinc-300 text-[12px] transition-colors"
+                      >
+                        <span className="font-semibold mr-2 text-zinc-500">
+                          {brand}
+                        </span>
+
+                        {b.name}
+                      </button>
+
+                    ))}
+
+                  </div>
+
+                ))}
+              </>
 
             ) : (
 

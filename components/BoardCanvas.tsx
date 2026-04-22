@@ -2,7 +2,7 @@
 
 import React, { useRef, useLayoutEffect, useEffect, useState } from "react";
 import { Stage, Layer, Group, Rect, Text, Image as KonvaImage } from "react-konva";
-import { Zap, Weight, Minus, Plus, Upload, RotateCw, Trash2, X, Download, Info, List } from "lucide-react";
+import { Zap, Weight, Minus, Cable, Plus, Check, Upload, AlertTriangle, RotateCw, Trash2, X, Download, Info, List } from "lucide-react";
 import PedalImage from "@/components/PedalImage";
 import { formatWeight } from "@/utils/units";
 import { getTranslator } from "@/utils/i18n";
@@ -20,19 +20,19 @@ type Background = {
 };
 
 type Props = {
-viewer?: boolean;
+  viewer?: boolean;
 
-activeProject: {
-  name?: string;
-  boardPedals: AnyRow[];
-  selectedBoards?: AnyRow[];
-  zoom?: number;
-  stageX?: number;
-  stageY?: number;
-};
+  activeProject: {
+    name?: string;
+    boardPedals: AnyRow[];
+    selectedBoards?: AnyRow[];
+    zoom?: number;
+    stageX?: number;
+    stageY?: number;
+  };
 
-setMobileSidebarOpen: (v: boolean) => void;
-setSpecsOpen: (v: boolean) => void;
+  setMobileSidebarOpen: (v: boolean) => void;
+  setSpecsOpen: (v: boolean) => void;
 
   units: "metric" | "imperial";
   language: "en" | "fr" | "es" | "de" | "it" | "pt";
@@ -66,12 +66,13 @@ setSpecsOpen: (v: boolean) => void;
   onStageSizeChange?: (size: { width: number; height: number }) => void;
   stagePos?: { x: number; y: number };
   setStagePos?: React.Dispatch<React.SetStateAction<{ x: number; y: number }>>;
-    getCenterRef?: React.MutableRefObject<
+  getCenterRef?: React.MutableRefObject<
     (() => { x: number; y: number }) | null
   >;
-  };
+};
 
-  // ================== GEOMETRY (PRO) ==================
+
+// ================== GEOMETRY (PRO) ==================
 
 function getOrientedBox(p: any, size: { w: number; h: number }) {
   const angle = ((p.rotation || 0) * Math.PI) / 180;
@@ -110,6 +111,8 @@ function getOverlap(projA: any, projB: any) {
   return Math.min(projA.max, projB.max) - Math.max(projA.min, projB.min);
 }
 
+
+
 function getSATOverlap(boxA: any, boxB: any) {
   const axes = [boxA.axisX, boxA.axisY, boxB.axisX, boxB.axisY];
 
@@ -122,7 +125,7 @@ function getSATOverlap(boxA: any, boxB: any) {
 
     const overlap = getOverlap(projA, projB);
 
-    if (overlap <= 0) return null;
+    if (overlap < 0) return null;
 
     if (overlap < minOverlap) {
       minOverlap = overlap;
@@ -132,6 +135,52 @@ function getSATOverlap(boxA: any, boxB: any) {
 
   return { overlap: minOverlap, axis: smallestAxis };
 }
+
+/* 🔥 ICI EXACTEMENT (EN DEHORS) */
+function extractOutputs(details: string) {
+  if (!details) return [];
+
+  const outputs: {
+    count: number;
+    voltages: string[];
+    currents: number[];
+    isSwitch: boolean;
+  }[] = [];
+
+  const parts = details.split(",");
+
+  parts.forEach(part => {
+    const p = part.trim();
+
+    const match = p.match(/(\d+)x(.+?):([\d\/]+)mA/i);
+    if (!match) return;
+
+    const count = Number(match[1]);
+
+    const isSwitch = /switch/i.test(match[2]);
+
+    const voltages = match[2]
+      .replace(/switch:/gi, "")
+      .replace(/DC/gi, "")
+      .replace(/V/gi, "")
+      .split("/")
+      .map(v => v.trim());
+
+    const currents = match[3]
+      .split("/")
+      .map(c => Number(c));
+
+    outputs.push({
+      count,
+      voltages,
+      currents,
+      isSwitch,
+    });
+  });
+
+  return outputs;
+}
+
 
 export default function BoardCanvas({
   activeProject,
@@ -169,10 +218,10 @@ export default function BoardCanvas({
   const [footswitch] = useImage("/images/footswitch.png");
   const currentZoom = activeProject.zoom || 100;
   const zoomPercent = Math.round(currentZoom);
-  const MIN_ZOOM = 50;
-  const MAX_ZOOM = 200;
+  const MIN_ZOOM = 100;
+  const MAX_ZOOM = 300;
 
-const ZOOM_STEP = 10;
+  const ZOOM_STEP = 5;
 
 const applyZoom = (newZoomPercent: number) => {
   const stage = stageRef.current;
@@ -233,7 +282,7 @@ const handleWheel = (e: any) => {
       ? oldScale * scaleBy
       : oldScale / scaleBy;
 
-  const clampedScale = Math.max(0.5, Math.min(2, newScale));
+  const clampedScale = Math.max(1, Math.min(3, newScale));
 
   if (viewer) {
     // 🔥 ZOOM CENTRÉ ÉCRAN
@@ -301,11 +350,168 @@ const zoomOut = () => {
   const isMaxZoom = zoomPercent >= MAX_ZOOM;
   const effectiveStagePos = stagePos ?? { x: 0, y: 0 };
 
-  const totalDraw = activeProject.boardPedals.reduce(
-    (sum, p) => sum + (Number(p.draw) || 0),
-    0
+// 1. Consommation (Pédales uniquement)
+const totalDraw = activeProject.boardPedals
+  .filter(p => p.type !== "power") 
+  .reduce((acc, p) => acc + (Number(p.draw) || 0), 0);
+
+// 2. Capacité (Alims uniquement)
+const totalPowerCapacity = activeProject.boardPedals
+  .filter(p => p.type === "power")
+  .reduce((acc, p) => acc + (Number(p.capacity) || 0), 0);
+
+const hasPower = totalPowerCapacity > 0;
+const isOverloaded = hasPower && totalDraw > totalPowerCapacity;
+
+// ================= OUTPUT LOGIC (NEW UX) =================
+
+// pédales uniquement
+const pedals = activeProject.boardPedals
+  .filter(p => p.type !== "power")
+  .sort((a, b) => {
+    const nameA = `${a.brand || ""} ${a.name || ""}`.toLowerCase();
+    const nameB = `${b.brand || ""} ${b.name || ""}`.toLowerCase();
+    return nameA.localeCompare(nameB);
+  });
+const powerUnits = activeProject.boardPedals.filter(p => p.type === "power");
+
+const allOutputs = powerUnits.flatMap(p => extractOutputs(p.details));
+
+const pedalAssignments = pedals.map(p => {
+  const neededV = Number(p.voltage) || 9;
+  const neededA = Number(p.draw) || 0;
+
+const match = allOutputs.find(o => {
+  const voltages = o.voltages.map(v => {
+    if (v.toUpperCase().includes("AC")) return "AC";
+    return Number(v);
+  });
+
+  const currents = o.currents;
+
+  const voltageMatch = voltages.includes(neededV);
+
+  const currentMatch = currents.some(c => c >= neededA);
+
+  return voltageMatch && currentMatch;
+});
+
+  return {
+    pedal: p,
+    ok: !!match,
+    output: match,
+  };
+});
+
+const hasFailingPedal = pedalAssignments.some(a => !a.ok);
+
+const drawColor = !hasPower
+  ? "text-white"
+  : hasFailingPedal
+  ? "text-red-500"
+  : "text-green-500";
+
+// sorties dispo
+const totalOutputs = activeProject.boardPedals
+  .filter(p => p.type === "power")
+  .reduce((acc, p) => acc + (Number(p.outputs) || 0), 0);
+
+// 🔥 1. séparer digital / analog
+const digitalPedals = pedals.filter(p => {
+  const circuit = (p.circuit || "").toLowerCase();
+  return circuit.includes("digital") || circuit.includes("dsp");
+});
+
+const analogPedals = pedals.filter(p => !digitalPedals.includes(p));
+
+// 🔥 2. priorité digitale
+const outputsAfterDigital = totalOutputs - digitalPedals.length;
+
+// 🔥 3. analog restants
+const remainingAnalog = Math.max(
+  0,
+  analogPedals.length - outputsAfterDigital
+);
+const extraPedals = remainingAnalog;
+
+// 🔥 4. règles UX
+const notEnoughForDigital = outputsAfterDigital < 0;
+
+const shouldShowNotEnough =
+  notEnoughForDigital || remainingAnalog >= 4;
+  
+
+
+const shouldShowDaisy =
+  !notEnoughForDigital &&
+  remainingAnalog > 0 &&
+  remainingAnalog <= 3;
+
+
+const currentPowerLevel = !hasPower
+  ? 0
+  : shouldShowNotEnough
+  ? 2
+  : shouldShowDaisy
+  ? 1
+  : 0;
+
+
+// 🔥 CONDITION UNIQUE POWER ISSUE
+const hasPowerIssue =
+  hasPower && (
+    hasFailingPedal ||
+    shouldShowNotEnough ||
+    shouldShowDaisy
   );
 
+  const hasDaisyChainTuner = activeProject.boardPedals.some(p => {
+  const name = (p.name || "").trim();
+
+  return (
+    name === "TU-3 Chromatic Tuner" ||
+    name === "TU-3S Chromatic Tuner" ||
+    name === "TU-3W Chromatic Tuner" ||
+    name === "PolyTune 3" ||
+    name === "Pitchblack X"
+  );
+});
+
+
+let powerMessage: string | null = null;
+let powerMessageColor = "text-green-600";
+let powerStatus = "none";
+
+
+// 🔹 CAS 1 : PAS D'ALIM
+if (!hasPower) {
+  powerMessage = null; // ❌ plus de message ici
+}
+
+// 🔹 CAS 2 : AVEC ALIM → CHECK COMPATIBILITÉ
+if (hasPower) {
+  const failingPedals = pedalAssignments.filter(a => !a.ok);
+
+  if (failingPedals.length > 0) {
+    powerMessage = "→ Your power supply is not compatible with all pedals.";
+    powerMessageColor = "text-red-500";
+    powerStatus = "error";
+  } 
+  else {
+    // ✅ TOUJOURS OK ici
+    powerMessage = "✓ All pedals are compatible with your power supply.";
+    powerMessageColor = "text-green-600 mt-2";
+
+    // ⚠️ MAIS état warning si daisy
+if (shouldShowNotEnough) {
+  powerStatus = "error";
+} else if (shouldShowDaisy) {
+  powerStatus = "warning";
+} else {
+  powerStatus = "ok";
+}
+  }
+}
   const totalWeight =
     activeProject.boardPedals.reduce(
       (sum, p) => sum + (Number(p.weight) || 0),
@@ -320,18 +526,67 @@ const zoomOut = () => {
   const weightValue = formattedWeight.replace(/ ?(kg|lb|oz|g)$/, "");
   const weightUnit = formattedWeight.match(/(kg|lb|oz|g)$/)?.[0] ?? "";
 
-  const handleStageClick = (e: any) => {
-    if (e.target === e.target.getStage()) {
-      setSelectedInstanceId(null);
-      setSelectedBoardInstanceId(null);
-      closeSearchMenus();
-      setContactOpen(false);
-      setShowExport(false);
-    }
-  };
+const handleStageClick = (e: any) => {
+  if (e.target === e.target.getStage()) {
+    // sélection
+    setSelectedInstanceId(null);
+    setSelectedBoardInstanceId(null);
+
+    // menus sidebar
+    closeSearchMenus();
+    setContactOpen(false);
+
+    // 🔥 AJOUT ICI (LA CLE)
+    setShowPower(false);
+    setShowExport(false);
+    setShowShare(false);
+    setShowList(false);
+    setShowJacksMargin(false);
+  }
+};
 
   const containerRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<any>(null);
+  const marginRefs = useRef<Record<number, any>>({});
+  const prevPowerLevelRef = useRef<number | null>(null);
+
+useEffect(() => {
+  const prev = prevPowerLevelRef.current;
+
+  // 🔥 uniquement si on MONTE en gravité
+  if (hasPower && prev !== null && currentPowerLevel > prev) {
+    setShowPowerAlert(true);
+
+    const timeout = setTimeout(() => {
+      setShowPowerAlert(false);
+    }, 5000);
+
+    prevPowerLevelRef.current = currentPowerLevel;
+
+    return () => clearTimeout(timeout);
+  }
+
+  // mise à jour normale
+  prevPowerLevelRef.current = currentPowerLevel;
+
+}, [currentPowerLevel]);
+
+  const checkCollision = (id1: number, id2: number) => {
+  const n1 = marginRefs.current[id1];
+  const n2 = marginRefs.current[id2];
+
+  if (!n1 || !n2) return false;
+
+  const r1 = n1.getClientRect({ skipTransform: false });
+  const r2 = n2.getClientRect({ skipTransform: false });
+
+  return !(
+    r2.x > r1.x + r1.width ||
+    r2.x + r2.width < r1.x ||
+    r2.y > r1.y + r1.height ||
+    r2.y + r2.height < r1.y
+  );
+};
   const lastRenderedPos = useRef<{ x: number; y: number } | null>(null);
   const lastStablePos = useRef<{ x: number; y: number } | null>(null);
   const dragStartPos = useRef<{ x: number; y: number } | null>(null);
@@ -366,7 +621,12 @@ const zoomOut = () => {
   const [hoveredPedalId, setHoveredPedalId] = useState<number | null>(null);
   const [showExport, setShowExport] = useState(false);
   const [showShare, setShowShare] = useState(false);
+  const [showJacksMargin, setShowJacksMargin] = useState(false);
+  const [collisionReady, setCollisionReady] = useState(false);
   const [showList, setShowList] = useState(false);
+  const [showOutputs, setShowOutputs] = useState(false);
+  const [showPower, setShowPower] = useState(false);
+  const [showPowerAlert, setShowPowerAlert] = useState(false);
   const [hoveredBoardId, setHoveredBoardId] = useState<number | null>(null);
   const [overlayPosition, setOverlayPosition] = useState<{
   x: number;
@@ -407,6 +667,18 @@ useLayoutEffect(() => {
   return () => window.removeEventListener("resize", measure);
 }, []);
 
+useEffect(() => {
+  if (!showJacksMargin) {
+    setCollisionReady(false);
+    return;
+  }
+
+  const t = setTimeout(() => {
+    setCollisionReady(true);
+  }, 50);
+
+  return () => clearTimeout(t);
+}, [showJacksMargin, activeProject.boardPedals.length]);
 
 /* ================= AUTO FIT + CENTER VIEWER ================= */
 useEffect(() => {
@@ -660,293 +932,523 @@ const getVisibleBounds = () => {
             backgroundPosition: "center",
             backgroundRepeat: "no-repeat",
           }
-    }
-  >
+}
+>
 
+{/* --- ZOOM (HAUT DROITE) ---
+{!viewer && !(isMobile && mobileSidebarOpen) && (
+  <div className="absolute top-6 right-6 z-50">
+    <div className="relative flex items-center justify-center h-9 w-24 md:h-10 md:w-28 bg-zinc-900 backdrop-blur-md border border-zinc-800 rounded-2xl shadow-2xl">
+      <button 
+        onClick={zoomOut} 
+        disabled={isMinZoom} 
+        className="absolute left-2 flex items-center justify-center w-6 h-6 text-white hover:text-blue-400 disabled:text-zinc-600 transition-colors"
+      >
+        {isMinZoom ? <span className="text-[9px] tracking-wider text-zinc-500 font-bold">MIN</span> : <Minus size={14} />}
+      </button>
+      
+      <span className="text-[12px] font-black font-mono tabular-nums text-white">
+        {zoomPercent}%
+      </span>
+      
+      <button 
+        onClick={zoomIn} 
+        disabled={isMaxZoom} 
+        className="absolute right-2 flex items-center justify-center w-6 h-6 text-white hover:text-blue-400 disabled:text-zinc-600 transition-colors"
+      >
+        {isMaxZoom ? <span className="text-[9px] tracking-wider text-zinc-500 font-bold">MAX</span> : <Plus size={14} />}
+      </button>
+    </div>
+  </div>
+)}
+*/}
+
+{/* --- MODE VIEWER (CENTER BOTTOM) --- */}
 {viewer && (
   <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4 z-50">
-
     {/* ZOOM */}
     <div className="relative flex items-center justify-center h-9 w-24 md:h-10 md:w-28 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl">
+      <button onClick={zoomOut} disabled={isMinZoom} className="absolute left-2 flex items-center justify-center w-6 h-6 text-white hover:text-blue-400 disabled:text-zinc-600">
+        {isMinZoom ? <span className="text-[9px] tracking-wider text-zinc-500">MIN</span> : <Minus size={14} />}
+      </button>
+      <span className="text-[12px] font-black font-mono tabular-nums text-white">{zoomPercent}%</span>
+      <button onClick={zoomIn} disabled={isMaxZoom} className="absolute right-2 flex items-center justify-center w-6 h-6 text-white hover:text-blue-400 disabled:text-zinc-600">
+        {isMaxZoom ? <span className="text-[9px] tracking-wider text-zinc-500">MAX</span> : <Plus size={14} />}
+      </button>
+    </div>
 
-  {/* MINUS */}
-  <button
-    onClick={zoomOut}
-    disabled={isMinZoom}
-    className="absolute left-2 flex items-center justify-center w-6 h-6 text-white hover:text-blue-400 disabled:text-zinc-600"
-  >
-    {isMinZoom ? (
-      <span className="text-[9px] tracking-wider text-zinc-500">MIN</span>
-    ) : (
-      <Minus size={14} />
-    )}
-  </button>
-
-  {/* % */}
-  <span className="text-[12px] font-black font-mono tabular-nums text-white">
-    {zoomPercent}%
-  </span>
-
-  {/* PLUS */}
-  <button
-    onClick={zoomIn}
-    disabled={isMaxZoom}
-    className="absolute right-2 flex items-center justify-center w-6 h-6 text-white hover:text-blue-400 disabled:text-zinc-600"
-  >
-    {isMaxZoom ? (
-      <span className="text-[9px] tracking-wider text-zinc-500">MAX</span>
-    ) : (
-      <Plus size={14} />
-    )}
-  </button>
-
-</div>
-
-    {/* TOTAL DRAW */}
+    {/* TOTAL DRAW (mA) */}
     <div className="relative flex items-center justify-center h-9 w-24 md:h-10 md:w-28 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl">
       <Zap className="absolute left-3 size-4 text-yellow-500" />
       <span className="text-[12px] font-black font-mono tabular-nums text-white">
-        {totalDraw}
       </span>
-      <span className="absolute right-3 text-[10px] text-zinc-500">
-        mA
-      </span>
+      <span className="absolute right-2 text-[9px] text-zinc-500 font-bold">mA</span>
     </div>
 
     {/* TOTAL WEIGHT */}
     <div className="relative flex items-center justify-center h-9 w-24 md:h-10 md:w-28 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl">
       <Weight className="absolute left-3 size-4 text-red-400" />
-      <span className="text-[12px] font-black font-mono tabular-nums text-white">
-        {weightValue}
-      </span>
-      <span className="absolute right-3 text-[10px] text-zinc-500">
-        {weightUnit}
-      </span>
+      <span className="text-[12px] font-black font-mono tabular-nums text-white">{weightValue}</span>
+      <span className="absolute right-3 text-[10px] text-zinc-500">{weightUnit}</span>
     </div>
 
-{/* LIST */}
+    {/* LIST SETUP */}
+    <div className="relative">
+      <button onClick={() => {
+  setShowList(v => !v);
+
+  setShowPower(false);
+  setShowJacksMargin(false);
+  setShowExport(false);
+  setShowShare(false);
+}} className="relative flex items-center justify-center gap-2 h-9 w-24 md:h-10 md:w-28 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl text-[11px] font-mono font-bold text-white uppercase transition-all hover:border-blue-500">
+        <List size={16} className="text-blue-400" /> SETUP
+      </button>
+      {showList && (
+        <>
+          <div className="fixed inset-0 z-40 pointer-events-none" />
+          <div className="absolute bottom-12 left-0 z-50">
+            <div className="w-72 max-h-80 overflow-y-auto bg-zinc-900 border border-zinc-800 rounded-xl shadow-2xl p-4 space-y-3" onClick={(e) => e.stopPropagation()}>
+              <div className="text-xs uppercase tracking-wider text-white font-bold">PEDALBOARD</div>
+              {[...activeProject.boardPedals].sort((a, b) => (a.brand || "").localeCompare(b.brand || "")).map((p, i) => (
+                <div key={i} className="text-sm text-white "><span className="text-zinc-400">- {p.brand || "Custom"}</span> {p.name || "Unnamed"}</div>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  </div>
+)}
+
+{/* --- MODE EDITION (BAS GAUCHE & DROITE) --- */}
+{!viewer && !(isMobile && mobileSidebarOpen) && (
+  <>
+    {/* GAUCHE : INDICATEURS */}
+    <div className="absolute bottom-6 left-6 flex items-center gap-4 z-50">
+      
+     {/* BOUTON JACKS */}
+<button 
+  onClick={() => {
+  setShowJacksMargin(v => !v);
+
+  setShowPower(false);
+  setShowExport(false);
+  setShowShare(false);
+  setShowList(false);
+}}
+  className="
+    relative flex items-center justify-center gap-2
+    h-9 md:h-10 w-24 md:w-28
+    bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl
+    text-[11px] font-mono font-bold text-white uppercase
+    transition-all duration-200
+    hover:scale-105 hover:border-blue-500 active:scale-95
+    cursor-pointer
+  "
+>
+  <Cable
+    size={16}
+    className={`
+      transition-colors duration-300
+      ${showJacksMargin ? "text-green-500" : "text-red-500"}
+    `}
+  />
+
+  JACKS
+</button>
+
+      {/* TOTAL DRAW (mA)*/}
 <div className="relative">
+
+  {showPowerAlert && (
+    <div
+      className="
+        absolute bottom-full left-1/2 -translate-x-1/2 mb-2
+        px-3 py-1
+        bg-yellow-400 text-black
+        text-[10px] font-bold uppercase tracking-wide
+        rounded-full shadow-lg
+        animate-bounce
+        whitespace-nowrap
+        pointer-events-none
+        z-50
+      "
+    >
+      CHECK POWER
+    </div>
+  )}
 
   <button
     onClick={() => {
-      setShowList((v) => !v);
-      setShowExport(false);
-      setShowShare(false);
-    }}
-    className="
-      relative flex items-center justify-center gap-2
-      h-9 w-24 md:h-10 md:w-28
-      bg-zinc-900 border border-zinc-800
-      rounded-2xl shadow-2xl
-      text-[11px] md:text-[11px] font-mono font-bold text-white uppercase
-      transition-all duration-150
-      hover:border-blue-500 hover:scale-[1.02]
-      active:scale-95
-    "
+  setShowPower(v => !v);
+
+  setShowJacksMargin(false);
+  setShowExport(false);
+  setShowShare(false);
+  setShowList(false);
+}}
+    className={`
+      relative
+      flex items-center justify-center gap-2
+      h-9 md:h-10 w-24 md:w-28
+      bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl
+      text-[11px] font-mono font-bold text-white uppercase
+      transition-all duration-200
+      hover:scale-105 hover:border-blue-500 active:scale-95
+      cursor-pointer
+
+      ${hasPowerIssue ? "border-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.4)]" : ""}
+    `}
   >
-    <List size={16} className="text-blue-400" />
-    SETUP
+    <Zap size={16} className="text-yellow-500" />
+    POWER
   </button>
 
-{showList && (
+{showPower && (
   <>
-    {/* OVERLAY */}
-    <div
-      className="fixed inset-0 z-40"
-      onClick={() => setShowList(false)}
-    />
+<div className="fixed inset-0 z-40 pointer-events-none" />
 
-    {/* POPUP */}
     <div className="absolute bottom-12 left-0 z-50">
+      <div className="w-[420px] max-w-[90vw] bg-zinc-900 border border-zinc-800 rounded-xl shadow-2xl p-4">
 
-      <div
-        className="w-72 max-h-80 overflow-y-auto bg-zinc-900 border border-zinc-800 rounded-xl shadow-2xl p-4 space-y-3"
-        onClick={(e) => e.stopPropagation()} // 🔥 IMPORTANT
-      >
+        {/* HEADER */}
+        <div className="flex items-center justify-between mb-5">
 
-        <div className="text-xs uppercase tracking-wider text-white font-bold">
-          PEDALBOARD
-        </div>
-
-        {/* PEDALS TRI ALPHABÉTIQUE */}
-        {[...activeProject.boardPedals]
-          .sort((a, b) => {
-            const nameA = `${a.brand || ""} ${a.name || ""}`.toLowerCase();
-            const nameB = `${b.brand || ""} ${b.name || ""}`.toLowerCase();
-            return nameA.localeCompare(nameB);
-          })
-          .map((p, i) => (
-            <div key={i} className="text-sm text-white">
-              <span className="text-zinc-400">
-                - {p.brand || "Custom"}
-              </span>{" "}
-              {p.name || "Unnamed"}
-            </div>
-          ))}
-
-          {/* BOARD */}
-        {(activeProject.selectedBoards || []).map((b, i) => (
-          <div key={`board-${i}`} className="text-sm text-white">
-            <span className="text-zinc-400">
-              - {b.brand || "Board"}
-            </span>{" "}
-            {b.name || "Custom"}
+          <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-white font-bold">
+            <Zap size={14} className="text-yellow-500" />
+            POWER SETUP
           </div>
-        ))}
 
-      </div>
-
-    </div>
-  </>
-)}
-
-</div>
-  </div>
-)}
-
-    {/* 🔽 TON CODE EXISTANT — INCHANGÉ */}
-    {!viewer && !(isMobile && mobileSidebarOpen) && (
-      <div className="absolute bottom-6 left-6 flex items-center gap-4 z-50">
-
-        {/* Desktop uniquement */}
-        <>
-
-        {/* ZOOM */}
-        <div className="relative flex items-center justify-center h-9 w-24 md:h-10 md:w-28 bg-zinc-900 backdrop-blur-md border border-zinc-800 rounded-2xl shadow-2xl">
-
-          {/* LEFT BUTTON */}
-          <button
-            onClick={zoomOut}
-            disabled={isMinZoom}
-            className="absolute left-2 flex items-center justify-center w-6 h-6 text-white hover:text-blue-400 disabled:text-zinc-600"
-          >
-            {isMinZoom ? (
-              <span className="text-[9px] tracking-wider text-zinc-500">MIN</span>
-            ) : (
-              <Minus size={14} />
-            )}
-          </button>
-
-          {/* % CENTER */}
-          <span className="text-[12px] font-black font-mono tabular-nums">
-            {zoomPercent}%
-          </span>
-
-          {/* RIGHT BUTTON */}
-          <button
-            onClick={zoomIn}
-            disabled={isMaxZoom}
-            className="absolute right-2 flex items-center justify-center w-6 h-6 text-white hover:text-blue-400 disabled:text-zinc-600"
-          >
-            {isMaxZoom ? (
-              <span className="text-[9px] tracking-wider text-zinc-500">MAX</span>
-            ) : (
-              <Plus size={14} />
-            )}
-          </button>
 
         </div>
 
-        {/* TOTAL DRAW */}
-        <div className="relative flex items-center justify-center h-9 w-24 md:h-10 md:w-28 bg-zinc-900 backdrop-blur-md border border-zinc-800 rounded-2xl shadow-2xl pointer-events-none">
-          <Zap className="absolute left-3 size-4 text-yellow-500" />
-          <span className="text-[12px] font-black font-mono tabular-nums">
-            {totalDraw}
-          </span>
-          <span className="absolute right-3 text-[10px] text-zinc-500">
-            mA
-          </span>
-        </div>
+{/* POWER SUPPLY */}
+{powerUnits.length > 0 && (
+  <div className="mb-5">
 
-        {/* TOTAL WEIGHT */}
-        <div className="relative flex items-center justify-center h-9 w-24 md:h-10 md:w-28 bg-zinc-900 backdrop-blur-md border border-zinc-800 rounded-2xl shadow-2xl pointer-events-none">
-          <Weight className="absolute left-3 size-4 text-red-400" />
-          <span className="text-[12px] font-black font-mono tabular-nums">
-            {weightValue}
-          </span>
-          <span className="absolute right-3 text-[10px] text-zinc-500">
-            {weightUnit}
-          </span>
-        </div>
+    <div className="space-y-6">
+      {powerUnits.map((p, index) => {
+        const outputs = extractOutputs(p.details);
 
-        </>
+        return (
+          <div key={index} className="space-y-4">
 
-        {/* EXPORT */}
-        <div className="relative">
-
-          <button
-            onClick={() => setShowExport((v) => !v)}
-            className="
-              relative flex items-center justify-center gap-2
-              h-9 w-24 md:h-10 md:w-28
-              bg-zinc-900 backdrop-blur-md border border-zinc-800
-              rounded-2xl shadow-2xl
-              text-[11px] font-mono font-bold text-white uppercase
-              transition-all duration-150
-              hover:border-blue-500 hover:scale-[1.02]
-              active:scale-95
-            "
-          >
-            <Download size={16} className="text-green-600" />
-            {t("export.button")}
-          </button>
-
-
-{showExport && (
-  <div className="absolute bottom-12 left-0 z-50">
-    <ExportPNG
-      boardPedals={activeProject.boardPedals}
-      selectedBoards={activeProject.selectedBoards}
-      displaySizes={displaySizes}
-      boardName={activeProject.name}
-      canvasBg={canvasBg}
-      currentBackground={currentBackground}
+            {/* IMAGE FULL WIDTH */}
+            <div className="w-full flex justify-center">
+              <div className="w-full flex justify-center">
+  <div className="w-full flex justify-center">
+  <div className="overflow-hidden rounded-md">
+    <img
+      src={p.image || p.image_url || p.photo}
+      alt={p.name}
+      className="w-full max-w-[200px] object-contain"
     />
   </div>
-)}
-        </div>
-
-        {/* SHARE */}
-        <div className="relative">
-
-          <button
-            onClick={() => {
-              setShowShare((v) => !v);
-              setShowExport(false);
-            }}
-            className="
-              relative flex items-center justify-center gap-2
-              h-9 w-24 md:h-10 md:w-28
-              bg-zinc-900 backdrop-blur-md border border-zinc-800
-              rounded-2xl shadow-2xl
-              text-[11px] font-mono font-bold text-white uppercase
-              transition-all duration-150
-              hover:border-blue-500 hover:scale-[1.02] transform-gpu
-              active:scale-95
-            "
-          >
-            <Upload size={16} className="text-blue-500" />
-            {t("share.button")}
-          </button>
-
-          {showShare && (
-            <div className="absolute bottom-12 left-0 z-50">
-              <ShareBoard
-                boardPedals={activeProject.boardPedals}
-                selectedBoards={activeProject.selectedBoards}
-                displaySizes={displaySizes}
-                boardName={activeProject.name}
-                onClose={() => setShowShare(false)}
-              />
+</div>
+</div>
             </div>
-          )}
 
+            {/* INFOS */}
+            <div className="text-center">
+
+              {/* NAME */}
+              <div className="text-[14px] text-white font-semibold leading-tight mb-3">
+                {p.brand} {p.name}
+              </div>
+
+              {/* OUTPUTS = MULTI COLUMNS */}
+              <div
+                className={`
+                  grid gap-6 justify-center
+                  ${outputs.length === 1 ? "grid-cols-1" : ""}
+                  ${outputs.length === 2 ? "grid-cols-2" : ""}
+                  ${outputs.length >= 3 ? "grid-cols-3" : ""}
+                `}
+              >
+                {outputs.map((o, i) => {
+
+const pairs = o.voltages.map((v, idx) => ({
+  voltage: v,
+  current: o.currents[idx] ?? o.currents[0],
+}));
+
+                  return (
+                    <div key={i} className="space-y-2 text-center">
+
+                      {/* LABEL */}
+                      <div className="text-[10px] text-zinc-500 uppercase tracking-wide">
+                        {o.count}{" "}
+{o.isSwitch
+  ? `switchable output${o.count > 1 ? "s" : ""}`
+  : `fixed output${o.count > 1 ? "s" : ""}`}
+                      </div>
+
+                      {/* VALUES */}
+                      <div className="space-y-[2px]">
+                        {pairs.map((pair, j) => (
+                          <div
+                            key={j}
+                            className="flex items-center justify-center gap-2 text-[11px] leading-none"
+                          >
+                            <span className="text-white font-semibold w-[28px] text-right">
+                              {pair.voltage}V
+                            </span>
+
+                            <span className="text-zinc-500">→</span>
+
+                            <span className="text-zinc-400 w-[70px] text-left">
+                              {pair.current}mA
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+
+                    </div>
+                  );
+                })}
+              </div>
+
+            </div>
+
+          </div>
+        );
+      })}
+    </div>
+
+  </div>
+)}
+        {/* PEDALS */}
+        <div className="mb-2.5 mt-6 text-[12px] uppercase tracking-wider text-white font-bold">
+  Pedals
+</div>
+        <div className="mb-5">
+
+          <div className="space-y-2">
+            {pedalAssignments.map((a, i) => (
+              <div
+                key={i}
+                className="grid grid-cols-[auto_1fr_auto] items-end text-[11px] leading-none"
+              >
+                <div className="flex items-center gap-1 whitespace-nowrap">
+                  <span className="text-zinc-500 font-bold">
+                    {a.pedal.brand || "Custom"}
+                  </span>
+                  <span className="text-white">
+                    {a.pedal.name}
+                  </span>
+                </div>
+
+                <div className="mx-2 border-b border-dotted border-zinc-600 mb-[2px]" />
+
+                <div className="text-[11px] whitespace-nowrap text-right">
+                  <span
+  className={
+    !hasPower
+      ? "text-white"
+      : a.ok
+      ? "text-green-600"
+      : "text-red-500"
+  }
+>
+                    {Number(a.pedal.voltage) || 9}V / {Number(a.pedal.draw) || 0}mA
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
+        {/* STATUS */}
+<div className="flex items-center justify-between -mt-4">
+
+  {/* LEFT → MESSAGE */}
+  <div className={`text-[12px] ${powerMessageColor}`}>
+    {powerMessage}
+  </div>
+</div>
+
+{/* RECOMMENDATION */}
+<div className="mb-2 mt-6 text-[12px] uppercase tracking-wider text-white font-bold">
+  Recommendation
+</div>
+
+<div className="space-y-3 text-[12px]">
+
+{/* 🔵 PAS D'ALIM */}
+{!hasPower && (
+  <>
+    {/* 🟢 DAISY CHAIN SIMPLE */}
+    {pedals.length <= 3 && digitalPedals.length === 0 && (
+      <div className="text-green-500">
+        → You can power your pedals with a daisy chain.
       </div>
     )}
 
-      {stageSize.width > 0 && stageSize.height > 0 && (
+    {/* 🟡 BESOIN D'ALIM */}
+    {(pedals.length > 3 || digitalPedals.length > 0) && (
+      <div className="text-yellow-400">
+        → You should use an isolated power supply for your board.
+      </div>
+    )}
+
+    {/* 🔥 TIP TUNER (NOUVEAU) */}
+    {hasDaisyChainTuner && (
+      <div className="text-zinc-400 -mt-2">
+        Your tuner can power multiple pedals using a daisy chain 🤘
+      </div>
+    )}
+  </>
+)}
+
+  {/* 🔴 PRIORITÉ : PEDAL NON COMPATIBLE */}
+{hasPower && hasFailingPedal && (
+  <div className="text-red-500">
+    Upgrade your power supply or power the incompatible pedal separately.
+  </div>
+)}
+
+  {/* ✅ LE RESTE UNIQUEMENT SI TOUT EST OK */}
+  {!hasFailingPedal && (
+    <>
+      {extraPedals === 0 && (
+        <div className="text-green-500">
+          Your board is perfectly powered. Rock on 🤘
+        </div>
+      )}
+
+      {/* 🔴 NOT ENOUGH OUTPUTS */}
+{shouldShowNotEnough && (
+<div>
+    <div className="text-red-500">
+      → Your power supply is fully loaded.
+    </div>
+    <div className="text-zinc-400">
+      Add another unit or upgrade to a model with more outputs.
+    </div>
+  </div>
+)}
+
+{/* 🟡 DAISY CHAIN */}
+{shouldShowDaisy && (
+  <div>
+    <div className="text-yellow-400">
+      → You can power multiple pedals with a daisy chain.
+    </div>
+    <div className="text-zinc-400">
+      Use a splitter cable to power multiple pedals. Works best with analog pedals. Digital ones can get noisy.
+    </div>
+  </div>
+)}
+
+      {/* 🟢 TU-3 TIP */}
+      {extraPedals > 0 && hasDaisyChainTuner && (
+        <div className="text-zinc-400 -mt-3">
+          Your tuner can power multiple pedals using a daisy chain 🤘
+        </div>
+      )}
+    </>
+  )}
+
+</div>
+      </div>
+    </div>
+  </>
+)}
+</div>
+
+      
+
+      {/* TOTAL WEIGHT (Commenté pour ne pas l'afficher mais garder le code)
+      <div className="relative flex items-center justify-center h-9 w-24 md:h-10 md:w-28 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl pointer-events-none">
+        <Weight className="absolute left-3 size-4 text-red-400" />
+        <span className="text-[12px] font-black font-mono tabular-nums text-white">{weightValue}</span>
+        <span className="absolute right-3 text-[10px] text-zinc-500">{weightUnit}</span>
+      </div>
+      */}
+    </div>
+
+
+{/* --- DROITE : ACTIONS --- */}
+<div className="absolute bottom-6 right-6 flex items-center gap-4 z-50">
+  
+  {/* EXPORT */}
+  <div className="relative">
+    <button 
+      onClick={() => {
+  setShowExport(v => !v);
+
+  setShowPower(false);
+  setShowJacksMargin(false);
+  setShowShare(false);
+  setShowList(false);
+}}
+      className="relative flex items-center justify-center gap-2 h-9 w-24 md:h-10 md:w-28 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl text-[11px] font-mono font-bold text-white uppercase transition-all duration-200 hover:scale-105 hover:border-blue-500 active:scale-95 cursor-pointer"
+    >
+      <Download size={16} className="text-green-600" /> 
+      {t("export.button")}
+    </button>
+    
+    {showExport && (
+      <>
+        {/* Calque invisible pour fermer en cliquant ailleurs */}
+        <div className="fixed inset-0 z-40 pointer-events-none" />
+        <div className="absolute bottom-12 right-0 z-50">
+          <ExportPNG 
+            boardPedals={activeProject.boardPedals} 
+            selectedBoards={activeProject.selectedBoards} 
+            displaySizes={displaySizes} 
+            boardName={activeProject.name} 
+            canvasBg={canvasBg} 
+            currentBackground={currentBackground} 
+          />
+        </div>
+      </>
+    )}
+  </div>
+
+  {/* SHARE */}
+  <div className="relative">
+    <button 
+      onClick={() => {
+  setShowShare(v => !v);
+
+  setShowPower(false);
+  setShowJacksMargin(false);
+  setShowExport(false);
+  setShowList(false);
+}}
+      className="relative flex items-center justify-center gap-2 h-9 w-24 md:h-10 md:w-28 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl text-[11px] font-mono font-bold text-white uppercase transition-all duration-200 hover:scale-105 hover:border-blue-500 active:scale-95 cursor-pointer transform-gpu"
+    >
+      <Upload size={16} className="text-blue-500" /> 
+      {t("share.button")}
+    </button>
+    
+    {showShare && (
+      <>
+        {/* Calque invisible pour fermer en cliquant ailleurs */}
+        <div className="fixed inset-0 z-40 pointer-events-none" />
+        <div className="absolute bottom-12 right-0 z-50">
+          <ShareBoard 
+            boardPedals={activeProject.boardPedals} 
+            selectedBoards={activeProject.selectedBoards} 
+            displaySizes={displaySizes} 
+            boardName={activeProject.name} 
+            onClose={() => setShowShare(false)} 
+          />
+        </div>
+      </>
+    )}
+  </div>
+</div>
+
+{/* Fermetures des conditions parentes */}
+    </>
+  )
+}
+
+{/* --- LE STAGE (CANVAS) --- */}
+{stageSize.width > 0 && stageSize.height > 0 && (
 
 <Stage
   ref={stageRef}
@@ -1046,7 +1548,7 @@ if (!viewer) {
   const scaleBy = dist / lastDist.current;
   const newScale = oldScale * scaleBy;
 
-  const clampedScale = Math.max(0.5, Math.min(2, newScale));
+  const clampedScale = Math.max(1, Math.min(3, newScale));
 
   const pointTo = {
     x: (center.x - stage.x()) / oldScale,
@@ -1186,6 +1688,8 @@ onDragEnd={(e) => {
   onSizeReady={(w, h) =>
     handleSizeUpdate?.(b.instanceId, w, h)
   }
+  showJacksMargin={showJacksMargin}
+  jacksLocation=""
 />
 
 {/* 💎 Hover halo (desktop only) */}
@@ -1246,22 +1750,21 @@ onDragEnd={(e) => {
 {/* PEDALS */}
 {activeProject.boardPedals.map((p: AnyRow) => (
   <Group
-    name="exportable"
-    key={p.instanceId}
+  name="exportable"
+  key={p.instanceId}
     x={p.x}
     y={p.y}
     rotation={p.rotation || 0}
     draggable={!viewer}
     instanceId={p.instanceId}
 
-onDragStart={(e) => {
-  setIsDragging(true);
-
-  lastRenderedPos.current = {
-    x: e.target.x(),
-    y: e.target.y(),
-  };
-}}
+    onDragStart={(e) => {
+      setIsDragging(true);
+      lastRenderedPos.current = {
+        x: e.target.x(),
+        y: e.target.y(),
+      };
+    }}
 
     onMouseEnter={() => {
       if (!isMobile) setHoveredPedalId(p.instanceId);
@@ -1273,88 +1776,93 @@ onDragStart={(e) => {
 
     onClick={(e) => {
       if (viewer) return;
-  e.cancelBubble = true;
+      e.cancelBubble = true;
+      setSelectedInstanceId(p.instanceId);
+      setSelectedBoardInstanceId(null);
+    }}
 
-  setSelectedInstanceId(p.instanceId);
-  setSelectedBoardInstanceId(null);
-}}
+    onTap={(e) => {
+      if (viewer) return;
+      e.cancelBubble = true;
+      setSelectedInstanceId(p.instanceId);
+      setSelectedBoardInstanceId(null);
+    }}
 
-onTap={(e) => {
-  if (viewer) return;
-  e.cancelBubble = true;
+    onDragMove={(e) => {
+      const node = e.target;
+      const bounds = getVisibleBounds();
+      const box = node.getClientRect({ skipTransform: false });
+      const scale = stageRef.current?.scaleX() || 1;
+      const width = box.width / scale;
+      const height = box.height / scale;
 
-  setSelectedInstanceId(p.instanceId);
-  setSelectedBoardInstanceId(null);
-}}
+      let x = node.x();
+      let y = node.y();
 
+      if (x - width / 2 < bounds.minX) x = bounds.minX + width / 2;
+      if (y - height / 2 < bounds.minY) y = bounds.minY + height / 2;
+      if (x + width / 2 > bounds.maxX) x = bounds.maxX - width / 2;
+      if (y + height / 2 > bounds.maxY) y = bounds.maxY - height / 2;
 
+      const hasMovedVisually =
+        !lastRenderedPos.current ||
+        Math.abs(lastRenderedPos.current.x - x) > 0.5 ||
+        Math.abs(lastRenderedPos.current.y - y) > 0.5;
 
-// MOVE ON CANVAS
-onDragMove={(e) => {
-  const node = e.target;
-  const bounds = getVisibleBounds();
+      node.position({ x, y });
 
-  const box = node.getClientRect({ skipTransform: false });
-  const scale = stageRef.current?.scaleX() || 1;
+      if (!hasMovedVisually) return;
+      lastRenderedPos.current = { x, y };
 
-  const width = box.width / scale;
-  const height = box.height / scale;
+      updateActiveProject({
+        boardPedals: activeProject.boardPedals.map((item: AnyRow) =>
+          item.instanceId === p.instanceId ? { ...item, x, y } : item
+        ),
+      });
+    }}
 
-  let x = node.x();
-  let y = node.y();
+    onDragEnd={(e) => {
+      setTimeout(() => {
+        setIsDragging(false);
+      }, 0);
+      const node = e.target;
+      let finalX = node.x();
+      let finalY = node.y();
+      lastRenderedPos.current = null;
 
-  if (x - width / 2 < bounds.minX) x = bounds.minX + width / 2;
-  if (y - height / 2 < bounds.minY) y = bounds.minY + height / 2;
-  if (x + width / 2 > bounds.maxX) x = bounds.maxX - width / 2;
-  if (y + height / 2 > bounds.maxY) y = bounds.maxY - height / 2;
-
-  
-
-  const hasMovedVisually =
-    !lastRenderedPos.current ||
-    Math.abs(lastRenderedPos.current.x - x) > 0.5 ||
-    Math.abs(lastRenderedPos.current.y - y) > 0.5;
-
-  node.position({ x, y });
-
-  if (!hasMovedVisually) return;
-
-  lastRenderedPos.current = { x, y };
-}}
-
-onDragEnd={(e) => {
-  setTimeout(() => {
-    setIsDragging(false);
-  }, 0);
-
-  const node = e.target;
-
-  let finalX = node.x();
-  let finalY = node.y();
-
-  lastRenderedPos.current = null;
-
-  if (!viewer) {
-  updateActiveProject({
-    boardPedals: activeProject.boardPedals.map((x: AnyRow) =>
-      x.instanceId === p.instanceId
-        ? {
-            ...x,
-            x: finalX,
-            y: finalY,
-          }
-        : x
-    ),
-  });
-}}}
->
+      if (!viewer) {
+        updateActiveProject({
+          boardPedals: activeProject.boardPedals.map((x: AnyRow) =>
+            x.instanceId === p.instanceId ? { ...x, x: finalX, y: finalY } : x
+          ),
+        });
+      }
+    }}
+  >
 <PedalImage
   url={p.image || p.image_url || p.photo || null}
   width={p.width}
   depth={p.depth}
   color={p.color}
-  rotation={0}
-onSizeReady={(nw, nh) => handleSizeUpdate?.(p.instanceId, nw, nh)}
+  rotation={p.rotation || 0}
+  showJacksMargin={showJacksMargin}
+  jacksLocation={p.jacks || ""}
+  onSizeReady={(nw, nh) => handleSizeUpdate?.(p.instanceId, nw, nh)}
+
+  marginRef={(node) => {
+    if (node) {
+      marginRefs.current[p.instanceId] = node;
+    }
+  }}
+
+isColliding={
+  collisionReady &&
+  showJacksMargin &&
+  activeProject.boardPedals.some(other =>
+    other.instanceId !== p.instanceId &&
+    checkCollision(p.instanceId, other.instanceId)
+  )
+}
 />
 
 {/* 🎛 CUSTOM CONTROLS */}
