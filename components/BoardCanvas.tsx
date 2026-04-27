@@ -411,7 +411,7 @@ const drawColor = !hasPower
   ? "text-white"
   : hasFailingPedal
   ? "text-red-500"
-  : "text-green-500";
+  : "text-green-600";
 
 // sorties dispo
 const totalOutputs = activeProject.boardPedals
@@ -562,6 +562,8 @@ const handleStageClick = (e: any) => {
 
   const containerRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<any>(null);
+  const rafRef = useRef<number | null>(null);
+  const wheelTimeout = useRef<any>(null);
   const marginRefs = useRef<Record<number, any>>({});
   const prevPowerLevelRef = useRef<number | null>(null);
 
@@ -1065,7 +1067,7 @@ const getVisibleBounds = () => {
     size={16}
     className={`
       transition-colors duration-300
-      ${showJacksMargin ? "text-green-500" : "text-red-500"}
+      ${showJacksMargin ? "text-green-600" : "text-red-500"}
     `}
   />
 
@@ -1317,13 +1319,13 @@ const pairs = o.voltages.map((v, idx) => ({
       <>
         {/* 🟢 2–4 analog → daisy OK */}
         {isAnalogOnlySmall && (
-          <div className="text-green-500">
+          <div className="text-green-600">
             {t("powerSetup.recommendation.daisySimple")}
           </div>
         )}
 
         {isMixedWithSingleDigital && (
-  <div className="text-green-500">
+  <div className="text-green-600">
     {t("powerSetup.recommendation.daisy")}
   </div>
 )}
@@ -1365,7 +1367,7 @@ const pairs = o.voltages.map((v, idx) => ({
       {!hasFailingPedal && (
         <>
           {extraPedals === 0 && (
-            <div className="text-green-500">
+            <div className="text-green-600">
               {t("powerSetup.recommendation.perfect")}
             </div>
           )}
