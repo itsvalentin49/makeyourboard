@@ -22,8 +22,8 @@ export default function SidebarLogo({ t }: Props) {
 
       {/* TEXT */}
       <div className="flex items-center mt-[2px]">
-        <span className="text-white font-bold text-[20px] whitespace-nowrap">
-          MAKE YOUR BOARD
+        <span className="text-white font-bold text-[24px] whitespace-nowrap">
+          Make Your Board
         </span>
       </div>
 

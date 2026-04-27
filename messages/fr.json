@@ -18,11 +18,10 @@
 
   "canvasIntro": {
     "title": "Make Your Board",
-    "desktopText": "Ajoutez des pédales, explorez par type d’effet et créez votre pedalboard idéal.",
-    "desktopExtra": "Jusqu’à 5 boards pour tester, comparer et affiner vos setups.",
-    "mobileText": "Ajoutez des pédales, explorez par type d’effet et créez votre pedalboard idéal.",
-    "text3": "Unlimited setups. Endless tone."
-    },
+    "desktopText": "Sélectionnez des pédales, pedalboards et alimentations dans le panneau de gauche.\nGlissez, déposez et organisez-les pour créer votre setup parfait.\nVérifiez votre alimentation et partagez votre pedalboard avec vos amis.",
+    "desktopExtra": "",
+    "mobileText": "Sélectionnez des pédales, pedalboards et alimentations dans le panneau de gauche.\nGlissez, déposez et organisez-les pour créer votre setup parfait.\nVérifiez votre alimentation et partagez votre pedalboard avec vos amis."
+  },
 
   "pedal": {
 

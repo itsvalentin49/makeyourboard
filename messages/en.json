@@ -18,11 +18,11 @@
 
   "canvasIntro": {
     "title": "Make Your Board",
-    "desktopText": "Add pedals, explore by effect type, and create your ideal pedalboard.",
-    "desktopExtra": "Up to 5 boards to test, compare, and refine your setups.",
-    "mobileText": "Add pedals, explore by effect type, and create your ideal pedalboard.",
-    "text3": "Unlimited setups. Endless tone."
-  },
+    "desktopText": "Select pedals, boards and power supplies from the left panel.\nDrag, drop and arrange them to build your perfect setup.\nCheck your power setup and share your board with friends.",
+    "desktopExtra": "",
+    "mobileText": "Select pedals, boards and power supplies from the left panel.\nDrag, drop and arrange them to build your perfect setup.\nCheck your power setup and share your board with friends."
+    },
+
 
   "pedal": {
     "features": "Specifications",

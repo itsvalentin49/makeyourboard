@@ -17,11 +17,10 @@
   },
 
   "canvasIntro": {
-    "title": "Crea la tua pedaliera",
-    "desktopText": "Aggiungi pedali, esplora per tipo di effetto e crea la tua pedaliera ideale.",
-    "desktopExtra": "Fino a 5 pedaliere per testare, confrontare e perfezionare i tuoi setup.",
-    "mobileText": "Aggiungi pedali, esplora per tipo di effetto e crea la tua pedaliera ideale.",
-    "text3": "Setup illimitati. Suono infinito."
+    "title": "Make Your Board",
+    "desktopText": "Seleziona pedali, pedalboard e alimentatori dal pannello a sinistra.\nTrascinali e disponili per creare il tuo setup perfetto.\nVerifica l'alimentazione e condividi la tua pedalboard con gli amici.",
+    "desktopExtra": "",
+    "mobileText": "Seleziona pedali, pedalboard e alimentatori dal pannello a sinistra.\nTrascinali e disponili per creare il tuo setup perfetto.\nVerifica l'alimentazione e condividi la tua pedalboard con gli amici."
   },
 
   "pedal": {

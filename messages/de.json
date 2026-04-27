@@ -17,11 +17,10 @@
   },
 
   "canvasIntro": {
-    "title": "Baue dein Pedalboard",
-    "desktopText": "Füge Pedale hinzu, entdecke Effekttypen und erstelle dein ideales Pedalboard.",
-    "desktopExtra": "Bis zu 5 Boards zum Testen, Vergleichen und Optimieren deiner Setups.",
-    "mobileText": "Füge Pedale hinzu, entdecke Effekttypen und erstelle dein ideales Pedalboard.",
-    "text3": "Unbegrenzte Setups. Endloser Sound."
+    "title": "Make Your Board",
+    "desktopText": "Wählen Sie Pedale, Boards und Netzteile im linken Bereich aus.\nZiehen Sie sie per Drag & Drop, um Ihr perfektes Setup zu erstellen.\nÜberprüfen Sie Ihre Stromversorgung und teilen Sie Ihr Board mit anderen.",
+    "desktopExtra": "",
+    "mobileText": "Wählen Sie Pedale, Boards und Netzteile im linken Bereich aus.\nZiehen Sie sie per Drag & Drop, um Ihr perfektes Setup zu erstellen.\nÜberprüfen Sie Ihre Stromversorgung und teilen Sie Ihr Board mit anderen."
   },
 
   "pedal": {

@@ -9,6 +9,7 @@ import { getTranslator } from "@/utils/i18n";
 import useImage from "use-image";
 import ExportPNG from "@/components/ExportPNG";
 import ShareBoard from "@/components/ShareBoard";
+import Image from "next/image";
 
 type AnyRow = Record<string, any>;
 
@@ -2128,10 +2129,27 @@ const LARGE_KNOB = 25;
   <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
     <div className="max-w-2xl text-center px-8">
 
-      {/* Title */}
-      <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-white mb-8">
-        {t("canvasIntro.title")}
-      </h2>
+      {/* LOGO + TITLE */}
+      <div className="flex flex-col items-center mb-8">
+
+<Image
+  src="/logos/logo.png"
+  alt="Make Your Board logo"
+  width={56}
+  height={56}
+  className="mb-4 opacity-90 h-auto w-auto"
+  priority
+/>
+
+        <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-white">
+          {t("canvasIntro.title")}
+        </h2>
+
+        <p className="text-sm text-zinc-400 mt-2">
+          Guitar Pedalboard Builder
+        </p>
+
+      </div>
 
       {/* Main text */}
       <p className="whitespace-pre-line text-[15px] text-zinc-300 leading-relaxed">
@@ -2145,11 +2163,6 @@ const LARGE_KNOB = 25;
           {t("canvasIntro.desktopExtra")}
         </p>
       )}
-
-      {/* Punchline */}
-      <p className="mt-10 text-[10px] tracking-widest uppercase text-zinc-400">
-        {t("canvasIntro.text3")}
-      </p>
 
     </div>
   </div>

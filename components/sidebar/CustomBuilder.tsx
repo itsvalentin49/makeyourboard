@@ -232,11 +232,15 @@ onClick={(e) => {
 }}
   className="w-full max-w-[120px] h-[34px] rounded-md border border-zinc-700 cursor-pointer overflow-hidden"
 >
-  <div
-    className="w-full h-full"
-    style={{
-      background: customColor || "linear-gradient(145deg, #bbb, #eee)"
-    }}
+<div
+  className="w-full h-full"
+  style={{
+    background:
+      !customColor || customColor === "#111111"
+        ? "linear-gradient(145deg, #bbb, #eee)"
+        : customColor,
+  }}
+
   />
 </div>
 

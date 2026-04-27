@@ -151,12 +151,17 @@ export default function TopBarTabs({
   className="px-6 h-full flex items-center justify-center shrink-0"
   aria-label="Create project"
 >
-  <Plus
-    size={16}
-    style={{ color: "#71717a", cursor: "pointer" }}
-    onMouseEnter={(e) => (e.currentTarget.style.color = "#ffffff")}
-    onMouseLeave={(e) => (e.currentTarget.style.color = "#71717a")}
-  />
+<Plus
+  size={16}
+  style={{ color: "#71717a", cursor: "pointer" }}
+  onMouseEnter={(e) => {
+    const isLight = document.documentElement.classList.contains("light");
+    e.currentTarget.style.color = isLight ? "#000000" : "#ffffff";
+  }}
+  onMouseLeave={(e) => {
+    e.currentTarget.style.color = "#71717a";
+  }}
+/>
 </button>
             )}
 
@@ -181,12 +186,17 @@ export default function TopBarTabs({
   className="flex shrink-0 px-6 h-full items-center justify-center"
   aria-label="Settings"
 >
-  <Settings
-    size={20}
-    style={{ color: "#71717a", cursor: "pointer" }}
-    onMouseEnter={(e) => (e.currentTarget.style.color = "#ffffff")}
-    onMouseLeave={(e) => (e.currentTarget.style.color = "#71717a")}
-  />
+<Settings
+  size={20}
+  style={{ color: "#71717a", cursor: "pointer" }}
+  onMouseEnter={(e) => {
+    const isLight = document.documentElement.classList.contains("light");
+    e.currentTarget.style.color = isLight ? "#000000" : "#ffffff";
+  }}
+  onMouseLeave={(e) => {
+    e.currentTarget.style.color = "#71717a";
+  }}
+/>
 </button>
 
     </div>

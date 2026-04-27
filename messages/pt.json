@@ -17,11 +17,10 @@
   },
 
   "canvasIntro": {
-    "title": "Crie o seu pedalboard",
-    "desktopText": "Adicione pedais, explore por tipo de efeito e crie o seu pedalboard ideal.",
-    "desktopExtra": "Até 5 pedalboards para testar, comparar e aperfeiçoar os seus setups.",
-    "mobileText": "Adicione pedais, explore por tipo de efeito e crie o seu pedalboard ideal.",
-    "text3": "Setups ilimitados. Som infinito."
+    "title": "Make Your Board",
+    "desktopText": "Selecione pedais, pedalboards e fontes de alimentação no painel à esquerda.\nArraste e organize para criar o seu setup perfeito.\nVerifique a alimentação e partilhe o seu pedalboard com outros.",
+    "desktopExtra": "",
+    "mobileText": "Selecione pedais, pedalboards e fontes de alimentação no painel à esquerda.\nArraste e organize para criar o seu setup perfeito.\nVerifique a alimentação e partilhe o seu pedalboard com outros."
   },
 
   "pedal": {
