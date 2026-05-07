@@ -131,7 +131,9 @@ export default function PedalSpecs({
     <div className="flex-1 border-b border-dotted border-zinc-600 mx-2 translate-y-[3.5px]" />
 
     <span className="text-[11px] font-bold text-white whitespace-nowrap">
-      {selectedPedal.year || "N/A"}
+      {selectedPedal.year
+  ? String(selectedPedal.year).split("-")[0]
+  : "N/A"}
     </span>
 
   </div>

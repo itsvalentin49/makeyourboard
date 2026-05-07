@@ -18,8 +18,8 @@
 
   "canvasIntro": {
     "title": "Make Your Board",
+    "subtitle": "Planificador de Pedalboard",
     "desktopText": "Selecciona pedales, pedalboards y fuentes de alimentación desde el panel izquierdo.\nArrastra y colócalos para crear tu configuración perfecta.\nComprueba la alimentación y comparte tu pedalboard con otros.",
-    "desktopExtra": "",
     "mobileText": "Selecciona pedales, pedalboards y fuentes de alimentación desde el panel izquierdo.\nArrastra y colócalos para crear tu configuración perfecta.\nComprueba la alimentación y comparte tu pedalboard con otros."
   },
 
@@ -41,6 +41,7 @@
       "Acoustic": "Acústico",
       "Amp Simulator": "Simulador de amplificador",
       "Audio Interface": "Interfaz de audio",
+      "Bit Crusher": "Bit Crusher",
       "Boost": "Boost",
       "Buffer": "Buffer",
       "Cab Simulator": "Simulador de pantalla",
@@ -48,6 +49,7 @@
       "Compressor": "Compresor",
       "Delay": "Delay",
       "Delay / Reverb": "Delay / Reverb",
+      "DI": "DI",
       "Distortion": "Distorsión",
       "Enveloppe Filter": "Filtro envolvente",
       "Equalizer": "Ecualizador",
@@ -60,6 +62,7 @@
       "Lo-Fi": "Lo-Fi",
       "Looper": "Looper",
       "MIDI Controller": "Controlador MIDI",
+      "MIDI Switcher": "MIDI Switcher",
       "Multi-FX": "Multi-FX",
       "Noise Gate": "Puerta de ruido",
       "Octaver": "Octavador",
@@ -108,8 +111,12 @@
     "power": {
       "label": "Alimentación",
       "AC": "AC",
+      "8-20V DC": "8-20V DC",
+      "9-20V DC": "9-20V DC",
       "9V DC": "9V DC",
       "12V DC": "12V DC",
+      "9-12V DC": "9-12V DC",
+      "9-15V DC": "9-15V DC",
       "18V DC": "18V DC",
       "24V DC": "24V DC",
       "48V DC": "48V DC",
@@ -326,5 +333,10 @@
 
   "search": {
     "noResults": "Sin resultados"
-  }
+  },
+
+  "pedalsMenu": {
+    "new": "NUEVO",
+    "newReleases": "Novedades"
+}
 }

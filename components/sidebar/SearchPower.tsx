@@ -125,9 +125,9 @@ onClick={() => {
   addPower(p); // ✅ AJOUT DIRECT
   setShowPowerResults(false);
 }}
-                      className="w-full px-5 py-2 text-left hover:bg-zinc-700 text-zinc-300 text-[12px] transition-colors"
+                      className="w-full px-4 py-1 text-left hover:bg-zinc-700 text-zinc-300 text-[12px] transition-colors"
                     >
-                      <span className="font-semibold mr-2 text-zinc-500">
+                      <span className="font-semibold mr-2 text-zinc-400">
                         {brand}
                       </span>
 

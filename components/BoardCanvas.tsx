@@ -2132,21 +2132,21 @@ const LARGE_KNOB = 25;
       {/* LOGO + TITLE */}
       <div className="flex flex-col items-center mb-8">
 
-<Image
-  src="/logos/logo.png"
-  alt="Make Your Board logo"
-  width={56}
-  height={56}
-  className="mb-4 opacity-90 h-auto w-auto"
-  priority
-/>
+        <Image
+          src="/logos/logo.png"
+          alt="Make Your Board logo"
+          width={56}
+          height={56}
+          className="mb-4 opacity-90 h-auto w-auto"
+          priority
+        />
 
         <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-white">
           {t("canvasIntro.title")}
         </h2>
 
-        <p className="text-sm text-zinc-400 mt-2">
-          Guitar Pedalboard Builder
+        <p className="text-sm italic text-zinc-400 mt-2">
+          {t("canvasIntro.subtitle")}
         </p>
 
       </div>
@@ -2157,12 +2157,6 @@ const LARGE_KNOB = 25;
           ? t("canvasIntro.mobileText")
           : t("canvasIntro.desktopText")}
       </p>
-
-      {!isMobile && (
-        <p className="text-[15px] text-zinc-300 leading-relaxed mt-4">
-          {t("canvasIntro.desktopExtra")}
-        </p>
-      )}
 
     </div>
   </div>

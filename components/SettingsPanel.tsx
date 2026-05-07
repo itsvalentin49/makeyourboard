@@ -144,12 +144,17 @@ if (contactOpenLocal) {
         </span>
 
 <button onClick={() => setContactOpenLocal(false)} className="p-1">
-  <ArrowLeft
-    size={18}
-    style={{ color: "#71717a", cursor: "pointer" }} // gris
-    onMouseEnter={(e) => (e.currentTarget.style.color = "#ffffff")}
-    onMouseLeave={(e) => (e.currentTarget.style.color = "#71717a")}
-  />
+<ArrowLeft
+  size={18}
+  style={{ color: "#71717a", cursor: "pointer" }}
+  onMouseEnter={(e) => {
+    const isLight = document.documentElement.classList.contains("light");
+    e.currentTarget.style.color = isLight ? "#000000" : "#ffffff";
+  }}
+  onMouseLeave={(e) => {
+    e.currentTarget.style.color = "#71717a";
+  }}
+/>
 </button>
       </div>
 
@@ -285,10 +290,10 @@ if (contactOpenLocal) {
   }}
   className={`w-full mt-2 text-[10px] font-black uppercase py-2 rounded-lg transition-all duration-300 ${
     contactSuccess
-      ? "bg-emerald-500 text-white"
+      ? "bg-emerald-500 !text-white"
       : contactLoading
       ? "bg-zinc-700 text-zinc-400 cursor-not-allowed"
-      : "bg-blue-600 hover:bg-blue-500 text-white"
+      : "bg-blue-600 hover:bg-blue-500 !text-white"
   }`}
 >
   {contactSuccess
