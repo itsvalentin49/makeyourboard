@@ -64,7 +64,7 @@ export default function SearchBoards({
 
       <div className="relative flex items-center shrink-0">
         <Search
-          size={18}
+          size={15}
           strokeWidth={2.5}
           className="absolute left-4 text-[#6f6a5d]"
         />
@@ -79,7 +79,7 @@ export default function SearchBoards({
           placeholder={t("boardsMenu.searchPlaceholder")}
           className="
             w-full h-[30px]
-            bg-white text-zinc-950 placeholder:!text-zinc-500
+            bg-white !text-black placeholder:!text-zinc-500
             rounded-md
             pl-12 pr-11
             text-[12px] font-bold

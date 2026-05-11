@@ -43,9 +43,6 @@ export default function PedalSpecs({
 
   if (!selectedPedal) return null;
 
-  const pedalImage =
-  selectedPedal.image || selectedPedal.image_url || selectedPedal.photo || null;
-
   return (
     <div className="flex flex-col gap-1 animate-in slide-in-from-left duration-300 px-1">
 
@@ -67,23 +64,7 @@ export default function PedalSpecs({
       {t("pedal.actions.title")}
     </div>
 
-    <div className="grid grid-cols-5 gap-2">
-
-      {pedalImage && (
-      <div
-        className="
-          h-[40px]
-          flex items-center justify-center
-          overflow-visible
-        "
-      >
-        <img
-          src={pedalImage}
-          alt={selectedPedal.name || "Selected pedal"}
-          className="max-h-[34px] object-contain"
-        />
-      </div>
-    )}    
+    <div className="grid grid-cols-4 gap-2">
 
   {/* ROTATE */}
   <button

@@ -61,7 +61,7 @@ export function HelpGuide({ t }: Props) {
             "
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="mb-5 flex items-start justify-between gap-4">
+            <div className="mb-7 flex items-start justify-between gap-4">
               <h2 className="mt-1 text-[18px] font-black tracking-[-0.04em]">
                 {t("help.title")}
               </h2>
