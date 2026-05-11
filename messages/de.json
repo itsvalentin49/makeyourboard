@@ -25,6 +25,13 @@
 
   "pedal": {
     "features": "Spezifikationen",
+    "actions": {
+      "title": "Aktionen",
+      "rotate": "Drehen",
+      "delete": "Löschen",
+      "moveFront": "Nach vorne",
+      "moveBack": "Nach hinten"
+      },
     "brand": "Marke",
     "model": "Modell",
     "year": "Jahr",
@@ -38,6 +45,7 @@
     "type": {
       "label": "Typ",
       "A/B Box": "A/B Box",
+      "Accessory": "Zubehör",
       "Acoustic": "Akustik",
       "Amp Simulator": "Amp-Simulator",
       "Audio Interface": "Audio-Interface",
@@ -117,12 +125,14 @@
       "12V DC": "12V DC",
       "9-12V DC": "9-12V DC",
       "9-15V DC": "9-15V DC",
+      "9-24V DC": "9-24V DC",
       "18V DC": "18V DC",
       "24V DC": "24V DC",
       "48V DC": "48V DC",
       "9-18V DC": "9-18V DC",
       "Passive": "Passiv",
-      "Battery": "Batterie"
+      "Battery": "Batterie",
+      "N/A": "N/A"
     },
 
     "draw": "Stromverbrauch",
@@ -147,13 +157,15 @@
       "label": "Material",
       "Aluminium": "Aluminium",
       "ABS": "ABS",
+      "Plastic": "Kunststoff",
       "Plywood": "Sperrholz"
     },
 
     "profile": {
       "label": "Profil",
       "Flat": "Flach",
-      "Angled": "Gewinkelt"
+      "Angled": "Gewinkelt",
+      "N/A": "N/A"
     },
 
     "dimensions": "Abmessungen",
@@ -327,7 +339,9 @@
       "full": "Dein Netzteil ist ausgelastet.",
       "fullHint": "Füge ein weiteres Gerät hinzu oder nutze ein Modell mit mehr Ausgängen.",
       "upgrade": "Verwende ein geeignetes Netzteil oder schließe das inkompatible Pedal an ein separates Netzteil an.",
-      "tuner": "Dein Tuner kann mehrere Pedale über eine Daisy-Chain versorgen 🤘"
+      "tuner": "Dein Tuner kann mehrere Pedale über eine Daisy-Chain versorgen 🤘",
+      "singleAdapter": "Du kannst ein {voltage}V-Netzteil mit einer Stromstärke über {draw}mA verwenden.",
+      "battery9v": "Du kannst auch eine 9V-Batterie verwenden, wenn das Pedal den Batteriebetrieb unterstützt."
     }
   },
 
@@ -336,7 +350,66 @@
   },
 
   "pedalsMenu": {
-    "new": "NEU",
+    "title": "Pedale",
+    "searchPlaceholder": "Suchen...",
+    "count": "{count} Pedale",
+    "results": "{count} Ergebnisse",
+    "latest": "Hier sind die neuesten veröffentlichten Pedale.",
+    "new": "NEW",
     "newReleases": "Neuheiten"
-}
+  },
+
+  "boardsMenu": {
+    "title": "Pedalboards",
+    "searchPlaceholder": "Suchen...",
+    "count": "{count} Pedalboards"
+  },
+
+  "powerMenu": {
+    "title": "Netzteile",
+    "searchPlaceholder": "Suchen...",
+    "count": "{count} Netzteile"
+  },
+
+  "customMenu": {
+    "title": "Eigene Elemente",
+    "subtitle": "Erstelle ein eigenes Pedal oder Pedalboard mit individuellen Abmessungen.",
+    "importTitle": "Bild importieren",
+    "importSubtitle": "Importiere dein eigenes Pedal von deinem Computer.",
+    "chooseImage": "Bild auswählen",
+    "brand": "Marke",
+    "model": "Modell",
+    "voltage": "Spannung (V)",
+    "current": "Stromstärke (mA)",
+    "add": "Hinzufügen"
+  },
+
+  "canvasControls": {
+    "min": "MIN",
+    "max": "MAX",
+    "setup": "Setup",
+    "pedalboard": "Pedalboard",
+    "boards": "Boards",
+    "pedalboards": "Pedalboards",
+    "newBoard": "Neues Board",
+    "jacks": "Jacks",
+    "power": "Power"
+  },
+
+  "help": {
+    "title": "Willkommen bei MakeYourBoard",
+    "open": "Hilfe öffnen",
+    "close": "Hilfe schließen",
+    "gearTitle": "Wähle dein Equipment",
+    "gearText": "Wähle Pedale, Pedalboards und Netzteile im linken Bereich aus.",
+    "layoutTitle": "Erstelle dein Layout",
+    "layoutText": "Ziehe, platziere und ordne alles auf dem Canvas an.",
+    "jacksTitle": "Prüfe den Platz für Stecker",
+    "jacksText": "Stelle sicher, dass zwischen deinen Pedalen genug Platz für Kabel und Stecker vorhanden ist.",
+    "powerTitle": "Prüfe deine Stromversorgung",
+    "powerText": "Füge ein Netzteil hinzu, um Stromverbrauch und Kompatibilität zu überprüfen.",
+    "shareTitle": "Exportieren oder teilen",
+    "shareText": "Exportiere dein Pedalboard als Bild oder teile es mit Freunden.",
+    "ok": "OK"
+  }
 }

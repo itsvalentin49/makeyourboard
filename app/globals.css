@@ -65,7 +65,6 @@ body {
 /* =========================
    TEXT OVERRIDES
    ========================= */
-.text-white { color: var(--foreground) !important; }
 .text-zinc-100 { color: var(--zinc-100) !important; }
 .text-zinc-200 { color: var(--zinc-200) !important; }
 .text-zinc-300 { color: var(--zinc-300) !important; }
@@ -241,4 +240,95 @@ html:not(.light) .pill-ui-sm {
 
 .light .hover\:bg-canvas:hover {
   background-color: var(--zinc-200) !important;
+}
+
+/* =========================
+   SIDEBAR SCROLLBAR
+   ========================= */
+
+/* DARK */
+.sidebar-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #3f3f46 #18181b;
+}
+
+.sidebar-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.sidebar-scrollbar::-webkit-scrollbar-track {
+  background: #18181b;
+  border-radius: 999px;
+}
+
+.sidebar-scrollbar::-webkit-scrollbar-thumb {
+  background: #3f3f46;
+  border-radius: 999px;
+}
+
+.sidebar-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #52525b;
+}
+
+/* LIGHT */
+.light .sidebar-scrollbar {
+  scrollbar-color: #adb5bd #f1f3f5;
+}
+
+.light .sidebar-scrollbar::-webkit-scrollbar-track {
+  background: #f1f3f5;
+}
+
+.light .sidebar-scrollbar::-webkit-scrollbar-thumb {
+  background: #adb5bd;
+}
+
+.light .sidebar-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #868e96;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* =========================
+   FORM TEXT COLORS
+   ========================= */
+
+/* DARK */
+html:not(.light) input,
+html:not(.light) textarea,
+html:not(.light) select {
+  color: #ffffff !important;
+}
+
+html:not(.light) input::placeholder,
+html:not(.light) textarea::placeholder {
+  color: #ffffff !important;
+  opacity: 1;
+}
+
+/* LIGHT */
+.light input,
+.light textarea,
+.light select {
+  color: #0a0a0a !important;
+}
+
+.light input::placeholder,
+.light textarea::placeholder {
+  color: #0a0a0a !important;
+  opacity: 1;
+}
+.border-canvas {
+  border-color: var(--zinc-600) !important;
+}
+
+.light .border-canvas {
+  border-color: var(--zinc-200) !important;
 }

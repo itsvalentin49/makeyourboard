@@ -1,27 +1,20 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
-import { ChevronDown } from "lucide-react";
+import React, { useMemo } from "react";
+import { Search, X } from "lucide-react";
 
 type AnyRow = Record<string, any>;
 
 type Props = {
   boardsLibrary: AnyRow[];
-
   boardSearch: string;
   setBoardSearch: (v: string) => void;
-
   showBoardResults: boolean;
   setShowBoardResults: (v: boolean) => void;
-
   setShowPedalResults: (v: boolean) => void;
-
   selectBoard: (b: AnyRow) => void;
-
   boardInputRef: React.RefObject<HTMLInputElement | null>;
-
   t: (key: string) => string;
-
   groupItems: (items: AnyRow[], filter: string) => Record<string, AnyRow[]>;
 };
 
@@ -29,141 +22,161 @@ export default function SearchBoards({
   boardsLibrary,
   boardSearch,
   setBoardSearch,
-  showBoardResults,
   setShowBoardResults,
   setShowPedalResults,
   selectBoard,
   boardInputRef,
   t,
-  groupItems,
 }: Props) {
+  const search = boardSearch.trim().toLowerCase();
 
-  const prevOpen = useRef(false);
+  const visibleBoards = useMemo(() => {
+    const terms = search.split(" ").filter(Boolean);
 
-  useEffect(() => {
-    if (showBoardResults && !prevOpen.current) {
-      setBoardSearch(""); // 🔥 reset à l'ouverture
-      boardInputRef.current?.focus(); // 🔥 focus
-    }
+    return boardsLibrary
+      .filter((b) => {
+        if (!terms.length) return true;
 
-    prevOpen.current = showBoardResults;
-  }, [showBoardResults]);
+        const haystack = `${b.brand ?? ""} ${b.name ?? ""} ${b.type ?? ""}`.toLowerCase();
+        return terms.every((term) => haystack.includes(term));
+      })
+      .sort((a, b) => {
+        const brandA = String(a.brand || "").localeCompare(String(b.brand || ""));
+        if (brandA !== 0) return brandA;
+        return String(a.name || "").localeCompare(String(b.name || ""));
+      });
+  }, [boardsLibrary, search]);
 
   return (
-    <div className="flex flex-col gap-2 mt-8">
+    <div className="flex flex-col gap-4 mt-1 h-full min-h-0">
+<div
+  className="
+    w-full
+    text-[11px] font-black uppercase
+    py-2 rounded-md
+    bg-blue-600 !text-white
+    text-center
+    cursor-default
+  "
+>
+  {t("boardsMenu.title")}
+</div>
 
-      <div className="flex items-center gap-3">
+      <div className="relative flex items-center shrink-0">
+        <Search
+          size={18}
+          strokeWidth={2.5}
+          className="absolute left-4 text-[#6f6a5d]"
+        />
 
-        <span className="text-[12px] uppercase font-bold tracking-[0.18em] text-white">
-          {t("sidebar.addBoardTitle")}
-        </span>
+        <input
+          ref={boardInputRef}
+          type="text"
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="off"
+          spellCheck={false}
+          placeholder={t("boardsMenu.searchPlaceholder")}
+          className="
+            w-full h-[30px]
+            bg-white text-zinc-950 placeholder:!text-zinc-500
+            rounded-md
+            pl-12 pr-11
+            text-[12px] font-bold
+            outline-none
+          "
+          value={boardSearch}
+          onClick={(e) => {
+            e.stopPropagation();
+            setShowPedalResults(false);
+            setShowBoardResults(true);
+          }}
+          onChange={(e) => {
+            setBoardSearch(e.target.value);
+            setShowBoardResults(true);
+          }}
+        />
+
+        {boardSearch && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setBoardSearch("");
+              boardInputRef.current?.focus();
+            }}
+            className="
+              absolute right-4
+              flex items-center justify-center
+              text-[#6f6a5d]
+              hover:opacity-70
+              transition-opacity
+            "
+          >
+            <X size={15} strokeWidth={3} />
+          </button>
+        )}
       </div>
 
-      <div className="relative" style={{ zIndex: showBoardResults ? 60 : 5 }}>
+      <div className="px-1 text-[11px] font-black uppercase tracking-wide text-zinc-300 shrink-0">
+        {t("boardsMenu.count").replace("{count}", String(visibleBoards.length))}
+      </div>
 
-        <div className="relative flex items-center">
+      <div className="flex flex-col gap-2.5 overflow-y-auto no-scrollbar pb-28 min-h-0">
+        {visibleBoards.length > 0 ? (
+          visibleBoards.map((b) => {
+            const img = b.image || b.image_url || b.photo;
 
-          <input
-            ref={boardInputRef}
-            type="text"
-            autoComplete="off"
-            autoCorrect="off"
-            autoCapitalize="off"
-            spellCheck={false}
-            placeholder={showBoardResults ? "" : `${t("sidebar.searchBoard")}...`} // 🔥 cache placeholder
-            className={`w-full bg-zinc-950 border rounded-lg py-2 pl-4 pr-10 text-[11px] text-white placeholder:text-zinc-500 outline-none transition-all ${
-              showBoardResults
-                ? "border-zinc-500"
-                : "border-zinc-700"
-            }`}
-            value={boardSearch}
-            onClick={(e) => {
-              e.stopPropagation();
-              setShowPedalResults(false);
-              setShowBoardResults(true);
-            }}
-            onChange={(e) => {
-              setBoardSearch(e.target.value);
-              setShowBoardResults(true);
-            }}
-          />
-
-          <ChevronDown
-            onClick={(e) => {
-              e.stopPropagation();
-              setShowPedalResults(false);
-              setShowBoardResults(!showBoardResults);
-            }}
-            className={`absolute right-3 size-4 cursor-pointer transition-transform ${
-              showBoardResults
-                ? "rotate-180 text-zinc-400"
-                : "text-zinc-500"
-            }`}
-          />
-
-        </div>
-
-        {showBoardResults && (
-          <div className="absolute top-10 left-0 right-0 bg-zinc-900 border border-zinc-700 rounded-xl shadow-2xl z-50 max-h-80 overflow-y-auto custom-scrollbar">
-
-            {Object.keys(groupItems(boardsLibrary, boardSearch)).length > 0 ? (
-
-              <>
-                {/* CREDIT */}
-                <div className="px-4 pt-3 pb-2">
-                  <div className="text-[9px] text-white italic">
-                    Some images courtesy of Pedal Playground
-                  </div>
+            return (
+              <button
+                key={b.id}
+                type="button"
+                onClick={() => {
+                  setBoardSearch("");
+                  selectBoard(b);
+                  setShowBoardResults(false);
+                }}
+                className="
+                  w-full min-h-[50px]
+                  rounded-xl
+                  bg-zinc-950 hover:bg-canvas
+                  px-3 py-1.5
+                  flex items-center gap-3
+                  text-left
+                  transition-colors
+                  shrink-0
+                "
+              >
+                <div className="w-[50px] h-[34px] shrink-0 flex items-center justify-center">
+                  {img ? (
+                    <img
+                      src={img}
+                      alt={`${b.brand || ""} ${b.name || ""}`}
+                      className="max-w-full max-h-full object-contain"
+                    />
+                  ) : (
+                    <div className="w-12 h-6 rounded-md bg-zinc-700" />
+                  )}
                 </div>
 
-                {Object.keys(groupItems(boardsLibrary, boardSearch)).map((brand) => (
-
-                  <div key={brand} className="flex flex-col">
-
-                    <div className="px-4 h-10 flex items-center bg-zinc-950">
-                      <span className="text-[11px] font-bold text-zinc-100 uppercase tracking-widest">
-                        {brand}
-                      </span>
-                    </div>
-
-                    {groupItems(boardsLibrary, boardSearch)[brand].map((b) => (
-
-                      <button
-                        key={b.id}
-                        onClick={() => {
-                          setBoardSearch(""); // 🔥 évite texte restant
-                          selectBoard(b);
-                          setShowBoardResults(false);
-                        }}
-                        className="w-full px-4 py-1 text-left hover:bg-zinc-700 text-zinc-300 text-[12px] transition-colors"
-                      >
-                        <span className="font-semibold mr-2 text-zinc-400">
-                          {brand}
-                        </span>
-
-                        {b.name}
-                      </button>
-
-                    ))}
-
+                <div className="min-w-0 flex-1">
+                  <div className="text-[12px] font-black leading-tight">
+                    {b.name}
                   </div>
 
-                ))}
-              </>
-
-            ) : (
-
-              <div className="p-4 text-center text-[10px] text-zinc-500 uppercase font-semibold tracking-widest">
-                {t("search.noResults")}
-              </div>
-
-            )}
-
+                  <div className="text-[10px] font-bold text-zinc-300 leading-tight mt-0.5">
+                    {b.brand}
+                  </div>
+                </div>
+              </button>
+            );
+          })
+        ) : (
+          <div className="rounded-xl border border-zinc-800 px-4 py-6 text-center text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+            {t("search.noResults")}
           </div>
         )}
-
       </div>
-
     </div>
   );
 }

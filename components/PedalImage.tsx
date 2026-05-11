@@ -14,6 +14,7 @@ type PedalImageProps = {
   isBoard?: boolean;
   onSizeReady?: (w: number, h: number) => void;
   rotation?: number;
+  listening?: boolean;
   showJacksMargin?: boolean;
   jacksLocation?: string; 
   isColliding?: boolean;
@@ -29,6 +30,7 @@ export default function PedalImage({
   isBoard = false,
   onSizeReady,
   rotation = 0,
+  listening = true,
   showJacksMargin = false,
   jacksLocation = "",
   isColliding = false,
@@ -111,7 +113,7 @@ export default function PedalImage({
           fill={color || (isBoard ? "#18181b" : "#27272a")}
           stroke={color ? "rgba(255,255,255,0.3)" : "#3f3f46"}
           strokeWidth={1}
-          cornerRadius={3}
+          cornerRadius={isBoard ? 0 : 3}
         />
       ) : (
         <KonvaImage
@@ -120,7 +122,8 @@ export default function PedalImage({
           y={-proportionalHeight / 2}
           width={scaledWidth}
           height={proportionalHeight}
-          cornerRadius={3}
+          listening={listening}
+          cornerRadius={isBoard ? 0 : 3}
         />
       )}
 

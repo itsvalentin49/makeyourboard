@@ -25,6 +25,13 @@
 
   "pedal": {
     "features": "Specifiche",
+    "actions": {
+      "title": "Azioni",
+      "rotate": "Ruota",
+      "delete": "Elimina",
+      "moveFront": "Porta avanti",
+      "moveBack": "Porta indietro"
+     },
     "brand": "Marca",
     "model": "Modello",
     "year": "Anno",
@@ -38,6 +45,7 @@
     "type": {
       "label": "Tipo",
       "A/B Box": "A/B Box",
+      "Accessory": "Accessorio",
       "Acoustic": "Acustico",
       "Amp Simulator": "Simulatore di amplificatore",
       "Audio Interface": "Interfaccia audio",
@@ -117,12 +125,14 @@
       "12V DC": "12V DC",
       "9-12V DC": "9-12V DC",
       "9-15V DC": "9-15V DC",
+      "9-24V DC": "9-24V DC",
       "18V DC": "18V DC",
       "24V DC": "24V DC",
       "48V DC": "48V DC",
       "9-18V DC": "9-18V DC",
       "Passive": "Passivo",
-      "Battery": "Batteria"
+      "Battery": "Batteria",
+      "N/A": "N/A"
     },
 
     "draw": "Assorbimento",
@@ -147,13 +157,15 @@
       "label": "Materiale",
       "Aluminium": "Alluminio",
       "ABS": "ABS",
+      "Plastic": "Plastica",
       "Plywood": "Compensato"
     },
 
     "profile": {
       "label": "Profilo",
       "Flat": "Piatto",
-      "Angled": "Inclinato"
+      "Angled": "Inclinato",
+      "N/A": "N/A"
     },
 
     "dimensions": "Dimensioni",
@@ -327,7 +339,9 @@
       "full": "Il tuo alimentatore è al limite.",
       "fullHint": "Aggiungi un'altra unità o passa a un modello con più uscite.",
       "upgrade": "Usa un alimentatore adeguato o collega il pedale incompatibile a un alimentatore dedicato.",
-      "tuner": "Il tuo accordatore può alimentare più pedali con un daisy chain 🤘"
+      "tuner": "Il tuo accordatore può alimentare più pedali con un daisy chain 🤘",
+      "singleAdapter": "Puoi usare un alimentatore da {voltage}V con un amperaggio superiore a {draw}mA.",
+      "battery9v": "Puoi anche usare una batteria da 9V se il pedale supporta il funzionamento a batteria."
     }
   },
 
@@ -336,7 +350,66 @@
   },
 
   "pedalsMenu": {
-    "new": "NUOVO",
+    "title": "Pedali",
+    "searchPlaceholder": "Cerca...",
+    "count": "{count} pedali",
+    "results": "{count} risultati",
+    "latest": "Ecco gli ultimi pedali usciti.",
+    "new": "NEW",
     "newReleases": "Novità"
-}
+  },
+
+  "boardsMenu": {
+    "title": "Pedaliere",
+    "searchPlaceholder": "Cerca...",
+    "count": "{count} pedaliere"
+  },
+
+  "powerMenu": {
+    "title": "Alimentatori",
+    "searchPlaceholder": "Cerca...",
+    "count": "{count} alimentatori"
+  },
+
+  "customMenu": {
+    "title": "Elementi personalizzati",
+    "subtitle": "Crea un pedale o una pedaliera personalizzati con dimensioni su misura.",
+    "importTitle": "Importa immagine",
+    "importSubtitle": "Importa il tuo pedale dal computer.",
+    "chooseImage": "Scegli un'immagine",
+    "brand": "Marca",
+    "model": "Modello",
+    "voltage": "Voltaggio (V)",
+    "current": "Corrente (mA)",
+    "add": "Aggiungi"
+  },
+
+  "canvasControls": {
+    "min": "MIN",
+    "max": "MAX",
+    "setup": "Setup",
+    "pedalboard": "Pedalboard",
+    "boards": "Boards",
+    "pedalboards": "Pedalboard",
+    "newBoard": "Nuova board",
+    "jacks": "Jacks",
+    "power": "Power"
+},
+
+  "help": {
+    "title": "Benvenuto su MakeYourBoard",
+    "open": "Apri la guida",
+    "close": "Chiudi la guida",
+    "gearTitle": "Scegli la tua attrezzatura",
+    "gearText": "Scegli pedali, pedalboard e alimentatori dal pannello di sinistra.",
+    "layoutTitle": "Crea il tuo layout",
+    "layoutText": "Trascina, rilascia e organizza tutto sul canvas.",
+    "jacksTitle": "Controlla lo spazio per i jack",
+    "jacksText": "Assicurati che i pedali siano abbastanza distanziati per cavi e connettori.",
+    "powerTitle": "Controlla l’alimentazione",
+    "powerText": "Aggiungi un alimentatore per verificare consumo e compatibilità.",
+    "shareTitle": "Esporta o condividi",
+    "shareText": "Esporta il tuo pedalboard come immagine o condividilo con gli amici.",
+    "ok": "OK"
+  }
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { ChevronDown, ArrowLeft, X } from "lucide-react";
+import { ChevronDown, ArrowLeft, X, Sun, Moon } from "lucide-react";
 
 type Background = {
   id: string;
@@ -62,16 +62,16 @@ export default function SettingsPanel({
   const bgRef = React.useRef<HTMLDivElement>(null);
   const langRef = React.useRef<HTMLDivElement>(null);
   
-  React.useEffect(() => {
+React.useEffect(() => {
   const savedTheme = localStorage.getItem("theme");
 
-  if (savedTheme === "dark") {
-  document.documentElement.classList.remove("light");
-  setTheme("dark");
-} else {
-  document.documentElement.classList.add("light");
-  setTheme("light");
-}
+  if (savedTheme === "light") {
+    document.documentElement.classList.add("light");
+    setTheme("light");
+  } else {
+    document.documentElement.classList.remove("light");
+    setTheme("dark");
+  }
 }, []);
 
   React.useEffect(() => {
@@ -307,12 +307,12 @@ if (contactOpenLocal) {
   );
 }
 
-  return (
-  <div className="space-y-6">
+return (
+  <div className="flex flex-col gap-4">
 
    {/* LANGUAGE */}
-  <div className="flex items-center gap-4">
-  <span className="w-28 text-[10px] text-white uppercase font-black tracking-widest">
+<div className="flex flex-col gap-1">
+  <span className="text-[10px] uppercase font-bold tracking-wider">
     {t("settings.language")}
   </span>
 
@@ -320,7 +320,7 @@ if (contactOpenLocal) {
     <button
       type="button"
       onClick={() => setLangOpen((v) => !v)}
-      className="w-full h-[36px] bg-zinc-950 font-black border border-zinc-800 rounded-lg px-4 text-[10px] text-left text-white flex items-center justify-between hover:border-zinc-600 transition-colors"
+      className="w-full h-[35px] bg-zinc-950 font-black border border-zinc-800 rounded-lg px-4 text-[10px] text-left flex items-center justify-between hover:border-zinc-600 transition-colors"
     >
       <span>{LANGUAGE_LABELS[language]}</span>
       <ChevronDown className={`size-3 transition-transform ${langOpen ? "rotate-180" : ""}`} />
@@ -335,7 +335,7 @@ if (contactOpenLocal) {
               setLanguage(l as any);
               setLangOpen(false);
             }}
-            className="w-full h-[36px] px-4 text-left text-[10px] text-white flex items-center hover:bg-canvas"
+            className="w-full h-[25px] px-4 text-left text-[11px] flex items-center hover:bg-canvas"
           >
             {LANGUAGE_LABELS[l]}
           </button>
@@ -346,16 +346,46 @@ if (contactOpenLocal) {
 </div>
 
 {/* UNITS */}
-<div className="flex items-center gap-4 pt-5 border-t border-zinc-800/60">
-  <span className="w-28 text-[10px] text-white uppercase font-black tracking-widest">
+<div className="flex flex-col gap-2">
+  <span className="text-[10px] uppercase font-bold tracking-wider">
     {t("settings.units")}
   </span>
 
-  <div className="flex-1">
-    <div className="flex bg-zinc-950 p-1 rounded-lg border border-zinc-800">
+  <div>
+    <div
+      className="
+        relative grid grid-cols-2
+        h-[36px]
+        rounded-lg
+        bg-zinc-950 border border-zinc-800
+        overflow-hidden
+      "
+    >
+      {/* SLIDER */}
+      <div
+        className={`
+          absolute top-0 h-full w-1/2
+          rounded-md bg-canvas
+          transition-transform duration-200 ease-out
+          ${
+            units === "imperial"
+              ? "translate-x-full"
+              : "translate-x-0"
+          }
+        `}
+      />
+
       {[
-        { key: "metric", label: t("settings.unitsOptions.metric"), sub: "mm · g · kg" },
-        { key: "imperial", label: t("settings.unitsOptions.imperial"), sub: "in · oz · lb" },
+        {
+          key: "metric",
+          label: t("settings.unitsOptions.metric"),
+          sub: "mm · g · kg",
+        },
+        {
+          key: "imperial",
+          label: t("settings.unitsOptions.imperial"),
+          sub: "in · oz · lb",
+        },
       ].map((u) => {
         const isActive = units === u.key;
 
@@ -363,20 +393,40 @@ if (contactOpenLocal) {
           <button
             key={u.key}
             onClick={() => setUnits(u.key as any)}
-            className={`flex-1 h-[36px] rounded-md ${
-              isActive
-                ? "bg-canvas text-white"
-                : "text-white"
-            }`}
+            className="
+              relative z-10
+              flex flex-col items-center justify-center
+              h-full leading-tight
+            "
           >
-            <div className="flex flex-col items-center justify-center h-full leading-tight">
-              <span className="text-[10px] font-black tracking-wide">
-                {u.label}
-              </span>
-              <span className="mt-[3px] text-[8px] font-semibold tracking-wide">
-                {u.sub}
-              </span>
-            </div>
+            <span
+              className={`
+                text-[10px] font-black tracking-wide
+                transition-colors duration-200
+                ${
+                  isActive
+                    ? ""
+                    : "text-zinc-500"
+                }
+              `}
+            >
+              {u.label}
+            </span>
+
+            <span
+              className={`
+                mt-[2px]
+                text-[8px] font-semibold tracking-wide
+                transition-colors duration-200
+                ${
+                  isActive
+                    ? ""
+                    : "text-zinc-500"
+                }
+              `}
+            >
+              {u.sub}
+            </span>
           </button>
         );
       })}
@@ -385,50 +435,102 @@ if (contactOpenLocal) {
 </div>
 
 {/* THEME */}
-<div className="flex items-center gap-4 pt-5 border-t border-zinc-800/60">
-  <span className="w-28 text-[10px] text-white uppercase font-black tracking-widest">
+<div className="flex flex-col gap-2">
+  <span className="text-[10px] uppercase font-bold tracking-wider">
     {t("settings.theme")}
   </span>
 
-  <div className="flex-1">
-    <div className="flex bg-zinc-950 p-1 rounded-lg border border-zinc-800">
-      {[
-        { key: "dark", label: t("settings.themeOptions.dark") },
-        { key: "light", label: t("settings.themeOptions.light") },
-      ].map((t) => {
-        const isActive = theme === t.key;
+  <div
+    className="
+      relative grid grid-cols-2
+      h-[36px]
+      rounded-lg
+      bg-zinc-950 border border-zinc-800
+      overflow-hidden
+    "
+  >
+    {/* SLIDER */}
+    <div
+      className={`
+        absolute top-0 h-full w-1/2
+        rounded-md bg-canvas
+        transition-transform duration-200 ease-out
+        ${
+          theme === "light"
+            ? "translate-x-full"
+            : "translate-x-0"
+        }
+      `}
+    />
 
-        return (
-          <button
-            key={t.key}
-            onClick={() => handleThemeChange(t.key as any)}
-            className={`flex-1 h-[36px] rounded-md ${
-              isActive
-                ? "bg-canvas text-white"
-                : "text-white"
-            }`}
+    {[
+      {
+        key: "dark",
+        label: t("settings.themeOptions.dark"),
+        icon: Moon,
+      },
+      {
+        key: "light",
+        label: t("settings.themeOptions.light"),
+        icon: Sun,
+      },
+    ].map((item) => {
+      const isActive = theme === item.key;
+      const Icon = item.icon;
+
+      return (
+        <button
+          key={item.key}
+          type="button"
+          onClick={() =>
+            handleThemeChange(item.key as "dark" | "light")
+          }
+          className="
+            relative z-10
+            flex items-center justify-center gap-1.5
+            h-full
+            text-[10px] font-black
+          "
+        >
+          <Icon
+            size={15}
+            className={`
+              transition-colors duration-200
+              ${
+                isActive
+                  ? ""
+                  : "text-zinc-500"
+              }
+            `}
+          />
+
+          <span
+            className={`
+              transition-colors duration-200
+              ${
+                isActive
+                  ? ""
+                  : "text-zinc-500"
+              }
+            `}
           >
-            <div className="flex flex-col items-center justify-center h-full leading-tight">
-              <span className="text-[10px] font-black tracking-wide">
-                {t.label}
-              </span>
-            </div>
-          </button>
-        );
-      })}
-    </div>
+            {item.label}
+          </span>
+        </button>
+      );
+    })}
   </div>
 </div>
 
 {/* BACKGROUND */}
-<div className="flex items-start gap-4 pt-5 border-t border-zinc-800/60">
+<div className="flex flex-col gap-2">
 
-  <span className="w-28 text-[10px] text-white uppercase font-black tracking-widest">
+  <span className="text-[10px] uppercase font-bold tracking-wider">
     {t("settings.background")}
   </span>
 
-  <div className="flex-1">
-    <div className="grid grid-cols-2 gap-3">
+  <div>
+    <div className="grid grid-cols-3 gap-2">
 
       {(backgrounds ?? []).map((bg) => {
         const isActive = canvasBg === bg.id;
@@ -440,7 +542,7 @@ if (contactOpenLocal) {
             className={`
               relative
               w-full
-              h-[80px]
+              h-12
               rounded-lg
               overflow-hidden
               border
@@ -448,7 +550,7 @@ if (contactOpenLocal) {
               duration-200
               cursor-pointer
               ${isActive 
-                ? "border-blue-500" 
+                ? "border-white" 
                 : "border-[var(--zinc-600)] hover:border-[var(--zinc-400)]"
               }
             `}
@@ -476,8 +578,13 @@ if (contactOpenLocal) {
   </div>
 </div>
 
-{/* ================= CONTACT / SUPPORT ================= */}
-<div className="pt-6 border-t border-zinc-800/60 flex items-center justify-between">
+{/* ABOUT */}
+<div className="flex flex-col gap-2">
+  <span className="text-[10px] uppercase font-bold tracking-wider">
+    About us
+  </span>
+
+  <div className="flex items-center justify-between pt-2">
 
   {/* CONTACT (GAUCHE) */}
   <button
@@ -490,7 +597,7 @@ if (contactOpenLocal) {
   "
 >
   <span className="text-[12px]">✉️</span>
-  <span className="text-[10px] font-black uppercase text-white">
+  <span className="text-[10px] font-black uppercase">
     {t("footer.feedback")}
   </span>
 </button>
@@ -509,11 +616,12 @@ if (contactOpenLocal) {
   "
 >
   <span className="text-[12px]">❤️</span>
-  <span className="text-[10px] font-black uppercase text-white">
+  <span className="text-[10px] font-black uppercase">
     {t("footer.donate")}
   </span>
 </a>
 
+</div>
 </div>
 
   </div>

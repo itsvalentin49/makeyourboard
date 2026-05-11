@@ -25,6 +25,13 @@
 
   "pedal": {
     "features": "Especificaciones",
+    "actions": {
+      "title": "Acciones",
+      "rotate": "Girar",
+      "delete": "Eliminar",
+      "moveFront": "Mover delante",
+      "moveBack": "Mover detrás"
+      },
     "brand": "Marca",
     "model": "Modelo",
     "year": "Año",
@@ -38,6 +45,7 @@
     "type": {
       "label": "Tipo",
       "A/B Box": "A/B Box",
+      "Accessory": "Accesorio",
       "Acoustic": "Acústico",
       "Amp Simulator": "Simulador de amplificador",
       "Audio Interface": "Interfaz de audio",
@@ -117,12 +125,14 @@
       "12V DC": "12V DC",
       "9-12V DC": "9-12V DC",
       "9-15V DC": "9-15V DC",
+      "9-24V DC": "9-24V DC",
       "18V DC": "18V DC",
       "24V DC": "24V DC",
       "48V DC": "48V DC",
       "9-18V DC": "9-18V DC",
       "Passive": "Pasivo",
-      "Battery": "Batería"
+      "Battery": "Batería",
+      "N/A": "N/A"
     },
 
     "draw": "Consumo",
@@ -147,13 +157,15 @@
       "label": "Material",
       "Aluminium": "Aluminio",
       "ABS": "ABS",
+      "Plastic": "Plástico",
       "Plywood": "Madera contrachapada"
     },
 
     "profile": {
       "label": "Perfil",
       "Flat": "Plano",
-      "Angled": "Inclinado"
+      "Angled": "Inclinado",
+      "N/A": "N/A"
     },
 
     "dimensions": "Dimensiones",
@@ -327,7 +339,9 @@
       "full": "Tu fuente de alimentación está al límite.",
       "fullHint": "Añade otra unidad o cambia a un modelo con más salidas.",
       "upgrade": "Usa una fuente adecuada o conecta el pedal incompatible a un adaptador dedicado.",
-      "tuner": "Tu afinador puede alimentar varios pedales con un daisy chain 🤘"
+      "tuner": "Tu afinador puede alimentar varios pedales con un daisy chain 🤘",
+      "singleAdapter": "Puedes usar un adaptador de corriente de {voltage}V con un amperaje superior a {draw}mA.",
+      "battery9v": "También puedes usar una pila de 9V si el pedal permite funcionar con pila."
     }
   },
 
@@ -336,7 +350,66 @@
   },
 
   "pedalsMenu": {
-    "new": "NUEVO",
+    "title": "Pedales",
+    "searchPlaceholder": "Buscar...",
+    "count": "{count} pedales",
+    "results": "{count} resultados",
+    "latest": "Estas son las últimas pedales lanzadas.",
+    "new": "NEW",
     "newReleases": "Novedades"
-}
+  },
+
+  "boardsMenu": {
+    "title": "Pedaleras",
+    "searchPlaceholder": "Buscar...",
+    "count": "{count} pedaleras"
+  },
+
+  "powerMenu": {
+    "title": "Fuentes de alimentación",
+    "searchPlaceholder": "Buscar...",
+    "count": "{count} fuentes de alimentación"
+  },
+
+  "customMenu": {
+    "title": "Personalizados",
+    "subtitle": "Crea un pedal o una pedalera personalizados con tus propias dimensiones.",
+    "importTitle": "Importar imagen",
+    "importSubtitle": "Importa tu propio pedal desde tu ordenador.",
+    "chooseImage": "Elegir una imagen",
+    "brand": "Marca",
+    "model": "Modelo",
+    "voltage": "Voltaje (V)",
+    "current": "Corriente (mA)",
+    "add": "Añadir"
+  },
+
+  "canvasControls": {
+    "min": "MÍN",
+    "max": "MÁX",
+    "setup": "Setup",
+    "pedalboard": "Pedalboard",
+    "boards": "Boards",
+    "pedalboards": "Pedalboards",
+    "newBoard": "Nuevo board",
+    "jacks": "Jacks",
+    "power": "Power"
+  },
+
+  "help": {
+    "title": "Bienvenido a MakeYourBoard",
+    "open": "Abrir la guía de ayuda",
+    "close": "Cerrar la guía de ayuda",
+    "gearTitle": "Selecciona tu equipo",
+    "gearText": "Elige pedales, pedalboards y fuentes de alimentación desde el panel izquierdo.",
+    "layoutTitle": "Construye tu layout",
+    "layoutText": "Arrastra, suelta y organiza todo en el canvas.",
+    "jacksTitle": "Verifica el espacio para los jacks",
+    "jacksText": "Asegúrate de que tus pedales tengan suficiente espacio para cables y conectores.",
+    "powerTitle": "Verifica tu alimentación",
+    "powerText": "Añade una fuente de alimentación para verificar el consumo y la compatibilidad.",
+    "shareTitle": "Exporta o comparte",
+    "shareText": "Exporta tu pedalboard como imagen o compártelo con tus amigos.",
+    "ok": "OK"
+  }
 }

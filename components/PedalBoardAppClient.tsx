@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from "react";
 
 import Sidebar from "@/components/sidebar/Sidebar";
-import TopBarTabs from "@/components/TopBarTabs";
 import BoardCanvas from "@/components/BoardCanvas";
 import SettingsPanel from "@/components/SettingsPanel";
 import { useLibrary } from "@/hooks/useLibrary";
@@ -495,9 +494,12 @@ while (isOccupied && totalSteps < 200) {
 newX = center.x + xOffset;
 newY = center.y + yOffset;
 
-  const newPedal: BoardItem = {
+  const now = Date.now();
+
+const newPedal: BoardItem = {
     ...pedal,
-    instanceId: Date.now(),
+    instanceId: now,
+zIndex: now,
 x: newX,
 y: newY,
     rotation: 0,
@@ -520,13 +522,16 @@ y: newY,
   const center = getCenterRef.current?.() ?? { x: 0, y: 0 };
   const { x, y } = center;
 
-  const newBoard: BoardItem = {
-    ...board,
-    instanceId: Date.now(),
-    x,
-    y,
-    rotation: 0,
-  };
+const now = Date.now();
+
+const newBoard: BoardItem = {
+  ...board,
+  instanceId: now,
+  x,
+  y,
+  rotation: 0,
+  zIndex: -9999,
+};
 
   updateActiveProject({
     selectedBoards: [...activeProject.selectedBoards, newBoard],
@@ -538,21 +543,25 @@ y: newY,
   closeSearchMenus();
 };
 
-const addCustomItem = (item: AnyRow) => {
-  if (!customType) return;
+const addCustomItem = (item: AnyRow = {}) => {
+  const isUploadedImage = item?.slug === "custom-upload";
+  const itemType = isUploadedImage ? "pedal" : customType;
+
+  if (!itemType) return;
 
   const widthMm =
-    units === "metric"
+    item?.width ??
+    (units === "metric"
       ? Number(customWidth)
-      : Number(customWidth) * 25.4;
+      : Number(customWidth) * 25.4);
 
   const depthMm =
-    units === "metric"
+    item?.depth ??
+    (units === "metric"
       ? Number(customDepth)
-      : Number(customDepth) * 25.4;
+      : Number(customDepth) * 25.4);
 
-  // 🎛 PEDAL (30–300)
-  if (customType === "pedal") {
+  if (itemType === "pedal") {
     if (
       !widthMm ||
       !depthMm ||
@@ -565,8 +574,7 @@ const addCustomItem = (item: AnyRow) => {
     }
   }
 
-  // 🪵 BOARD (100–1000)
-  if (customType === "board") {
+  if (itemType === "board") {
     if (
       !widthMm ||
       !depthMm ||
@@ -579,43 +587,67 @@ const addCustomItem = (item: AnyRow) => {
     }
   }
 
-  // ✅ Centre réel du canvas
   const center = getCenterRef.current?.() ?? { x: 0, y: 0 };
-const { x, y } = center;
-
   const instanceId = Date.now();
 
   const newItem: BoardItem = {
     id: instanceId,
     instanceId,
-    slug: "custom",
-    type: "Custom",
-    circuit: "",
-    bypass: "",
-    power: "",
-    status: "Active",
-    origin: "",
-    year: "",
-    manual: "",
 
-    name: item?.name?.trim() || "",
-    brand: "Custom",
+    ...item,
+
+    slug: item?.slug || (isUploadedImage ? "custom-upload" : "custom"),
+    type: item?.type || (itemType === "pedal" ? "Custom" : "board"),
+    brand: item?.brand || "Custom",
+    name: item?.name?.trim() || customName.trim() || "Custom",
+
     width: widthMm,
     depth: depthMm,
-    color: customType === "pedal" ? (customColor || undefined) : "",
-    image:
-      customType === "pedal"
-        ? "/images/custom-pedal.png"
-        : "/images/custom-board.png",
 
-    x,
-    y,
+    image:
+      item?.image ||
+      item?.image_url ||
+      item?.photo ||
+      (itemType === "pedal"
+        ? "/images/custom-pedal.png"
+        : "/images/custom-board.png"),
+
+    image_url:
+      item?.image_url ||
+      item?.image ||
+      item?.photo ||
+      undefined,
+
+    photo:
+      item?.photo ||
+      item?.image ||
+      item?.image_url ||
+      undefined,
+
+    color:
+      itemType === "pedal"
+        ? item?.color || customColor || undefined
+        : "",
+
+    circuit: item?.circuit || "",
+    bypass: item?.bypass || "",
+    power: item?.power || "",
+    status: item?.status || "Active",
+    origin: item?.origin || "",
+    year: item?.year || "",
+    manual: item?.manual || "",
+
+    voltage: Number(item?.voltage) || 9,
+    draw: Number(item?.draw) || 0,
+    weight: Number(item?.weight) || 0,
+
+    x: center.x,
+    y: center.y,
     rotation: 0,
-    draw: 0,
-    weight: 0,
+    zIndex: instanceId,
   };
 
-  if (customType === "pedal") {
+  if (itemType === "pedal") {
     updateActiveProject({
       boardPedals: [...activeProject.boardPedals, newItem],
     });
@@ -636,12 +668,80 @@ const { x, y } = center;
     });
   };
 
+const movePedalFront = (id: number) => {
+  const allItems = [
+    ...activeProject.boardPedals,
+    ...(activeProject.selectedBoards || []),
+  ];
+
+  const maxZ = Math.max(
+    0,
+    ...allItems.map((item) => Number(item.zIndex) || 0)
+  );
+
+  updateActiveProject({
+    boardPedals: activeProject.boardPedals.map((p) =>
+      p.instanceId === id
+        ? { ...p, zIndex: maxZ + 1 }
+        : p
+    ),
+  });
+};
+
+const movePedalBack = (id: number) => {
+  const allItems = [
+    ...activeProject.boardPedals,
+    ...(activeProject.selectedBoards || []),
+  ];
+
+  const minZ = Math.min(
+    0,
+    ...allItems.map((item) => Number(item.zIndex) || 0)
+  );
+
+  updateActiveProject({
+    boardPedals: activeProject.boardPedals.map((p) =>
+      p.instanceId === id
+        ? { ...p, zIndex: minZ - 1 }
+        : p
+    ),
+  });
+};
+
   const deletePedal = (id: number) => {
     updateActiveProject({
       boardPedals: activeProject.boardPedals.filter((p) => p.instanceId !== id),
     });
     setSelectedInstanceId(null);
   };
+
+  const moveBoardFront = (id: number) => {
+  const maxZ = Math.max(
+    0,
+    ...activeProject.boardPedals.map((p) => Number(p.zIndex) || 0),
+    ...(activeProject.selectedBoards || []).map((b) => Number(b.zIndex) || 0)
+  );
+
+  updateActiveProject({
+    selectedBoards: (activeProject.selectedBoards || []).map((b) =>
+      b.instanceId === id ? { ...b, zIndex: maxZ + 1 } : b
+    ),
+  });
+};
+
+const moveBoardBack = (id: number) => {
+  const minZ = Math.min(
+    0,
+    ...activeProject.boardPedals.map((p) => Number(p.zIndex) || 0),
+    ...(activeProject.selectedBoards || []).map((b) => Number(b.zIndex) || 0)
+  );
+
+  updateActiveProject({
+    selectedBoards: (activeProject.selectedBoards || []).map((b) =>
+      b.instanceId === id ? { ...b, zIndex: minZ - 1 } : b
+    ),
+  });
+};
 
   const rotateBoard = (id: number) => {
   updateActiveProject({
@@ -709,6 +809,10 @@ setLastSelectedPower={setLastSelectedPower}
           selectBoard={selectBoard}
           addCustomItem={addCustomItem}
           rotatePedal={rotatePedal}
+          movePedalFront={movePedalFront}
+          movePedalBack={movePedalBack}
+          moveBoardFront={moveBoardFront}
+          moveBoardBack={moveBoardBack}
           deletePedal={deletePedal}
           rotateBoard={rotateBoard}
           deleteBoard={deleteBoard}
@@ -730,26 +834,27 @@ setLastSelectedPower={setLastSelectedPower}
   ref={desktopCanvasRef}
   className="flex-1 min-w-0 bg-[#323234] flex flex-col overflow-hidden"
 >
-  <TopBarTabs
-    projects={projects}
-    setProjects={setProjects}
-    activeProjectId={activeProjectId}
-    setActiveProjectId={setActiveProjectId}
-    editingProjectId={editingProjectId}
-    tempName={tempName}
-    setTempName={setTempName}
-    startEditing={startEditing}
-    saveName={saveName}
-    deleteProject={deleteProject}
-    createNewProject={createNewProject}
-    language={language}
-    settingsOpen={settingsOpen}
-    setSettingsOpen={setSettingsOpen}
-  />
+{/* <TopBarTabs
+  projects={projects}
+  setProjects={setProjects}
+  activeProjectId={activeProjectId}
+  setActiveProjectId={setActiveProjectId}
+  editingProjectId={editingProjectId}
+  tempName={tempName}
+  setTempName={setTempName}
+  startEditing={startEditing}
+  saveName={saveName}
+  deleteProject={deleteProject}
+  createNewProject={createNewProject}
+  language={language}
+  settingsOpen={settingsOpen}
+  setSettingsOpen={setSettingsOpen}
+/> */}
 
   <div className="flex-1 relative overflow-hidden">
+
     <BoardCanvas
-    key={activeProject.id}
+      key={activeProject.id}
       activeProject={activeProject}
       units={units}
       language={language}
@@ -775,6 +880,19 @@ setLastSelectedPower={setLastSelectedPower}
       deleteBoard={deleteBoard}
       onStageSizeChange={setCanvasSize}
       getCenterRef={getCenterRef}
+      projects={projects}
+      activeProjectId={activeProjectId}
+      setActiveProjectId={setActiveProjectId}
+      createNewProject={createNewProject}
+      deleteProject={deleteProject}
+      startEditing={startEditing}
+      editingProjectId={editingProjectId}
+      tempName={tempName}
+      setTempName={setTempName}
+      saveName={saveName}
+      setSettingsOpen={setSettingsOpen}
+      setLanguage={setLanguage}
+      setUnits={setUnits}
     />
   </div>
 </div>
@@ -835,6 +953,13 @@ setLastSelectedPower={setLastSelectedPower}
             isMobile
             mobileSidebarOpen={mobileSidebarOpen}
             getCenterRef={getCenterRef}
+            projects={projects}
+            activeProjectId={activeProjectId}
+            setActiveProjectId={setActiveProjectId}
+            createNewProject={createNewProject}
+            setSettingsOpen={setSettingsOpen}
+            setLanguage={setLanguage}
+            setUnits={setUnits}
           />
         </div>
 
@@ -946,6 +1071,7 @@ setLastSelectedPower={setLastSelectedPower}
                   setCustomDepth={setCustomDepth}
                   customColor={customColor}
                   setCustomColor={setCustomColor}
+                
                   addPedal={(p) => {
                     addPedal(p);
                     setMobileSidebarOpen(false);
@@ -959,6 +1085,10 @@ setLastSelectedPower={setLastSelectedPower}
                     setMobileSidebarOpen(false);
                   }}
                   rotatePedal={rotatePedal}
+                  movePedalFront={movePedalFront}
+                  movePedalBack={movePedalBack}
+                  moveBoardFront={moveBoardFront}
+                  moveBoardBack={moveBoardBack}
                   deletePedal={deletePedal}
                   rotateBoard={rotateBoard}
                   deleteBoard={deleteBoard}
@@ -1036,7 +1166,7 @@ setLastSelectedPower={setLastSelectedPower}
   selectedBoardDetails={selectedBoardDetails}
   lastSelectedPedal={lastSelectedPedal}
   lastSelectedBoard={lastSelectedBoard}
-  selectedInstanceId={null}
+  selectedInstanceId={selectedInstanceId}
   selectedBoardInstanceId={null}
   setSelectedInstanceId={() => {}}
   setSelectedBoardInstanceId={() => {}}
@@ -1057,11 +1187,15 @@ setLastSelectedPower={setLastSelectedPower}
   selectBoard={() => {}}
   addCustomItem={() => {}}
 
-  rotatePedal={() => {}}
-  deletePedal={() => {}}
+  rotatePedal={rotatePedal}
+  movePedalFront={movePedalFront}
+  movePedalBack={movePedalBack}
+  moveBoardFront={moveBoardFront}
+  moveBoardBack={moveBoardBack}
+  deletePedal={deletePedal}
 
-  rotateBoard={() => {}}
-  deleteBoard={() => {}}
+  rotateBoard={rotateBoard}
+  deleteBoard={deleteBoard}
 
   canvasBg={canvasBg}
   setCanvasBg={setCanvasBg}

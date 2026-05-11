@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
-import { ChevronDown } from "lucide-react";
+import React, { useMemo } from "react";
+import { Search, X } from "lucide-react";
 
 type AnyRow = Record<string, any>;
 
@@ -10,12 +10,12 @@ type Props = {
   powerSearch: string;
   setPowerSearch: (v: string) => void;
   showPowerResults: boolean;
-  powerDropdownRef: React.RefObject<HTMLDivElement | null>;
   setShowPowerResults: (v: boolean) => void;
   setShowPedalResults: (v: boolean) => void;
   setShowBoardResults: (v: boolean) => void;
   addPower: (p: AnyRow) => void;
   powerInputRef: React.RefObject<HTMLInputElement | null>;
+  powerDropdownRef: React.RefObject<HTMLDivElement | null>;
   t: (key: string) => string;
   groupItems: (items: AnyRow[], filter: string) => Record<string, AnyRow[]>;
 };
@@ -24,135 +24,163 @@ export default function SearchPower({
   powerLibrary,
   powerSearch,
   setPowerSearch,
-  showPowerResults,
   setShowPowerResults,
   setShowPedalResults,
   setShowBoardResults,
   addPower,
   powerInputRef,
-  powerDropdownRef,
   t,
-  groupItems,
 }: Props) {
+  const search = powerSearch.trim().toLowerCase();
 
-  const prevOpen = useRef(false);
+  const visiblePower = useMemo(() => {
+    const terms = search.split(" ").filter(Boolean);
 
-  useEffect(() => {
-    if (showPowerResults && !prevOpen.current) {
-      setPowerSearch("");
-      powerInputRef.current?.focus();
-    }
+    return powerLibrary
+      .filter((p) => {
+        if (!terms.length) return true;
 
-    prevOpen.current = showPowerResults;
-  }, [showPowerResults]);
+        const haystack = `${p.brand ?? ""} ${p.name ?? ""} ${p.type ?? ""}`.toLowerCase();
+        return terms.every((term) => haystack.includes(term));
+      })
+      .sort((a, b) => {
+        const brandA = String(a.brand || "").localeCompare(String(b.brand || ""));
+        if (brandA !== 0) return brandA;
+        return String(a.name || "").localeCompare(String(b.name || ""));
+      });
+  }, [powerLibrary, search]);
 
   return (
-    <div ref={powerDropdownRef} className="flex flex-col gap-2 mt-4">
+    <div className="flex flex-col gap-4 mt-1 h-full min-h-0">
+<div
+  className="
+    w-full
+    text-[11px] font-black uppercase
+    py-2 rounded-md
+    bg-blue-600 !text-white
+    text-center
+    cursor-default
+  "
+>
+  {t("powerMenu.title")}
+</div>
 
-      <div className="mt-3 flex items-center gap-3">
-        <span className="text-[12px] uppercase font-bold tracking-[0.18em] text-white">
-          {t("sidebar.addPowerTitle")}
-        </span>
+      <div className="relative flex items-center shrink-0">
+        <Search
+          size={18}
+          strokeWidth={2.5}
+          className="absolute left-4 text-[#6f6a5d]"
+        />
+
+        <input
+          ref={powerInputRef}
+          type="text"
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="off"
+          spellCheck={false}
+          placeholder={t("powerMenu.searchPlaceholder")}
+          className="
+            w-full h-[30px]
+            bg-white text-zinc-950 placeholder:!text-zinc-500
+            rounded-md
+            pl-12 pr-11
+            text-[12px] font-bold
+            outline-none
+          "
+          value={powerSearch}
+          onClick={(e) => {
+            e.stopPropagation();
+            setShowPedalResults(false);
+            setShowBoardResults(false);
+            setShowPowerResults(true);
+          }}
+          onChange={(e) => {
+            setPowerSearch(e.target.value);
+            setShowPowerResults(true);
+          }}
+        />
+
+        {powerSearch && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setPowerSearch("");
+              powerInputRef.current?.focus();
+            }}
+            className="
+              absolute right-4
+              flex items-center justify-center
+              text-[#6f6a5d]
+              hover:opacity-70
+              transition-opacity
+            "
+          >
+            <X size={15} strokeWidth={3} />
+          </button>
+        )}
       </div>
 
-      <div className="relative" style={{ zIndex: showPowerResults ? 60 : 10 }}>
+      <div className="px-1 text-[11px] font-black uppercase tracking-wide text-zinc-300 shrink-0">
+        {t("powerMenu.count").replace("{count}", String(visiblePower.length))}
+      </div>
 
-        <div className="relative flex items-center">
+      <div className="flex flex-col gap-2.5 overflow-y-auto no-scrollbar pb-28 min-h-0">
+        {visiblePower.length > 0 ? (
+          visiblePower.map((p) => {
+            const img = p.image || p.image_url || p.photo;
 
-          <input
-            ref={powerInputRef}
-            type="text"
-            autoComplete="off"
-            autoCorrect="off"
-            autoCapitalize="off"
-            spellCheck={false}
-            placeholder={showPowerResults ? "" : `${t("sidebar.searchPower")}...`}
-            className={`w-full bg-zinc-950 border rounded-lg py-2 pl-4 pr-10 text-[11px] text-white placeholder:text-zinc-500 outline-none transition-all ${
-              showPowerResults
-                ? "border-zinc-500"
-                : "border-zinc-700"
-            }`}
-            value={powerSearch}
-            onClick={(e) => {
-              e.stopPropagation();
-              setShowPedalResults(false);
-              setShowBoardResults(false);
-              setShowPowerResults(true);
-            }}
-            onChange={(e) => {
-              setPowerSearch(e.target.value);
-              setShowPowerResults(true);
-            }}
-          />
-
-          <ChevronDown
-            onClick={(e) => {
-              e.stopPropagation();
-              setShowPedalResults(false);
-              setShowBoardResults(false);
-              setShowPowerResults(!showPowerResults);
-            }}
-            className={`absolute right-3 size-4 cursor-pointer transition-transform ${
-              showPowerResults
-                ? "rotate-180 text-zinc-400"
-                : "text-zinc-500"
-            }`}
-          />
-
-        </div>
-
-        {showPowerResults && (
-          <div className="absolute top-10 left-0 right-0 bg-zinc-900 border border-zinc-700 rounded-xl shadow-2xl z-50 max-h-80 overflow-y-auto custom-scrollbar">
-
-            {Object.keys(groupItems(powerLibrary, powerSearch)).length > 0 ? (
-
-              Object.keys(groupItems(powerLibrary, powerSearch)).map((brand) => (
-
-                <div key={brand} className="flex flex-col">
-
-                  <div className="px-4 h-10 flex items-center bg-zinc-950">
-                    <span className="text-[11px] font-bold text-zinc-100 uppercase tracking-widest">
-                      {brand}
-                    </span>
-                  </div>
-
-                  {groupItems(powerLibrary, powerSearch)[brand].map((p) => (
-
-                    <button
-                      key={p.id}
-onClick={() => {
-  setPowerSearch("");
-  addPower(p); // ✅ AJOUT DIRECT
-  setShowPowerResults(false);
-}}
-                      className="w-full px-4 py-1 text-left hover:bg-zinc-700 text-zinc-300 text-[12px] transition-colors"
-                    >
-                      <span className="font-semibold mr-2 text-zinc-400">
-                        {brand}
-                      </span>
-
-                      {p.name}
-                    </button>
-
-                  ))}
-
+            return (
+              <button
+                key={p.id}
+                type="button"
+                onClick={() => {
+                  setPowerSearch("");
+                  addPower(p);
+                  setShowPowerResults(false);
+                }}
+                className="
+                  w-full min-h-[50px]
+                  rounded-xl
+                  bg-zinc-950 hover:bg-canvas
+                  px-3 py-1.5
+                  flex items-center gap-3
+                  text-left
+                  transition-colors
+                  shrink-0
+                "
+              >
+                <div className="w-[50px] h-[34px] shrink-0 flex items-center justify-center">
+                  {img ? (
+                    <img
+                      src={img}
+                      alt={`${p.brand || ""} ${p.name || ""}`}
+                      className="max-w-full max-h-full object-contain"
+                    />
+                  ) : (
+                    <div className="w-12 h-6 rounded-md bg-zinc-700" />
+                  )}
                 </div>
 
-              ))
+                <div className="min-w-0 flex-1">
+                  <div className="text-[12px] font-black leading-tight">
+                    {p.name}
+                  </div>
 
-            ) : (
-
-              <div className="p-4 text-center text-[10px] text-zinc-500 uppercase font-semibold tracking-widest">
-                {t("search.noResults")}
-              </div>
-
-            )}
-
+                  <div className="text-[10px] font-bold text-zinc-300 leading-tight mt-0.5">
+                    {p.brand}
+                  </div>
+                </div>
+              </button>
+            );
+          })
+        ) : (
+          <div className="rounded-xl border border-zinc-800 px-4 py-6 text-center text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+            {t("search.noResults")}
           </div>
         )}
-
       </div>
-
     </div>
   );
 }

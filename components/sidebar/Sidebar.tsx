@@ -9,6 +9,10 @@ import {
   RotateCw,
   ShoppingCart,
   Trash2,
+  SlidersHorizontal,
+  LayoutPanelLeft,
+  Zap,
+  Boxes,
 } from "lucide-react";
 
 import SidebarLogo from "@/components/sidebar/SidebarLogo";
@@ -77,9 +81,13 @@ type Props = {
   selectBoard: (b: AnyRow) => void;
   addCustomItem: (item: AnyRow) => void;
   rotatePedal: (id: number) => void;
+  movePedalFront: (id: number) => void;
+  movePedalBack: (id: number) => void;
   deletePedal: (id: number) => void;
   rotateBoard: (id: number) => void;
   deleteBoard: (id: number) => void;
+  moveBoardFront: (id: number) => void;
+  moveBoardBack: (id: number) => void;
 
   // Settings
   canvasBg: string;
@@ -129,7 +137,11 @@ export default function Sidebar({
   rotatePedal,
   deletePedal,
   rotateBoard,
+  movePedalFront,
+  movePedalBack,
   deleteBoard,
+  moveBoardFront,
+  moveBoardBack,
   canvasBg,
   setCanvasBg,
   language,
@@ -177,6 +189,9 @@ export default function Sidebar({
   const maxValue =
   units === "metric" ? maxMm : mmToIn(maxMm);
 
+  const [activeSidebarTab, setActiveSidebarTab] =
+  React.useState<"pedals" | "boards" | "power" | "custom">("pedals");
+
   // Convert UI values to mm for validation
   const widthMm =
     units === "metric"
@@ -203,7 +218,9 @@ export default function Sidebar({
   const unitLabel = units === "metric" ? "mm" : "in";
   const withUnit = (label: string) =>
     `${label} (${unitLabel})`;
-  const isCustomPedal = selectedPedal?.brand === "Custom";
+  const isCustomPedal =
+  selectedPedal?.brand === "Custom" ||
+  selectedPedal?.slug === "custom-upload";
   const isCustomBoard = selectedBoardDetails?.brand === "Custom";
   const [country, setCountry] = React.useState<string>("FR");
   const USA_COUNTRIES = ["US"];
@@ -433,10 +450,10 @@ const addPower = (p: any) => {
 
     <div
   className="
-  relative z-40 w-full lg:w-72 shrink-0
+  relative z-40 w-full lg:w-76 shrink-0
   bg-zinc-900
-  px-6 py-4 flex flex-col gap-4 lg:gap-6
-  overflow-y-auto no-scrollbar touch-pan-y
+  px-6 py-6 flex flex-col gap-4 lg:gap-6
+  overflow-hidden touch-pan-y
   h-full
 "
   style={{ WebkitOverflowScrolling: "touch" }}
@@ -620,178 +637,194 @@ const addPower = (p: any) => {
   selectedPedal.type === "power" || selectedPedal.capacity
 ) ? (
 
-  <PowerSpecs
-    selectedPower={selectedPedal}
-    units={units}
-    language={language}
-    t={t}
-    isUSA={isUSA}
-    isEurope={isEurope}
-    buildThomannUrl={buildThomannUrl}
-  />
+<PowerSpecs
+  selectedPower={selectedPedal}
+  units={units}
+  language={language}
+  t={t}
+  isUSA={isUSA}
+  isEurope={isEurope}
+  buildThomannUrl={buildThomannUrl}
+  selectedInstanceId={selectedInstanceId}
+  rotatePedal={rotatePedal}
+  movePedalFront={movePedalFront}
+  movePedalBack={movePedalBack}
+  deletePedal={deletePedal}
+/>
 
 ) : selectedPedal ? (
 
-  <PedalSpecs
-    selectedPedal={selectedPedal}
-    units={units}
-    language={language}
-    t={t}
-    isCustomPedal={isCustomPedal}
-    isUSA={isUSA}
-    isEurope={isEurope}
-    buildThomannUrl={buildThomannUrl}
-  />
+<PedalSpecs
+  selectedPedal={selectedPedal}
+  selectedInstanceId={selectedInstanceId}
+  units={units}
+  language={language}
+  t={t}
+  isCustomPedal={isCustomPedal}
+  isUSA={isUSA}
+  isEurope={isEurope}
+  buildThomannUrl={buildThomannUrl}
+  rotatePedal={rotatePedal}
+  movePedalFront={movePedalFront}
+  movePedalBack={movePedalBack}
+  deletePedal={deletePedal}
+/>
 
 ) : selectedBoardDetails ? (
 
-  <BoardSpecs
-    selectedBoardDetails={selectedBoardDetails}
-    units={units}
-    language={language}
-    t={t}
-    isCustomBoard={isCustomBoard}
-    buildThomannUrl={buildThomannUrl}
-    getStoresForCountry={getStoresForCountry}
-    hasBoardCommercialLinks={hasBoardCommercialLinks}
-  />
+<BoardSpecs
+  selectedBoardDetails={selectedBoardDetails}
+  units={units}
+  language={language}
+  t={t}
+  isCustomBoard={isCustomBoard}
+  buildThomannUrl={buildThomannUrl}
+  getStoresForCountry={getStoresForCountry}
+  hasBoardCommercialLinks={hasBoardCommercialLinks}
+  selectedBoardInstanceId={selectedBoardInstanceId}
+  rotateBoard={rotateBoard}
+  moveBoardFront={moveBoardFront}
+  moveBoardBack={moveBoardBack}
+  deleteBoard={deleteBoard}
+  isUSA={isUSA}
+  isEurope={isEurope}
+/>
 
 ) : (
 
-  // LIBRARY (default view)
-  <div className="px-1">
+// LIBRARY (default view)
+<div className="px-1 flex flex-col gap-6 flex-1 overflow-hidden pb-24">
 
-{/* ================= PEDALS ================= */}
-<SearchPedals
-  pedalsLibrary={pedalsLibrary}
-  pedalSearch={pedalSearch}
-  setPedalSearch={setPedalSearch}
-  showPedalResults={showPedalResults}
-  setShowPedalResults={setShowPedalResults}
-  setShowBoardResults={setShowBoardResults}
-  addPedal={(p) => {
-    setLastSelectedPedal(p); // ✅ Enregistre spécifiquement la pédale
-    addPedal(p);
-  }}
-  pedalInputRef={pedalInputRef}
-  t={t}
-  groupItems={groupItems}
-/>
+{activeSidebarTab === "pedals" && (
+  <SearchPedals
+    pedalsLibrary={pedalsLibrary}
+    pedalSearch={pedalSearch}
+    setPedalSearch={setPedalSearch}
+    showPedalResults={showPedalResults}
+    setShowPedalResults={setShowPedalResults}
+    setShowBoardResults={setShowBoardResults}
+    addPedal={(p) => {
+      setLastSelectedPedal(p);
+      addPedal(p);
+    }}
+    pedalInputRef={pedalInputRef}
+    t={t}
+    groupItems={groupItems}
+  />
+)}
 
-<button
-  onClick={() => {
-    if (!lastSelectedPedal) return;
-    addPedal(lastSelectedPedal); // ✅ Utilise la mémoire des pédales
-  }}
-  className="
-    w-full mt-2
-    text-[10px] font-black uppercase
-    py-2 rounded-md
-    bg-blue-500 !text-white
-    hover:bg-blue-600 hover:brightness-110
-    active:scale-[0.98]
-    transition-all duration-150
-    cursor-pointer
-  "
->
-  {t("sidebar.addPedalButton")}
-</button>
+{activeSidebarTab === "boards" && (
+  <SearchBoards
+    boardsLibrary={boardsLibrary}
+    boardSearch={boardSearch}
+    setBoardSearch={setBoardSearch}
+    showBoardResults={showBoardResults}
+    setShowBoardResults={setShowBoardResults}
+    setShowPedalResults={setShowPedalResults}
+    selectBoard={selectBoard}
+    boardInputRef={boardInputRef}
+    t={t}
+    groupItems={groupItems}
+  />
+)}
 
-{/* ================= BOARDS ================= */}
-<SearchBoards
-  boardsLibrary={boardsLibrary}
-  boardSearch={boardSearch}
-  setBoardSearch={setBoardSearch}
-  showBoardResults={showBoardResults}
-  setShowBoardResults={setShowBoardResults}
-  setShowPedalResults={setShowPedalResults}
-  selectBoard={selectBoard}
-  boardInputRef={boardInputRef}
-  t={t}
-  groupItems={groupItems}
-/>
+{activeSidebarTab === "power" && (
+  <SearchPower
+    powerLibrary={powerLibrary}
+    powerSearch={powerSearch}
+    setPowerSearch={setPowerSearch}
+    showPowerResults={showPowerResults}
+    setShowPowerResults={setShowPowerResults}
+    setShowPedalResults={setShowPedalResults}
+    setShowBoardResults={setShowBoardResults}
+    addPower={(p) => {
+      addPower(p);
+    }}
+    powerInputRef={powerInputRef}
+    powerDropdownRef={powerDropdownRef}
+    t={t}
+    groupItems={groupItems}
+  />
+)}
 
-<button
-  onClick={() => {
-    if (!lastSelectedBoard) return;
-    selectBoard(lastSelectedBoard);
-  }}
-  className="
-    w-full mt-2
-    text-[10px] font-black uppercase
-    py-2 rounded-md
-    bg-blue-500 !text-white
-    hover:bg-blue-600 hover:brightness-110
-    active:scale-[0.98]
-    transition-all duration-150
-    cursor-pointer
-  "
->
-  {t("sidebar.addBoardButton")}
-</button>
+{activeSidebarTab === "custom" && (
+  <CustomBuilder
+    customType={customType}
+    setCustomType={setCustomType}
+    customName={customName}
+    setCustomName={setCustomName}
+    customColor={customColor}
+    setCustomColor={setCustomColor}
+    customWidth={customWidth}
+    setCustomWidth={setCustomWidth}
+    customDepth={customDepth}
+    setCustomDepth={setCustomDepth}
+    addCustomItem={addCustomItem}
+    isPedalValid={isPedalValid}
+    isBoardValid={isBoardValid}
+    minValue={minValue}
+    maxValue={maxValue}
+    displayMin={displayMin}
+    displayMax={displayMax}
+    units={units}
+    unitLabel={unitLabel}
+    withUnit={withUnit}
+    t={t}
+  />
+)}
 
-{/* ================= POWER SUPPLIES ================= */}
-<SearchPower
-  powerLibrary={powerLibrary}
-  powerSearch={powerSearch}
-  setPowerSearch={setPowerSearch}
-  showPowerResults={showPowerResults}
-  setShowPowerResults={setShowPowerResults}
-  setShowPedalResults={setShowPedalResults}
-  setShowBoardResults={setShowBoardResults}
-  addPower={(p) => {
-    addPower(p); // ✅ Appelle la fonction addPower qui gère setLastSelectedPower
-  }}
-  powerInputRef={powerInputRef}
-  powerDropdownRef={powerDropdownRef}
-  t={t}
-  groupItems={groupItems}
-/>
+<div className="absolute bottom-4 left-6 right-6 z-50">
+  <div className="grid grid-cols-4 gap-2">
+    {[
+      {
+        key: "pedals",
+        label: "Pedals",
+        icon: SlidersHorizontal,
+      },
+      {
+        key: "boards",
+        label: "Boards",
+        icon: LayoutPanelLeft,
+      },
+      {
+        key: "power",
+        label: "Power",
+        icon: Zap,
+      },
+      {
+        key: "custom",
+        label: "Custom",
+        icon: Boxes,
+      },
+    ].map((tab) => {
+      const Icon = tab.icon;
+      const active = activeSidebarTab === tab.key;
 
-<button
-  onClick={() => {
-    if (!lastSelectedPower) return;
-    addPower(lastSelectedPower); // ✅ Utilise la mémoire des alimentations
-  }}
-  className="
-    w-full mt-2
-    text-[10px] font-black uppercase
-    py-2 rounded-md
-    bg-blue-500 !text-white
-    hover:bg-blue-600 hover:brightness-110
-    active:scale-[0.98]
-    transition-all duration-150
-    cursor-pointer
-  "
->
-  {t("sidebar.addPowerSupplyButton")}
-</button>
-
-
-<CustomBuilder
-  customType={customType}
-  setCustomType={setCustomType}
-  customName={customName}
-  setCustomName={setCustomName}
-  customColor={customColor}
-  setCustomColor={setCustomColor}
-  customWidth={customWidth}
-  setCustomWidth={setCustomWidth}
-  customDepth={customDepth}
-  setCustomDepth={setCustomDepth}
-  addCustomItem={addCustomItem}
-  isPedalValid={isPedalValid}
-  isBoardValid={isBoardValid}
-  minValue={minValue}
-  maxValue={maxValue}
-  displayMin={displayMin}
-  displayMax={displayMax}
-  units={units}
-  unitLabel={unitLabel}
-  withUnit={withUnit}
-  t={t}
-/>
-
+      return (
+        <button
+          key={tab.key}
+          type="button"
+          onClick={() => {
+            setActiveSidebarTab(tab.key as any);
+            setShowPedalResults(false);
+            setShowBoardResults(false);
+            setShowPowerResults(false);
+          }}
+          className={`h-[72px] rounded-2xl flex flex-col items-center justify-center gap-2 transition-all ${
+            active
+              ? "bg-zinc-950"
+              : "bg-transparent hover:bg-canvas"
+          }`}
+        >
+          <Icon size={24} strokeWidth={1.8} />
+          <span className="text-[11px] font-black">
+            {tab.label}
+          </span>
+        </button>
+      );
+    })}
+  </div>
+</div>
 
 
         </div>

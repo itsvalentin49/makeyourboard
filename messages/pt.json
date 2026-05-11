@@ -25,6 +25,13 @@
 
   "pedal": {
     "features": "Especificações",
+    "actions": {
+      "title": "Ações",
+      "rotate": "Rodar",
+      "delete": "Eliminar",
+      "moveFront": "Mover para frente",
+      "moveBack": "Mover para trás"
+    },
     "brand": "Marca",
     "model": "Modelo",
     "year": "Ano",
@@ -38,6 +45,7 @@
     "type": {
       "label": "Tipo",
       "A/B Box": "A/B Box",
+      "Accessory": "Acessório",
       "Acoustic": "Acústico",
       "Amp Simulator": "Simulador de amplificador",
       "Audio Interface": "Interface de áudio",
@@ -117,12 +125,14 @@
       "12V DC": "12V DC",
       "9-12V DC": "9-12V DC",
       "9-15V DC": "9-15V DC",
+      "9-24V DC": "9-24V DC",
       "18V DC": "18V DC",
       "24V DC": "24V DC",
       "48V DC": "48V DC",
       "9-18V DC": "9-18V DC",
       "Passive": "Passivo",
-      "Battery": "Bateria"
+      "Battery": "Bateria",
+      "N/A": "N/A"
     },
 
     "draw": "Consumo",
@@ -147,13 +157,15 @@
       "label": "Material",
       "Aluminium": "Alumínio",
       "ABS": "ABS",
+      "Plastic": "Plástico",
       "Plywood": "Contraplacado"
     },
 
     "profile": {
       "label": "Perfil",
       "Flat": "Plano",
-      "Angled": "Inclinado"
+      "Angled": "Inclinado",
+      "N/A": "N/A"
     },
 
     "dimensions": "Dimensões",
@@ -327,7 +339,9 @@
       "full": "A sua fonte de alimentação está no limite.",
       "fullHint": "Adicione outra unidade ou atualize para um modelo com mais saídas.",
       "upgrade": "Use uma fonte adequada ou ligue o pedal incompatível a um adaptador dedicado.",
-      "tuner": "O seu afinador pode alimentar vários pedais com um daisy chain 🤘"
+      "tuner": "O seu afinador pode alimentar vários pedais com um daisy chain 🤘",
+      "singleAdapter": "Pode utilizar um adaptador de corrente de {voltage}V com uma amperagem superior a {draw}mA.",
+      "battery9v": "Também pode utilizar uma bateria de 9V se o pedal suportar funcionamento a bateria."
     }
   },
 
@@ -336,7 +350,66 @@
   },
 
   "pedalsMenu": {
-    "new": "NOVO",
+    "title": "Pedais",
+    "searchPlaceholder": "Pesquisar...",
+    "count": "{count} pedais",
+    "results": "{count} resultados",
+    "latest": "Aqui estão os pedais lançados mais recentemente.",
+    "new": "NEW",
     "newReleases": "Novidades"
-}
+  },
+
+  "boardsMenu": {
+    "title": "Pedalboards",
+    "searchPlaceholder": "Pesquisar...",
+    "count": "{count} pedalboards"
+  },
+
+  "powerMenu": {
+    "title": "Fontes de alimentação",
+    "searchPlaceholder": "Pesquisar...",
+    "count": "{count} fontes de alimentação"
+  },
+
+  "customMenu": {
+    "title": "Itens personalizados",
+    "subtitle": "Crie um pedal ou pedalboard personalizado com as suas próprias dimensões.",
+    "importTitle": "Importar imagem",
+    "importSubtitle": "Importe o seu próprio pedal a partir do computador.",
+    "chooseImage": "Escolher uma imagem",
+    "brand": "Marca",
+    "model": "Modelo",
+    "voltage": "Voltagem (V)",
+    "current": "Corrente (mA)",
+    "add": "Adicionar"
+  },
+
+  "canvasControls": {
+    "min": "MÍN",
+    "max": "MÁX",
+    "setup": "Setup",
+    "pedalboard": "Pedalboard",
+    "boards": "Boards",
+    "pedalboards": "Pedalboards",
+    "newBoard": "Novo board",
+    "jacks": "Jacks",
+    "power": "Power"
+  },
+
+  "help": {
+    "title": "Bem-vindo ao MakeYourBoard",
+    "open": "Abrir guia de ajuda",
+    "close": "Fechar guia de ajuda",
+    "gearTitle": "Escolha o seu equipamento",
+    "gearText": "Escolha pedais, pedalboards e fontes de alimentação no painel esquerdo.",
+    "layoutTitle": "Monte o seu layout",
+    "layoutText": "Arraste, solte e organize tudo no canvas.",
+    "jacksTitle": "Verifique o espaço para os jacks",
+    "jacksText": "Certifique-se de que os seus pedais têm espaço suficiente para cabos e conectores.",
+    "powerTitle": "Verifique a alimentação",
+    "powerText": "Adicione uma fonte de alimentação para verificar consumo e compatibilidade.",
+    "shareTitle": "Exporte ou compartilhe",
+    "shareText": "Exporte o seu pedalboard como imagem ou compartilhe com amigos.",
+    "ok": "OK"
+  }
 }

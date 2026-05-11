@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { getTranslator } from "@/utils/i18n";
 import { supabase } from "@/lib/supabase";
+import { Upload } from "lucide-react";
 
 type AnyRow = Record<string, any>;
 
@@ -11,7 +12,12 @@ type Props = {
   selectedBoards?: AnyRow[];
   displaySizes: Record<number, { w: number; h: number }>;
   boardName?: string;
-  onClose: () => void; // ✅ NEW
+  onClose: () => void;
+
+  currentBackground?: {
+    type: "css" | "image";
+    src?: string;
+  };
 };
 
 export default function ShareBoard({
@@ -19,8 +25,10 @@ export default function ShareBoard({
   selectedBoards = [],
   displaySizes,
   boardName,
-  onClose, // ✅ NEW
+  onClose,
+  currentBackground,
 }: Props) {
+
   const language =
     typeof window !== "undefined"
       ? JSON.parse(localStorage.getItem("myb_settings") || "{}")?.language || "en"
@@ -31,8 +39,39 @@ export default function ShareBoard({
   const [copied, setCopied] = useState(false);
   const [generatedUrl, setGeneratedUrl] = useState<string | null>(null);
   const previewRef = useRef<HTMLCanvasElement | null>(null);
+  const getRenderItems = (): AnyRow[] => [
+  // POWER SUPPLIES
+  ...boardPedals
+    .filter((p) => p.type === "power")
+    .map((item) => ({
+      ...item,
+      kind: "pedal",
+    })),
+
+  // BOARDS
+  ...selectedBoards.map((item) => ({
+    ...item,
+    kind: "board",
+  })),
+
+  // PEDALS
+  ...boardPedals
+    .filter((p) => p.type !== "power")
+    .sort(
+      (a, b) =>
+        (Number(a.zIndex) || 0) -
+        (Number(b.zIndex) || 0)
+    )
+    .map((item) => ({
+      ...item,
+      kind: "pedal",
+    })),
+];
   const [manualCopyUrl, setManualCopyUrl] = useState<string | null>(null);
   const [name, setName] = useState(boardName || "pedalboard");
+  const [background, setBackground] = useState<
+  "transparent" | "white" | "current"
+>("transparent");
   const createShareLink = async (): Promise<string | null> => {
   const { data } = await supabase
     .from("shared_boards")
@@ -127,10 +166,7 @@ const footswitchImg = await loadImage("/images/footswitch.png");
       let maxX = -Infinity;
       let maxY = -Infinity;
 
-const allItems = [
-  ...(boardPedals || []),
-  ...(selectedBoards || [])
-];
+const allItems = getRenderItems();
 
 allItems.forEach((p: any) => {
   const size = displaySizes[p.instanceId];
@@ -173,16 +209,30 @@ ctx.scale(SCALE, SCALE);
 ctx.clearRect(0, 0, width, height);
 
 ctx.imageSmoothingEnabled = true;
+if (background === "white") {
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, width, height);
+}
 
-      const loadedImages: Record<number, HTMLImageElement> = {};
+if (background === "current" && currentBackground) {
+  if (currentBackground.type === "css") {
+    ctx.fillStyle = getComputedStyle(document.documentElement)
+      .getPropertyValue("--zinc-600");
+    ctx.fillRect(0, 0, width, height);
+  }
+
+  if (currentBackground.type === "image" && currentBackground.src) {
+    const bgImg = await loadImage(currentBackground.src);
+    ctx.drawImage(bgImg, 0, 0, width, height);
+  }
+}
+
+const loadedImages: Record<number, HTMLImageElement> = {};
 
 const getImageSrc = (p: any) =>
   p.image || p.image_url || p.photo || null;
 
-const itemsToRender = [
-  ...(selectedBoards || []),
-  ...(boardPedals || [])
-];
+const itemsToRender = getRenderItems();
 
 // LOAD IMAGES
 for (const p of itemsToRender) {
@@ -193,30 +243,46 @@ for (const p of itemsToRender) {
 }
 
 // DRAW
-for (const p of itemsToRender) {
-  const img = loadedImages[p.instanceId];
+for (const item of itemsToRender) {
+  const img = loadedImages[item.instanceId];
 
-  const size = displaySizes[Number(p.instanceId)];
+  const size = displaySizes[Number(item.instanceId)];
   if (!size) continue;
 
-const w = size.w;
-const h = size.h;
+  const w = size.w;
+  const h = size.h;
 
-  const drawX = p.x - minX;
-  const drawY = p.y - minY;
+  const drawX = item.x - minX;
+  const drawY = item.y - minY;
 
-  const rotation = ((p.rotation || 0) * Math.PI) / 180;
+  const rotation =
+    ((item.rotation || 0) * Math.PI) / 180;
 
   ctx.save();
   ctx.translate(drawX, drawY);
   ctx.rotate(rotation);
+  // BOARD
+if (item.kind === "board") {
+  if (img) {
+    ctx.drawImage(
+      img,
+      -w / 2,
+      -h / 2,
+      w,
+      h
+    );
+  }
+
+  ctx.restore();
+  continue;
+}
 
   ctx.shadowColor = "rgba(0,0,0,0.2)";
   ctx.shadowBlur = 8;
   ctx.shadowOffsetY = 3;
 
   // ================= CUSTOM PEDAL =================
-  if (p.slug === "custom") {
+  if (item.slug === "custom") {
     const radius = 12;
 
     // 🔥 BODY uniquement (clip isolé)
@@ -236,7 +302,7 @@ const h = size.h;
     ctx.clip();
 
     // couleur
-    ctx.fillStyle = p.color || "#888";
+    ctx.fillStyle = item.color || "#888";
     ctx.fillRect(-w / 2, -h / 2, w, h);
 
     // texture
@@ -250,13 +316,13 @@ const h = size.h;
 
     // ================= KNOBS =================
     const knobSize =
-      p.width < 50 ? 30 :
-      p.width <= 100 ? 32 :
+      item.width < 50 ? 30 :
+      item.width <= 100 ? 32 :
       40;
 
     const knobCount =
-      p.width < 50 ? 1 :
-      p.width <= 100 ? 2 :
+      item.width < 50 ? 1 :
+      item.width <= 100 ? 2 :
       3;
 
     const spacing = w / (knobCount + 1);
@@ -288,13 +354,13 @@ const h = size.h;
     );
 
     // ================= TEXT =================
-    if (p.name) {
+    if (item.name) {
       ctx.fillStyle = "#000";
       ctx.font = "bold 10px Arial";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
 
-      ctx.fillText(p.name.toUpperCase(), 0, 0);
+      ctx.fillText(item.name.toUpperCase(), 0, 0);
     }
   }
 
@@ -312,11 +378,9 @@ const h = size.h;
     }
   };
 
-  
-
-  useEffect(() => {
-    renderPreview();
-  }, [boardPedals, displaySizes]);
+useEffect(() => {
+  renderPreview();
+}, [background, boardPedals, selectedBoards, displaySizes, currentBackground]);
 
 
   // 📋 COPY LINK
@@ -394,28 +458,64 @@ const h = size.h;
     className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 w-64 shadow-2xl flex flex-col gap-4"
   >
 
-    {/* TITLE */}
-    <div className="text-xs font-bold uppercase tracking-wider text-white">
-      {t("share.title")}
-    </div>
+<div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider">
+  <Upload size={14} className="text-purple-500" />
+  {t("share.title")}
+</div>
 
     {/* NAME (EDITABLE) */}
     <div className="flex flex-col gap-1">
-      <label className="text-[10px] uppercase tracking-wider text-white font-bold">
+      <label className="text-[10px] uppercase tracking-wider font-bold">
         {t("export.name")}
       </label>
 
-<input
-  value={name}
-  onChange={(e) => setName(e.target.value)}
-  className="h-9 px-3 rounded-md bg-zinc-800 border border-zinc-700 text-[12px] font-mono text-white focus:outline-none focus:border-blue-500"
-/>
+      <input
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        className="h-9 px-3 rounded-md bg-zinc-800 border border-zinc-700 text-[12px] font-mono focus:outline-none focus:border-blue-500"
+      />
     </div>
+
+    {/* BACKGROUND */}
+<div className="flex flex-col gap-2">
+  <label className="text-[10px] uppercase tracking-wider font-bold">
+    {t("export.background")}
+  </label>
+
+  <div className="flex flex-col gap-1 text-xs">
+    <label className="flex items-center gap-2 cursor-pointer">
+      <input
+        type="radio"
+        checked={background === "transparent"}
+        onChange={() => setBackground("transparent")}
+      />
+      {t("export.transparent")}
+    </label>
+
+    <label className="flex items-center gap-2 cursor-pointer">
+      <input
+        type="radio"
+        checked={background === "white"}
+        onChange={() => setBackground("white")}
+      />
+      {t("export.white")}
+    </label>
+
+    <label className="flex items-center gap-2 cursor-pointer">
+      <input
+        type="radio"
+        checked={background === "current"}
+        onChange={() => setBackground("current")}
+      />
+      Canvas (PNG)
+    </label>
+  </div>
+</div>
 
     {/* SHARE VIA */}
     <div className="flex flex-col gap-2">
 
-      <label className="text-[10px] uppercase tracking-wider text-white font-bold">
+      <label className="text-[10px] uppercase tracking-wider font-bold">
         {t("share.social")}
       </label>
 
@@ -513,7 +613,7 @@ const h = size.h;
 
     {/* PREVIEW */}
     <div className="flex flex-col gap-2">
-      <label className="text-[10px] uppercase tracking-wider text-white font-bold">
+      <label className="text-[10px] uppercase tracking-wider font-bold">
         {t("share.preview")}
       </label>
 
@@ -527,7 +627,7 @@ const h = size.h;
       {/* COPY */}
       <button
         onClick={copyLink}
-        className="w-full bg-blue-500 !text-white text-[11px] uppercase font-mono font-bold rounded-lg py-2 flex items-center justify-center transition-all duration-150 hover:bg-blue-600 hover:scale-[1.02] active:scale-95 transform-gpu"
+        className="w-full bg-blue-600 !text-white text-[11px] uppercase font-mono font-bold rounded-lg py-2 flex items-center justify-center transition-all duration-150 hover:bg-blue-600 hover:scale-[1.02] active:scale-95 transform-gpu"
       >
         <span>
           {copied ? t("share.copied") : t("share.copy")}

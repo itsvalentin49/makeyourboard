@@ -2,7 +2,7 @@
 
 import React, { useRef, useLayoutEffect, useEffect, useState } from "react";
 import { Stage, Layer, Group, Rect, Text, Image as KonvaImage } from "react-konva";
-import { Zap, Weight, Minus, Cable, Plus, Check, Upload, AlertTriangle, RotateCw, Trash2, X, Download, Info, List } from "lucide-react";
+import { Zap, Weight, Minus, Cable, Plus, Check, Upload, AlertTriangle, RotateCw, Trash2, X, Download, Info, List, LayoutPanelLeft, Settings } from "lucide-react";
 import PedalImage from "@/components/PedalImage";
 import { formatWeight } from "@/utils/units";
 import { getTranslator } from "@/utils/i18n";
@@ -10,6 +10,11 @@ import useImage from "use-image";
 import ExportPNG from "@/components/ExportPNG";
 import ShareBoard from "@/components/ShareBoard";
 import Image from "next/image";
+import type { Project } from "@/types/project";
+import SettingsPanel from "@/components/SettingsPanel";
+import PowerSetup from "@/components/PowerSetup";
+import { HelpGuide } from "@/components/HelpGuide";
+
 
 type AnyRow = Record<string, any>;
 
@@ -32,8 +37,16 @@ type Props = {
     stageY?: number;
   };
 
+  projects?: Project[];
+  activeProjectId?: number | null;
+  setActiveProjectId?: (id: number | null) => void;
+  createNewProject?: () => void;
+
   setMobileSidebarOpen: (v: boolean) => void;
   setSpecsOpen: (v: boolean) => void;
+  setSettingsOpen?: (v: boolean) => void;
+  setLanguage?: (v: "en" | "fr" | "es" | "de" | "it" | "pt") => void;
+  setUnits?: (v: "metric" | "imperial") => void;
 
   units: "metric" | "imperial";
   language: "en" | "fr" | "es" | "de" | "it" | "pt";
@@ -57,6 +70,13 @@ type Props = {
   updateActiveProject: (updates: Partial<Props["activeProject"]>) => void;
   closeSearchMenus: () => void;
   setContactOpen: (v: boolean) => void;
+
+  deleteProject?: (id: number, e: React.MouseEvent<HTMLElement>) => void;
+  startEditing?: (project: Project, e: React.MouseEvent<HTMLElement>) => void;
+  editingProjectId?: number | null;
+  tempName?: string;
+  setTempName?: (v: string) => void;
+  saveName?: () => void;
 
   BACKGROUNDS: Background[];
   canvasBg: string;
@@ -198,6 +218,7 @@ export default function BoardCanvas({
   setContactOpen,
   BACKGROUNDS = [],
   canvasBg,
+  setCanvasBg,
   showIntro,
   isMobile = false,
   mobileSidebarOpen = false,
@@ -212,9 +233,23 @@ export default function BoardCanvas({
   setMobileSidebarOpen,
   setSpecsOpen,
   viewer = false,
+  projects = [],
+  activeProjectId,
+  setActiveProjectId,
+  createNewProject,
+  deleteProject,
+  startEditing,
+  editingProjectId,
+  tempName = "",
+  setTempName,
+  saveName,
+  setSettingsOpen,
+  setLanguage,
+  setUnits,
 }: Props) {
 
   const t = getTranslator(language);
+  const [showSettings, setShowSettings] = useState(false);
   const [knob] = useImage("/images/knob.png");
   const [footswitch] = useImage("/images/footswitch.png");
   const currentZoom = activeProject.zoom || 100;
@@ -434,6 +469,19 @@ const digitalCount = digitalPedals.length;
 
 // règles
 const isSinglePedal = pedalCount === 1;
+const singlePedal = isSinglePedal ? pedals[0] : null;
+
+const singlePedalVoltage = singlePedal
+  ? Number(singlePedal.voltage) || 9
+  : 9;
+
+const singlePedalDraw = singlePedal
+  ? Number(singlePedal.draw) || 0
+  : 0;
+
+const singlePedalCanUseBattery =
+  singlePedal &&
+  String(singlePedal.power || "").toLowerCase().includes("battery");
 const isAnalogOnlySmall = pedalCount >= 2 && pedalCount <= 4 && digitalCount === 0;
 const isMixedWithMultipleDigital = pedalCount >= 2 && pedalCount <= 4 && digitalCount >= 2;
 const isLargeBoard = pedalCount >= 5;
@@ -557,11 +605,14 @@ const handleStageClick = (e: any) => {
     setShowExport(false);
     setShowShare(false);
     setShowList(false);
-
+    setShowBoardsMenu(false);
+    setShowSettings(false);
   }
 };
 
   const containerRef = useRef<HTMLDivElement>(null);
+  const boardsMenuRef = useRef<HTMLDivElement>(null);
+  const boardsButtonRef = useRef<HTMLButtonElement>(null);
   const stageRef = useRef<any>(null);
   const rafRef = useRef<number | null>(null);
   const wheelTimeout = useRef<any>(null);
@@ -640,6 +691,25 @@ useEffect(() => {
   const [showExport, setShowExport] = useState(false);
   const [showShare, setShowShare] = useState(false);
   const [showJacksMargin, setShowJacksMargin] = useState(false);
+  const [showBoardsMenu, setShowBoardsMenu] = useState(false);
+  useEffect(() => {
+  if (!showBoardsMenu) return;
+
+  const handleClickOutsideBoards = (e: MouseEvent) => {
+    const target = e.target as Node;
+
+    if (boardsMenuRef.current?.contains(target)) return;
+    if (boardsButtonRef.current?.contains(target)) return;
+
+    setShowBoardsMenu(false);
+  };
+
+  document.addEventListener("mousedown", handleClickOutsideBoards);
+
+  return () => {
+    document.removeEventListener("mousedown", handleClickOutsideBoards);
+  };
+}, [showBoardsMenu]);
   const [collisionReady, setCollisionReady] = useState(false);
   const [showList, setShowList] = useState(false);
   const [showOutputs, setShowOutputs] = useState(false);
@@ -912,7 +982,7 @@ const getVisibleBounds = () => {
     id: number,
     rotation: number,
     pos: { x: number; y: number }
-  ) => {
+    ) => {
     const size = displaySizes[id];
     if (!size) return pos;
 
@@ -930,6 +1000,79 @@ const getVisibleBounds = () => {
       y: Math.max(h / 2, Math.min(stageH - h / 2, pos.y)),
     };
   };
+
+  const pointInRotatedRect = (
+  point: { x: number; y: number },
+  item: AnyRow,
+  size: { w: number; h: number }
+  ) => {
+    
+  const angle = -((item.rotation || 0) * Math.PI) / 180;
+
+  const dx = point.x - item.x;
+  const dy = point.y - item.y;
+
+  const localX = dx * Math.cos(angle) - dy * Math.sin(angle);
+  const localY = dx * Math.sin(angle) + dy * Math.cos(angle);
+
+  return (
+    localX >= -size.w / 2 &&
+    localX <= size.w / 2 &&
+    localY >= -size.h / 2 &&
+    localY <= size.h / 2
+  );
+};
+
+const selectPedalBehindBoard = () => {
+  const stage = stageRef.current;
+  if (!stage) return false;
+
+  const pointer = stage.getPointerPosition();
+  if (!pointer) return false;
+
+  const transform = stage.getAbsoluteTransform().copy();
+  transform.invert();
+
+  const point = transform.point(pointer);
+
+  const pedalsFromTop = [...activeProject.boardPedals].sort((a, b) => {
+    return (Number(b.zIndex) || 0) - (Number(a.zIndex) || 0);
+  });
+
+  const found = pedalsFromTop.find((p) => {
+    const size = displaySizes[p.instanceId];
+    if (!size) return false;
+
+    return pointInRotatedRect(point, p, size);
+  });
+
+  if (!found) return false;
+
+  setSelectedInstanceId(found.instanceId);
+  setSelectedBoardInstanceId(null);
+
+  return true;
+};
+
+const canvasItems: AnyRow[] = [
+  ...(activeProject.selectedBoards || []).map((item: AnyRow) => ({
+    ...item,
+    kind: "board",
+  })),
+  ...(activeProject.boardPedals || []).map((item: AnyRow) => ({
+    ...item,
+    kind: "pedal",
+  })),
+].sort((a: AnyRow, b: AnyRow) => {
+  return (Number(a.zIndex) || 0) - (Number(b.zIndex) || 0);
+});
+
+const shouldShowHelpGuide =
+  !viewer &&
+  !isMobile &&
+  activeProject.boardPedals.length === 0 &&
+  (activeProject.selectedBoards || []).length <= 1 &&
+  projects.length === 1;
 
   return (
   <div
@@ -952,53 +1095,26 @@ const getVisibleBounds = () => {
           }
 }
 >
-
-{/* --- ZOOM (HAUT DROITE) ---
-{!viewer && !(isMobile && mobileSidebarOpen) && (
-  <div className="absolute top-6 right-6 z-50">
-    <div className="relative flex items-center justify-center h-9 w-24 md:h-10 md:w-28 bg-zinc-900 backdrop-blur-md border border-zinc-800 rounded-2xl shadow-2xl">
-      <button 
-        onClick={zoomOut} 
-        disabled={isMinZoom} 
-        className="absolute left-2 flex items-center justify-center w-6 h-6 text-white hover:text-blue-400 disabled:text-zinc-600 transition-colors"
-      >
-        {isMinZoom ? <span className="text-[9px] tracking-wider text-zinc-500 font-bold">MIN</span> : <Minus size={14} />}
-      </button>
-      
-      <span className="text-[12px] font-black font-mono tabular-nums text-white">
-        {zoomPercent}%
-      </span>
-      
-      <button 
-        onClick={zoomIn} 
-        disabled={isMaxZoom} 
-        className="absolute right-2 flex items-center justify-center w-6 h-6 text-white hover:text-blue-400 disabled:text-zinc-600 transition-colors"
-      >
-        {isMaxZoom ? <span className="text-[9px] tracking-wider text-zinc-500 font-bold">MAX</span> : <Plus size={14} />}
-      </button>
-    </div>
-  </div>
-)}
-*/}
+{shouldShowHelpGuide && <HelpGuide t={t} />}
 
 {/* --- MODE VIEWER (CENTER BOTTOM) --- */}
 {viewer && (
   <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4 z-50">
     {/* ZOOM */}
     <div className="relative flex items-center justify-center h-9 w-24 md:h-10 md:w-28 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl">
-      <button onClick={zoomOut} disabled={isMinZoom} className="absolute left-2 flex items-center justify-center w-6 h-6 text-white hover:text-blue-400 disabled:text-zinc-600">
-        {isMinZoom ? <span className="text-[9px] tracking-wider text-zinc-500">MIN</span> : <Minus size={14} />}
+      <button onClick={zoomOut} disabled={isMinZoom} className="absolute left-2 flex items-center justify-center w-6 h-6 hover:text-blue-400 disabled:text-zinc-600">
+        {isMinZoom ? <span className="text-[9px] tracking-wider text-zinc-500">{t("canvasControls.min")}</span> : <Minus size={14} />}
       </button>
-      <span className="text-[12px] font-black font-mono tabular-nums text-white">{zoomPercent}%</span>
-      <button onClick={zoomIn} disabled={isMaxZoom} className="absolute right-2 flex items-center justify-center w-6 h-6 text-white hover:text-blue-400 disabled:text-zinc-600">
-        {isMaxZoom ? <span className="text-[9px] tracking-wider text-zinc-500">MAX</span> : <Plus size={14} />}
+      <span className="text-[12px] font-black font-mono tabular-nums">{zoomPercent}%</span>
+      <button onClick={zoomIn} disabled={isMaxZoom} className="absolute right-2 flex items-center justify-center w-6 h-6 hover:text-blue-400 disabled:text-zinc-600">
+        {isMaxZoom ? <span className="text-[9px] tracking-wider text-zinc-500">{t("canvasControls.max")}</span> : <Plus size={14} />}
       </button>
     </div>
 
     {/* TOTAL DRAW (mA) */}
     <div className="relative flex items-center justify-center h-9 w-24 md:h-10 md:w-28 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl">
       <Zap className="absolute left-3 size-4 text-yellow-500" />
-      <span className="text-[12px] font-black font-mono tabular-nums text-white">
+      <span className="text-[12px] font-black font-mono tabular-nums">
       </span>
       <span className="absolute right-2 text-[9px] text-zinc-500 font-bold">mA</span>
     </div>
@@ -1006,29 +1122,30 @@ const getVisibleBounds = () => {
     {/* TOTAL WEIGHT */}
     <div className="relative flex items-center justify-center h-9 w-24 md:h-10 md:w-28 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl">
       <Weight className="absolute left-3 size-4 text-red-400" />
-      <span className="text-[12px] font-black font-mono tabular-nums text-white">{weightValue}</span>
+      <span className="text-[12px] font-black font-mono tabular-nums">{weightValue}</span>
       <span className="absolute right-3 text-[10px] text-zinc-500">{weightUnit}</span>
     </div>
 
     {/* LIST SETUP */}
     <div className="relative">
       <button onClick={() => {
-  setShowList(v => !v);
-
-  setShowPower(false);
-  setShowExport(false);
-  setShowShare(false);
-}} className="relative flex items-center justify-center gap-2 h-9 w-24 md:h-10 md:w-28 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl text-[11px] font-mono font-bold text-white uppercase transition-all hover:border-blue-500">
-        <List size={16} className="text-blue-400" /> SETUP
+      setShowList(v => !v);
+      setShowBoardsMenu(false);
+      setShowPower(false);
+      setShowExport(false);
+      setShowShare(false);
+      setShowSettings(false);
+}} className="relative flex items-center justify-center gap-2 h-9 w-24 md:h-10 md:w-28 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl text-[11px] font-mono font-bold uppercase transition-all hover:border-blue-500">
+        <List size={16} className="text-blue-400" /> {t("canvasControls.setup")}
       </button>
       {showList && (
         <>
           <div className="fixed inset-0 z-40 pointer-events-none" />
           <div className="absolute bottom-12 left-0 z-50">
             <div className="w-72 max-h-80 overflow-y-auto bg-zinc-900 border border-zinc-800 rounded-xl shadow-2xl p-4 space-y-3" onClick={(e) => e.stopPropagation()}>
-              <div className="text-xs uppercase tracking-wider text-white font-bold">PEDALBOARD</div>
+              <div className="text-xs uppercase tracking-wider font-bold">{t("canvasControls.pedalboard")}</div>
               {[...activeProject.boardPedals].sort((a, b) => (a.brand || "").localeCompare(b.brand || "")).map((p, i) => (
-                <div key={i} className="text-sm text-white "><span className="text-zinc-400">- {p.brand || "Custom"}</span> {p.name || "Unnamed"}</div>
+                <div key={i} className="text-sm "><span className="text-zinc-400">- {p.brand || "Custom"}</span> {p.name || "Unnamed"}</div>
               ))}
             </div>
           </div>
@@ -1042,23 +1159,200 @@ const getVisibleBounds = () => {
 {!viewer && !(isMobile && mobileSidebarOpen) && (
   <>
     {/* GAUCHE : INDICATEURS */}
-    <div className="absolute bottom-6 left-6 flex items-center gap-4 z-50">
-      
-     {/* BOUTON JACKS */}
+<div className="absolute bottom-6 left-6 flex items-center gap-4 z-50">
+
+{/* BOUTON BOARDS */}
+<div className="relative">
+<button
+   ref={boardsButtonRef}
+    onClick={() => {
+    setShowBoardsMenu((v) => !v);
+    setShowPower(false);
+    setShowExport(false);
+    setShowShare(false);
+    setShowList(false);
+    setShowSettings(false);
+  }}
+  className="
+    relative flex items-center justify-center gap-2
+    h-9 md:h-10 w-24 md:w-28
+    bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl
+    text-[11px] font-mono font-bold uppercase
+    transition-all duration-200
+    hover:scale-105 hover:border-blue-500 active:scale-95
+    cursor-pointer
+  "
+>
+  <LayoutPanelLeft
+    size={16}
+    className="text-blue-600"
+  />
+
+  {t("canvasControls.boards")}
+</button>
+
+{showBoardsMenu && (
+  <>
+
+    <div ref={boardsMenuRef} className="absolute bottom-12 left-0 z-50">
+      <div
+        className="
+          w-64 bg-zinc-900 border border-zinc-800 rounded-xl shadow-2xl
+          p-3 flex flex-col gap-2
+        "
+        onClick={(e) => e.stopPropagation()}
+      >
+<div className="flex items-center gap-2 text-xs uppercase tracking-wider font-bold px-2 pb-3">
+  <LayoutPanelLeft size={14} className="text-blue-600" />
+  {t("canvasControls.pedalboards")}
+</div>
+
+        {projects.map((project, index) => {
+          const active = project.id === activeProjectId;
+
+          return (
+  <div
+    key={project.id}
+    className={`
+      group flex items-center gap-2 rounded-lg transition-colors
+      ${
+        active
+          ? "bg-blue-600 !text-white"
+          : "text-zinc-300 hover:bg-canvas"
+      }
+    `}
+  >
+    {editingProjectId === project.id ? (
+      <input
+        autoFocus
+        value={tempName}
+        onChange={(e) => setTempName?.(e.target.value)}
+        onClick={(e) => e.stopPropagation()}
+        onBlur={() => saveName?.()}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") saveName?.();
+          if (e.key === "Escape") saveName?.();
+        }}
+        className="flex-1 bg-transparent outline-none px-3 py-2 text-[11px] font-bold uppercase tracking-wide"
+      />
+    ) : (
+      <button
+        type="button"
+        onClick={() => {
+          setActiveProjectId?.(project.id);
+          setShowBoardsMenu(false);
+        }}
+        onDoubleClick={(e) => {
+          e.stopPropagation();
+          startEditing?.(project, e);
+        }}
+        className="flex-1 text-left px-3 py-2 text-[11px] font-bold uppercase tracking-wide"
+      >
+        {project.name || `Board ${index + 1}`}
+      </button>
+    )}
+
+    <div className="flex items-center pr-2">
+
+  {/* EDIT */}
+  <button
+    type="button"
+    onClick={(e) => {
+      e.stopPropagation();
+      startEditing?.(project, e);
+    }}
+    className="px-1.5 py-2 opacity-60 hover:opacity-100 transition-opacity group/edit"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="13"
+      height="13"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+className="
+  transition-transform duration-150
+  group-hover/edit:scale-110
+"
+    >
+      <path d="M12 20h9" />
+      <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
+    </svg>
+  </button>
+
+{/* DELETE */}
+<button
+  type="button"
+  onClick={(e) => {
+    e.stopPropagation();
+
+    const confirmed = window.confirm(
+      t("tabs.confirmDelete")
+    );
+
+    if (confirmed) {
+      deleteProject?.(project.id, e);
+    }
+  }}
+  className="px-1.5 py-2 opacity-60 hover:opacity-100 transition-opacity group/delete"
+>
+  <X
+    size={14}
+className="
+  transition-transform duration-150
+  group-hover/delete:scale-110
+"
+  />
+</button>
+</div>
+
+
+  </div>
+);
+        })}
+
+        {projects.length < 5 && (
+          <button
+            type="button"
+            onClick={() => {
+              createNewProject?.();
+              setShowBoardsMenu(false);
+            }}
+            className="
+              mt-1 w-full px-3 py-2 rounded-lg text-[10px] font-black uppercase
+              bg-zinc-800 hover:bg-canvas transition-colors
+              flex items-center justify-center gap-2
+            "
+          >
+            <Plus size={14} />
+            {t("canvasControls.newBoard")}
+          </button>
+        )}
+      </div>
+    </div>
+  </>
+)}
+</div>
+
+{/* BOUTON JACKS */}
 <button 
   onClick={() => {
   setShowJacksMargin(v => !v);
-
+  setShowBoardsMenu(false);
   setShowPower(false);
   setShowExport(false);
   setShowShare(false);
   setShowList(false);
+  setShowSettings(false);
 }}
   className="
     relative flex items-center justify-center gap-2
     h-9 md:h-10 w-24 md:w-28
     bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl
-    text-[11px] font-mono font-bold text-white uppercase
+    text-[11px] font-mono font-bold uppercase
     transition-all duration-200
     hover:scale-105 hover:border-blue-500 active:scale-95
     cursor-pointer
@@ -1072,7 +1366,7 @@ const getVisibleBounds = () => {
     `}
   />
 
-  JACKS
+  {t("canvasControls.jacks")}
 </button>
 
       {/* TOTAL DRAW (mA)*/}
@@ -1099,8 +1393,7 @@ const getVisibleBounds = () => {
   <button
     onClick={() => {
   setShowPower(v => !v);
-
- 
+  setShowBoardsMenu(false);
   setShowExport(false);
   setShowShare(false);
   setShowList(false);
@@ -1110,7 +1403,7 @@ const getVisibleBounds = () => {
       flex items-center justify-center gap-2
       h-9 md:h-10 w-24 md:w-28
       bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl
-      text-[11px] font-mono font-bold text-white uppercase
+      text-[11px] font-mono font-bold uppercase
       transition-all duration-200
       hover:scale-105 hover:border-blue-500 active:scale-95
       cursor-pointer
@@ -1119,309 +1412,46 @@ const getVisibleBounds = () => {
     `}
   >
     <Zap size={16} className="text-yellow-500" />
-    POWER
+    {t("canvasControls.power")}
   </button>
+
+
+
 
 {showPower && (
   <>
-<div className="fixed inset-0 z-40 pointer-events-none" />
+    <div className="fixed inset-0 z-40 pointer-events-none" />
 
     <div className="absolute bottom-12 left-0 z-50">
-      <div className="w-[420px] max-w-[90vw] bg-zinc-900 border border-zinc-800 rounded-xl shadow-2xl p-4">
-
-        {/* HEADER */}
-        <div className="flex items-center justify-between mb-5">
-
-          <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-white font-bold">
-            <Zap size={14} className="text-yellow-500" />
-            {t("powerSetup.title")}
-          </div>
-
-
-        </div>
-
-{/* POWER SUPPLY */}
-{powerUnits.length > 0 && (
-  <div className="mb-5">
-
-    <div className="space-y-6">
-      {powerUnits.map((p, index) => {
-        const outputs = extractOutputs(p.details);
-
-        return (
-          <div key={index} className="space-y-4">
-
-            {/* IMAGE FULL WIDTH */}
-            <div className="w-full flex justify-center">
-              <div className="w-full flex justify-center">
-  <div className="w-full flex justify-center">
-  <div className="overflow-hidden rounded-md">
-    <img
-      src={p.image || p.image_url || p.photo}
-      alt={p.name}
-      className="w-full max-w-[200px] object-contain"
-    />
-  </div>
-</div>
-</div>
-            </div>
-
-            {/* INFOS */}
-            <div className="text-center">
-
-              {/* NAME */}
-              <div className="text-[14px] text-white font-semibold leading-tight mb-3">
-                {p.brand} {p.name}
-              </div>
-
-              {/* OUTPUTS = MULTI COLUMNS */}
-              <div
-                className={`
-                  grid gap-6 justify-center
-                  ${outputs.length === 1 ? "grid-cols-1" : ""}
-                  ${outputs.length === 2 ? "grid-cols-2" : ""}
-                  ${outputs.length >= 3 ? "grid-cols-3" : ""}
-                `}
-              >
-                {outputs.map((o, i) => {
-
-const pairs = o.voltages.map((v, idx) => ({
-  voltage: v,
-  current: o.currents[idx] ?? o.currents[0],
-}));
-
-                  return (
-                    <div key={i} className="space-y-2 text-center">
-
-                      {/* LABEL */}
-                      <div className="text-[10px] text-zinc-500 uppercase tracking-wide">
-                        {o.count}{" "}
-{o.isSwitch
-  ? t(o.count > 1
-      ? "powerSetup.outputs.switchable_plural"
-      : "powerSetup.outputs.switchable")
-  : t(o.count > 1
-      ? "powerSetup.outputs.fixed_plural"
-      : "powerSetup.outputs.fixed")}
-                      </div>
-
-                      {/* VALUES */}
-                      <div className="space-y-[2px]">
-                        {pairs.map((pair, j) => (
-                          <div
-                            key={j}
-                            className="flex items-center justify-center gap-2 text-[11px] leading-none"
-                          >
-                            <span className="text-white font-semibold w-[28px] text-right">
-                              {pair.voltage}V
-                            </span>
-
-                            <span className="text-zinc-500">→</span>
-
-                            <span className="text-zinc-400 w-[70px] text-left">
-                              {pair.current}mA
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-
-                    </div>
-                  );
-                })}
-              </div>
-
-            </div>
-
-          </div>
-        );
-      })}
-    </div>
-
-  </div>
-)}
-        {/* PEDALS */}
-        <div className="mb-2.5 mt-6 text-[12px] uppercase tracking-wider text-white font-bold">
-  {t("powerSetup.sections.pedals")}
-</div>
-        <div className="mb-5">
-
-          <div className="space-y-2">
-            {pedalAssignments.map((a, i) => (
-              <div
-                key={i}
-                className="grid grid-cols-[auto_1fr_auto] items-end text-[11px] leading-none"
-              >
-                <div className="flex items-center gap-1 whitespace-nowrap">
-                  <span className="text-zinc-500 font-bold">
-                    {a.pedal.brand || "Custom"}
-                  </span>
-                  <span className="text-white">
-                    {a.pedal.name}
-                  </span>
-                </div>
-
-                <div className="mx-2 border-b border-dotted border-zinc-600 mb-[2px]" />
-
-                <div className="text-[11px] whitespace-nowrap text-right">
-                  <span
-  className={
-    !hasPower
-      ? "text-white"
-      : a.ok
-      ? "text-green-600"
-      : "text-red-500"
-  }
->
-                    {Number(a.pedal.voltage) || 9}V / {Number(a.pedal.draw) || 0}mA
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* STATUS */}
-<div className="flex items-center justify-between -mt-4">
-
-  {/* LEFT → MESSAGE */}
-  <div className={`text-[12px] ${powerMessageColor}`}>
-    {powerMessage}
-  </div>
-</div>
-
-{/* RECOMMENDATION */}
-<div className="mb-2 mt-6 text-[12px] uppercase tracking-wider text-white font-bold">
-  {t("powerSetup.sections.recommendation")}
-</div>
-
-<div className="space-y-3 text-[12px]">
-
-  {/* 🚀 AUCUNE PEDALE */}
-  {!hasPedals && (
-    <>
-      <div className="text-blue-400">
-        {t("powerSetup.empty.title")}
-      </div>
-      <div className="text-white -mt-3">
-        {t("powerSetup.empty.subtitle")}
-      </div>
-    </>
-  )}
-
-  {/* 🔥 LOGIQUE NORMALE */}
-  {hasPedals && (
-    <>
-      {/* 🔵 PAS D'ALIM */}
-{!hasPower && (
-  <>
-    {/* ❌ 1 pédale → rien */}
-    {!isSinglePedal && (
-
-      <>
-        {/* 🟢 2–4 analog → daisy OK */}
-        {isAnalogOnlySmall && (
-          <div className="text-green-600">
-            {t("powerSetup.recommendation.daisySimple")}
-          </div>
-        )}
-
-        {isMixedWithSingleDigital && (
-  <div className="text-green-600">
-    {t("powerSetup.recommendation.daisy")}
-  </div>
-)}
-
-        {/* 🟡 2–4 avec ≥2 digital */}
-        {isMixedWithMultipleDigital && (
-          <div className="text-yellow-400">
-            {t("powerSetup.recommendation.isolated")}
-          </div>
-        )}
-
-        {/* 🔴 5+ pédales */}
-        {isLargeBoard && (
-          <div className="text-yellow-400">
-            {t("powerSetup.recommendation.isolated")}
-          </div>
-        )}
-
-      </>
-    )}
-
-    {/* bonus tuner */}
-    {hasDaisyChainTuner && !isSinglePedal && (
-      <div className="text-zinc-400 -mt-2">
-        {t("powerSetup.recommendation.tuner")}
-      </div>
-    )}
-  </>
-)}
-
-      {/* 🔴 PRIORITÉ : PEDAL NON COMPATIBLE */}
-      {hasPower && hasFailingPedal && (
-        <div className="text-yellow-500">
-          {t("powerSetup.recommendation.upgrade")}
-        </div>
-      )}
-
-      {/* ✅ SI TOUT EST OK */}
-      {!hasFailingPedal && (
-        <>
-          {extraPedals === 0 && (
-            <div className="text-green-600">
-              {t("powerSetup.recommendation.perfect")}
-            </div>
-          )}
-
-          {shouldShowNotEnough && (
-            <div>
-              <div className="text-red-500">
-                {t("powerSetup.recommendation.full")}
-              </div>
-              <div className="text-zinc-400">
-                {t("powerSetup.recommendation.fullHint")}
-              </div>
-            </div>
-          )}
-
-          {shouldShowDaisy && (
-            <div>
-              <div className="text-yellow-500">
-                {t("powerSetup.recommendation.daisy")}
-              </div>
-              <div className="text-zinc-400">
-                {t("powerSetup.recommendation.daisyHint")}
-              </div>
-            </div>
-          )}
-
-          {extraPedals > 0 && hasDaisyChainTuner && (
-            <div className="text-zinc-400 -mt-3">
-              {t("powerSetup.recommendation.tuner")}
-            </div>
-          )}
-        </>
-      )}
-    </>
-  )}
-
-</div>
-      </div>
+      <PowerSetup
+        t={t}
+        powerUnits={powerUnits}
+        pedalAssignments={pedalAssignments}
+        hasPower={hasPower}
+        hasPedals={hasPedals}
+        hasFailingPedal={hasFailingPedal}
+        powerMessage={powerMessage}
+        powerMessageColor={powerMessageColor}
+        isSinglePedal={isSinglePedal}
+        singlePedal={singlePedal}
+        singlePedalVoltage={singlePedalVoltage}
+        singlePedalDraw={singlePedalDraw}
+        singlePedalCanUseBattery={singlePedalCanUseBattery}
+        isAnalogOnlySmall={isAnalogOnlySmall}
+        isMixedWithSingleDigital={isMixedWithSingleDigital}
+        isMixedWithMultipleDigital={isMixedWithMultipleDigital}
+        isLargeBoard={isLargeBoard}
+        hasDaisyChainTuner={hasDaisyChainTuner}
+        extraPedals={extraPedals}
+        shouldShowNotEnough={shouldShowNotEnough}
+        shouldShowDaisy={shouldShowDaisy}
+        extractOutputs={extractOutputs}
+      />
     </div>
   </>
 )}
 </div>
-
-      
-
-      {/* TOTAL WEIGHT (Commenté pour ne pas l'afficher mais garder le code)
-      <div className="relative flex items-center justify-center h-9 w-24 md:h-10 md:w-28 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl pointer-events-none">
-        <Weight className="absolute left-3 size-4 text-red-400" />
-        <span className="text-[12px] font-black font-mono tabular-nums text-white">{weightValue}</span>
-        <span className="absolute right-3 text-[10px] text-zinc-500">{weightUnit}</span>
-      </div>
-      */}
-    </div>
+</div>
 
 
 {/* --- DROITE : ACTIONS --- */}
@@ -1432,13 +1462,13 @@ const pairs = o.voltages.map((v, idx) => ({
     <button 
       onClick={() => {
   setShowExport(v => !v);
-
+  setShowBoardsMenu(false);
   setShowPower(false);
-
   setShowShare(false);
   setShowList(false);
+  setShowSettings(false);
 }}
-      className="relative flex items-center justify-center gap-2 h-9 w-24 md:h-10 md:w-28 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl text-[11px] font-mono font-bold text-white uppercase transition-all duration-200 hover:scale-105 hover:border-blue-500 active:scale-95 cursor-pointer"
+      className="relative flex items-center justify-center gap-2 h-9 w-24 md:h-10 md:w-28 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl text-[11px] font-mono font-bold uppercase transition-all duration-200 hover:scale-105 hover:border-blue-500 active:scale-95 cursor-pointer"
     >
       <Download size={16} className="text-green-600" /> 
       {t("export.button")}
@@ -1456,6 +1486,7 @@ const pairs = o.voltages.map((v, idx) => ({
             boardName={activeProject.name} 
             canvasBg={canvasBg} 
             currentBackground={currentBackground} 
+            onClose={() => setShowExport(false)}
           />
         </div>
       </>
@@ -1463,21 +1494,20 @@ const pairs = o.voltages.map((v, idx) => ({
   </div>
 
   {/* SHARE */}
-  <div className="relative">
+    <div className="relative">
     <button 
       onClick={() => {
-  setShowShare(v => !v);
-
-  setShowPower(false);
-  setShowExport(false);
-  setShowList(false);
-}}
-      className="relative flex items-center justify-center gap-2 h-9 w-24 md:h-10 md:w-28 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl text-[11px] font-mono font-bold text-white uppercase transition-all duration-200 hover:scale-105 hover:border-blue-500 active:scale-95 cursor-pointer transform-gpu"
-    >
-      <Upload size={16} className="text-blue-500" /> 
+      setShowShare(v => !v);
+      setShowBoardsMenu(false);
+      setShowPower(false);
+      setShowExport(false);
+      setShowList(false)
+      setShowSettings(false);
+    }}
+      className="relative flex items-center justify-center gap-2 h-9 w-24 md:h-10 md:w-28 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl text-[11px] font-mono font-bold uppercase transition-all duration-200 hover:scale-105 hover:border-blue-500 active:scale-95 cursor-pointer transform-gpu">
+      <Upload size={16} className="text-purple-500" /> 
       {t("share.button")}
     </button>
-    
     {showShare && (
       <>
         {/* Calque invisible pour fermer en cliquant ailleurs */}
@@ -1488,12 +1518,60 @@ const pairs = o.voltages.map((v, idx) => ({
             selectedBoards={activeProject.selectedBoards} 
             displaySizes={displaySizes} 
             boardName={activeProject.name} 
-            onClose={() => setShowShare(false)} 
+            onClose={() => setShowShare(false)}
+            currentBackground={currentBackground}
           />
         </div>
       </>
     )}
   </div>
+
+{/* SETTINGS */}
+<div className="relative">
+  <button
+    type="button"
+    onClick={() => {
+      setShowSettings((v) => !v);
+      setShowBoardsMenu(false);
+      setShowPower(false);
+      setShowExport(false);
+      setShowShare(false);
+      setShowList(false);
+    }}
+    className="relative flex items-center justify-center gap-2 h-9 w-24 md:h-10 md:w-28 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl text-[11px] font-mono font-bold uppercase transition-all duration-200 hover:scale-105 hover:border-blue-500 active:scale-95 cursor-pointer"
+  >
+    <Settings size={16} className="text-zinc-400" />
+    {t("settings.title")}
+  </button>
+
+  {showSettings && (
+    <>
+      <div className="fixed inset-0 z-40 pointer-events-none" />
+
+      <div className="absolute bottom-12 right-0 z-50">
+        <div className="w-64 bg-zinc-900 border border-zinc-800 rounded-xl shadow-2xl p-4">
+          <div className="flex items-center gap-2 text-xs uppercase tracking-wider font-bold mb-6">
+            <Settings size={14} className="text-zinc-400" />
+            {t("settings.title")}
+          </div>
+
+          <SettingsPanel
+            t={t}
+            canvasBg={canvasBg}
+            setCanvasBg={setCanvasBg}
+            language={language}
+            setLanguage={setLanguage ?? (() => {})}
+            units={units}
+            setUnits={setUnits ?? (() => {})}
+            backgrounds={BACKGROUNDS}
+            setContactOpen={setContactOpen}
+          />
+        </div>
+      </div>
+    </>
+  )}
+</div>
+
 </div>
 
 {/* Fermetures des conditions parentes */}
@@ -1523,6 +1601,12 @@ scaleY={viewer ? 1 : (activeProject.zoom || 100) / 100}
 
 onMouseDown={(e) => {
   if (viewer) return;
+
+  // ✅ ferme Export dès qu'on clique sur le canvas,
+  // même sur une pédale, board, alim, etc.
+  if (showExport) {
+    setShowExport(false);
+  }
 
   const stage = stageRef.current;
   if (!stage) return;
@@ -1557,13 +1641,6 @@ if (!viewer) {
   onClick={handleStageClick}
 
 
-  
-
-  
-
-
-
-  
 
   onTouchMove={(e: any) => {
   const stage = stageRef.current;
@@ -1631,107 +1708,98 @@ if (!viewer) {
 }}
 
 >
-    <Layer>
+    <Layer listening={true}>
 
-{/* BOARDS */}
-{(activeProject.selectedBoards || []).map((b: AnyRow) => (
-  <Group
-    name="exportable"
-    key={b.instanceId}
-    x={b.x}
-    y={b.y}
-    draggable={!viewer}
-    rotation={b.rotation || 0}
+{canvasItems.map((item: AnyRow) => {
 
-    onDragStart={() => {
-      setIsDragging(true);
-    }}
+  // =========================
+  // BOARDS
+  // =========================
+  if (item.kind === "board") {
 
-    onMouseEnter={() => {
-      if (!isMobile) setHoveredBoardId(b.instanceId);
-    }}
+    const b = item;
 
-    onMouseLeave={() => {
-      if (!isMobile) setHoveredBoardId(null);
-    }}
+    return (
+      <Group
+        name="exportable"
+        key={b.instanceId}
+        x={b.x}
+        y={b.y}
+        draggable={!viewer}
+        rotation={b.rotation || 0}
 
-    onClick={(e) => {
-      if (viewer) return;
-  e.cancelBubble = true;
+        onDragStart={() => {
+          setIsDragging(true);
+        }}
 
-  setSelectedBoardInstanceId(b.instanceId);
-  setSelectedInstanceId(null);
-}}
+        onMouseEnter={() => {
+          if (!isMobile) setHoveredBoardId(b.instanceId);
+        }}
 
-onTap={(e) => {
-  if (viewer) return;
-  e.cancelBubble = true;
+        onMouseLeave={() => {
+          if (!isMobile) setHoveredBoardId(null);
+        }}
 
-  setSelectedBoardInstanceId(b.instanceId);
-  setSelectedInstanceId(null);
-}}
+        onClick={(e) => {
+          if (viewer) return;
+          e.cancelBubble = true;
 
-    onDragMove={(e) => {
-  const node = e.target;
+          setSelectedBoardInstanceId(b.instanceId);
+          setSelectedInstanceId(null);
+        }}
 
-  const MOVE_THRESHOLD = 3;
+        onTap={(e) => {
+          if (viewer) return;
+          e.cancelBubble = true;
 
-  if (lastStablePos.current) {
-    const dxMove = Math.abs(node.x() - lastStablePos.current.x);
-    const dyMove = Math.abs(node.y() - lastStablePos.current.y);
+          setSelectedBoardInstanceId(b.instanceId);
+          setSelectedInstanceId(null);
+        }}
 
+        onDragMove={(e) => {
+          const node = e.target;
 
+          const bounds = getVisibleBounds();
 
-    // ✅ vrai mouvement → on valide la position
-    lastStablePos.current = {
-      x: node.x(),
-      y: node.y(),
-    };
-  }
+          const box = node.getClientRect({ skipTransform: false });
+          const scale = stageRef.current?.scaleX() || 1;
 
-  const bounds = getVisibleBounds();
+          const width = box.width / scale;
+          const height = box.height / scale;
 
-  const box = node.getClientRect({ skipTransform: false });
-  const scale = stageRef.current?.scaleX() || 1;
+          let x = node.x();
+          let y = node.y();
 
-  const width = box.width / scale;
-  const height = box.height / scale;
+          if (x - width / 2 < bounds.minX) x = bounds.minX + width / 2;
+          if (y - height / 2 < bounds.minY) y = bounds.minY + height / 2;
+          if (x + width / 2 > bounds.maxX) x = bounds.maxX - width / 2;
+          if (y + height / 2 > bounds.maxY) y = bounds.maxY - height / 2;
 
-  let x = node.x();
-  let y = node.y();
+          node.position({ x, y });
+        }}
 
-  if (x - width / 2 < bounds.minX) x = bounds.minX + width / 2;
-  if (y - height / 2 < bounds.minY) y = bounds.minY + height / 2;
-  if (x + width / 2 > bounds.maxX) x = bounds.maxX - width / 2;
-  if (y + height / 2 > bounds.maxY) y = bounds.maxY - height / 2;
+        onDragEnd={(e) => {
+          setTimeout(() => {
+            setIsDragging(false);
+          }, 0);
 
-  node.position({ x, y });
-}}
+          if (!viewer) {
+            updateActiveProject({
+              selectedBoards: (activeProject.selectedBoards || []).map(
+                (x: AnyRow) =>
+                  x.instanceId === b.instanceId
+                    ? {
+                        ...x,
+                        x: e.target.x(),
+                        y: e.target.y(),
+                      }
+                    : x
+              ),
+            });
+          }
+        }}
+      >
 
-
-onDragEnd={(e) => {
-  setTimeout(() => {
-    setIsDragging(false);
-  }, 0);
-
-  if (!viewer) {
-  updateActiveProject({
-    selectedBoards: (activeProject.selectedBoards || []).map(
-      (x: AnyRow) =>
-        x.instanceId === b.instanceId
-          ? {
-              ...x,
-              x: e.target.x(),
-              y: e.target.y(),
-            }
-          : x
-    ),
-  });
-}}}
-
-
-
-  >
 <PedalImage
   url={b.image || b.image_url || b.photo || null}
   width={b.width}
@@ -1739,73 +1807,59 @@ onDragEnd={(e) => {
   color={b.color}
   isBoard
   rotation={0}
-  onSizeReady={(w, h) =>
-    handleSizeUpdate?.(b.instanceId, w, h)
+          onSizeReady={(w, h) =>
+            handleSizeUpdate?.(b.instanceId, w, h)
+          }
+          showJacksMargin={showJacksMargin}
+          jacksLocation=""
+        />
+
+        {!isDragging &&
+          hoveredBoardId === b.instanceId &&
+          selectedBoardInstanceId !== b.instanceId &&
+          displaySizes[b.instanceId] && (
+            <Rect
+              x={-displaySizes[b.instanceId].w / 2}
+              y={-displaySizes[b.instanceId].h / 2}
+              width={displaySizes[b.instanceId].w}
+              height={displaySizes[b.instanceId].h}
+              stroke="white"
+              strokeWidth={1}
+              opacity={0.25}
+              cornerRadius={3}
+              listening={false}
+            />
+        )}
+
+        {!isDragging &&
+          selectedBoardInstanceId === b.instanceId &&
+          displaySizes[b.instanceId] && (
+            <Rect
+              x={-displaySizes[b.instanceId].w / 2}
+              y={-displaySizes[b.instanceId].h / 2}
+              width={displaySizes[b.instanceId].w}
+              height={displaySizes[b.instanceId].h}
+              stroke="white"
+              strokeWidth={1}
+              cornerRadius={3}
+              listening={false}
+            />
+        )}
+
+      </Group>
+    );
   }
-  showJacksMargin={showJacksMargin}
-  jacksLocation=""
-/>
 
-{/* 💎 Hover halo (desktop only) */}
+// =========================
+// PEDALS
+// =========================
 
-{!isDragging &&
-  hoveredBoardId === b.instanceId &&
-  selectedBoardInstanceId !== b.instanceId &&
-  displaySizes[b.instanceId] && (
-    <Rect
-      x={-displaySizes[b.instanceId].w / 2}
-      y={-displaySizes[b.instanceId].h / 2}
-      width={displaySizes[b.instanceId].w}
-      height={displaySizes[b.instanceId].h}
-      stroke="white"
-      strokeWidth={1}
-      opacity={0.25}
-      cornerRadius={3}
-      listening={false}
-    />
-)}
+const p = item;
 
-{!isDragging &&
-  selectedBoardInstanceId === b.instanceId &&
-  displaySizes[b.instanceId] && (
-    
-    <Rect
-      x={-displaySizes[b.instanceId].w / 2}
-      y={-displaySizes[b.instanceId].h / 2}
-      width={displaySizes[b.instanceId].w}
-      height={displaySizes[b.instanceId].h}
-      stroke="white"
-      strokeWidth={1}
-      cornerRadius={3}
-      listening={false}
-    />
-)}
-
-          
-{!isDragging &&
-  !isMobile &&
-  selectedBoardInstanceId === b.instanceId &&
-  displaySizes[b.instanceId] && (
-
-    <Rect
-      x={-displaySizes[b.instanceId].w / 2}
-      y={-displaySizes[b.instanceId].h / 2}
-      width={displaySizes[b.instanceId].w}
-      height={displaySizes[b.instanceId].h}
-      stroke="white"
-      strokeWidth={1}
-      cornerRadius={3}
-      listening={false}
-    />
-)}
-        </Group>
-      ))}
-
-{/* PEDALS */}
-{activeProject.boardPedals.map((p: AnyRow) => (
+return (
   <Group
-  name="exportable"
-  key={p.instanceId}
+    name="exportable"
+    key={p.instanceId}
     x={p.x}
     y={p.y}
     rotation={p.rotation || 0}
@@ -1879,288 +1933,328 @@ onDragEnd={(e) => {
       setTimeout(() => {
         setIsDragging(false);
       }, 0);
+
       const node = e.target;
-      let finalX = node.x();
-      let finalY = node.y();
+      const finalX = node.x();
+      const finalY = node.y();
+
       lastRenderedPos.current = null;
 
       if (!viewer) {
         updateActiveProject({
           boardPedals: activeProject.boardPedals.map((x: AnyRow) =>
-            x.instanceId === p.instanceId ? { ...x, x: finalX, y: finalY } : x
+            x.instanceId === p.instanceId
+              ? { ...x, x: finalX, y: finalY }
+              : x
           ),
         });
       }
     }}
   >
-<PedalImage
-  url={p.image || p.image_url || p.photo || null}
-  width={p.width}
-  depth={p.depth}
-  color={p.color}
-  rotation={p.rotation || 0}
-  showJacksMargin={showJacksMargin}
-  jacksLocation={p.jacks || ""}
-  onSizeReady={(nw, nh) => handleSizeUpdate?.(p.instanceId, nw, nh)}
-
-  marginRef={(node) => {
-    if (node) {
-      marginRefs.current[p.instanceId] = node;
-    }
-  }}
-
+    <PedalImage
+      url={p.image || p.image_url || p.photo || null}
+      width={p.width}
+      depth={p.depth}
+      color={p.color}
+      rotation={p.rotation || 0}
+      showJacksMargin={showJacksMargin}
+      jacksLocation={p.jacks || ""}
+      onSizeReady={(nw, nh) => handleSizeUpdate?.(p.instanceId, nw, nh)}
+      marginRef={(node) => {
+        if (node) {
+          marginRefs.current[p.instanceId] = node;
+        }
+      }}
 isColliding={
   collisionReady &&
   showJacksMargin &&
-  activeProject.boardPedals.some(other =>
-    other.instanceId !== p.instanceId &&
-    checkCollision(p.instanceId, other.instanceId)
-  )
+  activeProject.boardPedals.some((other) => {
+    if (other.instanceId === p.instanceId) return false;
+
+    // ✅ Si une alim est SOUS le board, elle ne gêne pas les pédales SUR le board
+    const pIsUnderBoard = p.type === "power" && Number(p.zIndex || 0) < 0;
+    const otherIsUnderBoard = other.type === "power" && Number(other.zIndex || 0) < 0;
+
+    if (pIsUnderBoard || otherIsUnderBoard) return false;
+
+    // ✅ Sinon, alim + pédale peuvent bien entrer en collision
+    return checkCollision(p.instanceId, other.instanceId);
+  })
 }
-/>
+    />
 
-{/* 🎛 CUSTOM CONTROLS */}
-{p.slug === "custom" &&
-  displaySizes[p.instanceId] &&
-  knob &&
-  footswitch && (() => {
+    {/* 🎛 CUSTOM CONTROLS */}
+    {p.slug === "custom" &&
+      displaySizes[p.instanceId] &&
+      knob &&
+      footswitch &&
+      (() => {
+        const size = displaySizes[p.instanceId];
+        const hasColor = !!p.color;
 
-    const size = displaySizes[p.instanceId];
-    const hasColor = !!p.color;
+        const SMALL_KNOB = 25;
+        const MEDIUM_KNOB = 25;
+        const LARGE_KNOB = 25;
 
-    // 🎛 tailles CUSTOM
-const SMALL_KNOB = 25;
-const MEDIUM_KNOB = 25;
-const LARGE_KNOB = 25;
+        const knobSize =
+          p.width < 70
+            ? SMALL_KNOB
+            : p.width <= 100
+            ? MEDIUM_KNOB
+            : LARGE_KNOB;
 
-    let knobSize =
-      p.width < 70 ? SMALL_KNOB :
-      p.width <= 100 ? MEDIUM_KNOB :
-      LARGE_KNOB;
+        const footswitchSize = 18;
 
-    const footswitchSize = 18;
+        const knobCount =
+          p.width < 70 ? 1 : p.width <= 100 ? 2 : 3;
 
-    const knobCount =
-      p.width < 70 ? 1 :
-      p.width <= 100 ? 2 :
-      3;
+        const knobY = -size.h / 2 + 14;
+        const spacing = size.w / (knobCount + 1);
+        const spread = 1.25;
 
-    // 📍 position verticale
-    const knobY = -size.h / 2 + 14;
+        return (
+          <>
+            {hasColor && (
+              <Rect
+                x={-size.w / 2}
+                y={-size.h / 2}
+                width={size.w}
+                height={size.h}
+                fill={p.color}
+                opacity={0.7}
+                cornerRadius={5}
+              />
+            )}
 
-    // 👉 espacement contrôlé (centré)
-    const spacing = size.w / (knobCount + 1);
-    const spread = 1.25;
+            {Array.from({ length: knobCount }).map((_, i) => {
+              const offsetFromCenter =
+                (i - (knobCount - 1) / 2) * spacing * spread;
 
-    return (
-      <>
+              return (
+                <KonvaImage
+                  key={i}
+                  image={knob}
+                  width={knobSize}
+                  height={knobSize}
+                  x={offsetFromCenter - knobSize / 2}
+                  y={knobY}
+                  listening={false}
+                />
+              );
+            })}
 
-      {hasColor && (
-  <Rect
-    x={-size.w / 2}
-    y={-size.h / 2}
-    width={size.w}
-    height={size.h}
-    fill={p.color}
-    opacity={0.7}   // 🔥 LA CLE
-    cornerRadius={5}
-  />
-)}
-      
-        {/* KNOBS */}
-        {Array.from({ length: knobCount }).map((_, i) => {
-          const offsetFromCenter =
-            (i - (knobCount - 1) / 2) * spacing * spread;
-
-          return (
             <KonvaImage
-              key={i}
-              image={knob}
-              width={knobSize}
-              height={knobSize}
-              x={offsetFromCenter - knobSize / 2}
-              y={knobY}
+              image={footswitch}
+              width={footswitchSize}
+              height={footswitchSize}
+              x={-footswitchSize / 2}
+              y={size.h / 2 - 30}
               listening={false}
             />
-          );
-        })}
+          </>
+        );
+      })()}
 
-        {/* FOOTSWITCH */}
-        <KonvaImage
-          image={footswitch}
-          width={footswitchSize}
-          height={footswitchSize}
-          x={-footswitchSize / 2}
-          y={size.h / 2 - 30}
+    {p.slug === "custom" && p.name && displaySizes[p.instanceId] && (
+      <Text
+        text={p.name.toUpperCase()}
+        fontSize={8}
+        fill="#000000"
+        align="center"
+        verticalAlign="middle"
+        width={displaySizes[p.instanceId].w}
+        height={displaySizes[p.instanceId].h}
+        x={-displaySizes[p.instanceId].w / 2}
+        y={-displaySizes[p.instanceId].h / 2}
+        fontStyle="bold"
+        stroke="#000000"
+        strokeWidth={0.5}
+        letterSpacing={0.5}
+        listening={false}
+      />
+    )}
+
+    {/* 💎 Hover halo */}
+    {!isDragging &&
+      hoveredPedalId === p.instanceId &&
+      selectedInstanceId !== p.instanceId &&
+      displaySizes[p.instanceId] && (
+        <Rect
+          x={-displaySizes[p.instanceId].w / 2}
+          y={-displaySizes[p.instanceId].h / 2}
+          width={displaySizes[p.instanceId].w}
+          height={displaySizes[p.instanceId].h}
+          stroke="white"
+          strokeWidth={1}
+          opacity={0.25}
+          cornerRadius={3}
           listening={false}
         />
-      </>
+      )}
+
+    {!isDragging &&
+      selectedInstanceId === p.instanceId &&
+      displaySizes[p.instanceId] && (
+        <Rect
+          x={-displaySizes[p.instanceId].w / 2}
+          y={-displaySizes[p.instanceId].h / 2}
+          width={displaySizes[p.instanceId].w}
+          height={displaySizes[p.instanceId].h}
+          stroke="white"
+          strokeWidth={1}
+          cornerRadius={3}
+          listening={false}
+        />
+      )}
+  </Group>
+);
+})}
+
+</Layer>
+
+<Layer>
+  {/* 1. HITBOX BOARDS EN PREMIER */}
+  {(activeProject.selectedBoards || []).map((b: AnyRow) => {
+    const size = displaySizes[b.instanceId];
+    if (!size) return null;
+
+    return (
+      <Rect
+        key={`hit-board-${b.instanceId}`}
+        x={b.x}
+        y={b.y}
+        width={size.w}
+        height={size.h}
+        offsetX={size.w / 2}
+        offsetY={size.h / 2}
+        rotation={b.rotation || 0}
+        fill="rgba(0,0,0,0.01)"
+        draggable={!viewer}
+        onMouseEnter={() => {
+          if (!isMobile) {
+            setHoveredBoardId(b.instanceId);
+            setHoveredPedalId(null);
+          }
+        }}
+        onMouseLeave={() => {
+          if (!isMobile) setHoveredBoardId(null);
+        }}
+        onClick={(e) => {
+          if (viewer) return;
+          e.cancelBubble = true;
+          setSelectedBoardInstanceId(b.instanceId);
+          setSelectedInstanceId(null);
+        }}
+        onTap={(e) => {
+          if (viewer) return;
+          e.cancelBubble = true;
+          setSelectedBoardInstanceId(b.instanceId);
+          setSelectedInstanceId(null);
+        }}
+        onDragStart={() => {
+          setIsDragging(true);
+        }}
+        onDragMove={(e) => {
+          updateActiveProject({
+            selectedBoards: (activeProject.selectedBoards || []).map((item: AnyRow) =>
+              item.instanceId === b.instanceId
+                ? { ...item, x: e.target.x(), y: e.target.y() }
+                : item
+            ),
+          });
+        }}
+        onDragEnd={(e) => {
+          setTimeout(() => setIsDragging(false), 0);
+
+          updateActiveProject({
+            selectedBoards: (activeProject.selectedBoards || []).map((item: AnyRow) =>
+              item.instanceId === b.instanceId
+                ? { ...item, x: e.target.x(), y: e.target.y() }
+                : item
+            ),
+          });
+        }}
+      />
     );
-})()}
+  })}
 
-{p.slug === "custom" && p.name && displaySizes[p.instanceId] && (
-  <Text
-    text={p.name.toUpperCase()}
-    fontSize={8}    
-    fill="#000000"
-    align="center"
-    verticalAlign="middle"
-    width={displaySizes[p.instanceId].w}
-    height={displaySizes[p.instanceId].h}
-    x={-displaySizes[p.instanceId].w / 2}
-    y={-displaySizes[p.instanceId].h / 2}
-    fontStyle="bold"      
-    stroke="#000000"       
-    strokeWidth={0.5}   
-    letterSpacing={0.5}        
-    listening={false}
-  />
-)}
+  {/* 2. HITBOX PÉDALES / ALIMS APRÈS */}
+  {[...activeProject.boardPedals]
+    .sort((a: AnyRow, b: AnyRow) => {
+      return (Number(a.zIndex) || 0) - (Number(b.zIndex) || 0);
+    })
+    .map((p: AnyRow) => {
+      const size = displaySizes[p.instanceId];
+      if (!size) return null;
 
-         {/* 💎 Hover halo (desktop only) */}
-{!isDragging &&
-  hoveredPedalId === p.instanceId &&
-  selectedInstanceId !== p.instanceId &&
-  displaySizes[p.instanceId] && (
-    <Rect
-      x={-displaySizes[p.instanceId].w / 2}
-      y={-displaySizes[p.instanceId].h / 2}
-      width={displaySizes[p.instanceId].w}
-      height={displaySizes[p.instanceId].h}
-      stroke="white"
-      strokeWidth={1}
-      opacity={0.25}
-      cornerRadius={3}
-      listening={false}
-    />
-)}
+      return (
+        <Rect
+          key={`hit-pedal-${p.instanceId}`}
+          x={p.x}
+          y={p.y}
+          width={size.w}
+          height={size.h}
+          offsetX={size.w / 2}
+          offsetY={size.h / 2}
+          rotation={p.rotation || 0}
+          fill="rgba(0,0,0,0.01)"
+          draggable={!viewer}
+          onMouseEnter={() => {
+            if (!isMobile) {
+              setHoveredPedalId(p.instanceId);
+              setHoveredBoardId(null);
+            }
+          }}
+          onMouseLeave={() => {
+            if (!isMobile) setHoveredPedalId(null);
+          }}
+          onClick={(e) => {
+            if (viewer) return;
+            e.cancelBubble = true;
+            setSelectedInstanceId(p.instanceId);
+            setSelectedBoardInstanceId(null);
+          }}
+          onTap={(e) => {
+            if (viewer) return;
+            e.cancelBubble = true;
+            setSelectedInstanceId(p.instanceId);
+            setSelectedBoardInstanceId(null);
+          }}
+          onDragStart={(e) => {
+            setIsDragging(true);
+            lastRenderedPos.current = {
+              x: e.target.x(),
+              y: e.target.y(),
+            };
+          }}
+          onDragMove={(e) => {
+            updateActiveProject({
+              boardPedals: activeProject.boardPedals.map((item: AnyRow) =>
+                item.instanceId === p.instanceId
+                  ? { ...item, x: e.target.x(), y: e.target.y() }
+                  : item
+              ),
+            });
+          }}
+          onDragEnd={(e) => {
+            setTimeout(() => setIsDragging(false), 0);
+            lastRenderedPos.current = null;
 
-{!isDragging &&
-  selectedInstanceId === p.instanceId &&
-  displaySizes[p.instanceId] && (
-    
-  <Rect
-    x={-displaySizes[p.instanceId].w / 2}
-    y={-displaySizes[p.instanceId].h / 2}
-    width={displaySizes[p.instanceId].w}
-    height={displaySizes[p.instanceId].h}
-    stroke="white"
-    strokeWidth={1}
-    cornerRadius={3}
-    listening={false}
-  />
-)}
-
-
-
-        </Group>
-      ))}
-
-        </Layer>
+            updateActiveProject({
+              boardPedals: activeProject.boardPedals.map((item: AnyRow) =>
+                item.instanceId === p.instanceId
+                  ? { ...item, x: e.target.x(), y: e.target.y() }
+                  : item
+              ),
+            });
+          }}
+        />
+      );
+    })}
+</Layer>
   </Stage>
 )}
 
-{!viewer && overlayPosition && !isDragging && !isStageDragging && (
-  <div
-    style={{
-      position: "absolute",
-      left: overlayPosition.x,
-      top: overlayPosition.y,
-      transform: "translate(-50%, -100%)",
-      zIndex: 10,
-    }}
-    className="pointer-events-auto"
-  >
-    <div className="flex items-center justify-between w-20 lg:w-14 h-6 px-2 bg-black/90 backdrop-blur-md rounded-full shadow-lg">
-
-      <button
-  onClick={() => {
-    if (selectedInstanceId !== null) {
-      rotatePedal(selectedInstanceId);
-    }
-    if (selectedBoardInstanceId !== null) {
-      rotateBoard(selectedBoardInstanceId);
-    }
-  }}
-  className="text-white"
->
-  <RotateCw
-    size={14}
-    className="transition-colors duration-150 hover:text-blue-500"
-  />
-</button>
-
-{isMobile && (selectedInstanceId !== null || selectedBoardInstanceId !== null) && (
-  <button
-    onClick={() => {
-      setSpecsOpen(true);
-    }}
-    className="text-white"
-  >
-    <Info
-      size={14}
-      className="transition-colors hover:text-blue-500"
-    />
-  </button>
-)}
-
-<button
-  onClick={() => {
-    if (selectedInstanceId !== null) {
-      deletePedal(selectedInstanceId);
-    }
-    if (selectedBoardInstanceId !== null) {
-      deleteBoard(selectedBoardInstanceId);
-    }
-  }}
-  className="text-white"
->
-  <Trash2
-    size={14}
-    className="transition-colors hover:text-red-500"
-  />
-</button>
-
-    </div>
-  </div>
-)}
-
-{showIntro && (
-  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-    <div className="max-w-2xl text-center px-8">
-
-      {/* LOGO + TITLE */}
-      <div className="flex flex-col items-center mb-8">
-
-        <Image
-          src="/logos/logo.png"
-          alt="Make Your Board logo"
-          width={56}
-          height={56}
-          className="mb-4 opacity-90 h-auto w-auto"
-          priority
-        />
-
-        <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-white">
-          {t("canvasIntro.title")}
-        </h2>
-
-        <p className="text-sm italic text-zinc-400 mt-2">
-          {t("canvasIntro.subtitle")}
-        </p>
-
-      </div>
-
-      {/* Main text */}
-      <p className="whitespace-pre-line text-[15px] text-zinc-300 leading-relaxed">
-        {isMobile
-          ? t("canvasIntro.mobileText")
-          : t("canvasIntro.desktopText")}
-      </p>
-
-    </div>
-  </div>
-)}
 
 </div>
 );

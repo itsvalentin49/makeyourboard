@@ -26,6 +26,15 @@
 
   "pedal": {
     "features": "Specifications",
+
+    "actions": {
+      "title": "Actions",
+      "rotate": "Rotate",
+      "delete": "Delete",
+      "moveFront": "Move Front",
+      "moveBack": "Move Back"
+    },
+    
     "brand": "Brand",
     "model": "Model",
     "year": "Year",
@@ -39,6 +48,7 @@
     "type": {
       "label": "Type",
       "A/B Box": "A/B Box",
+      "Accessory": "Accessory",
       "Acoustic": "Acoustic",
       "Amp Simulator": "Amp Simulator",
       "Audio Interface": "Audio Interface",
@@ -118,12 +128,14 @@
       "12V DC": "12V DC",
       "9-12V DC": "9-12V DC",
       "9-15V DC": "9-15V DC",
+      "9-24V DC": "9-24V DC",
       "18V DC": "18V DC",
       "24V DC": "24V DC",
       "48V DC": "48V DC",
       "9-18V DC": "9-18V DC",
       "Passive": "Passive",
-      "Battery": "Battery"
+      "Battery": "Battery",
+      "N/A": "N/A"
     },
 
     "draw": "Current draw",
@@ -148,13 +160,15 @@
       "label": "Material",
       "Aluminium": "Aluminium",
       "ABS": "ABS",
+      "Plastic": "Plastic",
       "Plywood": "Plywood"
     },
 
     "profile": {
       "label": "Profile",
       "Flat": "Flat",
-      "Angled": "Angled"
+      "Angled": "Angled",
+      "N/A": "N/A"
     },
 
     "dimensions": "Dimensions",
@@ -328,7 +342,9 @@
       "full": "Your power supply is fully loaded.",
       "fullHint": "Add another unit or upgrade to a model with more outputs.",
       "upgrade": "Use a suitable power supply or plug the incompatible pedal into a dedicated wall adapter.",
-      "tuner": "Your tuner can power multiple pedals using a daisy chain 🤘"
+      "tuner": "Your tuner can power multiple pedals using a daisy chain 🤘",
+      "singleAdapter": "You can use a {voltage}V power adapter with a current rating higher than {draw}mA.",
+      "battery9v": "You can also use a 9V battery if the pedal supports battery operation." 
     }
   },
 
@@ -337,8 +353,67 @@
   },
 
   "pedalsMenu": {
+    "title": "Pedals",
+    "searchPlaceholder": "Search...",
+    "count": "{count} pedals",
+    "results": "{count} results",
+    "latest": "Here are the latest pedal releases.",
     "new": "NEW",
     "newReleases": "New Releases"
-}
+  },
+
+  "boardsMenu": {
+    "title": "Pedalboards",
+    "searchPlaceholder": "Search...",
+    "count": "{count} pedalboards"
+  },
+
+  "powerMenu": {
+    "title": "Power Supplies",
+    "searchPlaceholder": "Search...",
+    "count": "{count} power supplies"
+  },
+
+  "customMenu": {
+    "title": "Custom Items",
+    "subtitle": "Create a custom pedal or pedalboard with your own dimensions.",
+    "importTitle": "Import Image",
+    "importSubtitle": "Import your own pedal from your computer.",
+    "chooseImage": "Choose an image",
+    "brand": "Brand",
+    "model": "Model",
+    "voltage": "Voltage (V)",
+    "current": "Current (mA)",
+    "add": "Add"
+  },
+
+  "canvasControls": {
+    "min": "MIN",
+    "max": "MAX",
+    "setup": "Setup",
+    "pedalboard": "Pedalboard",
+    "boards": "Boards",
+    "pedalboards": "Pedalboards",
+    "newBoard": "New board",
+    "jacks": "Jacks",
+    "power": "Power"
+  },
+
+  "help": {
+    "title": "Welcome to MakeYourBoard",
+    "open": "Open help guide",
+    "close": "Close help guide",
+    "gearTitle": "Select your gear",
+    "gearText": "Choose pedals, boards and power supplies from the left panel.",
+    "layoutTitle": "Build your layout",
+    "layoutText": "Drag, drop and arrange everything on the canvas.",
+    "jacksTitle": "Check your jack clearance",
+    "jacksText": "Make sure your pedals are spaced correctly for cables and plugs.",
+    "powerTitle": "Check your power setup",
+    "powerText": "Add a power supply to verify current draw and compatibility.",
+    "shareTitle": "Export or share",
+    "shareText": "Export your board as an image or share it with friends.",
+    "ok": "OK"
+  }
 
 }

@@ -26,10 +26,16 @@
   "pedal": {
 
     "features": "Caractéristiques",
+    "actions": {
+      "title": "Actions",
+      "rotate": "Tourner",
+      "delete": "Supprimer",
+      "moveFront": "Premier-plan",
+      "moveBack": "Arrière-plan"
+      },
     "brand": "Marque",
     "model": "Modèle",
     "year": "Année",
-
     "status": {
       "label": "Statut",
       "active": "En production",
@@ -39,6 +45,7 @@
    "type": {
       "label": "Type",
       "A/B Box": "Boîtier A/B",
+      "Accessory": "Accessoire",
       "Acoustic": "Acoustique",
       "Amp Simulator": "Simulateur d’ampli",
       "Audio Interface": "Interface audio",
@@ -118,12 +125,14 @@
       "12V DC": "12V DC",
       "9-12V DC": "9-12V DC",
       "9-15V DC": "9-15V DC",
+      "9-24V DC": "9-24V DC",
       "18V DC": "18V DC",
       "24V DC": "24V DC",
       "48V DC": "48V DC",
       "9-18V DC": "9-18V DC",
       "Passive": "Passive",
-      "Battery": "Batterie"
+      "Battery": "Batterie",
+      "N/A": "N/A"
     },
 
     "draw": "Consommation",
@@ -138,7 +147,7 @@
     "status": {
       "label": "Statut",
       "active": "En production",
-      "discontinued": "Hors production"
+      "discontinued": "Arrêté"
     },
 
     "brand": "Marque",
@@ -149,13 +158,15 @@
       "label": "Matériau",
       "Aluminium": "Aluminium",
       "ABS": "ABS",
+      "Plastic": "Plastique",
       "Plywood": "Contreplaqué"
     },
 
     "profile": {
       "label": "Profil",
       "Flat": "Plat",
-      "Angled": "Incliné"
+      "Angled": "Incliné",
+      "N/A": "N/A"
     },
 
     "dimensions": "Dimensions",
@@ -169,7 +180,7 @@
   "pedal": "Pédale",
   "board": "Board",
   "nameOptional": "Nom",
-  "namePlaceholder": "Fuzz",
+  "namePlaceholder": "Nom (Fuzz)",
   "enterDimensions": "Dimensions",
   "width": "Largeur",
   "depth": "Profondeur",
@@ -257,7 +268,7 @@
 
   "share": {
     "button": "Partager",
-    "title": "Partager votre pedalboard",
+    "title": "Partager votre Board",
     "preview": "Aperçu",
     "social": "Partager via",
     "copy": "Copier le lien",
@@ -323,7 +334,9 @@
       "full": "Votre alimentation est à pleine capacité.",
       "fullHint": "Ajoutez une autre alimentation ou choisissez un modèle avec plus de sorties.",
       "upgrade": "Utilisez une alimentation plus puissante ou une prise secteur dédiée pour la pédale incompatible.",
-      "tuner": "Votre accordeur peut alimenter des pédales avec une daisy chain 🤘"
+      "tuner": "Votre accordeur peut alimenter des pédales avec une daisy chain 🤘",
+      "singleAdapter": "Vous pouvez utiliser une alimentation secteur {voltage}V avec un ampérage supérieur à {draw}mA.",
+      "battery9v": "Vous pouvez aussi utiliser une pile 9V si la pédale permet un fonctionnement sur pile."
     }
   },
 
@@ -332,8 +345,67 @@
   },
 
   "pedalsMenu": {
+    "title": "Pédales",
+    "searchPlaceholder": "Rechercher...",
+    "count": "{count} pédales",
+    "results": "{count} résultats",
+    "latest": "Voici les dernières pédales sorties.",
     "new": "NEW",
     "newReleases": "Nouveautés"
-}
+  },
+
+  "boardsMenu": {
+    "title": "Pedalboards",
+    "searchPlaceholder": "Rechercher...",
+    "count": "{count} pedalboards"
+  },
+
+  "powerMenu": {
+    "title": "Alimentations",
+    "searchPlaceholder": "Rechercher...",
+    "count": "{count} alimentations"
+  },
+
+  "customMenu": {
+    "title": "Custom",
+    "subtitle": "Créez une pédale ou un pedalboard personnalisé avec des dimensions sur mesure.",
+    "importTitle": "Importer une image",
+    "importSubtitle": "Importez votre propre pédale depuis votre ordinateur.",
+    "chooseImage": "Choisir une image",
+    "brand": "Marque",
+    "model": "Modèle",
+    "voltage": "Voltage (V)",
+    "current": "Ampérage (mA)",
+    "add": "Ajouter"
+  },
+
+  "canvasControls": {
+    "min": "MIN",
+    "max": "MAX",
+    "setup": "Setup",
+    "pedalboard": "Pedalboard",
+    "boards": "Boards",
+    "pedalboards": "Pedalboards",
+    "newBoard": "Nouveau board",
+    "jacks": "Jacks",
+    "power": "Power"
+  },
+
+  "help": {
+    "title": "Bienvenue sur MakeYourBoard",
+    "open": "Ouvrir le guide d’aide",
+    "close": "Fermer le guide d’aide",
+    "gearTitle": "Choisissez votre matériel",
+    "gearText": "Choisissez des pédales, pedalboards et alimentations dans le panneau de gauche.",
+    "layoutTitle": "Construisez votre layout",
+    "layoutText": "Glissez, déposez et organisez tout sur le canvas.",
+    "jacksTitle": "Vérifiez l’espace pour les jacks",
+    "jacksText": "Assurez-vous que vos pédales sont suffisamment espacées pour les câbles et connecteurs.",
+    "powerTitle": "Vérifiez votre alimentation",
+    "powerText": "Ajoutez une alimentation pour vérifier la consommation et la compatibilité.",
+    "shareTitle": "Exportez ou partagez",
+    "shareText": "Exportez votre pedalboard en image ou partagez-le avec vos amis.",
+    "ok": "OK"
+  }
 
 }

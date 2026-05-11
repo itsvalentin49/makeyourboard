@@ -58,7 +58,7 @@ export default function BuyOnline({
       w-full
       text-[11px] font-black uppercase
       py-2 rounded-md
-      bg-blue-500 !text-white
+      bg-blue-600 !text-white
       transition-all duration-150
       text-center
       cursor-default
@@ -111,7 +111,7 @@ export default function BuyOnline({
               rel="noopener noreferrer"
               className="
                 flex items-center gap-3
-                px-3 py-3
+                px-3 py-2
                 rounded-lg
                 transition-all duration-200 ease-out
                 hover:bg-zinc-900
