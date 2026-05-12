@@ -365,7 +365,7 @@ return (
       <div
         className={`
           absolute top-0 h-full w-1/2
-          rounded-md bg-canvas
+          rounded-md bg-blue-600
           transition-transform duration-200 ease-out
           ${
             units === "imperial"
@@ -399,32 +399,31 @@ return (
               h-full leading-tight
             "
           >
-            <span
-              className={`
-                text-[10px] font-black tracking-wide
-                transition-colors duration-200
-                ${
-                  isActive
-                    ? ""
-                    : "text-zinc-500"
-                }
-              `}
-            >
+<span
+  className={`
+    text-[10px] font-black tracking-wide
+    transition-colors duration-200
+    ${
+      isActive
+        ? "!text-white"
+        : ""
+    }
+  `}
+>
               {u.label}
             </span>
 
-            <span
-              className={`
-                mt-[2px]
-                text-[8px] font-semibold tracking-wide
-                transition-colors duration-200
-                ${
-                  isActive
-                    ? ""
-                    : "text-zinc-500"
-                }
-              `}
-            >
+<span
+  className={`
+    text-[8px] tracking-wide
+    transition-colors duration-200
+    ${
+      isActive
+        ? "!text-white"
+        : ""
+    }
+  `}
+>
               {u.sub}
             </span>
           </button>
@@ -453,7 +452,7 @@ return (
     <div
       className={`
         absolute top-0 h-full w-1/2
-        rounded-md bg-canvas
+        rounded-md bg-blue-600
         transition-transform duration-200 ease-out
         ${
           theme === "light"
@@ -498,8 +497,8 @@ return (
               transition-colors duration-200
               ${
                 isActive
-                  ? ""
-                  : "text-zinc-500"
+                  ? "!text-white"
+                  : ""
               }
             `}
           />
@@ -509,8 +508,8 @@ return (
               transition-colors duration-200
               ${
                 isActive
-                  ? ""
-                  : "text-zinc-500"
+                  ? "!text-white"
+                  : ""
               }
             `}
           >
@@ -581,7 +580,7 @@ return (
 {/* ABOUT */}
 <div className="flex flex-col gap-2">
   <span className="text-[10px] uppercase font-bold tracking-wider">
-    About us
+    {t("settings.about")}
   </span>
 
   <div className="flex items-center justify-between pt-2">
@@ -597,7 +596,7 @@ return (
   "
 >
   <span className="text-[12px]">✉️</span>
-  <span className="text-[10px] font-black uppercase">
+  <span className="text-[10px] font-bold uppercase">
     {t("footer.feedback")}
   </span>
 </button>
@@ -616,7 +615,7 @@ return (
   "
 >
   <span className="text-[12px]">❤️</span>
-  <span className="text-[10px] font-black uppercase">
+  <span className="text-[10px] font-bold uppercase">
     {t("footer.donate")}
   </span>
 </a>

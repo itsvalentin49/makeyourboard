@@ -2,7 +2,7 @@
 
 import React, { useRef, useLayoutEffect, useEffect, useState } from "react";
 import { Stage, Layer, Group, Rect, Text, Image as KonvaImage } from "react-konva";
-import { Zap, Weight, Minus, Cable, Plus, Check, Upload, AlertTriangle, RotateCw, Trash2, X, Download, Info, List, LayoutPanelLeft, Settings } from "lucide-react";
+import { Zap, Weight, Minus, Cable, Plus, Check, Upload, AlertTriangle, RotateCw, Trash2, X, Download, Info, List, Settings, PanelsTopLeft } from "lucide-react";
 import PedalImage from "@/components/PedalImage";
 import { formatWeight } from "@/utils/units";
 import { getTranslator } from "@/utils/i18n";
@@ -14,6 +14,7 @@ import type { Project } from "@/types/project";
 import SettingsPanel from "@/components/SettingsPanel";
 import PowerSetup from "@/components/PowerSetup";
 import { HelpGuide } from "@/components/HelpGuide";
+import SignalPath, { SignalPoint } from "@/components/SignalPath";
 
 
 type AnyRow = Record<string, any>;
@@ -28,14 +29,19 @@ type Background = {
 type Props = {
   viewer?: boolean;
 
-  activeProject: {
-    name?: string;
-    boardPedals: AnyRow[];
-    selectedBoards?: AnyRow[];
-    zoom?: number;
-    stageX?: number;
-    stageY?: number;
-  };
+activeProject: {
+  name?: string;
+  boardPedals: AnyRow[];
+  selectedBoards?: AnyRow[];
+  zoom?: number;
+  stageX?: number;
+  stageY?: number;
+  signalPath?: {
+    id: string;
+    from: number;
+    to: number;
+  }[];
+};
 
   projects?: Project[];
   activeProjectId?: number | null;
@@ -607,6 +613,7 @@ const handleStageClick = (e: any) => {
     setShowList(false);
     setShowBoardsMenu(false);
     setShowSettings(false);
+    setShowCableMenu(false);
   }
 };
 
@@ -691,6 +698,8 @@ useEffect(() => {
   const [showExport, setShowExport] = useState(false);
   const [showShare, setShowShare] = useState(false);
   const [showJacksMargin, setShowJacksMargin] = useState(false);
+  const [showSignalPath, setShowSignalPath] = useState(false);
+  const [showCableMenu, setShowCableMenu] = useState(false);
   const [showBoardsMenu, setShowBoardsMenu] = useState(false);
   useEffect(() => {
   if (!showBoardsMenu) return;
@@ -726,6 +735,77 @@ useEffect(() => {
   } | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isStageDragging, setIsStageDragging] = useState(false);
+const [localSignalPath, setLocalSignalPath] = useState<any[]>(
+  activeProject.signalPath || []
+);
+
+const [pendingSignalPoint, setPendingSignalPoint] =
+  useState<SignalPoint | null>(null);
+
+useEffect(() => {
+  setLocalSignalPath(activeProject.signalPath || []);
+  setPendingSignalPoint(null);
+}, [activeProjectId]);
+
+const setSignalPath = (path: any[]) => {
+  setLocalSignalPath(path);
+
+  updateActiveProject({
+    signalPath: path,
+  });
+};
+
+useEffect(() => {
+  const existingPedalIds = new Set(
+    activeProject.boardPedals.map((p: AnyRow) => p.instanceId)
+  );
+
+  const cleanedSignalPath = localSignalPath.filter((c: any) => {
+    return existingPedalIds.has(c.from) && existingPedalIds.has(c.to);
+  });
+
+  if (cleanedSignalPath.length === localSignalPath.length) return;
+
+  setLocalSignalPath(cleanedSignalPath);
+  setPendingSignalPoint(null);
+
+  updateActiveProject({
+    signalPath: cleanedSignalPath,
+  } as any);
+}, [activeProject.boardPedals, localSignalPath]);
+
+const handleSignalPointClick = (point: SignalPoint) => {
+  if (pendingSignalPoint === null) {
+    setPendingSignalPoint(point);
+    return;
+  }
+
+  if (
+    pendingSignalPoint.id === point.id &&
+    pendingSignalPoint.kind === point.kind
+  ) {
+    setPendingSignalPoint(null);
+    return;
+  }
+
+  const newPath = [
+    ...localSignalPath,
+    {
+      id: `${pendingSignalPoint.id}-${point.id}-${Date.now()}`,
+      from: pendingSignalPoint.id,
+      to: point.id,
+      fromKind: pendingSignalPoint.kind,
+      toKind: point.kind,
+    },
+  ];
+
+  setSignalPath(newPath);
+  setPendingSignalPoint(null);
+};
+
+const removeSignalConnection = (id: string) => {
+  setSignalPath(localSignalPath.filter((c) => c.id !== id));
+};
 
   /* ================= MEASURE STAGE ================= */
 useLayoutEffect(() => {
@@ -1135,6 +1215,7 @@ const shouldShowHelpGuide =
       setShowExport(false);
       setShowShare(false);
       setShowSettings(false);
+      setShowSignalPath(false);
 }} className="relative flex items-center justify-center gap-2 h-9 w-24 md:h-10 md:w-28 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl text-[11px] font-mono font-bold uppercase transition-all hover:border-blue-500">
         <List size={16} className="text-blue-400" /> {t("canvasControls.setup")}
       </button>
@@ -1172,6 +1253,8 @@ const shouldShowHelpGuide =
     setShowShare(false);
     setShowList(false);
     setShowSettings(false);
+    setShowSignalPath(false);
+    setShowCableMenu(false);
   }}
   className="
     relative flex items-center justify-center gap-2
@@ -1183,9 +1266,9 @@ const shouldShowHelpGuide =
     cursor-pointer
   "
 >
-  <LayoutPanelLeft
+  <PanelsTopLeft
     size={16}
-    className="text-blue-600"
+    className="text-blue-500"
   />
 
   {t("canvasControls.boards")}
@@ -1203,7 +1286,7 @@ const shouldShowHelpGuide =
         onClick={(e) => e.stopPropagation()}
       >
 <div className="flex items-center gap-2 text-xs uppercase tracking-wider font-bold px-2 pb-3">
-  <LayoutPanelLeft size={14} className="text-blue-600" />
+  <PanelsTopLeft size={14} className="text-blue-500" />
   {t("canvasControls.pedalboards")}
 </div>
 
@@ -1323,7 +1406,7 @@ className="
             }}
             className="
               mt-1 w-full px-3 py-2 rounded-lg text-[10px] font-black uppercase
-              bg-zinc-800 hover:bg-canvas transition-colors
+              bg-zinc-950 hover:bg-canvas transition-colors
               flex items-center justify-center gap-2
             "
           >
@@ -1337,10 +1420,13 @@ className="
 )}
 </div>
 
-{/* BOUTON JACKS */}
-<button 
-  onClick={() => {
-  setShowJacksMargin(v => !v);
+
+{/* BOUTON CABLES / JACKS */}
+<div className="relative">
+  <button
+    type="button"
+onClick={() => {
+  setShowCableMenu((v) => !v);
   setShowBoardsMenu(false);
   setShowPower(false);
   setShowExport(false);
@@ -1348,26 +1434,113 @@ className="
   setShowList(false);
   setShowSettings(false);
 }}
-  className="
-    relative flex items-center justify-center gap-2
-    h-9 md:h-10 w-24 md:w-28
-    bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl
-    text-[11px] font-mono font-bold uppercase
-    transition-all duration-200
-    hover:scale-105 hover:border-blue-500 active:scale-95
-    cursor-pointer
-  "
->
-  <Cable
-    size={16}
-    className={`
-      transition-colors duration-300
-      ${showJacksMargin ? "text-green-600" : "text-red-500"}
-    `}
-  />
+    className="
+      relative flex items-center justify-center gap-2
+      h-9 md:h-10 w-24 md:w-28
+      bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl
+      text-[11px] font-mono font-bold uppercase
+      transition-all duration-200
+      hover:scale-105 hover:border-blue-500 active:scale-95
+      cursor-pointer
+    "
+  >
+<Cable
+  size={16}
+  className="text-red-500"
+/>
 
-  {t("canvasControls.jacks")}
-</button>
+    Cables
+  </button>
+
+{showCableMenu && (
+  <div className="absolute bottom-12 left-0 z-50">
+    <div
+      className="
+        relative
+        w-65 bg-zinc-900 border border-zinc-800 rounded-xl shadow-2xl
+        p-4 space-y-4
+      "
+      onClick={(e) => e.stopPropagation()}
+    >
+      <div className="flex items-center gap-2 text-xs uppercase tracking-wider font-bold">
+        <Cable size={14} className="text-red-500" />
+        Cables
+      </div>
+
+      {/* SWITCH JACK CLEARANCE */}
+      <button
+        type="button"
+        onClick={() => setShowJacksMargin((v) => !v)}
+        className="
+          w-full
+          text-left
+        "
+      >
+<div className="pr-2">
+  <div className="text-[11px] font-black uppercase tracking-wide">
+    {t("canvasControls.cableClearance")}
+  </div>
+
+  <div className="text-[10px] text-zinc-500 font-medium mt-0.5 leading-snug">
+    {t("canvasControls.cableClearanceDescription")}
+  </div>
+</div>
+
+<div
+  className={`
+    absolute top-4 right-4
+    w-11 h-5 rounded-full transition-colors duration-200
+    ${showJacksMargin ? "bg-blue-600" : "bg-zinc-700"}
+  `}
+>
+          <div
+            className={`
+              absolute top-0.5 left-0.5 w-5 h-4 rounded-full bg-white
+              transition-transform duration-200
+              ${showJacksMargin ? "translate-x-5" : "translate-x-0"}
+            `}
+          />
+        </div>
+      </button>
+
+      {/* SWITCH SIGNAL PATH */}
+      {/*<button
+        type="button"
+        onClick={() => setShowSignalPath((v) => !v)}
+        className="
+          w-full flex items-center justify-between gap-3
+          text-left
+        "
+        >
+        <div>
+          <div className="text-[11px] font-black uppercase tracking-wide">
+            Cable mode
+          </div>
+          <div className="text-[10px] text-zinc-500 font-medium mt-0.5">
+            Signal path
+          </div>
+        </div>
+
+        <div
+          className={`
+            relative w-12 h-7 rounded-full transition-colors duration-200
+            ${showSignalPath ? "bg-blue-600" : "bg-zinc-700"}
+          `}
+        >
+          <div
+            className={`
+              absolute top-1 left-1 w-5 h-5 rounded-full bg-white
+              transition-transform duration-200
+              ${showSignalPath ? "translate-x-5" : "translate-x-0"}
+            `}
+          />
+        </div>
+      </button>*/}
+    </div>
+  </div>
+)}
+</div>
+
 
       {/* TOTAL DRAW (mA)*/}
 <div className="relative">
@@ -1397,6 +1570,7 @@ className="
   setShowExport(false);
   setShowShare(false);
   setShowList(false);
+  setShowCableMenu(false);
 }}
     className={`
       relative
@@ -1467,10 +1641,12 @@ className="
   setShowShare(false);
   setShowList(false);
   setShowSettings(false);
+  setShowSignalPath(false);
+  setShowCableMenu(false);
 }}
       className="relative flex items-center justify-center gap-2 h-9 w-24 md:h-10 md:w-28 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl text-[11px] font-mono font-bold uppercase transition-all duration-200 hover:scale-105 hover:border-blue-500 active:scale-95 cursor-pointer"
     >
-      <Download size={16} className="text-green-600" /> 
+      <Download size={16} /> 
       {t("export.button")}
     </button>
     
@@ -1503,9 +1679,10 @@ className="
       setShowExport(false);
       setShowList(false)
       setShowSettings(false);
+      setShowSignalPath(false);
     }}
       className="relative flex items-center justify-center gap-2 h-9 w-24 md:h-10 md:w-28 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl text-[11px] font-mono font-bold uppercase transition-all duration-200 hover:scale-105 hover:border-blue-500 active:scale-95 cursor-pointer transform-gpu">
-      <Upload size={16} className="text-purple-500" /> 
+      <Upload size={16}  /> 
       {t("share.button")}
     </button>
     {showShare && (
@@ -1537,10 +1714,11 @@ className="
       setShowExport(false);
       setShowShare(false);
       setShowList(false);
+      setShowCableMenu(false);
     }}
     className="relative flex items-center justify-center gap-2 h-9 w-24 md:h-10 md:w-28 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl text-[11px] font-mono font-bold uppercase transition-all duration-200 hover:scale-105 hover:border-blue-500 active:scale-95 cursor-pointer"
   >
-    <Settings size={16} className="text-zinc-400" />
+    <Settings size={16}/>
     {t("settings.title")}
   </button>
 
@@ -1551,7 +1729,7 @@ className="
       <div className="absolute bottom-12 right-0 z-50">
         <div className="w-64 bg-zinc-900 border border-zinc-800 rounded-xl shadow-2xl p-4">
           <div className="flex items-center gap-2 text-xs uppercase tracking-wider font-bold mb-6">
-            <Settings size={14} className="text-zinc-400" />
+            <Settings size={14} />
             {t("settings.title")}
           </div>
 
@@ -1708,7 +1886,10 @@ if (!viewer) {
 }}
 
 >
-    <Layer listening={true}>
+
+
+
+  <Layer listening={true}>
 
 {canvasItems.map((item: AnyRow) => {
 
@@ -2112,7 +2293,23 @@ isColliding={
 
 </Layer>
 
-<Layer>
+{showSignalPath && (
+  <Layer listening={true}>
+    <SignalPath
+      mode="cables"
+      pedals={activeProject.boardPedals}
+      displaySizes={displaySizes}
+      signalPath={localSignalPath}
+      enabled={showSignalPath}
+      pendingPoint={pendingSignalPoint}
+      onPointClick={handleSignalPointClick}
+      onRemoveConnection={removeSignalConnection}
+      isDragging={isDragging || isStageDragging}
+    />
+  </Layer>
+)}
+
+<Layer listening={true}>
   {/* 1. HITBOX BOARDS EN PREMIER */}
   {(activeProject.selectedBoards || []).map((b: AnyRow) => {
     const size = displaySizes[b.instanceId];
@@ -2252,6 +2449,23 @@ isColliding={
       );
     })}
 </Layer>
+
+{showSignalPath && (
+  <Layer listening={true}>
+    <SignalPath
+      mode="points"
+      pedals={activeProject.boardPedals}
+      displaySizes={displaySizes}
+      signalPath={localSignalPath}
+      enabled={showSignalPath}
+      pendingPoint={pendingSignalPoint}
+      onPointClick={handleSignalPointClick}
+      onRemoveConnection={removeSignalConnection}
+      isDragging={isDragging || isStageDragging}
+    />
+  </Layer>
+)}
+
   </Stage>
 )}
 

@@ -15,18 +15,18 @@ export default function SidebarLogo({ t }: Props) {
 
       {/* SUBTITLE */}
 <div
-  className="
-    mt-1
-    text-zinc-500
-    text-[11px]
-    font-bold
-    tracking-[0.205em]
-    uppercase
-    leading-none
-    whitespace-nowrap
-    origin-left
-    scale-x-[1.09]
-  "
+className="
+  mt-1
+  text-zinc-500 dark:text-zinc-500
+  text-[11px]
+  font-bold
+  tracking-[0.205em]
+  uppercase
+  leading-none
+  whitespace-nowrap
+  origin-left
+  scale-x-[1.09]
+"
 >
   Guitar Pedalboard Builder
 </div>

@@ -103,6 +103,24 @@ export default function CustomBuilder({
   };
 }, []);
 
+
+const widthNumber = Number(customWidth);
+const depthNumber = Number(customDepth);
+
+const hasCustomDimensions = customWidth !== "" || customDepth !== "";
+
+const customDimensionsInvalid =
+  hasCustomDimensions &&
+  (
+    !widthNumber ||
+    !depthNumber ||
+    widthNumber < minValue ||
+    widthNumber > maxValue ||
+    depthNumber < minValue ||
+    depthNumber > maxValue
+  );
+
+
   const handleLocalImageUpload = (file: File | null) => {
   if (!file) return;
 
@@ -215,16 +233,6 @@ return (
             {/* ENTER DIMENSIONS */}
               <div className="flex flex-col gap-1.5">
 
-                <div className="flex items-center gap-2 flex-wrap">
-  <span className="text-[9px] uppercase font-black tracking-widest leading-tight">
-    {t("custom.enterDimensions")} :
-  </span>
-
-  <span className="text-[9px] font-mono leading-tight">
-    min: {displayMin} {unitLabel} / max: {displayMax} {unitLabel}
-  </span>
-</div>
-
                 <div className="grid grid-cols-2 gap-2">
 
                   {/* WIDTH PEDAL */}
@@ -242,7 +250,7 @@ return (
                       setFocusedField(null);
                     }}
                     onChange={(e) => setCustomWidth(e.target.value)}
-className="w-full bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-[10px] outline-none focus:border-zinc-600"                  />
+                    className="w-full bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-[10px] outline-none focus:border-zinc-600"                  />
 
                   {/* DEPTH PEDAL */}
                   <input
@@ -258,6 +266,15 @@ className="w-full bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-[
 className="w-full bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-[10px] outline-none focus:border-zinc-600"                />
 
                 </div>
+
+{customDimensionsInvalid && (
+  <div className="text-[9px] font-bold text-red-500 leading-tight">
+    {t("custom.dimensionError")
+      .replace("{min}", String(displayMin))
+      .replace("{max}", String(displayMax))
+      .replaceAll("{unit}", unitLabel)}
+  </div>
+)}
 
               </div>
 
@@ -357,12 +374,12 @@ className="w-full bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-[
   }}
   disabled={!isPedalValid}
 className={`
-  w-full text-[10px] font-black uppercase py-2 mt-2 rounded-md !text-white
+  w-full text-[10px] font-black uppercase py-2 mt-2 rounded-md
   transition-all duration-150
   ${
     isPedalValid
       ? "bg-green-700 hover:bg-green-600 cursor-pointer"
-      : "bg-zinc-700 opacity-40 cursor-not-allowed"
+      : "bg-canvas cursor-not-allowed"
   }
 `}            >
               {t("custom.addPedal")}
@@ -379,16 +396,6 @@ className={`
 
               {/* ENTER DIMENSIONS */}
               <div className="flex flex-col gap-1.5">
-
-                <div className="flex items-center gap-2 flex-wrap">
-  <span className="text-[9px] uppercase font-black tracking-widest leading-tight">
-    {t("custom.enterDimensions")} :
-  </span>
-
-  <span className="text-[9px] font-mono leading-tight">
-    min: {displayMin} {unitLabel} / max: {displayMax} {unitLabel}
-  </span>
-</div>
 
                 <div className="grid grid-cols-2 gap-2">
 
@@ -424,6 +431,15 @@ className="w-full bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-[
 
                 </div>
 
+{customDimensionsInvalid && (
+  <div className="text-[9px] font-bold text-red-500 leading-tight">
+    {t("custom.dimensionError")
+      .replace("{min}", String(displayMin))
+      .replace("{max}", String(displayMax))
+      .replaceAll("{unit}", unitLabel)}
+  </div>
+)}
+
               </div>
 
 <button
@@ -436,12 +452,12 @@ className="w-full bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-[
   }}
   disabled={!isBoardValid}
 className={`
-  w-full mt-2 text-[10px] font-black uppercase py-2 rounded-md !text-white
+  w-full mt-2 text-[10px] font-black uppercase py-2 rounded-md
   transition-all duration-150
   ${
     isBoardValid
       ? "bg-green-700 hover:bg-green-600 cursor-pointer"
-      : "bg-zinc-700 opacity-40 cursor-not-allowed"
+      : "bg-canvas cursor-not-allowed"
   }
 `}            >
               {t("custom.addBoard")}
@@ -639,11 +655,11 @@ className="w-full bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-[
 className={`group w-full text-[10px] font-black uppercase py-2 mt-2 rounded-md transition-all duration-150
   ${
     uploadImage && uploadWidth && uploadDepth
-      ? "bg-green-700 hover:bg-green-600"
-      : "bg-zinc-700 opacity-40 cursor-not-allowed"
+      ? "bg-green-700 hover:bg-green-600 cursor-pointer"
+      : "bg-canvas cursor-not-allowed"
   }
 `} >
-    <span className={`inline-block transition-transform duration-150 !text-white`}>
+    <span className={`inline-block transition-transform duration-150`}>
   {t("customMenu.add")}
 </span>
   </button>

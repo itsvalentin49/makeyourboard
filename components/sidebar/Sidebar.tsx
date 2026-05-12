@@ -9,10 +9,11 @@ import {
   RotateCw,
   ShoppingCart,
   Trash2,
-  SlidersHorizontal,
-  LayoutPanelLeft,
+  CircuitBoard,
+  PanelsTopLeft,
   Zap,
-  Boxes,
+  PencilRuler,
+  AudioWaveform,
 } from "lucide-react";
 
 import SidebarLogo from "@/components/sidebar/SidebarLogo";
@@ -693,7 +694,74 @@ const addPower = (p: any) => {
 ) : (
 
 // LIBRARY (default view)
-<div className="px-1 flex flex-col gap-6 flex-1 overflow-hidden pb-24">
+<div className="px-1 flex flex-col gap-4 flex-1 overflow-hidden">
+
+  <div className="shrink-0">
+    <div className="grid grid-cols-4 gap-2">
+    {[
+{
+  key: "pedals",
+  label: "Pedals",
+  icon: AudioWaveform,
+},
+{
+  key: "boards",
+  label: "Boards",
+  icon: PanelsTopLeft,
+},
+{
+  key: "power",
+  label: "Power",
+  icon: Zap,
+},
+{
+  key: "custom",
+  label: "Custom",
+  icon: PencilRuler,
+},
+    ].map((tab) => {
+      const Icon = tab.icon;
+      const active = activeSidebarTab === tab.key;
+
+      return (
+        <button
+          key={tab.key}
+          type="button"
+          onClick={() => {
+            setActiveSidebarTab(tab.key as any);
+            setShowPedalResults(false);
+            setShowBoardResults(false);
+            setShowPowerResults(false);
+          }}
+          className={`h-[72px] rounded-2xl flex flex-col items-center justify-center gap-2 transition-all ${
+            active
+              ? "bg-zinc-950"
+              : "bg-transparent hover:bg-canvas"
+          }`}
+        >
+          <Icon
+  size={24}
+  strokeWidth={1.8}
+  className={
+    tab.key === "pedals"
+      ? "text-green-500"
+      : tab.key === "boards"
+      ? "text-blue-500"
+      : tab.key === "power"
+      ? "text-yellow-500"
+      : tab.key === "custom"
+      ? "text-purple-500"
+      : ""
+  }
+/>
+          <span className="text-[11px] font-black">
+            {tab.label}
+          </span>
+        </button>
+      );
+    })}
+  </div>
+</div>
 
 {activeSidebarTab === "pedals" && (
   <SearchPedals
@@ -773,58 +841,7 @@ const addPower = (p: any) => {
   />
 )}
 
-<div className="absolute bottom-4 left-6 right-6 z-50">
-  <div className="grid grid-cols-4 gap-2">
-    {[
-      {
-        key: "pedals",
-        label: "Pedals",
-        icon: SlidersHorizontal,
-      },
-      {
-        key: "boards",
-        label: "Boards",
-        icon: LayoutPanelLeft,
-      },
-      {
-        key: "power",
-        label: "Power",
-        icon: Zap,
-      },
-      {
-        key: "custom",
-        label: "Custom",
-        icon: Boxes,
-      },
-    ].map((tab) => {
-      const Icon = tab.icon;
-      const active = activeSidebarTab === tab.key;
 
-      return (
-        <button
-          key={tab.key}
-          type="button"
-          onClick={() => {
-            setActiveSidebarTab(tab.key as any);
-            setShowPedalResults(false);
-            setShowBoardResults(false);
-            setShowPowerResults(false);
-          }}
-          className={`h-[72px] rounded-2xl flex flex-col items-center justify-center gap-2 transition-all ${
-            active
-              ? "bg-zinc-950"
-              : "bg-transparent hover:bg-canvas"
-          }`}
-        >
-          <Icon size={24} strokeWidth={1.8} />
-          <span className="text-[11px] font-black">
-            {tab.label}
-          </span>
-        </button>
-      );
-    })}
-  </div>
-</div>
 
 
         </div>

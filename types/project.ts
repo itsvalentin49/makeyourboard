@@ -15,4 +15,9 @@ export type Project = {
   stageY?: number;
   boardPedals: BoardItem[];
   selectedBoards: BoardItem[];
+  signalPath?: {
+    id: string;
+    from: number;
+    to: number;
+  }[];
 };

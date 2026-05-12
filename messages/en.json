@@ -70,6 +70,7 @@
       "Footswitch": "Footswitch",
       "Fuzz": "Fuzz",
       "Limiter": "Limiter",
+      "Line Selector": "Line Selector",
       "Lo-Fi": "Lo-Fi",
       "Looper": "Looper",
       "MIDI Controller": "MIDI Controller",
@@ -184,6 +185,7 @@
     "nameOptional": "Name",
     "namePlaceholder": "Fuzz",
     "enterDimensions": "Dimensions",
+    "dimensionError": "Allowed dimensions: min {min} {unit} / max {max} {unit}",
     "width": "Width",
     "depth": "Depth",
     "color": "Color",
@@ -197,6 +199,7 @@
     "language": "Language",
     "units": "Unit",
     "theme": "Theme",
+    "about": "About us",
 
     "unitsOptions": {
       "metric": "Metric",
@@ -260,8 +263,8 @@
   },
 
   "export": {
-    "button": "Export",
-    "title": "Export Image",
+    "button": "Download",
+    "title": "Bild herunterladen",
     "name": "Name",
     "background": "Background",
     "preview": "Preview",
@@ -396,7 +399,9 @@
     "pedalboards": "Pedalboards",
     "newBoard": "New board",
     "jacks": "Jacks",
-    "power": "Power"
+    "power": "Power",
+    "cableClearance": "Cable Clearance",
+    "cableClearanceDescription": "Check if pedals have enough room for cables."
   },
 
   "help": {

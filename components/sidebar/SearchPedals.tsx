@@ -82,18 +82,6 @@ export default function SearchPedals({
 
   return (
     <div className="flex flex-col gap-4 mt-1 h-full min-h-0">
-<div
-  className="
-    w-full
-    text-[11px] font-black uppercase
-    py-2 rounded-md
-    bg-blue-600 !text-white
-    text-center
-    cursor-default
-  "
->
-  {t("pedalsMenu.title")}
-</div>
 
       <div className="relative flex items-center shrink-0">
         <Search

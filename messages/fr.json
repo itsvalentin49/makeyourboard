@@ -67,6 +67,7 @@
       "Footswitch": "Footswitch",
       "Fuzz": "Fuzz",
       "Limiter": "Limiteur",
+      "Line Selector": "Line Selector",
       "Lo-Fi": "Lo-Fi",
       "Looper": "Looper",
       "MIDI Controller": "Contrôleur MIDI",
@@ -182,6 +183,7 @@
   "nameOptional": "Nom",
   "namePlaceholder": "Nom (Fuzz)",
   "enterDimensions": "Dimensions",
+  "dimensionError": "Dimensions autorisées : min {min} {unit} / max {max} {unit}",
   "width": "Largeur",
   "depth": "Profondeur",
   "color": "Couleur",
@@ -195,6 +197,7 @@
   "language": "Langue",
   "units": "Unité",
   "theme": "Thème",
+  "about": "À propos",
 
   "unitsOptions": {
     "metric": "Métrique",
@@ -256,8 +259,8 @@
   },
 
   "export": {
-    "button": "Exporter",
-    "title": "Exporter l’image",
+    "button": "Télécharger",
+    "title": "Télécharger l’image",
     "name": "Nom",
     "background": "Fond",
     "preview": "Aperçu",
@@ -367,7 +370,7 @@
   },
 
   "customMenu": {
-    "title": "Custom",
+    "title": "Pédale personalisée",
     "subtitle": "Créez une pédale ou un pedalboard personnalisé avec des dimensions sur mesure.",
     "importTitle": "Importer une image",
     "importSubtitle": "Importez votre propre pédale depuis votre ordinateur.",
@@ -388,7 +391,9 @@
     "pedalboards": "Pedalboards",
     "newBoard": "Nouveau board",
     "jacks": "Jacks",
-    "power": "Power"
+    "power": "Power",
+    "cableClearance": "Passage des câbles",
+    "cableClearanceDescription": "Vérifiez l’espace disponible pour les câbles."
   },
 
   "help": {

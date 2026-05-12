@@ -329,6 +329,36 @@ html:not(.light) textarea::placeholder {
   border-color: var(--zinc-600) !important;
 }
 
+.text-canvas {
+  color: var(--zinc-600) !important;
+}
+
+.light .text-canvas {
+  color: var(--zinc-200) !important;
+}
+
 .light .border-canvas {
   border-color: var(--zinc-200) !important;
+}
+
+/* =========================
+   GREEN BUTTONS
+   ========================= */
+
+/* DARK MODE */
+html:not(.light) .bg-green-700 {
+  background-color: #15803d !important;
+}
+
+html:not(.light) .hover\:bg-green-600:hover {
+  background-color: #16a34a !important;
+}
+
+/* LIGHT MODE */
+html.light .bg-green-700 {
+  background-color: #22c55e !important;
+}
+
+html.light .hover\:bg-green-600:hover {
+  background-color: #4ade80 !important;
 }

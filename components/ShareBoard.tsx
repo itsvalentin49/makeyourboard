@@ -459,7 +459,7 @@ useEffect(() => {
   >
 
 <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider">
-  <Upload size={14} className="text-purple-500" />
+  <Upload size={14}/>
   {t("share.title")}
 </div>
 
@@ -472,7 +472,7 @@ useEffect(() => {
       <input
         value={name}
         onChange={(e) => setName(e.target.value)}
-        className="h-9 px-3 rounded-md bg-zinc-800 border border-zinc-700 text-[12px] font-mono focus:outline-none focus:border-blue-500"
+        className="h-9 px-3 rounded-md bg-zinc-950 border border-zinc-700 text-[12px] font-mono focus:outline-none focus:border-blue-500"
       />
     </div>
 
@@ -617,7 +617,7 @@ useEffect(() => {
         {t("share.preview")}
       </label>
 
-      <div className="bg-zinc-800 rounded-md p-2 flex items-center justify-center">
+      <div className="bg-canvas rounded-md p-2 flex items-center justify-center">
         <canvas
           ref={previewRef}
           className="max-w-full max-h-40"
