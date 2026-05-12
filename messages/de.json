@@ -406,15 +406,13 @@
     "open": "Hilfe öffnen",
     "close": "Hilfe schließen",
     "gearTitle": "Wähle dein Equipment",
-    "gearText": "Wähle Pedale, Pedalboards und Netzteile im linken Bereich aus.",
-    "layoutTitle": "Erstelle dein Layout",
-    "layoutText": "Ziehe, platziere und ordne alles auf dem Canvas an.",
-    "jacksTitle": "Prüfe den Platz für Stecker",
-    "jacksText": "Stelle sicher, dass zwischen deinen Pedalen genug Platz für Kabel und Stecker vorhanden ist.",
-    "powerTitle": "Prüfe deine Stromversorgung",
-    "powerText": "Füge ein Netzteil hinzu, um Stromverbrauch und Kompatibilität zu überprüfen.",
+    "gearText": "Wähle Pedale, Boards und Netzteile aus und ordne dein Setup auf der Arbeitsfläche an.",
+    "jacksTitle": "Kabelabstand prüfen",
+    "jacksText": "Stelle sicher, dass genügend Platz für Kabel und Stecker vorhanden ist.",
+    "powerTitle": "Stromversorgung prüfen",
+    "powerText": "Füge ein Netzteil hinzu, um Stromverbrauch und Kompatibilität zu prüfen.",
     "shareTitle": "Exportieren oder teilen",
-    "shareText": "Exportiere dein Pedalboard als Bild oder teile es mit Freunden.",
+    "shareText": "Exportiere dein Board als Bild oder teile es mit Freunden.",
     "ok": "OK"
   }
 }

@@ -403,18 +403,16 @@
 
   "help": {
     "title": "Bienvenido a MakeYourBoard",
-    "open": "Abrir la guía de ayuda",
-    "close": "Cerrar la guía de ayuda",
+    "open": "Abrir guía",
+    "close": "Cerrar guía",
     "gearTitle": "Selecciona tu equipo",
-    "gearText": "Elige pedales, pedalboards y fuentes de alimentación desde el panel izquierdo.",
-    "layoutTitle": "Construye tu layout",
-    "layoutText": "Arrastra, suelta y organiza todo en el canvas.",
-    "jacksTitle": "Verifica el espacio para los jacks",
-    "jacksText": "Asegúrate de que tus pedales tengan suficiente espacio para cables y conectores.",
-    "powerTitle": "Verifica tu alimentación",
+    "gearText": "Selecciona pedales, pedalboards y fuentes de alimentación, luego organiza tu setup en el lienzo.",
+    "jacksTitle": "Comprueba el espacio para cables",
+    "jacksText": "Asegúrate de que los pedales tengan suficiente espacio para cables y conectores.",
+    "powerTitle": "Comprueba tu alimentación",
     "powerText": "Añade una fuente de alimentación para verificar el consumo y la compatibilidad.",
-    "shareTitle": "Exporta o comparte",
-    "shareText": "Exporta tu pedalboard como imagen o compártelo con tus amigos.",
+    "shareTitle": "Exportar o compartir",
+    "shareText": "Exporta tu board como imagen o compártelo con tus amigos.",
     "ok": "OK"
   }
 }

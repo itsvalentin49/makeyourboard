@@ -69,27 +69,14 @@ export function HelpGuide({ t }: Props) {
 
             <div className="space-y-4 text-sm leading-snug">
               <div className="flex gap-3">
-                <LayoutPanelLeft
-                  size={18}
-                  className="mt-0.5 shrink-0 text-blue-500"
-                />
-                <div>
-                  <div className="font-black">{t("help.gearTitle")}</div>
-                  <p className="mt-0.5 text-zinc-400">
-                    {t("help.gearText")}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex gap-3">
                 <MousePointer2
                   size={18}
                   className="mt-0.5 shrink-0 text-green-500"
                 />
                 <div>
-                  <div className="font-black">{t("help.layoutTitle")}</div>
+                  <div className="font-black">{t("help.gearTitle")}</div>
                   <p className="mt-0.5 text-zinc-400">
-                    {t("help.layoutText")}
+                    {t("help.gearText")}
                   </p>
                 </div>
               </div>

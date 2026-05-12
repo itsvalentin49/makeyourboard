@@ -65,13 +65,15 @@ export default function SettingsPanel({
 React.useEffect(() => {
   const savedTheme = localStorage.getItem("theme");
 
-  if (savedTheme === "light") {
+  if (!savedTheme || savedTheme === "light") {
     document.documentElement.classList.add("light");
     setTheme("light");
-  } else {
-    document.documentElement.classList.remove("light");
-    setTheme("dark");
+    localStorage.setItem("theme", "light");
+    return;
   }
+
+  document.documentElement.classList.remove("light");
+  setTheme("dark");
 }, []);
 
   React.useEffect(() => {
@@ -448,32 +450,32 @@ return (
       overflow-hidden
     "
   >
-    {/* SLIDER */}
-    <div
-      className={`
-        absolute top-0 h-full w-1/2
-        rounded-md bg-blue-600
-        transition-transform duration-200 ease-out
-        ${
-          theme === "light"
-            ? "translate-x-full"
-            : "translate-x-0"
-        }
-      `}
-    />
+{/* SLIDER */}
+<div
+  className={`
+    absolute top-0 h-full w-1/2
+    rounded-md bg-blue-600
+    transition-transform duration-200 ease-out
+    ${
+      theme === "dark"
+        ? "translate-x-full"
+        : "translate-x-0"
+    }
+  `}
+/>
 
     {[
-      {
-        key: "dark",
-        label: t("settings.themeOptions.dark"),
-        icon: Moon,
-      },
-      {
-        key: "light",
-        label: t("settings.themeOptions.light"),
-        icon: Sun,
-      },
-    ].map((item) => {
+  {
+    key: "light",
+    label: t("settings.themeOptions.light"),
+    icon: Sun,
+  },
+  {
+    key: "dark",
+    label: t("settings.themeOptions.dark"),
+    icon: Moon,
+  },
+].map((item) => {
       const isActive = theme === item.key;
       const Icon = item.icon;
 
