@@ -699,26 +699,29 @@ const addPower = (p: any) => {
   <div className="shrink-0">
     <div className="grid grid-cols-4 gap-2">
     {[
+
 {
   key: "pedals",
-  label: "Pedals",
+  label: t("sidebar.pedals"),
   icon: AudioWaveform,
 },
 {
   key: "boards",
-  label: "Boards",
+  label: t("sidebar.boards"),
   icon: PanelsTopLeft,
 },
 {
   key: "power",
-  label: "Power",
+  label: t("sidebar.power"),
   icon: Zap,
 },
 {
   key: "custom",
-  label: "Custom",
+  label: t("sidebar.custom"),
   icon: PencilRuler,
 },
+
+
     ].map((tab) => {
       const Icon = tab.icon;
       const active = activeSidebarTab === tab.key;

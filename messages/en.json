@@ -13,7 +13,11 @@
     "searchPower": "Search for a power supply",
     "addPowerSupplyButton": "Add",
     "noPowerFound": "No power supplies found",
-    "back": "Back"
+    "back": "Back",
+    "pedals": "Pedals",
+    "boards": "Boards",
+    "power": "Power",
+    "custom": "Custom"
   },
 
   "canvasIntro": {
@@ -418,5 +422,6 @@
     "shareText": "Export your board as an image or share it with friends.",
     "ok": "OK"
   }
+  
 
 }

@@ -13,7 +13,11 @@
     "searchPower": "Netzteil suchen",
     "addPowerSupplyButton": "Hinzufügen",
     "noPowerFound": "Keine Netzteile gefunden",
-    "back": "Zurück"
+    "back": "Zurück",
+    "pedals": "Pedale",
+    "boards": "Boards",
+    "power": "Netzteil",
+    "custom": "Custom"
   },
 
   "canvasIntro": {

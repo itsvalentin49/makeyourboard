@@ -13,7 +13,11 @@
     "searchPower": "Cerca un alimentatore",
     "addPowerSupplyButton": "Aggiungi",
     "noPowerFound": "Nessun alimentatore trovato",
-    "back": "Indietro"
+    "back": "Indietro",
+    "pedals": "Pedali",
+    "boards": "Boards",
+    "power": "Power",
+    "custom": "Custom"
   },
 
   "canvasIntro": {

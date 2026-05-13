@@ -13,7 +13,11 @@
     "searchPower": "Buscar una fuente de alimentación",
     "addPowerSupplyButton": "Añadir",
     "noPowerFound": "No se encontraron fuentes de alimentación",
-    "back": "Volver"
+    "back": "Volver",
+    "pedals": "Pedales",
+    "boards": "Boards",
+    "power": "Fuente",
+    "custom": "Custom"
   },
 
   "canvasIntro": {
