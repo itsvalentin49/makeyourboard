@@ -57,12 +57,12 @@ export function HelpGuide({ t }: Props) {
               absolute right-0 top-12 z-[90]
               w-[350px] rounded-2xl
               bg-zinc-900 border border-zinc-800 shadow-2xl
-              pt-3 px-5 pb-5
+              pt-6 px-5 pb-5
             "
             onClick={(e) => e.stopPropagation()}
           >
-<div className="mb-6 select-none">
-  <div className="text-[30px] font-black tracking-tight leading-none">
+<div className="mb-8 select-none">
+  <div className="text-[30px] font-black text-center tracking-tight leading-none">
     MakeYourBoard
   </div>
 
@@ -72,12 +72,13 @@ export function HelpGuide({ t }: Props) {
       text-zinc-500
       text-[10px]
       font-bold
-      tracking-[0.255em]
+      tracking-[0.25em]
       uppercase
+      text-center
       leading-none
       whitespace-nowrap
       origin-left
-      scale-x-[1]
+      scale-x-[1.01]
     "
   >
     Guitar Pedalboard Builder
@@ -147,7 +148,7 @@ export function HelpGuide({ t }: Props) {
               type="button"
               onClick={closeGuide}
               className="
-                mt-6 h-8 w-full rounded-md bg-blue-600
+                mt-8 h-8 w-full rounded-md bg-blue-600
                 !text-white text-[11px] font-black uppercase tracking-wide
                 transition-colors hover:bg-blue-500
               "
