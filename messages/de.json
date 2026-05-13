@@ -184,7 +184,7 @@
     "pedal": "Pedal",
     "board": "Pedalboard",
     "nameOptional": "Name",
-    "namePlaceholder": "Fuzz",
+    "namePlaceholder": "Name (Fuzz)",
     "enterDimensions": "Abmessungen",
     "dimensionError": "Erlaubte Maße: min. {min} {unit} / max. {max} {unit}",
     "width": "Breite",
@@ -264,7 +264,7 @@
   },
 
   "export": {
-    "button": "Herunterladen",
+    "button": "Export",
     "title": "Bild exportieren",
     "name": "Name",
     "background": "Hintergrund",
@@ -379,15 +379,15 @@
   },
 
   "customMenu": {
-    "title": "Eigene Elemente",
-    "subtitle": "Erstelle ein eigenes Pedal oder Pedalboard mit individuellen Abmessungen.",
+    "title": "Benutzerdefiniertes Pedal",
+    "subtitle": "Erstelle ein individuelles Pedal oder Pedalboard.",
     "importTitle": "Bild importieren",
-    "importSubtitle": "Importiere dein eigenes Pedal von deinem Computer.",
+    "importSubtitle": "Importiere ein Pedal von deinem Computer.",
     "chooseImage": "Bild auswählen",
     "brand": "Marke",
     "model": "Modell",
     "voltage": "Spannung (V)",
-    "current": "Stromstärke (mA)",
+    "current": "Stromaufnahme (mA)",
     "add": "Hinzufügen"
   },
 
@@ -400,6 +400,7 @@
     "pedalboards": "Pedalboards",
     "newBoard": "Neues Board",
     "jacks": "Jacks",
+    "cables": "Kabel",
     "power": "Power",
     "cableClearance": "Kabelabstand",
     "cableClearanceDescription": "Prüfe, ob genügend Platz für die Kabel vorhanden ist."

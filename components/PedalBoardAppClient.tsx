@@ -12,13 +12,14 @@ import { Settings, Plus, Minus, RotateCw, X, Trash2 } from "lucide-react";
 import { useRef } from "react";
 
 type Units = "metric" | "imperial";
-const LANGUAGE_TO_LOCALE: Record<string, "en" | "fr" | "es" | "de" | "it" | "pt"> = {
+const LANGUAGE_TO_LOCALE: Record<string, "en" | "fr" | "es" | "de" | "it" | "pt" | "zh"> = {
   English: "en",
   French: "fr",
   Spanish: "es",
   German: "de",
   Italian: "it",
   Portuguese: "pt",
+  Chinese: "zh",
 };
 
 
@@ -142,12 +143,17 @@ useEffect(() => {
 
       if (parsed.canvasBg) setCanvasBg(parsed.canvasBg);
 
-      if (parsed.language) {
-        const allowed: Language[] = ["en", "fr", "es", "de", "it", "pt"];
-        if (allowed.includes(parsed.language)) {
-          setLanguage(parsed.language);
-        }
-      }
+if (parsed.language) {
+  const allowed: Language[] = ["en", "fr", "es", "de", "it", "pt", "zh"];
+
+  const normalizedLanguage = String(parsed.language)
+    .replace("Chinese", "zh")
+    .replace("中文", "zh") as Language;
+
+  if (allowed.includes(normalizedLanguage)) {
+    setLanguage(normalizedLanguage);
+  }
+}
 
       if (parsed.units) setUnits(parsed.units);
     }

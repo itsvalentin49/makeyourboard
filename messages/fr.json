@@ -263,8 +263,8 @@
   },
 
   "export": {
-    "button": "Télécharger",
-    "title": "Télécharger l’image",
+    "button": "Export",
+    "title": "Exporter l’image",
     "name": "Nom",
     "background": "Fond",
     "preview": "Aperçu",
@@ -375,9 +375,9 @@
 
   "customMenu": {
     "title": "Pédale personalisée",
-    "subtitle": "Créez une pédale ou un pedalboard personnalisé avec des dimensions sur mesure.",
+    "subtitle": "Créez une pédale ou un board sur mesure.",
     "importTitle": "Importer une image",
-    "importSubtitle": "Importez votre propre pédale depuis votre ordinateur.",
+    "importSubtitle": "Importez une pédale depuis votre ordinateur.",
     "chooseImage": "Choisir une image",
     "brand": "Marque",
     "model": "Modèle",
@@ -395,6 +395,7 @@
     "pedalboards": "Pedalboards",
     "newBoard": "Nouveau board",
     "jacks": "Jacks",
+    "cables": "Câbles",
     "power": "Power",
     "cableClearance": "Passage des câbles",
     "cableClearanceDescription": "Vérifiez l’espace disponible pour les câbles."

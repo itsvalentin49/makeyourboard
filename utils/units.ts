@@ -11,6 +11,7 @@ const LOCALE_MAP: Record<Language, string> = {
   de: "de-DE",
   it: "it-IT",
   pt: "pt-PT",
+  zh: "zh-CN",
 };
 
 function formatNumber(

@@ -487,9 +487,8 @@ className={`
 </div>
   </div>
 
-  <label className="h-[35px] rounded-lg border border-zinc-800 bg-zinc-950 hover:!border-white transition-all cursor-pointer flex items-center justify-center text-[9px] font-black uppercase tracking-wide light:!text-black hover:text-white
-
-  ">
+{!uploadImage && (
+  <label className="h-[35px] rounded-lg border border-zinc-800 bg-zinc-950 hover:!border-white transition-all cursor-pointer flex items-center justify-center text-[9px] font-black uppercase tracking-wide light:!text-black hover:text-white">
     {t("customMenu.chooseImage")}
     <input
       type="file"
@@ -498,6 +497,7 @@ className={`
       onChange={(e) => handleLocalImageUpload(e.target.files?.[0] || null)}
     />
   </label>
+)}
 
 {/* PREVIEW IMAGE */}
 {uploadImage && (

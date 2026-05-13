@@ -4,12 +4,13 @@ import React from "react";
 import { ExternalLink, RotateCw, Trash2, ArrowUp, ArrowDown, } from "lucide-react";
 import BuyOnline from "./BuyOnline";
 import { mmToIn, formatWeight } from "@/utils/units";
+import type { Language } from "@/utils/i18n";
 
 type Props = {
   selectedPower: any;
 
   units: "metric" | "imperial";
-  language: "en" | "fr" | "es" | "de" | "it" | "pt";
+  language: Language;
 
   t: (key: string) => string;
 
@@ -46,24 +47,11 @@ export default function PowerSpecs({
 
       {selectedInstanceId !== null && (
   <div className="space-y-4 mt-4 mb-4">
-    <div className="w-full text-[11px] font-black uppercase py-2 rounded-md bg-blue-500 !text-white text-center cursor-default">
+    <div className="w-full text-[11px] font-black uppercase py-2 rounded-md bg-blue-600 !text-white text-center cursor-default">
       {t("pedal.actions.title")}
     </div>
 
-    <div className="grid grid-cols-5 gap-2">
-
-  {/* POWER IMAGE */}
-  <div className="h-[40px] flex items-center justify-center overflow-visible">
-    <img
-      src={
-        selectedPower.image ||
-        selectedPower.image_url ||
-        selectedPower.photo
-      }
-      alt={selectedPower.name || "Selected power supply"}
-      className="max-w-full max-h-[34px] object-contain"
-    />
-  </div>
+<div className="grid grid-cols-4 gap-2">
 
   {/* ROTATE */}
   <button
@@ -150,7 +138,7 @@ export default function PowerSpecs({
               w-full
               text-[11px] font-black uppercase
               py-2 rounded-md
-              bg-blue-500 !text-white
+              bg-blue-600 !text-white
               text-center
               cursor-default
             "

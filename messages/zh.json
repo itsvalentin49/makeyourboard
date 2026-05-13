@@ -1,0 +1,425 @@
+{
+  "sidebar": {
+    "searchPedal": "搜索效果器",
+    "searchBoard": "搜索效果器板",
+    "buyOnline": "在线购买",
+    "addPedal": "添加效果器",
+    "addBoard": "添加效果器板",
+    "addPedalTitle": "效果器",
+    "addPedalButton": "添加",
+    "addBoardTitle": "效果器板",
+    "addBoardButton": "添加",
+    "addPowerTitle": "电源",
+    "searchPower": "搜索电源",
+    "addPowerSupplyButton": "添加",
+    "noPowerFound": "未找到电源",
+    "back": "返回",
+    "pedals": "效果器",
+    "boards": "板",
+    "power": "电源",
+    "custom": "自定义"
+  },
+
+  "canvasIntro": {
+    "title": "Make Your Board",
+    "subtitle": "吉他效果器板制作工具",
+    "desktopText": "从左侧面板选择效果器、效果器板和电源。\n拖放并排列它们，打造你的理想配置。\n检查供电设置，并与朋友分享你的效果器板。",
+    "mobileText": "从左侧面板选择效果器、效果器板和电源。\n拖放并排列它们，打造你的理想配置。\n检查供电设置，并与朋友分享你的效果器板。"
+  },
+
+  "pedal": {
+    "features": "规格",
+
+    "actions": {
+      "title": "操作",
+      "rotate": "旋转",
+      "delete": "删除",
+      "moveFront": "移到前面",
+      "moveBack": "移到后面"
+    },
+
+    "brand": "品牌",
+    "model": "型号",
+    "year": "年份",
+
+    "status": {
+      "label": "状态",
+      "active": "在售",
+      "discontinued": "已停产"
+    },
+
+    "type": {
+      "label": "类型",
+      "A/B Box": "A/B 切换盒",
+      "Accessory": "配件",
+      "Acoustic": "原声",
+      "Amp Simulator": "音箱模拟器",
+      "Audio Interface": "音频接口",
+      "Bit Crusher": "位深粉碎器",
+      "Boost": "提升器",
+      "Buffer": "缓冲器",
+      "Cab Simulator": "箱体模拟器",
+      "Chorus": "合唱",
+      "Compressor": "压缩器",
+      "Delay": "延迟",
+      "Delay / Reverb": "延迟 / 混响",
+      "DI": "DI",
+      "Distortion": "失真",
+      "Enveloppe Filter": "包络滤波器",
+      "Equalizer": "均衡器",
+      "Expression": "表情踏板",
+      "Filter": "滤波器",
+      "Flanger": "镶边",
+      "Footswitch": "脚踏开关",
+      "Fuzz": "法兹",
+      "Limiter": "限制器",
+      "Line Selector": "线路选择器",
+      "Lo-Fi": "低保真",
+      "Looper": "循环录音器",
+      "MIDI Controller": "MIDI 控制器",
+      "MIDI Switcher": "MIDI 切换器",
+      "Multi-FX": "综合效果器",
+      "Noise Gate": "噪声门",
+      "Octaver": "八度效果器",
+      "Overdrive": "过载",
+      "Phaser": "相位",
+      "Pitch": "音高",
+      "Power Amp": "后级放大器",
+      "Power Supply": "电源",
+      "Preamp": "前级放大器",
+      "Reverb": "混响",
+      "Reverb / Tremolo": "混响 / 颤音",
+      "Ring Modulator": "环形调制器",
+      "Rotary": "旋转扬声器",
+      "Slicer": "切片器",
+      "Sustainer": "延音器",
+      "Swell": "渐强效果",
+      "Synth": "合成器",
+      "Tap Tempo": "Tap Tempo",
+      "Tremolo": "颤音",
+      "Tuner": "调音器",
+      "Uni-Vibe": "Uni-Vibe",
+      "Utility": "实用工具",
+      "Vibrato": "揉音",
+      "Vocal": "人声",
+      "Volume": "音量",
+      "Wah": "哇音",
+      "Whammy": "Whammy"
+    },
+
+    "circuit": {
+      "label": "电路",
+      "Digital": "数字",
+      "Analog": "模拟",
+      "Hybrid": "混合",
+      "N/A": "无"
+    },
+
+    "bypass": {
+      "label": "旁路",
+      "True Bypass": "真旁路",
+      "Buffered Bypass": "缓冲旁路",
+      "Switchable": "可切换",
+      "N/A": "无"
+    },
+
+    "power": {
+      "label": "供电",
+      "AC": "AC",
+      "8-20V DC": "8-20V DC",
+      "9-20V DC": "9-20V DC",
+      "9V DC": "9V DC",
+      "12V DC": "12V DC",
+      "9-12V DC": "9-12V DC",
+      "9-15V DC": "9-15V DC",
+      "9-24V DC": "9-24V DC",
+      "18V DC": "18V DC",
+      "24V DC": "24V DC",
+      "48V DC": "48V DC",
+      "9-18V DC": "9-18V DC",
+      "Passive": "无源",
+      "Battery": "电池",
+      "N/A": "无"
+    },
+
+    "draw": "电流消耗",
+    "dimensions": "尺寸",
+    "weight": "重量",
+    "origin": "产地",
+    "manual": "说明书"
+  },
+
+  "board": {
+    "status": {
+      "label": "状态",
+      "active": "在售",
+      "discontinued": "已停产"
+    },
+
+    "brand": "品牌",
+    "model": "型号",
+    "year": "年份",
+
+    "material": {
+      "label": "材质",
+      "Aluminium": "铝",
+      "ABS": "ABS",
+      "Plastic": "塑料",
+      "Plywood": "胶合板"
+    },
+
+    "profile": {
+      "label": "结构",
+      "Flat": "平面",
+      "Angled": "倾斜",
+      "N/A": "无"
+    },
+
+    "dimensions": "尺寸",
+    "weight": "重量",
+    "origin": "产地"
+  },
+
+  "custom": {
+    "title": "自定义",
+    "selectType": "选择效果器或效果器板",
+    "pedal": "效果器",
+    "board": "效果器板",
+    "nameOptional": "名称",
+    "namePlaceholder": "名称（Fuzz）",
+    "enterDimensions": "尺寸",
+    "dimensionError": "允许尺寸：最小 {min} {unit} / 最大 {max} {unit}",
+    "width": "宽度",
+    "depth": "深度",
+    "color": "颜色",
+    "addPedal": "添加",
+    "addBoard": "添加"
+  },
+
+  "settings": {
+    "title": "设置",
+    "background": "背景",
+    "language": "语言",
+    "units": "单位",
+    "theme": "主题",
+    "about": "关于我们",
+
+    "unitsOptions": {
+      "metric": "公制",
+      "imperial": "英制"
+    },
+
+    "themeOptions": {
+      "dark": "深色",
+      "light": "浅色"
+    }
+  },
+
+  "backgrounds": {
+    "neutral": "中性",
+    "wood": "人字木纹",
+    "carpet": "蓝色锦缎",
+    "steel": "铁纹钢板",
+    "fabric": "棉质织物",
+    "stripes": "蓝色条纹",
+    "coast": "夏日氛围",
+    "houndstooth": "千鸟格"
+  },
+
+  "canvas": {
+    "totalDraw": "总电流",
+    "totalWeight": "总重量"
+  },
+
+  "footer": {
+    "feedback": "联系",
+    "donate": "支持"
+  },
+
+  "tabs": {
+    "confirmDelete": "确定要删除这个效果器板吗？",
+    "yes": "是",
+    "cancel": "取消"
+  },
+
+  "contact": {
+    "title": "联系",
+    "subtitle": "我们通常会在一个工作日内回复。",
+    "email": "你的邮箱",
+    "type": "类型",
+    "message": "消息",
+    "placeholderEmail": "you@email.com",
+    "placeholderMessage": "写下你的消息...",
+    "send": "发送消息",
+    "sending": "发送中...",
+    "sent": "消息已发送",
+    "errorRequired": "请填写所有字段。",
+    "errorInvalidEmail": "请输入有效的电子邮箱地址。",
+    "errorGeneric": "出现错误。请重试。",
+
+    "types": {
+      "question": "问题",
+      "request": "请求",
+      "bug": "Bug",
+      "other": "其他"
+    }
+  },
+
+  "export": {
+    "button": "导出",
+    "title": "导出图片",
+    "name": "名称",
+    "background": "背景",
+    "preview": "预览",
+    "transparent": "透明（PNG）",
+    "white": "白色（JPG）",
+    "download": "下载"
+  },
+
+  "share": {
+    "button": "分享",
+    "title": "分享你的效果器板",
+    "preview": "预览",
+    "social": "分享到",
+    "copy": "复制链接",
+    "copied": "已复制"
+  },
+
+  "list": {
+    "button": "列表",
+    "title": "效果器板"
+  },
+
+  "power": {
+    "button": "电源",
+    "check": "检查供电",
+    "features": "参数",
+    "status": {
+      "label": "状态",
+      "active": "在售",
+      "discontinued": "已停产"
+    },
+    "brand": "品牌",
+    "model": "型号",
+    "year": "年份",
+    "capacity": "总电流",
+    "outputs": "输出",
+    "voltage": "电压",
+    "isolated": "隔离",
+    "dimensions": "尺寸",
+    "weight": "重量",
+    "origin": "产地",
+    "manual": "说明书",
+    "yes": "是",
+    "no": "否"
+  },
+
+  "powerSetup": {
+    "title": "供电设置",
+
+    "outputs": {
+      "fixed": "固定输出",
+      "fixed_plural": "固定输出",
+      "switchable": "可切换输出",
+      "switchable_plural": "可切换输出"
+    },
+
+    "sections": {
+      "pedals": "效果器",
+      "recommendation": "建议"
+    },
+
+    "status": {
+      "compatible": "所有效果器都与你的电源兼容。",
+      "notCompatible": "你的电源并不兼容所有效果器。"
+    },
+
+    "empty": {
+      "title": "添加第一个效果器开始搭建。",
+      "subtitle": "使用左侧边栏搜索并添加效果器。"
+    },
+
+    "recommendation": {
+      "perfect": "你的效果器板供电完全正常。Rock on 🤘",
+      "daisy": "你可以使用菊链为多个效果器供电。",
+      "daisySimple": "一条菊链就足以为你的效果器供电。",
+      "daisyHint": "使用分线电源线。更适合模拟效果器，数字效果器可能会产生噪音。",
+      "isolated": "建议为你的效果器板使用隔离电源。",
+      "full": "你的电源已经满载。",
+      "fullHint": "添加另一台电源，或升级到输出更多的型号。",
+      "upgrade": "使用合适的电源，或将不兼容的效果器接入独立电源适配器。",
+      "tuner": "你的调音器可以通过菊链为多个效果器供电 🤘",
+      "singleAdapter": "你可以使用 {voltage}V 电源适配器，电流额定值需高于 {draw}mA。",
+      "battery9v": "如果该效果器支持电池供电，也可以使用 9V 电池。"
+    }
+  },
+
+  "search": {
+    "noResults": "无结果"
+  },
+
+  "pedalsMenu": {
+    "title": "效果器",
+    "searchPlaceholder": "搜索...",
+    "count": "{count} 个效果器",
+    "results": "{count} 个结果",
+    "latest": "以下是最新发布的效果器。",
+    "new": "新品",
+    "newReleases": "新品发布"
+  },
+
+  "boardsMenu": {
+    "title": "效果器板",
+    "searchPlaceholder": "搜索...",
+    "count": "{count} 个效果器板"
+  },
+
+  "powerMenu": {
+    "title": "电源",
+    "searchPlaceholder": "搜索...",
+    "count": "{count} 个电源"
+  },
+
+  "customMenu": {
+    "title": "自定义效果器",
+    "subtitle": "创建自定义效果器或效果器板。",
+    "importTitle": "导入图片",
+    "importSubtitle": "从电脑导入一个效果器。",
+    "chooseImage": "选择图片",
+    "brand": "品牌",
+    "model": "型号",
+    "voltage": "电压（V）",
+    "current": "电流消耗（mA）",
+    "add": "添加"
+  },
+
+  "canvasControls": {
+    "min": "最小",
+    "max": "最大",
+    "setup": "配置",
+    "pedalboard": "效果器板",
+    "boards": "板",
+    "pedalboards": "效果器板",
+    "newBoard": "新建板",
+    "jacks": "插孔",
+    "cables": "线缆",
+    "power": "电源",
+    "cableClearance": "线缆空间",
+    "cableClearanceDescription": "检查效果器是否有足够空间连接线缆。"
+  },
+
+  "help": {
+    "title": "欢迎",
+    "open": "打开帮助指南",
+    "close": "关闭帮助指南",
+    "gearTitle": "选择你的设备",
+    "gearText": "选择效果器、效果器板和电源，然后在画布上拖动并排列你的配置。",
+    "jacksTitle": "检查插头空间",
+    "jacksText": "确保效果器之间有足够空间连接线缆和插头。",
+    "powerTitle": "检查供电设置",
+    "powerText": "添加电源以检查电流消耗和兼容性。",
+    "shareTitle": "导出或分享",
+    "shareText": "将你的效果器板导出为图片，或分享给朋友。",
+    "ok": "确定"
+  }
+}

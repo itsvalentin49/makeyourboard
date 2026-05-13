@@ -15,6 +15,7 @@ import {
   PencilRuler,
   AudioWaveform,
 } from "lucide-react";
+import type { Language } from "@/utils/i18n";
 
 import SidebarLogo from "@/components/sidebar/SidebarLogo";
 import BuyOnline from "@/components/sidebar/BuyOnline";
@@ -94,8 +95,8 @@ type Props = {
   canvasBg: string;
   setCanvasBg: (v: string) => void;
 
-  language: "en" | "fr" | "es" | "de" | "it" | "pt";
-  setLanguage: (v: "en" | "fr" | "es" | "de" | "it" | "pt") => void;
+  language: Language;
+  setLanguage: (v: Language) => void;
 
   units: "metric" | "imperial";
   setUnits: (v: "metric" | "imperial") => void;
@@ -162,14 +163,15 @@ export default function Sidebar({
 }: Props) {
 
   const t = getTranslator(language);
-  const LANGUAGE_LABELS: Record<string, string> = {
+  const LANGUAGE_LABELS: Record<Language, string> = {
     en: "English",
     fr: "Français",
     es: "Español",
     de: "Deutsch",
     it: "Italiano",
     pt: "Português",
-  };
+    zh: "中文",
+};
   
   const minMm = customType === "pedal" ? 30 : 100;
   const maxMm = customType === "pedal" ? 300 : 1000;

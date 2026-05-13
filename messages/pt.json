@@ -184,7 +184,7 @@
     "pedal": "Pedal",
     "board": "Pedalboard",
     "nameOptional": "Nome",
-    "namePlaceholder": "Fuzz",
+    "namePlaceholder": "Nome (Fuzz)",
     "enterDimensions": "Dimensões",
     "dimensionError": "Dimensões permitidas: mín {min} {unit} / máx {max} {unit}",
     "width": "Largura",
@@ -264,14 +264,14 @@
   },
 
   "export": {
-    "button": "Baixar",
-    "title": "Baixar imagem",
+    "button": "Exportar",
+    "title": "Exportar imagem",
     "name": "Nome",
     "background": "Fundo",
     "preview": "Pré-visualização",
     "transparent": "Transparente (PNG)",
     "white": "Branco (JPG)",
-    "download": "Download"
+    "download": "Transferir"
   },
 
   "share": {
@@ -379,15 +379,15 @@
   },
 
   "customMenu": {
-    "title": "Itens personalizados",
-    "subtitle": "Crie um pedal ou pedalboard personalizado com as suas próprias dimensões.",
-    "importTitle": "Importar imagem",
-    "importSubtitle": "Importe o seu próprio pedal a partir do computador.",
+    "title": "Pedal personalizado",
+    "subtitle": "Crie um pedal ou pedalboard personalizado.",
+    "importTitle": "Importar uma imagem",
+    "importSubtitle": "Importe um pedal do seu computador.",
     "chooseImage": "Escolher uma imagem",
     "brand": "Marca",
     "model": "Modelo",
     "voltage": "Voltagem (V)",
-    "current": "Corrente (mA)",
+    "current": "Consumo (mA)",
     "add": "Adicionar"
   },
 
@@ -400,6 +400,7 @@
     "pedalboards": "Pedalboards",
     "newBoard": "Novo board",
     "jacks": "Jacks",
+    "cables": "Cabos",
     "power": "Power",
     "cableClearance": "Espaço para cabos",
     "cableClearanceDescription": "Verifique se os pedais têm espaço suficiente para os cabos."

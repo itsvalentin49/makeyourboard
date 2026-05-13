@@ -184,7 +184,7 @@
     "pedal": "Pedale",
     "board": "Pedaliera",
     "nameOptional": "Nome",
-    "namePlaceholder": "Fuzz",
+    "namePlaceholder": "Nome (Fuzz)",
     "enterDimensions": "Dimensioni",
     "dimensionError": "Dimensioni consentite: min {min} {unit} / max {max} {unit}",
     "width": "Larghezza",
@@ -264,8 +264,8 @@
   },
 
   "export": {
-    "button": "Scaricare",
-    "title": "Scaricare immagine",
+    "button": "Esporta",
+    "title": "Esporta immagine",
     "name": "Nome",
     "background": "Sfondo",
     "preview": "Anteprima",
@@ -379,15 +379,15 @@
   },
 
   "customMenu": {
-    "title": "Elementi personalizzati",
-    "subtitle": "Crea un pedale o una pedaliera personalizzati con dimensioni su misura.",
-    "importTitle": "Importa immagine",
-    "importSubtitle": "Importa il tuo pedale dal computer.",
+    "title": "Pedale personalizzato",
+    "subtitle": "Crea un pedale o una pedaliera personalizzata.",
+    "importTitle": "Importa un'immagine",
+    "importSubtitle": "Importa un pedale dal tuo computer.",
     "chooseImage": "Scegli un'immagine",
     "brand": "Marca",
     "model": "Modello",
     "voltage": "Voltaggio (V)",
-    "current": "Corrente (mA)",
+    "current": "Assorbimento (mA)",
     "add": "Aggiungi"
   },
 
@@ -400,6 +400,7 @@
     "pedalboards": "Pedalboard",
     "newBoard": "Nuova board",
     "jacks": "Jacks",
+    "cables": "Cavi",
     "power": "Power",
     "cableClearance": "Spazio per i cavi",
     "cableClearanceDescription": "Verifica che i pedali abbiano abbastanza spazio per i cavi."

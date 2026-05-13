@@ -2,19 +2,19 @@
 
 import React, { useRef, useLayoutEffect, useEffect, useState } from "react";
 import { Stage, Layer, Group, Rect, Text, Image as KonvaImage } from "react-konva";
-import { Zap, Weight, Minus, Cable, Plus, Check, Upload, AlertTriangle, RotateCw, Trash2, X, Download, Info, List, Settings, PanelsTopLeft } from "lucide-react";
+import { Zap, Weight, Minus, Cable, Plus, Check, Upload, AlertTriangle, RotateCw, Trash2, X, Share2, Info, List, Settings, PanelsTopLeft } from "lucide-react";
 import PedalImage from "@/components/PedalImage";
 import { formatWeight } from "@/utils/units";
 import { getTranslator } from "@/utils/i18n";
 import useImage from "use-image";
-import ExportPNG from "@/components/ExportPNG";
-import ShareBoard from "@/components/ShareBoard";
+import ExportPanel from "@/components/ExportPanel";
 import Image from "next/image";
 import type { Project } from "@/types/project";
 import SettingsPanel from "@/components/SettingsPanel";
 import PowerSetup from "@/components/PowerSetup";
 import { HelpGuide } from "@/components/HelpGuide";
 import SignalPath, { SignalPoint } from "@/components/SignalPath";
+import type { Language } from "@/utils/i18n";
 
 
 type AnyRow = Record<string, any>;
@@ -51,11 +51,11 @@ activeProject: {
   setMobileSidebarOpen: (v: boolean) => void;
   setSpecsOpen: (v: boolean) => void;
   setSettingsOpen?: (v: boolean) => void;
-  setLanguage?: (v: "en" | "fr" | "es" | "de" | "it" | "pt") => void;
+  setLanguage?: (v: Language) => void;
   setUnits?: (v: "metric" | "imperial") => void;
 
   units: "metric" | "imperial";
-  language: "en" | "fr" | "es" | "de" | "it" | "pt";
+  language: Language;
 
   mobileSidebarOpen?: boolean;
 
@@ -608,8 +608,7 @@ const handleStageClick = (e: any) => {
 
     // 🔥 AJOUT ICI (LA CLE)
     setShowPower(false);
-    setShowExport(false);
-    setShowShare(false);
+    setShowExportPanel(false);
     setShowList(false);
     setShowBoardsMenu(false);
     setShowSettings(false);
@@ -624,28 +623,7 @@ const handleStageClick = (e: any) => {
   const rafRef = useRef<number | null>(null);
   const wheelTimeout = useRef<any>(null);
   const marginRefs = useRef<Record<number, any>>({});
-  const prevPowerLevelRef = useRef<number | null>(null);
 
-useEffect(() => {
-  const prev = prevPowerLevelRef.current;
-
-  // 🔥 uniquement si on MONTE en gravité
-  if (hasPower && prev !== null && currentPowerLevel > prev) {
-    setShowPowerAlert(true);
-
-    const timeout = setTimeout(() => {
-      setShowPowerAlert(false);
-    }, 5000);
-
-    prevPowerLevelRef.current = currentPowerLevel;
-
-    return () => clearTimeout(timeout);
-  }
-
-  // mise à jour normale
-  prevPowerLevelRef.current = currentPowerLevel;
-
-}, [currentPowerLevel]);
 
   const checkCollision = (id1: number, id2: number) => {
   const n1 = marginRefs.current[id1];
@@ -695,8 +673,7 @@ useEffect(() => {
 
 
   const [hoveredPedalId, setHoveredPedalId] = useState<number | null>(null);
-  const [showExport, setShowExport] = useState(false);
-  const [showShare, setShowShare] = useState(false);
+  const [showExportPanel, setShowExportPanel] = useState(false);
   const [showJacksMargin, setShowJacksMargin] = useState(false);
   const [showSignalPath, setShowSignalPath] = useState(false);
   const [showCableMenu, setShowCableMenu] = useState(false);
@@ -723,7 +700,6 @@ useEffect(() => {
   const [showList, setShowList] = useState(false);
   const [showOutputs, setShowOutputs] = useState(false);
   const [showPower, setShowPower] = useState(false);
-  const [showPowerAlert, setShowPowerAlert] = useState(false);
   const [hoveredBoardId, setHoveredBoardId] = useState<number | null>(null);
   const [overlayPosition, setOverlayPosition] = useState<{
   x: number;
@@ -1212,8 +1188,7 @@ const shouldShowHelpGuide =
       setShowList(v => !v);
       setShowBoardsMenu(false);
       setShowPower(false);
-      setShowExport(false);
-      setShowShare(false);
+      setShowExportPanel(false);
       setShowSettings(false);
       setShowSignalPath(false);
 }} className="relative flex items-center justify-center gap-2 h-9 w-24 md:h-10 md:w-28 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl text-[11px] font-mono font-bold uppercase transition-all hover:border-blue-500">
@@ -1249,8 +1224,7 @@ const shouldShowHelpGuide =
     onClick={() => {
     setShowBoardsMenu((v) => !v);
     setShowPower(false);
-    setShowExport(false);
-    setShowShare(false);
+    setShowExportPanel(false);
     setShowList(false);
     setShowSettings(false);
     setShowSignalPath(false);
@@ -1429,8 +1403,7 @@ onClick={() => {
   setShowCableMenu((v) => !v);
   setShowBoardsMenu(false);
   setShowPower(false);
-  setShowExport(false);
-  setShowShare(false);
+  setShowExportPanel(false);
   setShowList(false);
   setShowSettings(false);
 }}
@@ -1449,7 +1422,7 @@ onClick={() => {
   className="text-red-500"
 />
 
-    Cables
+    {t("canvasControls.cables")}
   </button>
 
 {showCableMenu && (
@@ -1464,7 +1437,7 @@ onClick={() => {
     >
       <div className="flex items-center gap-2 text-xs uppercase tracking-wider font-bold">
         <Cable size={14} className="text-red-500" />
-        Cables
+        {t("canvasControls.cables")}
       </div>
 
       {/* SWITCH JACK CLEARANCE */}
@@ -1489,18 +1462,18 @@ onClick={() => {
 <div
   className={`
     absolute top-4 right-4
-    w-11 h-5 rounded-full transition-colors duration-200
+    w-10 h-5 rounded-full transition-colors duration-200
     ${showJacksMargin ? "bg-blue-600" : "bg-zinc-700"}
   `}
 >
-          <div
-            className={`
-              absolute top-0.5 left-0.5 w-5 h-4 rounded-full bg-white
-              transition-transform duration-200
-              ${showJacksMargin ? "translate-x-5" : "translate-x-0"}
-            `}
-          />
-        </div>
+  <div
+    className={`
+      absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white
+      transition-transform duration-200
+      ${showJacksMargin ? "translate-x-5" : "translate-x-0"}
+    `}
+  />
+</div>
       </button>
 
       {/* SWITCH SIGNAL PATH */}
@@ -1545,30 +1518,12 @@ onClick={() => {
       {/* TOTAL DRAW (mA)*/}
 <div className="relative">
 
-  {showPowerAlert && (
-    <div
-      className="
-        absolute bottom-full left-1/2 -translate-x-1/2 mb-2
-        px-3 py-1
-        bg-yellow-400 text-black
-        text-[10px] font-bold uppercase tracking-wide
-        rounded-full shadow-lg
-        animate-bounce
-        whitespace-nowrap
-        pointer-events-none
-        z-50
-      "
-    >
-      {t("power.check")}
-    </div>
-  )}
 
   <button
     onClick={() => {
   setShowPower(v => !v);
   setShowBoardsMenu(false);
-  setShowExport(false);
-  setShowShare(false);
+  setShowExportPanel(false);
   setShowList(false);
   setShowCableMenu(false);
 }}
@@ -1631,77 +1586,41 @@ onClick={() => {
 {/* --- DROITE : ACTIONS --- */}
 <div className="absolute bottom-6 right-6 flex items-center gap-4 z-50">
   
-  {/* EXPORT */}
-  <div className="relative">
-    <button 
-      onClick={() => {
-  setShowExport(v => !v);
-  setShowBoardsMenu(false);
-  setShowPower(false);
-  setShowShare(false);
-  setShowList(false);
-  setShowSettings(false);
-  setShowSignalPath(false);
-  setShowCableMenu(false);
-}}
-      className="relative flex items-center justify-center gap-2 h-9 w-24 md:h-10 md:w-28 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl text-[11px] font-mono font-bold uppercase transition-all duration-200 hover:scale-105 hover:border-blue-500 active:scale-95 cursor-pointer"
-    >
-      <Download size={16} /> 
-      {t("export.button")}
-    </button>
-    
-    {showExport && (
-      <>
-        {/* Calque invisible pour fermer en cliquant ailleurs */}
-        <div className="fixed inset-0 z-40 pointer-events-none" />
-        <div className="absolute bottom-12 right-0 z-50">
-          <ExportPNG 
-            boardPedals={activeProject.boardPedals} 
-            selectedBoards={activeProject.selectedBoards} 
-            displaySizes={displaySizes} 
-            boardName={activeProject.name} 
-            canvasBg={canvasBg} 
-            currentBackground={currentBackground} 
-            onClose={() => setShowExport(false)}
-          />
-        </div>
-      </>
-    )}
-  </div>
-
-  {/* SHARE */}
-    <div className="relative">
-    <button 
-      onClick={() => {
-      setShowShare(v => !v);
+ {/* EXPORT / SHARE */}
+<div className="relative">
+  <button
+    onClick={() => {
+      setShowExportPanel((v) => !v);
       setShowBoardsMenu(false);
       setShowPower(false);
-      setShowExport(false);
-      setShowList(false)
+      setShowList(false);
       setShowSettings(false);
       setShowSignalPath(false);
+      setShowCableMenu(false);
     }}
-      className="relative flex items-center justify-center gap-2 h-9 w-24 md:h-10 md:w-28 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl text-[11px] font-mono font-bold uppercase transition-all duration-200 hover:scale-105 hover:border-blue-500 active:scale-95 cursor-pointer transform-gpu">
-      <Upload size={16}  /> 
-      {t("share.button")}
-    </button>
-    {showShare && (
-      <>
-        {/* Calque invisible pour fermer en cliquant ailleurs */}
-        <div className="fixed inset-0 z-40 pointer-events-none" />
-        <div className="absolute bottom-12 right-0 z-50">
-          <ShareBoard 
-            boardPedals={activeProject.boardPedals} 
-            selectedBoards={activeProject.selectedBoards} 
-            displaySizes={displaySizes} 
-            boardName={activeProject.name} 
-            onClose={() => setShowShare(false)}
-            currentBackground={currentBackground}
-          />
-        </div>
-      </>
-    )}
-  </div>
+    className="relative flex items-center justify-center gap-2 h-9 w-24 md:h-10 md:w-28 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl text-[11px] font-mono font-bold uppercase transition-all duration-200 hover:scale-105 hover:border-blue-500 active:scale-95 cursor-pointer"
+  >
+    <Share2 size={16} />
+    {t("export.button")}
+  </button>
+
+  {showExportPanel && (
+    <>
+      <div className="fixed inset-0 z-40 pointer-events-none" />
+      <div className="absolute bottom-12 right-0 z-50">
+        <ExportPanel
+          boardPedals={activeProject.boardPedals}
+          selectedBoards={activeProject.selectedBoards}
+          displaySizes={displaySizes}
+          boardName={activeProject.name}
+          canvasBg={canvasBg}
+          currentBackground={currentBackground}
+          onClose={() => setShowExportPanel(false)}
+        />
+      </div>
+    </>
+  )}
+</div>
 
 {/* SETTINGS */}
 <div className="relative">
@@ -1711,8 +1630,7 @@ onClick={() => {
       setShowSettings((v) => !v);
       setShowBoardsMenu(false);
       setShowPower(false);
-      setShowExport(false);
-      setShowShare(false);
+      setShowExportPanel(false);
       setShowList(false);
       setShowCableMenu(false);
     }}
@@ -1782,8 +1700,8 @@ onMouseDown={(e) => {
 
   // ✅ ferme Export dès qu'on clique sur le canvas,
   // même sur une pédale, board, alim, etc.
-  if (showExport) {
-    setShowExport(false);
+  if (showExportPanel) {
+    setShowExportPanel(false);
   }
 
   const stage = stageRef.current;

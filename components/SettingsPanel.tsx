@@ -2,6 +2,7 @@
 
 import React from "react";
 import { ChevronDown, ArrowLeft, X, Sun, Moon } from "lucide-react";
+import type { Language } from "@/utils/i18n";
 
 type Background = {
   id: string;
@@ -16,8 +17,8 @@ type Props = {
   canvasBg: string;
   setCanvasBg: (v: string) => void;
 
-  language: "en" | "fr" | "es" | "de" | "it" | "pt";
-  setLanguage: (v: "en" | "fr" | "es" | "de" | "it" | "pt") => void;
+  language: Language;
+  setLanguage: (v: Language) => void;
 
   units: "metric" | "imperial";
   setUnits: (v: "metric" | "imperial") => void;
@@ -107,13 +108,14 @@ React.useEffect(() => {
   };
 }, []);
 
-  const LANGUAGE_LABELS: Record<string, string> = {
+  const LANGUAGE_LABELS: Record<Language, string> = {
     en: "English",
     fr: "Français",
     es: "Español",
     de: "Deutsch",
     it: "Italiano",
     pt: "Português",
+    zh: "中文",
   };
 
   const CONTACT_TYPES = [
@@ -330,13 +332,13 @@ return (
 
     {langOpen && (
       <div className="absolute z-50 mt-1 w-full bg-zinc-950 border border-zinc-800 rounded-lg overflow-hidden">
-        {Object.keys(LANGUAGE_LABELS).map((l) => (
-          <button
-            key={l}
-            onClick={() => {
-              setLanguage(l as any);
-              setLangOpen(false);
-            }}
+{(Object.keys(LANGUAGE_LABELS) as Language[]).map((l) => (
+  <button
+    key={l}
+    onClick={() => {
+      setLanguage(l);
+      setLangOpen(false);
+    }}
             className="w-full h-[25px] px-4 text-left text-[11px] flex items-center hover:bg-canvas"
           >
             {LANGUAGE_LABELS[l]}

@@ -3,12 +3,13 @@
 import React from "react";
 import { RotateCw, Trash2, ArrowUp, ArrowDown } from "lucide-react";
 import { mmToIn, formatWeight } from "@/utils/units";
+import type { Language } from "@/utils/i18n";
 
 type Props = {
   selectedBoardDetails: any;
 
   units: "metric" | "imperial";
-  language: "en" | "fr" | "es" | "de" | "it" | "pt";
+  language: Language;
 
   t: (key: string) => string;
 
@@ -52,22 +53,11 @@ return (
 
     {selectedBoardInstanceId !== null && (
       <div className="space-y-4 mt-4 mb-4">
-        <div className="w-full text-[11px] font-black uppercase py-2 rounded-md bg-blue-500 !text-white text-center cursor-default">
+        <div className="w-full text-[11px] font-black uppercase py-2 rounded-md bg-blue-600 !text-white text-center cursor-default">
           {t("pedal.actions.title")}
         </div>
 
-        <div className="grid grid-cols-5 gap-2">
-  <div className="h-[40px] flex items-center justify-center overflow-visible">
-    <img
-      src={
-        selectedBoardDetails.image ||
-        selectedBoardDetails.image_url ||
-        selectedBoardDetails.photo
-      }
-      alt={selectedBoardDetails.name || "Selected board"}
-      className="max-w-full max-h-[34px] object-contain"
-    />
-  </div>
+<div className="grid grid-cols-4 gap-2">
 
   <button
     onClick={() => rotateBoard(selectedBoardInstanceId)}
@@ -109,7 +99,7 @@ return (
       w-full
       text-[11px] font-black uppercase
       py-2 rounded-md
-      bg-blue-500 !text-white
+      bg-blue-600 !text-white
       text-center
       cursor-default
     "
@@ -298,7 +288,7 @@ return (
       w-full
       text-[11px] font-black uppercase
       py-2 rounded-md
-      bg-blue-500 !text-white
+      bg-blue-600 !text-white
       text-center
       cursor-default
     "

@@ -4,13 +4,14 @@ import React from "react";
 import { ExternalLink, RotateCw, Trash2, ArrowUp, ArrowDown } from "lucide-react";
 import BuyOnline from "./BuyOnline";
 import { mmToIn, formatWeight } from "@/utils/units";
+import type { Language } from "@/utils/i18n";
 
 type Props = {
   selectedPedal: any;
   selectedInstanceId: number | null;
 
   units: "metric" | "imperial";
-  language: "en" | "fr" | "es" | "de" | "it" | "pt";
+  language: Language;
   t: (key: string) => string;
 
   isCustomPedal: boolean;
