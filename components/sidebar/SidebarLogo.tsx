@@ -18,14 +18,14 @@ export default function SidebarLogo({ t }: Props) {
 className="
   mt-1
   text-zinc-500 dark:text-zinc-500
-  text-[11px]
+  text-[10px]
   font-bold
-  tracking-[0.205em]
+  tracking-[0.37em]
   uppercase
   leading-none
   whitespace-nowrap
   origin-left
-  scale-x-[1.09]
+  scale-x-[1]
 "
 >
   Guitar Pedalboard Builder

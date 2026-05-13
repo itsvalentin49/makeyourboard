@@ -61,11 +61,29 @@ export function HelpGuide({ t }: Props) {
             "
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="mb-7 flex items-start justify-between gap-4">
-              <h2 className="mt-1 text-[18px] font-black tracking-[-0.04em]">
-                {t("help.title")}
-              </h2>
-            </div>
+<div className="mb-6 select-none">
+  <div className="text-[30px] font-black tracking-tight leading-none">
+    MakeYourBoard
+  </div>
+
+  <div
+    className="
+      mt-1
+      text-zinc-500
+      text-[10px]
+      font-bold
+      tracking-[0.255em]
+      uppercase
+      leading-none
+      whitespace-nowrap
+      origin-left
+      scale-x-[1]
+    "
+  >
+    Guitar Pedalboard Builder
+  </div>
+
+</div>
 
             <div className="space-y-4 text-sm leading-snug">
               <div className="flex gap-3">
