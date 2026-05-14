@@ -165,13 +165,20 @@ export default function PowerSetup({
         </div>
       )}
 
-      <div className="mb-2.5 mt-6 text-[12px] uppercase tracking-wider font-bold">
-        {t("powerSetup.sections.pedals")}
-      </div>
+      <div className="mb-1 mt-6 text-[12px] uppercase tracking-wider font-bold">
+  {t("powerSetup.sections.pedals")}
+</div>
 
-      <div className="mb-5">
-        <div className="space-y-2">
-          {pedalAssignments.map((a, i) => (
+{!hasPedals && (
+  <div className="mb-4 text-[12px] text-blue-500">
+    {t("powerSetup.empty.noPedals")}
+  </div>
+)}
+
+{hasPedals && (
+  <div className="mb-5">
+    <div className="space-y-2">
+      {pedalAssignments.map((a, i) => (
             <div
               key={i}
               className="grid grid-cols-[auto_1fr_auto] items-end text-[11px] leading-none"
@@ -200,9 +207,10 @@ export default function PowerSetup({
                 </span>
               </div>
             </div>
-          ))}
-        </div>
-      </div>
+      ))}
+    </div>
+  </div>
+)}
 
       <div className="flex items-center justify-between -mt-4">
         <div className={`text-[12px] ${powerMessageColor}`}>

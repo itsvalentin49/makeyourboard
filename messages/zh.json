@@ -60,6 +60,7 @@
       "Buffer": "缓冲器",
       "Cab Simulator": "箱体模拟器",
       "Chorus": "合唱",
+      "Chorus / Vibrato": "合唱 / 颤音",
       "Compressor": "压缩器",
       "Delay": "延迟",
       "Delay / Reverb": "延迟 / 混响",
@@ -335,6 +336,7 @@
     },
 
     "empty": {
+      "noPedals": "没有效果器。",
       "title": "添加第一个效果器开始搭建。",
       "subtitle": "使用左侧边栏搜索并添加效果器。"
     },

@@ -46,6 +46,35 @@ export default function ExportPanel({
 const containerRef = useRef<HTMLDivElement>(null);
   const previewRef = useRef<HTMLCanvasElement | null>(null);
 
+ const drawBranding = async (
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  loadImage: (src: string) => Promise<HTMLImageElement>
+) => {
+  ctx.save();
+
+  ctx.globalAlpha = 0.025;
+  ctx.fillStyle = "#ffffff";
+  ctx.font = "900 18px Arial";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+
+  ctx.translate(width / 2, height / 2);
+  ctx.rotate((-25 * Math.PI) / 180);
+  ctx.translate(-width / 2, -height / 2);
+
+  const stepX = 190;
+  const stepY = 95;
+
+  for (let y = -height; y < height * 2; y += stepY) {
+    for (let x = -width; x < width * 2; x += stepX) {
+      ctx.fillText("MakeYourBoard", x, y);
+    }
+  }
+
+  ctx.restore();
+};
 
 const getRenderItems = (): AnyRow[] =>
   [
@@ -63,25 +92,6 @@ const getRenderItems = (): AnyRow[] =>
       (Number(a.zIndex) || 0) -
       (Number(b.zIndex) || 0)
   );
-
-// ===============================
-// 🔒 CLICK OUTSIDE
-// ===============================
-useEffect(() => {
-  const handleClickOutside = (e: MouseEvent) => {
-    if (!containerRef.current) return;
-
-    if (!containerRef.current.contains(e.target as Node)) {
-      onClose();
-    }
-  };
-
-  document.addEventListener("mousedown", handleClickOutside);
-
-  return () => {
-    document.removeEventListener("mousedown", handleClickOutside);
-  };
-}, [onClose]);
 
   // ===============================
   // 🖼️ PREVIEW RENDER
@@ -148,7 +158,7 @@ useEffect(() => {
     canvas.height = height * SCALE;
 
     ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.scale(SCALE, SCALE);
+    ctx.setTransform(SCALE, 0, 0, SCALE, 0, 0);
     ctx.clearRect(0, 0, width, height);
 
     ctx.imageSmoothingEnabled = true;
@@ -307,8 +317,10 @@ useEffect(() => {
         }
       }
 
-      ctx.restore();
+            ctx.restore();
     }
+
+    await drawBranding(ctx, width, height, loadImage);
   } catch (e) {
     console.error(e);
   }
@@ -564,6 +576,7 @@ for (const item of getRenderItems()) {
   ctx.restore();
 }
 
+    await drawBranding(ctx, width, height, loadImage);
     canvas.toBlob(
       (blob) => {
         if (!blob) return;
@@ -690,7 +703,7 @@ return (
   >
     {/* TITLE */}
     <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider">
-      <Share2 size={14} />
+      <Share2 size={14} className= "text-purple-500" />
       {t("export.title")}
     </div>
 

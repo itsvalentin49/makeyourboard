@@ -1240,10 +1240,10 @@ const shouldShowHelpGuide =
     cursor-pointer
   "
 >
-  <PanelsTopLeft
-    size={16}
-    className="text-blue-500"
-  />
+<PanelsTopLeft
+  size={16}
+  className={showBoardsMenu ? "text-blue-500" : undefined}
+/>
 
   {t("canvasControls.boards")}
 </button>
@@ -1419,7 +1419,7 @@ onClick={() => {
   >
 <Cable
   size={16}
-  className="text-red-500"
+  className={showCableMenu ? "text-red-500" : undefined}
 />
 
     {t("canvasControls.cables")}
@@ -1519,30 +1519,32 @@ onClick={() => {
 <div className="relative">
 
 
-  <button
-    onClick={() => {
-  setShowPower(v => !v);
-  setShowBoardsMenu(false);
-  setShowExportPanel(false);
-  setShowList(false);
-  setShowCableMenu(false);
-}}
-    className={`
-      relative
-      flex items-center justify-center gap-2
-      h-9 md:h-10 w-24 md:w-28
-      bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl
-      text-[11px] font-mono font-bold uppercase
-      transition-all duration-200
-      hover:scale-105 hover:border-blue-500 active:scale-95
-      cursor-pointer
+<button
+  onClick={() => {
+    setShowPower(v => !v);
+    setShowBoardsMenu(false);
+    setShowExportPanel(false);
+    setShowList(false);
+    setShowCableMenu(false);
+  }}
+  className={`
+    relative
+    flex items-center justify-center gap-2
+    h-9 md:h-10 w-24 md:w-28
+    bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl
+    text-[11px] font-mono font-bold uppercase
+    transition-all duration-200
+    hover:scale-105 hover:border-blue-500 active:scale-95
+    cursor-pointer
+  `}
+>
+  <Zap
+    size={16}
+    className={showPower ? "text-yellow-500" : undefined}
+  />
 
-      
-    `}
-  >
-    <Zap size={16} className="text-yellow-500" />
-    {t("canvasControls.power")}
-  </button>
+  {t("canvasControls.power")}
+</button>
 
 
 
@@ -1586,23 +1588,37 @@ onClick={() => {
 {/* --- DROITE : ACTIONS --- */}
 <div className="absolute bottom-6 right-6 flex items-center gap-4 z-50">
   
- {/* EXPORT / SHARE */}
+{/* EXPORT / SHARE */}
 <div className="relative">
-  <button
-    onClick={() => {
-      setShowExportPanel((v) => !v);
-      setShowBoardsMenu(false);
-      setShowPower(false);
-      setShowList(false);
-      setShowSettings(false);
-      setShowSignalPath(false);
-      setShowCableMenu(false);
-    }}
-    className="relative flex items-center justify-center gap-2 h-9 w-24 md:h-10 md:w-28 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl text-[11px] font-mono font-bold uppercase transition-all duration-200 hover:scale-105 hover:border-blue-500 active:scale-95 cursor-pointer"
-  >
-    <Share2 size={16} />
-    {t("export.button")}
-  </button>
+<button
+  type="button"
+  onMouseDown={(e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    setShowExportPanel((v) => {
+      const next = !v;
+
+      if (next) {
+        setShowBoardsMenu(false);
+        setShowPower(false);
+        setShowList(false);
+        setShowSettings(false);
+        setShowSignalPath(false);
+        setShowCableMenu(false);
+      }
+
+      return next;
+    });
+  }}
+  className="relative flex items-center justify-center gap-2 h-9 w-24 md:h-10 md:w-28 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl text-[11px] font-mono font-bold uppercase transition-all duration-200 hover:scale-105 hover:border-blue-500 active:scale-95 cursor-pointer"
+>
+  <Share2
+    size={16}
+    className={showExportPanel ? "text-purple-500" : undefined}
+  />
+  {t("export.button")}
+</button>
 
   {showExportPanel && (
     <>

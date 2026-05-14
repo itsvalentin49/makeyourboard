@@ -58,6 +58,7 @@
       "Buffer": "Buffer",
       "Cab Simulator": "Cab-Simulator",
       "Chorus": "Chorus",
+      "Chorus / Vibrato": "Chorus / Vibrato",
       "Compressor": "Kompressor",
       "Delay": "Delay",
       "Delay / Reverb": "Delay / Reverb",
@@ -333,6 +334,7 @@
     },
 
     "empty": {
+      "noPedals": "Keine Pedale.",
       "title": "Füge dein erstes Pedal hinzu, um zu starten.",
       "subtitle": "Nutze die Seitenleiste links, um Pedale zu suchen und hinzuzufügen."
     },
