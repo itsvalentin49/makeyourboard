@@ -267,7 +267,7 @@
   "export": {
     "button": "Exportar",
     "title": "Exportar imagen",
-    "name": "Nombre",
+    "name": "Nombre del archivo",
     "background": "Fondo",
     "preview": "Vista previa",
     "transparent": "Transparente (PNG)",
@@ -370,23 +370,29 @@
   "boardsMenu": {
     "title": "Pedaleras",
     "searchPlaceholder": "Buscar...",
-    "count": "{count} pedaleras"
+    "count": "{count} pedalboards",
+    "popular": "Pedaleras más utilizadas.",
+    "results": "{count} resultados"
   },
 
   "powerMenu": {
     "title": "Fuentes de alimentación",
     "searchPlaceholder": "Buscar...",
-    "count": "{count} fuentes de alimentación"
+    "count": "{count} fuentes de alimentación",
+    "popular": "Fuentes de alimentación más utilizadas.",
+    "results": "{count} resultados"
   },
 
   "customMenu": {
-    "title": "Pedal personalizado",
-    "subtitle": "Crea un pedal o pedalboard personalizado.",
+    "pedalTitle": "Pedal personalizado",
+    "boardTitle": "Pedalera personalizada",
+    "subtitle": "Crea un pedal o una pedalera a medida.",
     "importTitle": "Importar una imagen",
     "importSubtitle": "Importa un pedal desde tu ordenador.",
+    "formats": "Formatos aceptados: PNG, JPG, WEBP",
+    "maxSize": "Tamaño máx.: 1 MB",
+    "imageDimensions": "Dimensiones: mín. 30 mm / máx. 500 mm",
     "chooseImage": "Elegir una imagen",
-    "brand": "Marca",
-    "model": "Modelo",
     "voltage": "Voltaje (V)",
     "current": "Consumo (mA)",
     "add": "Añadir"
@@ -411,14 +417,14 @@
     "title": "Bienvenido",
     "open": "Abrir guía",
     "close": "Cerrar guía",
-    "gearTitle": "Selecciona tu equipo",
-    "gearText": "Selecciona pedales, pedalboards y fuentes de alimentación, luego organiza tu setup en el lienzo.",
-    "jacksTitle": "Comprueba el espacio para cables",
-    "jacksText": "Asegúrate de que los pedales tengan suficiente espacio para cables y conectores.",
-    "powerTitle": "Comprueba tu alimentación",
-    "powerText": "Añade una fuente de alimentación para verificar el consumo y la compatibilidad.",
-    "shareTitle": "Exportar o compartir",
-    "shareText": "Exporta tu board como imagen o compártelo con tus amigos.",
+    "gearTitle": "Elige tu equipo",
+    "gearText": "Añade pedales, una pedalera y una fuente de alimentación para crear tu pedalboard ideal.",
+    "jacksTitle": "Espacio para cables",
+    "jacksText": "Asegúrate de que los pedales estén lo bastante separados para permitir el paso de los cables.",
+    "powerTitle": "Comprueba la alimentación",
+    "powerText": "Asegúrate de que tu fuente de alimentación sea compatible con tus pedales y tenga potencia suficiente.",
+    "shareTitle": "Descarga tu pedalboard",
+    "shareText": "Exporta tu pedalboard en PNG para guardarla o compartirla.",
     "ok": "OK"
   }
 }

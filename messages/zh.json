@@ -269,7 +269,7 @@
   "export": {
     "button": "导出",
     "title": "导出图片",
-    "name": "名称",
+    "name": "文件名",
     "background": "背景",
     "preview": "预览",
     "transparent": "透明（PNG）",
@@ -342,7 +342,7 @@
     },
 
     "recommendation": {
-      "perfect": "你的效果器板供电完全正常。Rock on 🤘",
+      "perfect": "你的效果器板供电完全正常。Let's rock 🤘",
       "daisy": "你可以使用菊链为多个效果器供电。",
       "daisySimple": "一条菊链就足以为你的效果器供电。",
       "daisyHint": "使用分线电源线。更适合模拟效果器，数字效果器可能会产生噪音。",
@@ -373,27 +373,33 @@
   "boardsMenu": {
     "title": "效果器板",
     "searchPlaceholder": "搜索...",
-    "count": "{count} 个效果器板"
+    "count": "{count} 个效果器板",
+    "popular": "最常用的效果器板。",
+    "results": "{count} 个结果"
   },
 
   "powerMenu": {
     "title": "电源",
     "searchPlaceholder": "搜索...",
-    "count": "{count} 个电源"
+    "count": "{count} 个电源",
+    "popular": "最常用的电源。",
+    "results": "{count} 个结果"
   },
 
-  "customMenu": {
-    "title": "自定义效果器",
-    "subtitle": "创建自定义效果器或效果器板。",
-    "importTitle": "导入图片",
-    "importSubtitle": "从电脑导入一个效果器。",
-    "chooseImage": "选择图片",
-    "brand": "品牌",
-    "model": "型号",
-    "voltage": "电压（V）",
-    "current": "电流消耗（mA）",
-    "add": "添加"
-  },
+"customMenu": {
+  "pedalTitle": "自定义效果器",
+  "boardTitle": "自定义效果器板",
+  "subtitle": "创建自定义效果器或效果器板。",
+  "importTitle": "导入图片",
+  "importSubtitle": "从电脑导入一个效果器。",
+  "formats": "支持格式：PNG、JPG、WEBP",
+  "maxSize": "最大文件大小：1 MB",
+  "imageDimensions": "尺寸：最小 30 mm / 最大 500 mm",
+  "chooseImage": "选择图片",
+  "voltage": "电压 (V)",
+  "current": "电流消耗 (mA)",
+  "add": "添加"
+},
 
   "canvasControls": {
     "min": "最小",
@@ -412,16 +418,16 @@
 
   "help": {
     "title": "欢迎",
-    "open": "打开帮助指南",
-    "close": "关闭帮助指南",
+    "open": "打开指南",
+    "close": "关闭指南",
     "gearTitle": "选择你的设备",
-    "gearText": "选择效果器、效果器板和电源，然后在画布上拖动并排列你的配置。",
-    "jacksTitle": "检查插头空间",
-    "jacksText": "确保效果器之间有足够空间连接线缆和插头。",
-    "powerTitle": "检查供电设置",
-    "powerText": "添加电源以检查电流消耗和兼容性。",
-    "shareTitle": "导出或分享",
-    "shareText": "将你的效果器板导出为图片，或分享给朋友。",
-    "ok": "确定"
+    "gearText": "添加效果器、踏板板和电源，打造理想的 pedalboard。",
+    "jacksTitle": "线缆空间",
+    "jacksText": "确保效果器之间留有足够空间，方便线缆顺利连接。",
+    "powerTitle": "检查电源",
+    "powerText": "确认你的电源与效果器兼容，并且功率足够。",
+    "shareTitle": "下载你的 pedalboard",
+    "shareText": "将你的 pedalboard 导出为 PNG，方便保存或分享。",
+    "ok": "OK"
   }
 }

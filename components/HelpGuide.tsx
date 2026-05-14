@@ -1,15 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import {
-  Info,
-  X,
-  MousePointer2,
-  Zap,
-  Share2,
-  LayoutPanelLeft,
-  Cable,
-} from "lucide-react";
+import { Info, X, MousePointer2, Zap, Share2, Download, LayoutPanelLeft, Cable,} from "lucide-react";
 
 type Props = {
   t: (key: string) => string;
@@ -55,7 +47,7 @@ export function HelpGuide({ t }: Props) {
           <div
             className="
               absolute right-0 top-12 z-[90]
-              w-[350px] rounded-2xl
+              w-[400px] rounded-2xl
               bg-zinc-900 border border-zinc-800 shadow-2xl
               pt-6 px-5 pb-5
             "
@@ -131,9 +123,7 @@ export function HelpGuide({ t }: Props) {
               </div>
 
               <div className="flex gap-3">
-                <Share2
-                  size={18}
-                  className="mt-0.5 shrink-0 text-purple-500"
+                <Download size={18} className="mt-0.5 shrink-0 text-blue-500"
                 />
                 <div>
                   <div className="font-black">{t("help.shareTitle")}</div>

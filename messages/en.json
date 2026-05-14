@@ -270,7 +270,7 @@
   "export": {
     "button": "Export",
     "title": "Export image",
-    "name": "Name",
+    "name": "File name",
     "background": "Background",
     "preview": "Preview",
     "transparent": "Transparent (PNG)",
@@ -343,7 +343,7 @@
     },
 
     "recommendation": {
-      "perfect": "Your board is perfectly powered. Rock on 🤘",
+      "perfect": "Your board is perfectly powered. Let's rock 🤘",
       "daisy": "You can power multiple pedals with a daisy chain.",
       "daisySimple": "A daisy chain is enough to power your pedals.",
       "daisyHint": "Use a splitter cable. Works best with analog pedals. Digital ones can get noisy.",
@@ -374,23 +374,29 @@
   "boardsMenu": {
     "title": "Pedalboards",
     "searchPlaceholder": "Search...",
-    "count": "{count} pedalboards"
+    "count": "{count} pedalboards",
+    "popular": "Most used pedalboards.",
+    "results": "{count} results"
   },
 
   "powerMenu": {
     "title": "Power Supplies",
     "searchPlaceholder": "Search...",
-    "count": "{count} power supplies"
+    "count": "{count} power supplies",
+    "popular": "Most used power supplies.",
+    "results": "{count} results"
   },
 
   "customMenu": {
-    "title": "Custom Pedal",
+    "pedalTitle": "Custom Pedal",
+    "boardTitle": "Custom Board",
     "subtitle": "Create a custom pedal or pedalboard.",
     "importTitle": "Import an Image",
     "importSubtitle": "Import a pedal from your computer.",
+    "formats": "Accepted formats: PNG, JPG, WEBP",
+    "maxSize": "Max size: 1 MB",
+    "imageDimensions": "Dimensions: min 30 mm / max 500 mm",
     "chooseImage": "Choose an Image",
-    "brand": "Brand",
-    "model": "Model",
     "voltage": "Voltage (V)",
     "current": "Current Draw (mA)",
     "add": "Add"
@@ -412,16 +418,16 @@
 
   "help": {
     "title": "Welcome",
-    "open": "Open help guide",
-    "close": "Close help guide",
-    "gearTitle": "Select your gear",
-    "gearText": "Select pedals, boards and power supplies, then drag and arrange your setup on the canvas.",
-    "jacksTitle": "Check your jack clearance",
-    "jacksText": "Make sure your pedals are spaced correctly for cables and plugs.",
-    "powerTitle": "Check your power setup",
-    "powerText": "Add a power supply to verify current draw and compatibility.",
-    "shareTitle": "Export or share",
-    "shareText": "Export your board as an image or share it with friends.",
+    "open": "Open guide",
+    "close": "Close guide",
+    "gearTitle": "Choose your gear",
+    "gearText": "Add pedals, a board and a power supply to create your ideal pedalboard.",
+    "jacksTitle": "Cable clearance",
+    "jacksText": "Make sure your pedals are spaced far enough apart to allow cables to pass through.",
+    "powerTitle": "Check the power supply",
+    "powerText": "Make sure your power supply is compatible with your pedals and powerful enough.",
+    "shareTitle": "Download your pedalboard",
+    "shareText": "Export your pedalboard as a PNG to save or share it.",
     "ok": "OK"
   }
   

@@ -20,6 +20,26 @@ type Props = {
   groupItems: (items: AnyRow[], filter: string) => Record<string, AnyRow[]>;
 };
 
+const POPULAR_POWER_SUPPLIES = [
+  "Cioks DC7",
+  "Cioks SOL",
+  "Strymon Zuma",
+  "Strymon Ojai",
+  "Voodoo Lab Pedal Power 2 Plus",
+  "Voodoo Lab Pedal Power ISO-5",
+  "Voodoo Lab Pedal Power 3 Plus",
+  "Truetone 1 SPOT Pro CS6",
+  "Truetone 1 SPOT Pro CS7",
+  "Truetone 1 SPOT Pro CS12",
+  "MXR M238 Iso-Brick",
+  "MXR Mini Iso-Brick",
+  "Walrus Audio Canvas Power HP",
+];
+
+function normalize(value: any) {
+  return String(value || "").trim().toLowerCase();
+}
+
 export default function SearchPower({
   powerLibrary,
   powerSearch,
@@ -32,28 +52,59 @@ export default function SearchPower({
   t,
 }: Props) {
   const search = powerSearch.trim().toLowerCase();
+  const isSearching = search.length > 0;
 
   const visiblePower = useMemo(() => {
     const terms = search.split(" ").filter(Boolean);
 
-    return powerLibrary
-      .filter((p) => {
-        if (!terms.length) return true;
+    let list = powerLibrary.filter((p) => {
+      if (!terms.length) {
+        const fullName = normalize(`${p.brand ?? ""} ${p.name ?? ""}`);
+        const nameOnly = normalize(p.name);
 
-        const haystack = `${p.brand ?? ""} ${p.name ?? ""} ${p.type ?? ""}`.toLowerCase();
-        return terms.every((term) => haystack.includes(term));
-      })
-      .sort((a, b) => {
-        const brandA = String(a.brand || "").localeCompare(String(b.brand || ""));
-        if (brandA !== 0) return brandA;
-        return String(a.name || "").localeCompare(String(b.name || ""));
+        return POPULAR_POWER_SUPPLIES.some((popular) => {
+          const popularName = normalize(popular);
+          return fullName === popularName || nameOnly === popularName;
+        });
+      }
+
+      const haystack =
+        `${p.brand ?? ""} ${p.name ?? ""} ${p.type ?? ""}`.toLowerCase();
+
+      return terms.every((term) => haystack.includes(term));
+    });
+
+    if (!isSearching) {
+      return list.sort((a, b) => {
+        const fullA = normalize(`${a.brand ?? ""} ${a.name ?? ""}`);
+        const nameA = normalize(a.name);
+
+        const fullB = normalize(`${b.brand ?? ""} ${b.name ?? ""}`);
+        const nameB = normalize(b.name);
+
+        const indexA = POPULAR_POWER_SUPPLIES.findIndex((popular) => {
+          const p = normalize(popular);
+          return fullA === p || nameA === p;
+        });
+
+        const indexB = POPULAR_POWER_SUPPLIES.findIndex((popular) => {
+          const p = normalize(popular);
+          return fullB === p || nameB === p;
+        });
+
+        return indexA - indexB;
       });
-  }, [powerLibrary, search]);
+    }
+
+    return list.sort((a, b) => {
+      const brandA = String(a.brand || "").localeCompare(String(b.brand || ""));
+      if (brandA !== 0) return brandA;
+      return String(a.name || "").localeCompare(String(b.name || ""));
+    });
+  }, [powerLibrary, search, isSearching]);
 
   return (
     <div className="flex flex-col gap-4 mt-1 h-full min-h-0">
-
-
       <div className="relative flex items-center shrink-0">
         <Search
           size={15}
@@ -111,64 +162,82 @@ export default function SearchPower({
         )}
       </div>
 
-      <div className="px-1 text-[11px] font-black uppercase tracking-wide text-zinc-300 shrink-0">
-        {t("powerMenu.count").replace("{count}", String(visiblePower.length))}
-      </div>
-
-      <div className="flex flex-col gap-2.5 overflow-y-auto no-scrollbar pb-28 min-h-0">
-        {visiblePower.length > 0 ? (
-          visiblePower.map((p) => {
-            const img = p.image || p.image_url || p.photo;
-
-            return (
-              <button
-                key={p.id}
-                type="button"
-                onClick={() => {
-                  setPowerSearch("");
-                  addPower(p);
-                  setShowPowerResults(false);
-                }}
-                className="
-                  w-full min-h-[50px]
-                  rounded-xl
-                  bg-zinc-950 hover:bg-canvas
-                  px-3 py-1.5
-                  flex items-center gap-3
-                  text-left
-                  transition-colors
-                  shrink-0
-                "
-              >
-                <div className="w-[50px] h-[34px] shrink-0 flex items-center justify-center">
-                  {img ? (
-                    <img
-                      src={img}
-                      alt={`${p.brand || ""} ${p.name || ""}`}
-                      className="max-w-full max-h-full object-contain"
-                    />
-                  ) : (
-                    <div className="w-12 h-6 rounded-md bg-zinc-700" />
-                  )}
-                </div>
-
-                <div className="min-w-0 flex-1">
-                  <div className="text-[12px] font-black leading-tight">
-                    {p.name}
-                  </div>
-
-                  <div className="text-[10px] font-bold text-zinc-300 leading-tight mt-0.5">
-                    {p.brand}
-                  </div>
-                </div>
-              </button>
-            );
-          })
-        ) : (
-          <div className="rounded-xl border border-zinc-800 px-4 py-6 text-center text-[10px] font-bold uppercase tracking-widest text-zinc-500">
-            {t("search.noResults")}
+      <div className="flex flex-col gap-3 min-h-0 flex-1 overflow-hidden">
+        <div className="px-1 shrink-0">
+          <div className="text-[11px] font-black uppercase tracking-wide text-zinc-300">
+            {isSearching
+              ? t("powerMenu.results").replace(
+                  "{count}",
+                  String(visiblePower.length)
+                )
+              : t("powerMenu.count").replace(
+                  "{count}",
+                  String(powerLibrary.length)
+                )}
           </div>
-        )}
+
+          {!isSearching && (
+            <div className="mt-1 text-[10px] font-bold text-zinc-500">
+              {t("powerMenu.popular")}
+            </div>
+          )}
+        </div>
+
+        <div className="flex flex-col gap-2.5 overflow-y-auto no-scrollbar pb-28 min-h-0">
+          {visiblePower.length > 0 ? (
+            visiblePower.map((p) => {
+              const img = p.image || p.image_url || p.photo;
+
+              return (
+                <button
+                  key={p.id}
+                  type="button"
+                  onClick={() => {
+                    setPowerSearch("");
+                    addPower(p);
+                    setShowPowerResults(false);
+                  }}
+                  className="
+                    w-full min-h-[50px]
+                    rounded-xl
+                    bg-zinc-950 hover:bg-canvas
+                    px-3 py-1.5
+                    flex items-center gap-3
+                    text-left
+                    transition-colors
+                    shrink-0
+                  "
+                >
+                  <div className="w-[50px] h-[34px] shrink-0 flex items-center justify-center">
+                    {img ? (
+                      <img
+                        src={img}
+                        alt={`${p.brand || ""} ${p.name || ""}`}
+                        className="max-w-full max-h-full object-contain"
+                      />
+                    ) : (
+                      <div className="w-12 h-6 rounded-md bg-zinc-700" />
+                    )}
+                  </div>
+
+                  <div className="min-w-0 flex-1">
+                    <div className="text-[12px] font-black leading-tight">
+                      {p.name}
+                    </div>
+
+                    <div className="text-[10px] font-bold text-zinc-300 leading-tight mt-0.5">
+                      {p.brand}
+                    </div>
+                  </div>
+                </button>
+              );
+            })
+          ) : (
+            <div className="rounded-xl border border-zinc-800 px-4 py-6 text-center text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+              {t("search.noResults")}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

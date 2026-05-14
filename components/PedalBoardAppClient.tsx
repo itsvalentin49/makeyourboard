@@ -63,7 +63,6 @@ export default function PedalBoardAppClient() {
   const { pedalsLibrary, boardsLibrary, powerLibrary } = useLibrary();
 
 const BACKGROUNDS = React.useMemo(() => [
-  
   {
     id: "neutral",
     label: "Neutral",
@@ -76,30 +75,11 @@ const BACKGROUNDS = React.useMemo(() => [
     src: "/backgrounds/wood.webp",
   },
   {
-    id: "stripes",
-    label: "Stripes",
-    type: "image" as const,
-    src: "/backgrounds/stripes.webp",
-  },
-  {
-    id: "houndstooth",
-    label: "Houndstooth",
-    type: "image" as const,
-    src: "/backgrounds/houndstooth.webp",
-  },
-  {
     id: "steel",
     label: "Steel",
     type: "image" as const,
     src: "/backgrounds/steel.webp",
   },
-  {
-    id: "coast",
-    label: "Coast",
-    type: "image" as const,
-    src: "/backgrounds/coast.webp",
-  },
-
 ], []);
 
 // ✅ PRELOAD DES IMAGES (ULTRA IMPORTANT)
@@ -610,22 +590,30 @@ const addCustomItem = (item: AnyRow = {}) => {
     width: widthMm,
     depth: depthMm,
 
-    image:
-      item?.image ||
+imageId: item?.imageId || null,
+
+image:
+  item?.imageId
+    ? ""
+    : item?.image ||
       item?.image_url ||
       item?.photo ||
       (itemType === "pedal"
         ? "/images/custom-pedal.png"
         : "/images/custom-board.png"),
 
-    image_url:
-      item?.image_url ||
+image_url:
+  item?.imageId
+    ? ""
+    : item?.image_url ||
       item?.image ||
       item?.photo ||
       undefined,
 
-    photo:
-      item?.photo ||
+photo:
+  item?.imageId
+    ? ""
+    : item?.photo ||
       item?.image ||
       item?.image_url ||
       undefined,

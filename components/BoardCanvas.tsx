@@ -2,7 +2,7 @@
 
 import React, { useRef, useLayoutEffect, useEffect, useState } from "react";
 import { Stage, Layer, Group, Rect, Text, Image as KonvaImage } from "react-konva";
-import { Zap, Weight, Minus, Cable, Plus, Check, Upload, AlertTriangle, RotateCw, Trash2, X, Share2, Info, List, Settings, PanelsTopLeft } from "lucide-react";
+import { Zap, Weight, Minus, Cable, Plus, Check, Upload, AlertTriangle, RotateCw, Trash2, X, Share2, Info, List, Settings, PanelsTopLeft, Download } from "lucide-react";
 import PedalImage from "@/components/PedalImage";
 import { formatWeight } from "@/utils/units";
 import { getTranslator } from "@/utils/i18n";
@@ -1613,9 +1613,7 @@ onClick={() => {
   }}
   className="relative flex items-center justify-center gap-2 h-9 w-24 md:h-10 md:w-28 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl text-[11px] font-mono font-bold uppercase transition-all duration-200 hover:scale-105 hover:border-blue-500 active:scale-95 cursor-pointer"
 >
-  <Share2
-    size={16}
-    className={showExportPanel ? "text-purple-500" : undefined}
+  <Download size={16} className={showExportPanel ? "text-blue-500" : undefined}
   />
   {t("export.button")}
 </button>
@@ -2068,6 +2066,7 @@ return (
   >
     <PedalImage
       url={p.image || p.image_url || p.photo || null}
+      imageId={p.imageId || null}
       width={p.width}
       depth={p.depth}
       color={p.color}

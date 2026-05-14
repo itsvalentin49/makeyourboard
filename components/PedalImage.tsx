@@ -1,12 +1,14 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
+import { getCustomImageUrl } from "@/utils/customImageStore";
 import { Group, Rect, Text, Image as KonvaImage } from "react-konva";
 
 const MARGIN_SIZE = 10; 
 
 type PedalImageProps = {
   url?: string | null;
+  imageId?: string | null;
   width: number;
   depth: number;
   name?: string;
@@ -23,6 +25,7 @@ type PedalImageProps = {
 
 export default function PedalImage({
   url,
+  imageId,
   width,
   depth,
   name,
@@ -59,31 +62,69 @@ export default function PedalImage({
     h: scaledHeight + (hasTop ? MARGIN_SIZE : 0) + (hasBottom ? MARGIN_SIZE : 0),
   };
 
+
+
   useEffect(() => {
-    const finalW = width;
-    const finalH = depth;
+  let objectUrl: string | null = null;
+  let cancelled = false;
 
-    // ✅ évite spam + stabilise displaySizes
-    if (
-      lastSize.current.w !== finalW ||
-      lastSize.current.h !== finalH
-    ) {
-      lastSize.current = { w: finalW, h: finalH };
-      setProportionalHeight(finalH);
-      if (onSizeReady) onSizeReady(finalW, finalH);
-    }
+  const finalW = width;
+  const finalH = depth;
 
-    if (!url) { 
-      setImg(null); 
-      return; 
+  // ✅ évite spam + stabilise displaySizes
+  if (
+    lastSize.current.w !== finalW ||
+    lastSize.current.h !== finalH
+  ) {
+    lastSize.current = { w: finalW, h: finalH };
+    setProportionalHeight(finalH);
+    if (onSizeReady) onSizeReady(finalW, finalH);
+  }
+
+  const loadImage = async () => {
+    let finalUrl = url || null;
+
+if (imageId) {
+  const indexedDbUrl = await getCustomImageUrl(imageId);
+
+  if (indexedDbUrl) {
+    finalUrl = indexedDbUrl;
+    objectUrl = indexedDbUrl;
+  }
+}
+
+    if (!finalUrl) {
+      setImg(null);
+      return;
     }
 
     const image = new window.Image();
     image.crossOrigin = "anonymous";
-    image.src = url;
-    image.onload = () => setImg(image);
+    image.src = finalUrl;
 
-  }, [url, width, depth]);
+    image.onload = () => {
+      if (!cancelled) setImg(image);
+    };
+
+    image.onerror = () => {
+      if (!cancelled) setImg(null);
+    };
+  };
+
+  loadImage();
+
+  return () => {
+    cancelled = true;
+
+    if (objectUrl) {
+      URL.revokeObjectURL(objectUrl);
+    }
+  };
+}, [url, imageId, width, depth]);
+
+
+
+
 
   return (
     <Group>

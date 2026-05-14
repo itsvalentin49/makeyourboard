@@ -267,7 +267,7 @@
   "export": {
     "button": "Export",
     "title": "Bild exportieren",
-    "name": "Name",
+    "name": "Dateiname",
     "background": "Hintergrund",
     "preview": "Vorschau",
     "transparent": "Transparent (PNG)",
@@ -340,7 +340,7 @@
     },
 
     "recommendation": {
-      "perfect": "Dein Board ist perfekt versorgt. Rock on 🤘",
+      "perfect": "Dein Board ist perfekt versorgt. Let's rock 🤘",
       "daisy": "Du kannst mehrere Pedale mit einem Daisy-Chain-Kabel versorgen.",
       "daisySimple": "Ein Daisy-Chain reicht aus, um deine Pedale zu versorgen.",
       "daisyHint": "Verwende ein Splitter-Kabel. Funktioniert am besten mit analogen Pedalen. Digitale können Rauschen verursachen.",
@@ -371,23 +371,29 @@
   "boardsMenu": {
     "title": "Pedalboards",
     "searchPlaceholder": "Suchen...",
-    "count": "{count} Pedalboards"
+    "count": "{count} Pedalboards",
+    "popular": "Die beliebtesten Pedalboards.",
+    "results": "{count} Ergebnisse"
   },
 
   "powerMenu": {
     "title": "Netzteile",
     "searchPlaceholder": "Suchen...",
-    "count": "{count} Netzteile"
+    "count": "{count} Netzteile",
+    "popular": "Die beliebtesten Netzteile.",
+    "results": "{count} Ergebnisse"
   },
 
   "customMenu": {
-    "title": "Benutzerdefiniertes Pedal",
-    "subtitle": "Erstelle ein individuelles Pedal oder Pedalboard.",
+    "pedalTitle": "Individuelles Pedal",
+    "boardTitle": "Individuelles Pedalboard",
+    "subtitle": "Erstelle ein eigenes Pedal oder Pedalboard.",
     "importTitle": "Bild importieren",
     "importSubtitle": "Importiere ein Pedal von deinem Computer.",
+    "formats": "Akzeptierte Formate: PNG, JPG, WEBP",
+    "maxSize": "Max. Größe: 1 MB",
+    "imageDimensions": "Abmessungen: min. 30 mm / max. 500 mm",
     "chooseImage": "Bild auswählen",
-    "brand": "Marke",
-    "model": "Modell",
     "voltage": "Spannung (V)",
     "current": "Stromaufnahme (mA)",
     "add": "Hinzufügen"
@@ -410,16 +416,16 @@
 
   "help": {
     "title": "Willkommen",
-    "open": "Hilfe öffnen",
-    "close": "Hilfe schließen",
+    "open": "Anleitung öffnen",
+    "close": "Anleitung schließen",
     "gearTitle": "Wähle dein Equipment",
-    "gearText": "Wähle Pedale, Boards und Netzteile aus und ordne dein Setup auf der Arbeitsfläche an.",
-    "jacksTitle": "Kabelabstand prüfen",
-    "jacksText": "Stelle sicher, dass genügend Platz für Kabel und Stecker vorhanden ist.",
+    "gearText": "Füge Pedale, ein Board und ein Netzteil hinzu, um dein ideales Pedalboard zu erstellen.",
+    "jacksTitle": "Platz für Kabel",
+    "jacksText": "Stelle sicher, dass die Pedale weit genug auseinanderliegen, damit die Kabel problemlos verlegt werden können.",
     "powerTitle": "Stromversorgung prüfen",
-    "powerText": "Füge ein Netzteil hinzu, um Stromverbrauch und Kompatibilität zu prüfen.",
-    "shareTitle": "Exportieren oder teilen",
-    "shareText": "Exportiere dein Board als Bild oder teile es mit Freunden.",
+    "powerText": "Stelle sicher, dass dein Netzteil mit deinen Pedalen kompatibel und ausreichend leistungsstark ist.",
+    "shareTitle": "Pedalboard herunterladen",
+    "shareText": "Exportiere dein Pedalboard als PNG, um es zu speichern oder zu teilen.",
     "ok": "OK"
   }
 }

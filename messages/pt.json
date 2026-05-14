@@ -267,7 +267,7 @@
   "export": {
     "button": "Exportar",
     "title": "Exportar imagem",
-    "name": "Nome",
+    "name": "Nome do ficheiro",
     "background": "Fundo",
     "preview": "Pré-visualização",
     "transparent": "Transparente (PNG)",
@@ -340,7 +340,7 @@
     },
 
     "recommendation": {
-      "perfect": "O seu pedalboard está perfeitamente alimentado. Rock on 🤘",
+      "perfect": "O seu pedalboard está perfeitamente alimentado. Let's rock 🤘",
       "daisy": "Pode alimentar vários pedais com um cabo daisy chain.",
       "daisySimple": "Um daisy chain é suficiente para alimentar os seus pedais.",
       "daisyHint": "Use um cabo splitter. Funciona melhor com pedais analógicos. Os digitais podem gerar ruído.",
@@ -371,23 +371,29 @@
   "boardsMenu": {
     "title": "Pedalboards",
     "searchPlaceholder": "Pesquisar...",
-    "count": "{count} pedalboards"
+    "count": "{count} pedalboards",
+    "popular": "Pedalboards mais utilizadas.",
+    "results": "{count} resultados"
   },
 
   "powerMenu": {
     "title": "Fontes de alimentação",
     "searchPlaceholder": "Pesquisar...",
-    "count": "{count} fontes de alimentação"
+    "count": "{count} fontes de alimentação",
+    "popular": "Fontes de alimentação mais utilizadas.",
+    "results": "{count} resultados"
   },
 
   "customMenu": {
-    "title": "Pedal personalizado",
-    "subtitle": "Crie um pedal ou pedalboard personalizado.",
+    "pedalTitle": "Pedal personalizado",
+    "boardTitle": "Pedalboard personalizada",
+    "subtitle": "Cria um pedal ou uma pedalboard à medida.",
     "importTitle": "Importar uma imagem",
-    "importSubtitle": "Importe um pedal do seu computador.",
+    "importSubtitle": "Importa um pedal a partir do teu computador.",
+    "formats": "Formatos aceites: PNG, JPG, WEBP",
+    "maxSize": "Tamanho máx.: 1 MB",
+    "imageDimensions": "Dimensões: mín. 30 mm / máx. 500 mm",
     "chooseImage": "Escolher uma imagem",
-    "brand": "Marca",
-    "model": "Modelo",
     "voltage": "Voltagem (V)",
     "current": "Consumo (mA)",
     "add": "Adicionar"
@@ -412,14 +418,14 @@
     "title": "Bem-vindo",
     "open": "Abrir guia",
     "close": "Fechar guia",
-    "gearTitle": "Selecione o seu equipamento",
-    "gearText": "Selecione pedais, pedalboards e fontes de alimentação, depois organize o seu setup na área de trabalho.",
-    "jacksTitle": "Verifique o espaço para cabos",
-    "jacksText": "Certifique-se de que os pedais têm espaço suficiente para cabos e conectores.",
-    "powerTitle": "Verifique a alimentação",
-    "powerText": "Adicione uma fonte de alimentação para verificar o consumo e a compatibilidade.",
-    "shareTitle": "Exportar ou partilhar",
-    "shareText": "Exporte a sua board como imagem ou partilhe-a com amigos.",
+    "gearTitle": "Escolha o seu equipamento",
+    "gearText": "Adicione pedais, uma pedalboard e uma fonte de alimentação para criar a sua pedalboard ideal.",
+    "jacksTitle": "Espaço para cabos",
+    "jacksText": "Certifique-se de que os pedais estão suficientemente afastados para permitir a passagem dos cabos.",
+    "powerTitle": "Verificar a alimentação",
+    "powerText": "Verifique se a sua fonte de alimentação é compatível com os seus pedais e suficientemente potente.",
+    "shareTitle": "Transferir a sua pedalboard",
+    "shareText": "Exporte a sua pedalboard em PNG para a guardar ou partilhar.",
     "ok": "OK"
   }
 }

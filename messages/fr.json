@@ -266,7 +266,7 @@
   "export": {
     "button": "Export",
     "title": "Exporter l’image",
-    "name": "Nom",
+    "name": "Nom du fichier",
     "background": "Fond",
     "preview": "Aperçu",
     "transparent": "Transparent (PNG)",
@@ -335,7 +335,7 @@
     },
 
     "recommendation": {
-      "perfect": "Votre pedalboard est parfaitement alimenté. Rock on 🤘",
+      "perfect": "Votre pedalboard est parfaitement alimenté. Let's rock 🤘",
       "daisy": "Vous pouvez alimenter plusieurs pédales avec une daisy chain.",
       "daisySimple": "Vous pouvez alimenter vos pédales avec une daisy chain.",
       "daisyHint": "Utilisez un câble splitter. Fonctionne mieux avec des pédales analogiques. Les pédales digitales peuvent générer du bruit.",
@@ -358,7 +358,7 @@
     "searchPlaceholder": "Rechercher...",
     "count": "{count} pédales",
     "results": "{count} résultats",
-    "latest": "Voici les dernières pédales sorties.",
+    "latest": "Voici les dernières nouveautés.",
     "new": "NEW",
     "newReleases": "Nouveautés"
   },
@@ -366,23 +366,29 @@
   "boardsMenu": {
     "title": "Pedalboards",
     "searchPlaceholder": "Rechercher...",
-    "count": "{count} pedalboards"
+    "count": "{count} pedalboards",
+    "popular": "Pedalboards les plus utilisés.",
+    "results": "{count} résultats"
   },
 
   "powerMenu": {
     "title": "Alimentations",
     "searchPlaceholder": "Rechercher...",
-    "count": "{count} alimentations"
+    "count": "{count} alimentations",
+    "popular": "Alimentations les plus utilisées.",
+    "results": "{count} résultats"  
   },
 
   "customMenu": {
-    "title": "Pédale personalisée",
+    "pedalTitle": "Pédale personnalisée",
+    "boardTitle": "Board personnalisé",
     "subtitle": "Créez une pédale ou un board sur mesure.",
     "importTitle": "Importer une image",
     "importSubtitle": "Importez une pédale depuis votre ordinateur.",
+    "formats": "Formats acceptés : PNG, JPG, WEBP",
+    "maxSize": "Poids max : 1 Mo",
+    "imageDimensions": "Dimensions : min 30 mm / max 500 mm",
     "chooseImage": "Choisir une image",
-    "brand": "Marque",
-    "model": "Modèle",
     "voltage": "Voltage (V)",
     "current": "Ampérage (mA)",
     "add": "Ajouter"
@@ -408,13 +414,13 @@
     "open": "Ouvrir le guide",
     "close": "Fermer le guide",
     "gearTitle": "Choisissez votre matériel",
-    "gearText": "Sélectionnez des pédales, pedalboards et alimentations, puis organisez votre setup sur le canvas.",
-    "jacksTitle": "Vérifiez le passage des câbles",
-    "jacksText": "Assurez-vous que les pédales disposent de suffisamment d’espace pour les câbles et connecteurs.",
-    "powerTitle": "Vérifiez votre alimentation",
-    "powerText": "Ajoutez une alimentation pour vérifier la consommation et la compatibilité.",
-    "shareTitle": "Exporter ou partager",
-    "shareText": "Exportez votre board en image ou partagez-le avec vos amis.",
+    "gearText": "Ajoutez des pédales, un board et une alimentation pour créer votre pedalboard idéal.",
+    "jacksTitle": "Passage des câbles",
+    "jacksText": "Assurez-vous que les pédales soient suffisamment espacées pour permettre le passage des câbles.",
+    "powerTitle": "Contrôlez l’alimentation",
+    "powerText": "Vérifiez que votre alimentation est compatible avec vos pédales et suffisamment puissante.",
+    "shareTitle": "Téléchargez votre Pedalboard",
+    "shareText": "Exportez votre pedalboard en PNG pour le sauvegarder ou le partager.",
     "ok": "OK"
   }
 

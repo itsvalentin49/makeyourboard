@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { getTranslator } from "@/utils/i18n";
-import { Share2 } from "lucide-react";
+import { ChevronDown, Link, Download } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
 type AnyRow = Record<string, any>;
@@ -44,37 +44,18 @@ export default function ExportPanel({
   "transparent" | "white" | "current"
 >("current");
 const containerRef = useRef<HTMLDivElement>(null);
-  const previewRef = useRef<HTMLCanvasElement | null>(null);
+const previewRef = useRef<HTMLCanvasElement | null>(null);
+const previewRenderIdRef = useRef(0);
+const [shareOpen, setShareOpen] = useState(false);
+const [copied, setCopied] = useState(false);
 
- const drawBranding = async (
-  ctx: CanvasRenderingContext2D,
-  width: number,
-  height: number,
-  loadImage: (src: string) => Promise<HTMLImageElement>
-) => {
-  ctx.save();
+const [selectedShare, setSelectedShare] = useState({
+  key: "instagram",
+  label: "Instagram",
+  logo: "/logos/instagram.png",
+});
 
-  ctx.globalAlpha = 0.025;
-  ctx.fillStyle = "#ffffff";
-  ctx.font = "900 18px Arial";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
 
-  ctx.translate(width / 2, height / 2);
-  ctx.rotate((-25 * Math.PI) / 180);
-  ctx.translate(-width / 2, -height / 2);
-
-  const stepX = 190;
-  const stepY = 95;
-
-  for (let y = -height; y < height * 2; y += stepY) {
-    for (let x = -width; x < width * 2; x += stepX) {
-      ctx.fillText("MakeYourBoard", x, y);
-    }
-  }
-
-  ctx.restore();
-};
 
 const getRenderItems = (): AnyRow[] =>
   [
@@ -93,90 +74,219 @@ const getRenderItems = (): AnyRow[] =>
       (Number(b.zIndex) || 0)
   );
 
-  // ===============================
-  // 🖼️ PREVIEW RENDER
-  // ===============================
-  const renderPreview = async () => {
-  if (!boardPedals?.length && !selectedBoards?.length) return;
-  if (!displaySizes || Object.keys(displaySizes).length === 0) return;
+  const drawCustomPedal = (
+  ctx: CanvasRenderingContext2D,
+  item: AnyRow,
+  w: number,
+  h: number,
+  knobImg: HTMLImageElement,
+  footswitchImg: HTMLImageElement,
+  img?: HTMLImageElement | null
+) => {
+  const radius = 5;
+  const hasColor = !!item.color;
 
-  try {
-    const loadImage = (src: string): Promise<HTMLImageElement> =>
-      new Promise((resolve, reject) => {
-        const img = new Image();
-        img.crossOrigin = "anonymous";
-        img.src = src;
-        img.onload = () => resolve(img);
-        img.onerror = reject;
-      });
+  ctx.save();
 
+  ctx.beginPath();
+  ctx.moveTo(-w / 2 + radius, -h / 2);
+  ctx.lineTo(w / 2 - radius, -h / 2);
+  ctx.quadraticCurveTo(w / 2, -h / 2, w / 2, -h / 2 + radius);
+  ctx.lineTo(w / 2, h / 2 - radius);
+  ctx.quadraticCurveTo(w / 2, h / 2, w / 2 - radius, h / 2);
+  ctx.lineTo(-w / 2 + radius, h / 2);
+  ctx.quadraticCurveTo(-w / 2, h / 2, -w / 2, h / 2 - radius);
+  ctx.lineTo(-w / 2, -h / 2 + radius);
+  ctx.quadraticCurveTo(-w / 2, -h / 2, -w / 2 + radius, -h / 2);
+  ctx.closePath();
+  ctx.clip();
+
+  if (img) {
+    ctx.drawImage(img, -w / 2, -h / 2, w, h);
+  } else {
+    ctx.fillStyle = item.color || "#888";
+    ctx.fillRect(-w / 2, -h / 2, w, h);
+  }
+
+  if (hasColor) {
+    ctx.globalAlpha = 0.7;
+    ctx.fillStyle = item.color;
+    ctx.fillRect(-w / 2, -h / 2, w, h);
+    ctx.globalAlpha = 1;
+  }
+
+  ctx.restore();
+
+  const knobSize = 25;
+  const footswitchSize = 18;
+
+  const knobCount =
+    Number(item.width) < 70 ? 1 : Number(item.width) <= 100 ? 2 : 3;
+
+  const knobY = -h / 2 + 14;
+  const spacing = w / (knobCount + 1);
+  const spread = 1.25;
+
+  for (let i = 0; i < knobCount; i++) {
+    const offsetFromCenter =
+      (i - (knobCount - 1) / 2) * spacing * spread;
+
+    ctx.drawImage(
+      knobImg,
+      offsetFromCenter - knobSize / 2,
+      knobY,
+      knobSize,
+      knobSize
+    );
+  }
+
+  ctx.drawImage(
+    footswitchImg,
+    -footswitchSize / 2,
+    h / 2 - 30,
+    footswitchSize,
+    footswitchSize
+  );
+
+  if (item.name) {
+    ctx.fillStyle = "#000000";
+    ctx.strokeStyle = "#000000";
+    ctx.lineWidth = 0.5;
+    ctx.font = "bold 8px Arial";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+
+    ctx.strokeText(item.name.toUpperCase(), 0, 0);
+    ctx.fillText(item.name.toUpperCase(), 0, 0);
+  }
+};
+
+    const drawItems = async (
+    ctx: CanvasRenderingContext2D,
+    width: number,
+    height: number,
+    minX: number,
+    minY: number,
+    loadImage: (src: string) => Promise<HTMLImageElement>
+  ) => {
     const knobImg = await loadImage("/images/knob.png");
     const footswitchImg = await loadImage("/images/footswitch.png");
 
-    let minX = Infinity;
-    let minY = Infinity;
-    let maxX = -Infinity;
-    let maxY = -Infinity;
-
-    const itemsToRender = getRenderItems();
-
-    itemsToRender.forEach((item) => {
+    for (const item of getRenderItems()) {
       const size = displaySizes[Number(item.instanceId)];
-      if (!size) return;
+      if (!size) continue;
+
+      const imgSrc = item.image || item.image_url || item.photo || null;
 
       const w = size.w;
       const h = size.h;
 
-      minX = Math.min(minX, item.x - w / 2);
-      minY = Math.min(minY, item.y - h / 2);
-      maxX = Math.max(maxX, item.x + w / 2);
-      maxY = Math.max(maxY, item.y + h / 2);
-    });
+      const drawX = item.x - minX;
+      const drawY = item.y - minY;
 
-    const PADDING = 10;
+      const rotation = ((item.rotation || 0) * Math.PI) / 180;
 
-    minX -= PADDING;
-    minY -= PADDING;
-    maxX += PADDING;
-    maxY += PADDING;
+      ctx.save();
+      ctx.translate(drawX, drawY);
+      ctx.rotate(rotation);
 
-    if (!isFinite(minX) || !isFinite(maxX)) return;
-    if (!isFinite(minY) || !isFinite(maxY)) return;
+      if (item.kind === "board") {
+        if (imgSrc) {
+          const img = await loadImage(imgSrc);
+          ctx.drawImage(img, -w / 2, -h / 2, w, h);
+        }
 
-    const width = maxX - minX;
-    const height = maxY - minY;
+        ctx.restore();
+        continue;
+      }
 
-    const canvas = previewRef.current;
-    if (!canvas) return;
+      const img = imgSrc ? await loadImage(imgSrc) : null;
 
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+      if (item.slug === "custom") {
+        drawCustomPedal(ctx, item, w, h, knobImg, footswitchImg, img);
+      } else if (img) {
+        ctx.drawImage(img, -w / 2, -h / 2, w, h);
+      }
 
-    const SCALE = 6;
-
-    canvas.width = width * SCALE;
-    canvas.height = height * SCALE;
-
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.setTransform(SCALE, 0, 0, SCALE, 0, 0);
-    ctx.clearRect(0, 0, width, height);
-
-    ctx.imageSmoothingEnabled = true;
-
-    if (background === "transparent") {
-  const CHECKER = 10;
-
-  for (let y = 0; y < height; y += CHECKER) {
-    for (let x = 0; x < width; x += CHECKER) {
-      ctx.fillStyle =
-        (Math.floor(x / CHECKER) + Math.floor(y / CHECKER)) % 2 === 0
-          ? "#5f6068"
-          : "#777982";
-
-      ctx.fillRect(x, y, CHECKER, CHECKER);
+      ctx.restore();
     }
-  }
-}
+  };
+
+  const getExportBounds = () => {
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+
+  getRenderItems().forEach((item) => {
+    const size = displaySizes[Number(item.instanceId)];
+    if (!size) return;
+
+    const w = size.w;
+    const h = size.h;
+
+    const rotation = ((Number(item.rotation) || 0) * Math.PI) / 180;
+
+    const corners = [
+      { x: -w / 2, y: -h / 2 },
+      { x: w / 2, y: -h / 2 },
+      { x: w / 2, y: h / 2 },
+      { x: -w / 2, y: h / 2 },
+    ];
+
+    corners.forEach((corner) => {
+      const rotatedX =
+        corner.x * Math.cos(rotation) - corner.y * Math.sin(rotation);
+
+      const rotatedY =
+        corner.x * Math.sin(rotation) + corner.y * Math.cos(rotation);
+
+      const worldX = item.x + rotatedX;
+      const worldY = item.y + rotatedY;
+
+      minX = Math.min(minX, worldX);
+      minY = Math.min(minY, worldY);
+      maxX = Math.max(maxX, worldX);
+      maxY = Math.max(maxY, worldY);
+    });
+  });
+
+  const PADDING = 10;
+
+  minX -= PADDING;
+  minY -= PADDING;
+  maxX += PADDING;
+  maxY += PADDING;
+
+  return {
+    minX,
+    minY,
+    width: maxX - minX,
+    height: maxY - minY,
+  };
+};
+
+  const drawBackground = async (
+    ctx: CanvasRenderingContext2D,
+    width: number,
+    height: number,
+    loadImage: (src: string) => Promise<HTMLImageElement>,
+    preview = false
+  ) => {
+    if (background === "transparent" && preview) {
+      const CHECKER = 10;
+
+      for (let y = 0; y < height; y += CHECKER) {
+        for (let x = 0; x < width; x += CHECKER) {
+          ctx.fillStyle =
+            (Math.floor(x / CHECKER) + Math.floor(y / CHECKER)) % 2 === 0
+              ? "#5f6068"
+              : "#777982";
+
+          ctx.fillRect(x, y, CHECKER, CHECKER);
+        }
+      }
+    }
 
     if (background === "white") {
       ctx.fillStyle = "#ffffff";
@@ -195,411 +305,163 @@ const getRenderItems = (): AnyRow[] =>
         ctx.drawImage(bgImg, 0, 0, width, height);
       }
     }
+  };
 
-    const loadedImages: Record<number, HTMLImageElement> = {};
+  // ===============================
+  // 🖼️ PREVIEW RENDER
+  // ===============================
+const renderPreview = async () => {
+  const hasItems = !!boardPedals?.length || !!selectedBoards?.length;
 
-    const getImageSrc = (item: any) =>
-      item.image || item.image_url || item.photo || null;
-
-    for (const item of itemsToRender) {
-      const src = getImageSrc(item);
-      if (!src) continue;
-
-      loadedImages[Number(item.instanceId)] = await loadImage(src);
-    }
-
-    for (const item of itemsToRender) {
-      const img = loadedImages[Number(item.instanceId)];
-      const size = displaySizes[Number(item.instanceId)];
-      if (!size) continue;
-
-      const w = size.w;
-      const h = size.h;
-
-      const drawX = item.x - minX;
-      const drawY = item.y - minY;
-
-      const rotation = ((item.rotation || 0) * Math.PI) / 180;
-
-      ctx.save();
-      ctx.translate(drawX, drawY);
-      ctx.rotate(rotation);
-
-      if (item.kind === "board") {
-        if (img) {
-          ctx.drawImage(img, -w / 2, -h / 2, w, h);
-        }
-
-        ctx.restore();
-        continue;
-      }
-
-      ctx.shadowColor = "rgba(0,0,0,0.2)";
-      ctx.shadowBlur = 8;
-      ctx.shadowOffsetY = 3;
-
-      if (item.slug === "custom") {
-        const radius = 12;
-
-        ctx.save();
-
-        ctx.beginPath();
-        ctx.moveTo(-w / 2 + radius, -h / 2);
-        ctx.lineTo(w / 2 - radius, -h / 2);
-        ctx.quadraticCurveTo(w / 2, -h / 2, w / 2, -h / 2 + radius);
-        ctx.lineTo(w / 2, h / 2 - radius);
-        ctx.quadraticCurveTo(w / 2, h / 2, w / 2 - radius, h / 2);
-        ctx.lineTo(-w / 2 + radius, h / 2);
-        ctx.quadraticCurveTo(-w / 2, h / 2, -w / 2, h / 2 - radius);
-        ctx.lineTo(-w / 2, -h / 2 + radius);
-        ctx.quadraticCurveTo(-w / 2, -h / 2, -w / 2 + radius, -h / 2);
-        ctx.closePath();
-        ctx.clip();
-
-        ctx.fillStyle = item.color || "#888";
-        ctx.fillRect(-w / 2, -h / 2, w, h);
-
-        if (img) {
-          ctx.globalAlpha = 0.25;
-          ctx.drawImage(img, -w / 2, -h / 2, w, h);
-          ctx.globalAlpha = 1;
-        }
-
-        ctx.restore();
-
-        const knobSize =
-          item.width < 50 ? 30 :
-          item.width <= 100 ? 32 :
-          40;
-
-        const knobCount =
-          item.width < 50 ? 1 :
-          item.width <= 100 ? 2 :
-          3;
-
-        const spacing = w / (knobCount + 1);
-        const spread = 1.25;
-        const knobY = -h / 2 + 20;
-
-        for (let i = 0; i < knobCount; i++) {
-          const offset =
-            (i - (knobCount - 1) / 2) * spacing * spread;
-
-          ctx.drawImage(
-            knobImg,
-            offset - knobSize / 2,
-            knobY,
-            knobSize,
-            knobSize
-          );
-        }
-
-        const footswitchSize = 25;
-
-        ctx.drawImage(
-          footswitchImg,
-          -footswitchSize / 2,
-          h / 2 - 35,
-          footswitchSize,
-          footswitchSize
-        );
-
-        if (item.name) {
-          ctx.fillStyle = "#000";
-          ctx.font = "bold 10px Arial";
-          ctx.textAlign = "center";
-          ctx.textBaseline = "middle";
-          ctx.fillText(item.name.toUpperCase(), 0, 0);
-        }
-      } else {
-        if (img) {
-          ctx.drawImage(img, -w / 2, -h / 2, w, h);
-        }
-      }
-
-            ctx.restore();
-    }
-
-    await drawBranding(ctx, width, height, loadImage);
-  } catch (e) {
-    console.error(e);
+  if (hasItems && (!displaySizes || Object.keys(displaySizes).length === 0)) {
+    return;
   }
-};
+
+  const renderId = ++previewRenderIdRef.current;
+
+    try {
+      const loadImage = (src: string): Promise<HTMLImageElement> =>
+        new Promise((resolve, reject) => {
+          const img = new Image();
+          img.crossOrigin = "anonymous";
+          img.src = src;
+          img.onload = () => resolve(img);
+          img.onerror = reject;
+        });
+
+        if (!hasItems) {
+  const visibleCanvas = previewRef.current;
+  if (!visibleCanvas) return;
+
+  const visibleCtx = visibleCanvas.getContext("2d");
+  if (!visibleCtx) return;
+
+  const width = 240;
+  const height = 135;
+  const SCALE = 3;
+
+  visibleCanvas.width = width * SCALE;
+  visibleCanvas.height = height * SCALE;
+
+  visibleCtx.setTransform(SCALE, 0, 0, SCALE, 0, 0);
+  visibleCtx.clearRect(0, 0, width, height);
+  visibleCtx.imageSmoothingEnabled = true;
+
+  await drawBackground(visibleCtx, width, height, loadImage, true);
+
+  return;
+}
+
+      const { minX, minY, width, height } = getExportBounds();
+
+      if (!isFinite(width) || !isFinite(height)) return;
+
+      const visibleCanvas = previewRef.current;
+      if (!visibleCanvas) return;
+
+      const visibleCtx = visibleCanvas.getContext("2d");
+      if (!visibleCtx) return;
+
+      const SCALE = 6;
+
+      // ✅ on dessine d'abord sur un canvas temporaire
+      // comme ça un ancien rendu ne peut pas polluer le preview visible
+      const tempCanvas = document.createElement("canvas");
+      const tempCtx = tempCanvas.getContext("2d");
+      if (!tempCtx) return;
+
+      tempCanvas.width = width * SCALE;
+      tempCanvas.height = height * SCALE;
+
+      tempCtx.setTransform(SCALE, 0, 0, SCALE, 0, 0);
+      tempCtx.clearRect(0, 0, width, height);
+      tempCtx.imageSmoothingEnabled = true;
+
+      await drawBackground(tempCtx, width, height, loadImage, true);
+      if (renderId !== previewRenderIdRef.current) return;
+
+      await drawItems(tempCtx, width, height, minX, minY, loadImage);
+      if (renderId !== previewRenderIdRef.current) return;
+
+      // ✅ seulement le dernier rendu autorisé est copié dans le preview
+      visibleCanvas.width = tempCanvas.width;
+      visibleCanvas.height = tempCanvas.height;
+
+      visibleCtx.setTransform(1, 0, 0, 1, 0, 0);
+      visibleCtx.clearRect(0, 0, visibleCanvas.width, visibleCanvas.height);
+      visibleCtx.drawImage(tempCanvas, 0, 0);
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   // ===============================
   // 📥 EXPORT
   // ===============================
-const exportPNG = async () => {
-  setLoading(true);
+  const exportPNG = async () => {
+    setLoading(true);
 
-  try {
-    const loadImage = (src: string): Promise<HTMLImageElement> =>
-      new Promise((resolve, reject) => {
-        const img = new Image();
-        img.crossOrigin = "anonymous";
-        img.src = src;
-        img.onload = () => resolve(img);
-        img.onerror = reject;
-      });
+    try {
+      const loadImage = (src: string): Promise<HTMLImageElement> =>
+        new Promise((resolve, reject) => {
+          const img = new Image();
+          img.crossOrigin = "anonymous";
+          img.src = src;
+          img.onload = () => resolve(img);
+          img.onerror = reject;
+        });
 
-    let minX = Infinity;
-    let minY = Infinity;
-    let maxX = -Infinity;
-    let maxY = -Infinity;
-const knobImg = await loadImage("/images/knob.png");
-const footswitchImg = await loadImage("/images/footswitch.png");
-const allItems = getRenderItems();
+      const { minX, minY, width, height } = getExportBounds();
 
-allItems.forEach((item) => {
-  const size = displaySizes[Number(item.instanceId)];
-  if (!size) return;
+      if (!isFinite(width) || !isFinite(height)) {
+        setLoading(false);
+        return;
+      }
 
-  const w = size.w;
-  const h = size.h;
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      if (!ctx) {
+        setLoading(false);
+        return;
+      }
 
-  minX = Math.min(minX, item.x - w / 2);
-  minY = Math.min(minY, item.y - h / 2);
-  maxX = Math.max(maxX, item.x + w / 2);
-  maxY = Math.max(maxY, item.y + h / 2);
-});
+      const SCALE = 6;
 
-    const PADDING = 10;
+      canvas.width = width * SCALE;
+      canvas.height = height * SCALE;
 
-    minX -= PADDING;
-    minY -= PADDING;
-    maxX += PADDING;
-    maxY += PADDING;
+      ctx.setTransform(SCALE, 0, 0, SCALE, 0, 0);
+      ctx.imageSmoothingEnabled = true;
 
-    const width = maxX - minX;
-    const height = maxY - minY;
+      await drawBackground(ctx, width, height, loadImage, false);
+      await drawItems(ctx, width, height, minX, minY, loadImage);
 
-    // 🔥 CANVAS HAUTE QUALITÉ
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) {
+            setLoading(false);
+            return;
+          }
 
-    const SCALE = 6; // 🔥 🔥 🔥 QUALITÉ MAX
+          const url = URL.createObjectURL(blob);
 
-    canvas.width = width * SCALE;
-    canvas.height = height * SCALE;
+          const link = document.createElement("a");
+          link.href = url;
+          link.download =
+            background === "white" ? `${name}.jpg` : `${name}.png`;
+          link.click();
 
-    ctx.scale(SCALE, SCALE);
-    ctx.imageSmoothingEnabled = true;
-
-    // 🎨 BACKGROUND EXPORT
-if (background === "white") {
-  ctx.fillStyle = "#ffffff";
-  ctx.fillRect(0, 0, width, height);
-}
-
-if (background === "current" && currentBackground) {
-  if (currentBackground.type === "css") {
-    ctx.fillStyle = getComputedStyle(document.documentElement)
-      .getPropertyValue("--zinc-600");
-    ctx.fillRect(0, 0, width, height);
-  }
-
-  if (currentBackground.type === "image" && currentBackground.src) {
-    const bgImg = await loadImage(currentBackground.src);
-    ctx.drawImage(bgImg, 0, 0, width, height);
-  }
-}
-
-    const loadedImages: Record<number, HTMLImageElement> = {};
-
-    for (const p of boardPedals) {
-      if (!p.image) continue;
-      loadedImages[p.instanceId] = await loadImage(p.image);
-    }
-
-// ITEMS
-for (const item of getRenderItems()) {
-  const size = displaySizes[Number(item.instanceId)];
-  if (!size) continue;
-
-  const imgSrc =
-    item.image ||
-    item.image_url ||
-    item.photo;
-
-  const w = size.w;
-  const h = size.h;
-
-  const drawX = item.x - minX;
-  const drawY = item.y - minY;
-
-  const rotation =
-    ((item.rotation || 0) * Math.PI) / 180;
-
-  ctx.save();
-
-  ctx.translate(drawX, drawY);
-  ctx.rotate(rotation);
-
-  // BOARD
-  if (item.kind === "board") {
-    if (imgSrc) {
-      const img = await loadImage(imgSrc);
-
-      ctx.drawImage(
-        img,
-        -w / 2,
-        -h / 2,
-        w,
-        h
+          URL.revokeObjectURL(url);
+          setTimeout(() => setLoading(false), 300);
+        },
+        background === "white" ? "image/jpeg" : "image/png",
+        0.95
       );
+    } catch (e) {
+      console.error(e);
+      setLoading(false);
     }
-
-    ctx.restore();
-    continue;
-  }
-
-  ctx.shadowColor = "rgba(0,0,0,0.2)";
-  ctx.shadowBlur = 12;
-  ctx.shadowOffsetY = 4;
-
-  // CUSTOM BACKGROUND
-  if (item.slug === "custom") {
-    const radius = 12;
-
-    ctx.beginPath();
-    ctx.moveTo(-w / 2 + radius, -h / 2);
-    ctx.lineTo(w / 2 - radius, -h / 2);
-    ctx.quadraticCurveTo(w / 2, -h / 2, w / 2, -h / 2 + radius);
-    ctx.lineTo(w / 2, h / 2 - radius);
-    ctx.quadraticCurveTo(w / 2, h / 2, w / 2 - radius, h / 2);
-    ctx.lineTo(-w / 2 + radius, h / 2);
-    ctx.quadraticCurveTo(-w / 2, h / 2, -w / 2, h / 2 - radius);
-    ctx.lineTo(-w / 2, -h / 2 + radius);
-    ctx.quadraticCurveTo(-w / 2, -h / 2, -w / 2 + radius, -h / 2);
-    ctx.closePath();
-    ctx.clip();
-
-    ctx.fillStyle = item.color || "#888";
-    ctx.fill();
-
-    const img =
-      loadedImages[item.instanceId] ||
-      (imgSrc
-        ? await loadImage(imgSrc)
-        : null);
-
-    if (img) {
-      ctx.globalAlpha = 0.25;
-
-      ctx.drawImage(
-        img,
-        -w / 2,
-        -h / 2,
-        w,
-        h
-      );
-
-      ctx.globalAlpha = 1;
-    }
-  }
-
-  // NORMAL PEDAL
-  if (item.slug !== "custom") {
-    const img =
-      loadedImages[item.instanceId] ||
-      (imgSrc
-        ? await loadImage(imgSrc)
-        : null);
-
-    if (img) {
-      ctx.drawImage(
-        img,
-        -w / 2,
-        -h / 2,
-        w,
-        h
-      );
-    }
-  }
-
-  // CUSTOM CONTROLS
-  if (item.slug === "custom") {
-    const knobSize =
-      item.width < 50 ? 30 :
-      item.width <= 100 ? 32 :
-      40;
-
-    const footswitchSize = 25;
-
-    const knobCount =
-      item.width < 50 ? 1 :
-      item.width <= 100 ? 2 :
-      3;
-
-    const knobY = -h / 2 + 20;
-    const spacing = w / (knobCount + 1);
-    const spread = 1.25;
-
-    for (let i = 0; i < knobCount; i++) {
-      const offset =
-        (i - (knobCount - 1) / 2) *
-        spacing *
-        spread;
-
-      ctx.drawImage(
-        knobImg,
-        offset - knobSize / 2,
-        knobY,
-        knobSize,
-        knobSize
-      );
-    }
-
-    ctx.drawImage(
-      footswitchImg,
-      -footswitchSize / 2,
-      h / 2 - 35,
-      footswitchSize,
-      footswitchSize
-    );
-
-    if (item.name) {
-      ctx.fillStyle = "#000";
-      ctx.font = "bold 12px Arial";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-
-      ctx.fillText(
-        item.name.toUpperCase(),
-        0,
-        0
-      );
-    }
-  }
-
-  ctx.restore();
-}
-
-    await drawBranding(ctx, width, height, loadImage);
-    canvas.toBlob(
-      (blob) => {
-        if (!blob) return;
-
-        const url = URL.createObjectURL(blob);
-
-        const link = document.createElement("a");
-        link.href = url;
-        link.download =
-          background === "white" ? `${name}.jpg` : `${name}.png`;
-        link.click();
-
-        URL.revokeObjectURL(url);
-        setTimeout(() => setLoading(false), 300);
-      },
-      background === "white" ? "image/jpeg" : "image/png",
-      0.95
-    );
-  } catch (e) {
-    console.error(e);
-    setLoading(false);
-  }
-};
+  };
 
 
 
@@ -696,14 +558,25 @@ useEffect(() => {
   renderPreview();
 }, [background, boardPedals, selectedBoards, displaySizes]);
 
+const shareOptions = [
+  { key: "discord", label: "Discord", logo: "/logos/discord.png" },
+  { key: "facebook", label: "Facebook", logo: "/logos/facebook.png" },
+  { key: "instagram", label: "Instagram", logo: "/logos/instagram.png" },
+  { key: "mail", label: "Mail", logo: "/logos/mail.png" },
+  { key: "messenger", label: "Messenger", logo: "/logos/messenger.png" },
+  { key: "reddit", label: "Reddit", logo: "/logos/reddit.png" },
+  { key: "whatsapp", label: "WhatsApp", logo: "/logos/whatsapp.png" },
+  { key: "x", label: "X", logo: "/logos/twitter.png" },
+];
+
 return (
   <div
     ref={containerRef}
-    className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 w-64 shadow-2xl flex flex-col gap-4"
+    className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 w-64 shadow-2xl flex flex-col gap-6"
   >
     {/* TITLE */}
     <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider">
-      <Share2 size={14} className= "text-purple-500" />
+      <Download size={14} className= "text-blue-500" />
       {t("export.title")}
     </div>
 
@@ -721,7 +594,7 @@ return (
     </div>
 
     {/* BACKGROUND */}
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-2 -mt-2">
       <label className="text-[10px] uppercase tracking-wider font-bold">
         {t("export.background")}
       </label>
@@ -757,44 +630,89 @@ return (
     </div>
 
     {/* SHARE VIA */}
-    <div className="flex flex-col gap-2">
-      <label className="text-[10px] uppercase tracking-wider font-bold">
-        {t("share.social")}
-      </label>
+{/*<div className="flex flex-col gap-2 -mt-2 relative">
+  <label className="text-[10px] uppercase tracking-wider font-bold">
+    {t("share.social")}
+  </label>
 
-      <div className="grid grid-cols-2 gap-2">
-        {[
-          { key: "discord", label: "Discord", logo: "/logos/discord.png" },
-          { key: "facebook", label: "Facebook", logo: "/logos/facebook.png" },
-          { key: "instagram", label: "Instagram", logo: "/logos/instagram.png" },
-          { key: "mail", label: "Mail", logo: "/logos/mail.png" },
-          { key: "messenger", label: "Messenger", logo: "/logos/messenger.png" },
-          { key: "reddit", label: "Reddit", logo: "/logos/reddit.png" },
-          { key: "whatsapp", label: "WhatsApp", logo: "/logos/whatsapp.png" },
-          { key: "x", label: "X", logo: "/logos/twitter.png" },
-        ].map((item) => (
+  <div className="relative">
+    <button
+      type="button"
+      onClick={() => setShareOpen((v) => !v)}
+      className="
+        w-full h-10
+        bg-zinc-950 border border-zinc-700
+        rounded-md
+        px-3
+        flex items-center justify-between
+        hover:border-zinc-500
+        transition-colors
+      "
+    >
+      <span className="flex items-center gap-2">
+        <img
+          src={selectedShare.logo}
+          alt={selectedShare.label}
+          className="w-5 h-5 object-contain"
+        />
+
+        <span className="text-[11px] font-bold text-zinc-300">
+          {selectedShare.label}
+        </span>
+      </span>
+
+      <ChevronDown
+        size={14}
+        className={`text-zinc-400 transition-transform ${
+          shareOpen ? "rotate-180" : ""
+        }`}
+      />
+    </button>
+
+    {shareOpen && (
+      <div
+        className="
+          absolute z-50 mt-1 w-full
+          bg-zinc-950 border border-zinc-700
+          rounded-md overflow-hidden
+          shadow-xl
+        "
+      >
+        {shareOptions.map((item) => (
           <button
             type="button"
             key={item.key}
-            onClick={() => openShareLink(item.key)}
-            className="flex items-center gap-2 px-2 py-2 rounded-lg transition-all duration-200 ease-out hover:bg-canvas hover:scale-[1.02] active:scale-[0.98] group"
+            onClick={() => {
+              setSelectedShare(item);
+              setShareOpen(false);
+              openShareLink(item.key);
+            }}
+            className="
+              w-full h-9 px-3
+              flex items-center gap-2
+              text-left
+              hover:bg-canvas
+              transition-colors
+            "
           >
             <img
               src={item.logo}
               alt={item.label}
-              className="w-5 h-5 object-contain transition-transform duration-200 group-hover:scale-110"
+              className="w-5 h-5 object-contain"
             />
 
-            <span className="text-[11px] font-semibold text-zinc-300 transition-all duration-200 group-hover:text-white group-hover:translate-x-1">
+            <span className="text-[11px] font-bold text-zinc-300">
               {item.label}
             </span>
           </button>
         ))}
       </div>
-    </div>
+    )}
+  </div>
+</div>*/}
 
     {/* PREVIEW */}
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-2 -mt-2">
       <label className="text-[10px] uppercase tracking-wider font-bold">
         {t("export.preview")}
       </label>
