@@ -194,7 +194,7 @@ return (
 </div>
 
 <div className="flex flex-col gap-1">
-  <div className="text-[10px] italic font-bold text-zinc-500">
+  <div className="text-[10px] font-bold text-zinc-500">
     {t("customMenu.subtitle")}
   </div>
 
