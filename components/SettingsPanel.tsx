@@ -600,7 +600,7 @@ return (
   "
 >
   <span className="text-[12px]">✉️</span>
-  <span className="text-[10px] font-bold uppercase">
+  <span className="text-[10px] font-bold ">
     {t("footer.feedback")}
   </span>
 </button>
@@ -619,7 +619,7 @@ return (
   "
 >
   <span className="text-[12px]">❤️</span>
-  <span className="text-[10px] font-bold uppercase">
+  <span className="text-[10px] font-bold">
     {t("footer.donate")}
   </span>
 </a>

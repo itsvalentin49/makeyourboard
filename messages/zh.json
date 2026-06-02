@@ -60,12 +60,11 @@
       "Buffer": "缓冲器",
       "Cab Simulator": "箱体模拟器",
       "Chorus": "合唱",
-      "Chorus / Vibrato": "合唱 / 颤音",
       "Compressor": "压缩器",
       "Delay": "延迟",
-      "Delay / Reverb": "延迟 / 混响",
       "DI": "DI",
       "Distortion": "失真",
+      "Drum Machine": "鼓机",
       "Enveloppe Filter": "包络滤波器",
       "Equalizer": "均衡器",
       "Expression": "表情踏板",
@@ -89,7 +88,6 @@
       "Power Supply": "电源",
       "Preamp": "前级放大器",
       "Reverb": "混响",
-      "Reverb / Tremolo": "混响 / 颤音",
       "Ring Modulator": "环形调制器",
       "Rotary": "旋转扬声器",
       "Slicer": "切片器",
@@ -105,6 +103,7 @@
       "Vocal": "人声",
       "Volume": "音量",
       "Wah": "哇音",
+      "Wireless System": "无线系统",
       "Whammy": "Whammy"
     },
 
@@ -140,6 +139,7 @@
       "9-18V DC": "9-18V DC",
       "Passive": "无源",
       "Battery": "电池",
+      "USB": "USB",
       "N/A": "无"
     },
 

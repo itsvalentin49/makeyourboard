@@ -251,7 +251,7 @@ const getRenderItems = (): AnyRow[] =>
     });
   });
 
-  const PADDING = 10;
+  const PADDING = 20;
 
   minX -= PADDING;
   minY -= PADDING;
@@ -294,11 +294,18 @@ const getRenderItems = (): AnyRow[] =>
     }
 
     if (background === "current" && currentBackground) {
-      if (currentBackground.type === "css") {
-        ctx.fillStyle = getComputedStyle(document.documentElement)
-          .getPropertyValue("--zinc-600");
-        ctx.fillRect(0, 0, width, height);
-      }
+if (currentBackground.type === "css") {
+  const color = getComputedStyle(document.documentElement)
+    .getPropertyValue(
+      document.documentElement.classList.contains("light")
+        ? "--zinc-200"
+        : "--zinc-600"
+    )
+    .trim();
+
+  ctx.fillStyle = color;
+  ctx.fillRect(0, 0, width, height);
+}
 
       if (currentBackground.type === "image" && currentBackground.src) {
         const bgImg = await loadImage(currentBackground.src);
@@ -306,6 +313,32 @@ const getRenderItems = (): AnyRow[] =>
       }
     }
   };
+
+  const drawExportLogo = async (
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  loadImage: (src: string) => Promise<HTMLImageElement>
+) => {
+  const logo = await loadImage("/logos/logo-export.png");
+
+  const LOGO_SIZE = Math.max(20, Math.min(width, height) * 0.06);
+  const MARGIN = 5;
+
+  ctx.save();
+
+  ctx.globalAlpha = 0.9;
+
+  ctx.drawImage(
+    logo,
+    width - LOGO_SIZE - MARGIN,
+    height - LOGO_SIZE - MARGIN,
+    LOGO_SIZE,
+    LOGO_SIZE
+  );
+
+  ctx.restore();
+};
 
   // ===============================
   // 🖼️ PREVIEW RENDER
@@ -381,6 +414,7 @@ const renderPreview = async () => {
       if (renderId !== previewRenderIdRef.current) return;
 
       await drawItems(tempCtx, width, height, minX, minY, loadImage);
+      await drawExportLogo(tempCtx, width, height, loadImage);
       if (renderId !== previewRenderIdRef.current) return;
 
       // ✅ seulement le dernier rendu autorisé est copié dans le preview
@@ -435,6 +469,7 @@ const renderPreview = async () => {
 
       await drawBackground(ctx, width, height, loadImage, false);
       await drawItems(ctx, width, height, minX, minY, loadImage);
+      await drawExportLogo(ctx, width, height, loadImage);
 
       canvas.toBlob(
         (blob) => {

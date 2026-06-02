@@ -26,6 +26,16 @@ type Props = {
   deletePedal: (id: number) => void;
 };
 
+function translatePedalType(type: any, t: (key: string) => string): string {
+  if (!type) return "N/A";
+
+  return String(type)
+    .split("/")
+    .map((part) => part.trim())
+    .map((part) => t(`pedal.type.${part}`))
+    .join(" / ");
+}
+
 export default function PedalSpecs({
   selectedPedal,
   selectedInstanceId,
@@ -255,11 +265,9 @@ export default function PedalSpecs({
 
     <div className="flex-1 border-b border-dotted border-zinc-600 mx-2 translate-y-[3.5px]" />
 
-    <span className="text-[11px] font-bold font-mono whitespace-nowrap">
-      {selectedPedal.type
-        ? t(`pedal.type.${selectedPedal.type}`)
-        : "N/A"}
-    </span>
+<span className="text-[11px] font-bold font-mono whitespace-nowrap">
+  {translatePedalType(selectedPedal.type, t)}
+</span>
 
   </div>
 )}

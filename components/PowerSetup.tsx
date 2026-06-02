@@ -212,11 +212,13 @@ export default function PowerSetup({
   </div>
 )}
 
-      <div className="flex items-center justify-between -mt-4">
-        <div className={`text-[12px] ${powerMessageColor}`}>
-          {powerMessage}
-        </div>
-      </div>
+{hasPedals && powerMessage && (
+  <div className="flex items-center justify-between -mt-4">
+    <div className={`text-[12px] ${powerMessageColor}`}>
+      {powerMessage}
+    </div>
+  </div>
+)}
 
       <div className="mb-2 mt-6 text-[12px] uppercase tracking-wider font-bold">
         {t("powerSetup.sections.recommendation")}
@@ -227,9 +229,6 @@ export default function PowerSetup({
           <>
             <div className="text-blue-400">
               {t("powerSetup.empty.title")}
-            </div>
-            <div className="-mt-3">
-              {t("powerSetup.empty.subtitle")}
             </div>
           </>
         )}

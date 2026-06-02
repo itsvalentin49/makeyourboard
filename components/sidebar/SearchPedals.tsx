@@ -35,7 +35,7 @@ function isNewPedal(value: any): boolean {
   today.setHours(0, 0, 0, 0);
 
   const limitDate = new Date(today);
-  limitDate.setDate(today.getDate() - 30);
+  limitDate.setDate(today.getDate() - 60);
 
   releaseDate.setHours(0, 0, 0, 0);
 

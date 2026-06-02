@@ -58,12 +58,11 @@
       "Buffer": "Buffer",
       "Cab Simulator": "Simulador de cab",
       "Chorus": "Chorus",
-      "Chorus / Vibrato": "Chorus / Vibrato",
       "Compressor": "Compressor",
       "Delay": "Delay",
-      "Delay / Reverb": "Delay / Reverb",
       "DI": "DI",
       "Distortion": "Distorção",
+      "Drum Machine": "Caixa de ritmos",
       "Enveloppe Filter": "Envelope Filter",
       "Equalizer": "Equalizador",
       "Expression": "Pedal de expressão",
@@ -87,7 +86,6 @@
       "Power Supply": "Fonte de alimentação",
       "Preamp": "Pré-amplificador",
       "Reverb": "Reverb",
-      "Reverb / Tremolo": "Reverb / Tremolo",
       "Ring Modulator": "Ring Modulator",
       "Rotary": "Rotary",
       "Slicer": "Slicer",
@@ -103,6 +101,7 @@
       "Vocal": "Vocal",
       "Volume": "Volume",
       "Wah": "Wah",
+      "Wireless System": "Sistema sem fio",
       "Whammy": "Whammy"
     },
 
@@ -138,6 +137,7 @@
       "9-18V DC": "9-18V DC",
       "Passive": "Passivo",
       "Battery": "Bateria",
+      "USB": "USB",
       "N/A": "N/A"
     },
 
