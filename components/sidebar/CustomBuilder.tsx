@@ -292,7 +292,7 @@ return (
     onFocus={() => setFocusedField("name")}
     onBlur={() => setFocusedField(null)}
     onChange={(e) => setCustomName(e.target.value)}
-className="w-full bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-[10px] outline-none focus:border-zinc-600"  />
+    className="w-full bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-[10px] outline-none focus:border-zinc-600"  />
 
   </div>
 {/* COLOR */}
@@ -303,13 +303,7 @@ className="w-full bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-[
       e.preventDefault();
       setShowPicker((prev) => !prev);
     }}
-    className="
-      w-full h-[36px]
-      rounded-md border border-zinc-800
-      cursor-pointer overflow-hidden
-      bg-zinc-950
-    "
-  >
+    className="w-full py-2 rounded-md border border-zinc-800 cursor-pointer overflow-hidden bg-zinc-950">
     <div
       className="w-full h-full flex items-center px-3 text-[10px]"
       style={{
@@ -419,7 +413,7 @@ className="w-full bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-[
       type="button"
       onClick={() => setCustomVoltageOpen((v) => !v)}
       className="
-        w-full h-[36px]
+        w-full py-2
         bg-zinc-950 border border-zinc-800 rounded-md
         px-3 text-[10px] text-left
         flex items-center justify-between
@@ -462,7 +456,7 @@ className="w-full bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-[
     placeholder={t("customMenu.current")}
     value={customDraw}
     onChange={(e) => setCustomDraw(e.target.value)}
-    className="w-full h-[36px] bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-[10px] outline-none focus:border-zinc-600"
+    className="w-full py-2 bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-[10px] outline-none focus:border-zinc-600"
   />
 </div>
 
@@ -669,7 +663,7 @@ className="w-full bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-[
     type="button"
     onClick={() => setVoltageOpen((v) => !v)}
     className="
-      w-full h-[36px]
+      w-full py-2
       bg-zinc-950 border border-zinc-800 rounded-md
       px-3 text-[10px] text-left
       flex items-center justify-between
@@ -712,7 +706,7 @@ className="w-full bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-[
     placeholder={t("customMenu.current")}
     value={uploadDraw}
     onChange={(e) => setUploadDraw(e.target.value)}
-  className="w-full h-[36px] bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-[10px] outline-none focus:border-zinc-600"
+  className="w-full py-2 bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-[10px] outline-none focus:border-zinc-600"
   />
 </div>
 
