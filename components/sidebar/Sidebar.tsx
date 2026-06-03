@@ -454,8 +454,8 @@ const addPower = (p: any) => {
     <div
   className="
   relative z-40 w-full lg:w-76 shrink-0
-  bg-zinc-900
-  px-6 py-6 flex flex-col gap-4 lg:gap-6
+  bg-zinc-800
+  px-6 pt-3 pb-6 flex flex-col gap-4 lg:gap-6
   overflow-hidden touch-pan-y
   h-full
 "
@@ -467,7 +467,10 @@ const addPower = (p: any) => {
   }}
     >
 
-      {!hideLogo && <SidebarLogo t={t} />}
+{/* Desktop logo only */}
+<div className="hidden lg:block">
+  <SidebarLogo />
+</div>
 
 
       {contactOpen ? (

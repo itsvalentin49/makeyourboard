@@ -154,7 +154,7 @@ export default function SearchPedals({
   )}
 </div>
 
-        <div className="flex flex-col gap-2.5 overflow-y-auto no-scrollbar pb-28 min-h-0">
+        <div className="flex flex-col gap-2.5 overflow-y-auto no-scrollbar pb-6 min-h-0">
           {visiblePedals.length > 0 ? (
             visiblePedals.map((p) => {
               const img = p.image || p.image_url || p.photo;

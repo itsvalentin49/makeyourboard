@@ -181,7 +181,7 @@ export default function SearchBoards({
           )}
         </div>
 
-        <div className="flex flex-col gap-2.5 overflow-y-auto no-scrollbar pb-28 min-h-0">
+        <div className="flex flex-col gap-2.5 overflow-y-auto no-scrollbar pb-6 min-h-0">
           {visibleBoards.length > 0 ? (
             visibleBoards.map((b) => {
               const img = b.image || b.image_url || b.photo;

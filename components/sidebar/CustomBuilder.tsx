@@ -293,26 +293,28 @@ return (
     onBlur={() => setFocusedField(null)}
     onChange={(e) => setCustomName(e.target.value)}
     className="w-full bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-[10px] outline-none focus:border-zinc-600"  />
-
   </div>
+
+
 {/* COLOR */}
 <div className="relative">
   <div
-    onClick={(e) => {
-      e.stopPropagation();
-      e.preventDefault();
-      setShowPicker((prev) => !prev);
+  onClick={(e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setShowPicker((prev) => !prev);
+  }}
+  className="w-full h-[34px] rounded-md border border-zinc-800 cursor-pointer overflow-hidden bg-zinc-950"
+>
+  <div
+    className="w-full h-full flex items-center px-3 text-[10px]"
+    style={{
+      backgroundColor: customColor || undefined,
     }}
-    className="w-full py-2 rounded-md border border-zinc-800 cursor-pointer overflow-hidden bg-zinc-950">
-    <div
-      className="w-full h-full flex items-center px-3 text-[10px]"
-      style={{
-        backgroundColor: customColor || undefined,
-      }}
-    >
-      {!customColor ? t("custom.color") : null}
-    </div>
+  >
+    {!customColor ? t("custom.color") : null}
   </div>
+</div>
 
   {showPicker && (
     <div
@@ -730,8 +732,8 @@ className="w-full bg-zinc-950 border border-zinc-800 rounded-md py-2 px-3 text-[
           units === "metric"
             ? Number(uploadDepth)
             : Number(uploadDepth) * 25.4,
-        voltage: Number(uploadVoltage),
-        power: `${uploadVoltage}V DC`,
+        voltage: Number(uploadVoltage) || 9,
+        power: uploadVoltage ? `${uploadVoltage}V DC` : "9V DC",
         draw: Number(uploadDraw) || 0,
         weight: 0,
       });

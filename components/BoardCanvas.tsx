@@ -2,7 +2,7 @@
 
 import React, { useRef, useLayoutEffect, useEffect, useState } from "react";
 import { Stage, Layer, Group, Rect, Text, Image as KonvaImage } from "react-konva";
-import { Zap, Weight, Minus, Cable, Plus, Check, Upload, AlertTriangle, RotateCw, Trash2, X, Share2, Info, List, Settings, PanelsTopLeft, Download } from "lucide-react";
+import { Zap, Weight, Minus, Cable, Plus, Check, Upload, AlertTriangle, RotateCw, Trash2, X, Share2, Info, List, Settings, PanelsTopLeft, Download, ArrowUp, ArrowDown } from "lucide-react";
 import PedalImage from "@/components/PedalImage";
 import { formatWeight } from "@/utils/units";
 import { getTranslator } from "@/utils/i18n";
@@ -61,6 +61,8 @@ activeProject: {
 
   rotatePedal: (id: number) => void;
   deletePedal: (id: number) => void;
+  movePedalFront: (id: number) => void;
+  movePedalBack: (id: number) => void;
   rotateBoard: (id: number) => void;
   deleteBoard: (id: number) => void;
 
@@ -230,6 +232,8 @@ export default function BoardCanvas({
   mobileSidebarOpen = false,
   rotatePedal,
   deletePedal,
+  movePedalFront,
+  movePedalBack,
   rotateBoard,
   deleteBoard,
   onStageSizeChange,
@@ -260,6 +264,7 @@ export default function BoardCanvas({
   const [footswitch] = useImage("/images/footswitch.png");
   const currentZoom = activeProject.zoom || 100;
   const zoomPercent = Math.round(currentZoom);
+  const displayZoomPercent = Math.round(zoomPercent * 0.75 - 25);
   const MIN_ZOOM = 100;
   const MAX_ZOOM = 300;
 
@@ -1123,12 +1128,7 @@ const canvasItems: AnyRow[] = [
   return (Number(a.zIndex) || 0) - (Number(b.zIndex) || 0);
 });
 
-const shouldShowHelpGuide =
-  !viewer &&
-  !isMobile &&
-  activeProject.boardPedals.length === 0 &&
-  (activeProject.selectedBoards || []).length <= 1 &&
-  projects.length === 1;
+
 
   return (
   <div
@@ -1151,7 +1151,15 @@ const shouldShowHelpGuide =
           }
 }
 >
-{shouldShowHelpGuide && <HelpGuide t={t} />}
+
+{/* HELP GUIDE */}
+{showIntro && !mobileSidebarOpen && (
+  <HelpGuide
+    t={t}
+    mobile={isMobile}
+    forceClose={false}
+  />
+)}
 
 {/* --- MODE VIEWER (CENTER BOTTOM) --- */}
 {viewer && (
@@ -1161,7 +1169,7 @@ const shouldShowHelpGuide =
       <button onClick={zoomOut} disabled={isMinZoom} className="absolute left-2 flex items-center justify-center w-6 h-6 hover:text-blue-400 disabled:text-zinc-600">
         {isMinZoom ? <span className="text-[9px] tracking-wider text-zinc-500">{t("canvasControls.min")}</span> : <Minus size={14} />}
       </button>
-      <span className="text-[12px] font-black font-mono tabular-nums">{zoomPercent}%</span>
+      <span className="text-[12px] font-black font-mono tabular-nums">{displayZoomPercent}%</span>
       <button onClick={zoomIn} disabled={isMaxZoom} className="absolute right-2 flex items-center justify-center w-6 h-6 hover:text-blue-400 disabled:text-zinc-600">
         {isMaxZoom ? <span className="text-[9px] tracking-wider text-zinc-500">{t("canvasControls.max")}</span> : <Plus size={14} />}
       </button>
@@ -1211,14 +1219,224 @@ const shouldShowHelpGuide =
   </div>
 )}
 
+
+{isMobile && selectedInstanceId !== null && overlayPosition && (
+  <div
+    className="
+      absolute
+      z-[80]
+      flex
+      items-center
+      gap-2
+      bg-zinc-950
+      border
+      border-zinc-800
+      rounded-xl
+      p-2
+      shadow-2xl
+    "
+    style={{
+      left: overlayPosition.x,
+      top: Math.max(8, overlayPosition.y - 58),
+      transform: "translateX(-50%)",
+    }}
+    onClick={(e) => e.stopPropagation()}
+  >
+    <button
+      onClick={() => rotatePedal(selectedInstanceId)}
+      className="w-7 h-7 rounded-lg border border-zinc-700 flex items-center justify-center bg-zinc-950"
+    >
+      <RotateCw size={12} />
+    </button>
+
+    <button
+      onClick={() => deletePedal(selectedInstanceId)}
+      className="w-7 h-7 rounded-lg border border-zinc-700 flex items-center justify-center bg-zinc-950"
+    >
+      <Trash2 size={12} />
+    </button>
+
+<button
+  onClick={() => {
+    const maxZ = Math.max(
+      0,
+      ...activeProject.boardPedals.map((p) => Number(p.zIndex) || 0),
+      ...(activeProject.selectedBoards || []).map((b) => Number(b.zIndex) || 0)
+    );
+
+    updateActiveProject({
+      boardPedals: activeProject.boardPedals.map((p) =>
+        p.instanceId === selectedInstanceId
+          ? { ...p, zIndex: maxZ + 1 }
+          : p
+      ),
+    });
+  }}
+      className="w-7 h-7 rounded-lg border border-zinc-700 flex items-center justify-center bg-zinc-950"
+    >
+      <ArrowUp size={12} />
+    </button>
+
+<button
+  onClick={() => {
+    const minZ = Math.min(
+      0,
+      ...activeProject.boardPedals.map((p) => Number(p.zIndex) || 0),
+      ...(activeProject.selectedBoards || []).map((b) => Number(b.zIndex) || 0)
+    );
+
+    updateActiveProject({
+      boardPedals: activeProject.boardPedals.map((p) =>
+        p.instanceId === selectedInstanceId
+          ? { ...p, zIndex: minZ - 1 }
+          : p
+      ),
+    });
+  }}
+      className="w-7 h-7 rounded-lg border border-zinc-700 flex items-center justify-center bg-zinc-950"
+    >
+      <ArrowDown size={12} />
+    </button>
+  </div>
+)}
+
+
+{isMobile && selectedBoardInstanceId !== null && overlayPosition && (
+  <div
+    className="
+      absolute
+      z-[80]
+      flex
+      items-center
+      gap-2
+      bg-zinc-950
+      border
+      border-zinc-800
+      rounded-xl
+      p-2
+      shadow-2xl
+    "
+    style={{
+      left: overlayPosition.x,
+      top: Math.max(8, overlayPosition.y - 58),
+      transform: "translateX(-50%)",
+    }}
+    onClick={(e) => e.stopPropagation()}
+  >
+    <button
+      onClick={() => rotateBoard(selectedBoardInstanceId)}
+      className="w-7 h-7 rounded-lg border border-zinc-700 flex items-center justify-center bg-zinc-950"
+    >
+      <RotateCw size={12} />
+    </button>
+
+    <button
+      onClick={() => deleteBoard(selectedBoardInstanceId)}
+      className="w-7 h-7 rounded-lg border border-zinc-700 flex items-center justify-center bg-zinc-950"
+    >
+      <Trash2 size={12} />
+    </button>
+
+    <button
+      onClick={() => {
+        const maxZ = Math.max(
+          0,
+          ...activeProject.boardPedals.map((p) => Number(p.zIndex) || 0),
+          ...(activeProject.selectedBoards || []).map(
+            (b) => Number(b.zIndex) || 0
+          )
+        );
+
+        updateActiveProject({
+          selectedBoards: (activeProject.selectedBoards || []).map((b) =>
+            b.instanceId === selectedBoardInstanceId
+              ? { ...b, zIndex: maxZ + 1 }
+              : b
+          ),
+        });
+      }}
+      className="w-7 h-7 rounded-lg border border-zinc-700 flex items-center justify-center bg-zinc-950"
+    >
+      <ArrowUp size={12} />
+    </button>
+
+    <button
+      onClick={() => {
+        const minZ = Math.min(
+          0,
+          ...activeProject.boardPedals.map((p) => Number(p.zIndex) || 0),
+          ...(activeProject.selectedBoards || []).map(
+            (b) => Number(b.zIndex) || 0
+          )
+        );
+
+        updateActiveProject({
+          selectedBoards: (activeProject.selectedBoards || []).map((b) =>
+            b.instanceId === selectedBoardInstanceId
+              ? { ...b, zIndex: minZ - 1 }
+              : b
+          ),
+        });
+      }}
+      className="w-7 h-7 rounded-lg border border-zinc-700 flex items-center justify-center bg-zinc-950"
+    >
+      <ArrowDown size={12} />
+    </button>
+  </div>
+)}
+
+
+
+
 {/* --- MODE EDITION (BAS GAUCHE & DROITE) --- */}
 {!viewer && !(isMobile && mobileSidebarOpen) && (
   <>
     {/* GAUCHE : INDICATEURS */}
-<div className="absolute bottom-6 left-6 flex items-center gap-4 z-50">
+<div
+  className="
+    absolute
+    bottom-6
+    left-1/2
+    -translate-x-1/2
+    flex
+    items-center
+    gap-4
+    z-50
+  "
+>
+
+  {isMobile && (
+  <div
+    className="
+      relative flex items-center justify-center
+      h-8 w-20
+      bg-zinc-800 border border-zinc-800 rounded-2xl shadow-2xl
+    "
+  >
+    <button
+      onClick={zoomOut}
+      disabled={isMinZoom}
+      className="absolute left-2"
+    >
+      <Minus size={12} />
+    </button>
+
+    <span className="text-[10px] font-black">
+      {displayZoomPercent}%
+    </span>
+
+    <button
+      onClick={zoomIn}
+      disabled={isMaxZoom}
+      className="absolute right-2"
+    >
+      <Plus size={12} />
+    </button>
+  </div>
+)}
 
 {/* BOUTON BOARDS */}
-<div className="relative">
+<div className={isMobile ? "hidden" : "relative"}>
 <button
    ref={boardsButtonRef}
     onClick={() => {
@@ -1251,7 +1469,14 @@ const shouldShowHelpGuide =
 {showBoardsMenu && (
   <>
 
-    <div ref={boardsMenuRef} className="absolute bottom-12 left-0 z-50">
+    <div ref={boardsMenuRef} className={`
+    z-50
+    ${
+      isMobile
+        ? "fixed left-1/2 bottom-[50px] -translate-x-1/2"
+        : "absolute bottom-12 left-1/2 -translate-x-1/2"
+    }
+  `}>
       <div
         className="
           w-64 bg-zinc-900 border border-zinc-800 rounded-xl shadow-2xl
@@ -1407,15 +1632,15 @@ onClick={() => {
   setShowList(false);
   setShowSettings(false);
 }}
-    className="
-      relative flex items-center justify-center gap-2
-      h-9 md:h-10 w-24 md:w-28
-      bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl
-      text-[11px] font-mono font-bold uppercase
-      transition-all duration-200
-      hover:scale-105 hover:border-blue-500 active:scale-95
-      cursor-pointer
-    "
+className={`
+  relative flex items-center justify-center gap-2
+  ${isMobile ? "h-8 w-20 text-[9px]" : "h-10 w-28 text-[11px]"}
+  bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl
+  font-mono font-bold uppercase
+  transition-all duration-200
+  hover:scale-105 hover:border-blue-500 active:scale-95
+  cursor-pointer
+`}
   >
 <Cable
   size={16}
@@ -1426,7 +1651,14 @@ onClick={() => {
   </button>
 
 {showCableMenu && (
-  <div className="absolute bottom-12 left-0 z-50">
+        <div className={`
+    z-50
+    ${
+      isMobile
+        ? "fixed left-1/2 bottom-[50px] -translate-x-1/2"
+        : "absolute bottom-12 left-1/2 -translate-x-1/2"
+    }
+  `}>
     <div
       className="
         relative
@@ -1515,10 +1747,8 @@ onClick={() => {
 </div>
 
 
-      {/* TOTAL DRAW (mA)*/}
+      {/* TPOWER*/}
 <div className="relative">
-
-
 <button
   onClick={() => {
     setShowPower(v => !v);
@@ -1526,17 +1756,17 @@ onClick={() => {
     setShowExportPanel(false);
     setShowList(false);
     setShowCableMenu(false);
+    setShowSettings(false);
   }}
-  className={`
-    relative
-    flex items-center justify-center gap-2
-    h-9 md:h-10 w-24 md:w-28
-    bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl
-    text-[11px] font-mono font-bold uppercase
-    transition-all duration-200
-    hover:scale-105 hover:border-blue-500 active:scale-95
-    cursor-pointer
-  `}
+className={`
+  relative flex items-center justify-center gap-2
+  ${isMobile ? "h-8 w-20 text-[9px]" : "h-10 w-28 text-[11px]"}
+  bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl
+  font-mono font-bold uppercase
+  transition-all duration-200
+  hover:scale-105 hover:border-blue-500 active:scale-95
+  cursor-pointer
+`}
 >
   <Zap
     size={16}
@@ -1552,8 +1782,15 @@ onClick={() => {
 {showPower && (
   <>
     <div className="fixed inset-0 z-40 pointer-events-none" />
+      <div className={`
+    z-50
+    ${
+      isMobile
+        ? "fixed left-1/2 bottom-[50px] -translate-x-1/2"
+        : "absolute bottom-12 left-1/2 -translate-x-1/2"
+    }
+  `}>
 
-    <div className="absolute bottom-12 left-0 z-50">
       <PowerSetup
         t={t}
         powerUnits={powerUnits}
@@ -1582,13 +1819,11 @@ onClick={() => {
   </>
 )}
 </div>
-</div>
 
 
-{/* --- DROITE : ACTIONS --- */}
-<div className="absolute bottom-6 right-6 flex items-center gap-4 z-50">
+
   
-{/* EXPORT / SHARE */}
+{/* EXPORT */}
 <div className="relative">
 <button
   type="button"
@@ -1611,7 +1846,15 @@ onClick={() => {
       return next;
     });
   }}
-  className="relative flex items-center justify-center gap-2 h-9 w-24 md:h-10 md:w-28 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl text-[11px] font-mono font-bold uppercase transition-all duration-200 hover:scale-105 hover:border-blue-500 active:scale-95 cursor-pointer"
+  className={`
+  relative flex items-center justify-center gap-2
+  ${isMobile ? "h-8 w-20 text-[9px]" : "h-10 w-28 text-[11px]"}
+  bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl
+  font-mono font-bold uppercase
+  transition-all duration-200
+  hover:scale-105 hover:border-blue-500 active:scale-95
+  cursor-pointer
+`}
 >
   <Download size={16} className={showExportPanel ? "text-blue-500" : undefined}
   />
@@ -1621,7 +1864,14 @@ onClick={() => {
   {showExportPanel && (
     <>
       <div className="fixed inset-0 z-40 pointer-events-none" />
-      <div className="absolute bottom-12 right-0 z-50">
+      <div className={`
+    z-50
+    ${
+      isMobile
+        ? "fixed left-1/2 bottom-[50px] -translate-x-1/2"
+        : "absolute bottom-12 left-1/2 -translate-x-1/2"
+    }
+  `}>
         <ExportPanel
           boardPedals={activeProject.boardPedals}
           selectedBoards={activeProject.selectedBoards}
@@ -1636,6 +1886,8 @@ onClick={() => {
   )}
 </div>
 
+
+
 {/* SETTINGS */}
 <div className="relative">
   <button
@@ -1648,7 +1900,15 @@ onClick={() => {
       setShowList(false);
       setShowCableMenu(false);
     }}
-    className="relative flex items-center justify-center gap-2 h-9 w-24 md:h-10 md:w-28 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl text-[11px] font-mono font-bold uppercase transition-all duration-200 hover:scale-105 hover:border-blue-500 active:scale-95 cursor-pointer"
+className={`
+  relative flex items-center justify-center gap-2
+  ${isMobile ? "h-8 w-20 text-[9px]" : "h-10 w-28 text-[11px]"}
+  bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl
+  font-mono font-bold uppercase
+  transition-all duration-200
+  hover:scale-105 hover:border-blue-500 active:scale-95
+  cursor-pointer
+`}
   >
     <Settings size={16}/>
     {t("settings.title")}
@@ -1658,7 +1918,14 @@ onClick={() => {
     <>
       <div className="fixed inset-0 z-40 pointer-events-none" />
 
-      <div className="absolute bottom-12 right-0 z-50">
+      <div className={`
+    z-50
+    ${
+      isMobile
+        ? "fixed left-1/2 bottom-[50px] -translate-x-1/2"
+        : "absolute bottom-12 left-1/2 -translate-x-1/2"
+    }
+  `}>
         <div className="w-64 bg-zinc-900 border border-zinc-800 rounded-xl shadow-2xl p-4">
           <div className="flex items-center gap-2 text-xs uppercase tracking-wider font-bold mb-6">
             <Settings size={14} />
@@ -1681,10 +1948,7 @@ onClick={() => {
     </>
   )}
 </div>
-
 </div>
-
-{/* Fermetures des conditions parentes */}
     </>
   )
 }

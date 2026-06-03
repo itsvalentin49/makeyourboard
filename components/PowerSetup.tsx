@@ -73,7 +73,18 @@ export default function PowerSetup({
   extractOutputs,
 }: Props) {
   return (
-    <div className="w-[420px] max-w-[90vw] bg-zinc-900 border border-zinc-800 rounded-xl shadow-2xl p-4">
+    <div
+  className="
+    w-[calc(100vw-32px)]
+    max-w-[350px]
+    bg-zinc-900
+    border
+    border-zinc-800
+    rounded-xl
+    shadow-2xl
+    p-4
+  "
+>
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-2 text-xs uppercase tracking-wider font-bold">
           <Zap size={14} className="text-yellow-500" />
