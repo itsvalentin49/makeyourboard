@@ -13,22 +13,27 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  metadataBase: new URL("https://makeyourboard.com"),
+const SITE_URL = "https://makeyourboard.com";
+const SITE_NAME = "MakeYourBoard";
+const SITE_TITLE = "MakeYourBoard | Guitar Pedalboard Builder";
+const SITE_DESCRIPTION =
+  "Design your guitar pedalboard with real pedal sizes, drag-and-drop layout, power calculation, and high-quality export. Free and easy to use.";
 
-  applicationName: "MakeYourBoard",
+export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
+
+  applicationName: SITE_NAME,
 
   alternates: {
-    canonical: "https://makeyourboard.com",
+    canonical: SITE_URL,
   },
 
   title: {
-    default: "MakeYourBoard | Guitar Pedalboard Builder",
-    template: "%s | MakeYourBoard",
+    default: SITE_TITLE,
+    template: `%s | ${SITE_NAME}`,
   },
 
-  description:
-  "Design your guitar pedalboard with real pedal sizes, drag-and-drop layout, power calculation, and high-quality export. Free and easy to use.",
+  description: SITE_DESCRIPTION,
 
   keywords: [
     "guitar pedalboard builder",
@@ -38,30 +43,28 @@ export const metadata: Metadata = {
     "guitar pedals layout",
   ],
 
-openGraph: {
-  title: "MakeYourBoard | Guitar Pedalboard Builder",
-  description:
-  "Design your guitar pedalboard with real pedal sizes, drag-and-drop layout, power calculation, and high-quality export. Free and easy to use.",
-  url: "https://makeyourboard.com",
-  siteName: "MakeYourBoard",
-  images: [
-    {
-      url: "https://makeyourboard.com/og-image.png",
-      width: 1200,
-      height: 630,
-      alt: "MakeYourBoard | Guitar Pedalboard Builder",
-    },
-  ],
-  locale: "en_US",
-  type: "website",
-},
+  openGraph: {
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+    url: SITE_URL,
+    siteName: SITE_NAME,
+    images: [
+      {
+        url: `${SITE_URL}/og-image.png`,
+        width: 1200,
+        height: 630,
+        alt: SITE_TITLE,
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
 
   twitter: {
     card: "summary_large_image",
-    title: "MakeYourBoard | Guitar Pedalboard Builder",
-  description:
-  "Design your guitar pedalboard with real pedal sizes, drag-and-drop layout, power calculation, and high-quality export. Free and easy to use.",
-    images: ["https://makeyourboard.com/og-image.png"],
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+    images: [`${SITE_URL}/og-image.png`],
   },
 };
 
@@ -80,38 +83,37 @@ export default function RootLayout({
   const structuredDataWebsite = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: "MakeYourBoard",
-    alternateName: ["Make Your Board", "Pedalboard Builder"],
-    url: "https://makeyourboard.com",
+    "@id": `${SITE_URL}/#website`,
+    url: `${SITE_URL}/`,
+    name: SITE_NAME,
+    alternateName: "Make Your Board",
   };
 
   const structuredDataApp = {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    name: "MakeYourBoard",
-    url: "https://makeyourboard.com",
+    "@id": `${SITE_URL}/#webapp`,
+    name: SITE_NAME,
+    url: `${SITE_URL}/`,
     applicationCategory: "MusicApplication",
     operatingSystem: "All",
-    description:
-  "Design your guitar pedalboard with real pedal sizes, drag-and-drop layout, power calculation, and high-quality export. Free and easy to use.",
+    description: SITE_DESCRIPTION,
   };
 
-return (
-  <html lang="en" className="light">
+  return (
+    <html lang="en" className="light">
+      <head>
+        <link rel="preload" as="image" href="/backgrounds/wood.webp" />
+        <link rel="preload" as="image" href="/backgrounds/carpet.webp" />
+        <link rel="preload" as="image" href="/backgrounds/stripes.webp" />
+        <link rel="preload" as="image" href="/backgrounds/fabric.webp" />
+        <link rel="preload" as="image" href="/backgrounds/houndstooth.webp" />
+        <link rel="preload" as="image" href="/backgrounds/steel.webp" />
+        <link rel="preload" as="image" href="/backgrounds/coast.webp" />
+      </head>
 
-
-    <head>
-  <link rel="preload" as="image" href="/backgrounds/wood.webp" />
-  <link rel="preload" as="image" href="/backgrounds/carpet.webp" />
-  <link rel="preload" as="image" href="/backgrounds/stripes.webp" />
-  <link rel="preload" as="image" href="/backgrounds/fabric.webp" />
-  <link rel="preload" as="image" href="/backgrounds/houndstooth.webp" />
-  <link rel="preload" as="image" href="/backgrounds/steel.webp" />
-  <link rel="preload" as="image" href="/backgrounds/coast.webp" />
-</head>
-
-    <body
-      className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[var(--background)] text-[var(--foreground)]`}
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[var(--background)] text-[var(--foreground)]`}
         style={{
           paddingTop: "env(safe-area-inset-top)",
           paddingBottom: "env(safe-area-inset-bottom)",
@@ -119,7 +121,6 @@ return (
       >
         {children}
 
-        {/* Structured Data - Website */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -127,7 +128,6 @@ return (
           }}
         />
 
-        {/* Structured Data - Web Application */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
