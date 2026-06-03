@@ -1391,17 +1391,19 @@ const canvasItems: AnyRow[] = [
 {/* --- MODE EDITION (BAS GAUCHE & DROITE) --- */}
 {!viewer && !(isMobile && mobileSidebarOpen) && (
   <>
-    {/* GAUCHE : INDICATEURS */}
 <div
   className="
-    absolute
+    fixed
     bottom-6
-    left-1/2
-    -translate-x-1/2
+    left-0
+    right-0
+    lg:left-76
     flex
     items-center
-    gap-4
+    justify-center
+    gap-3
     z-50
+    px-4
   "
 >
 
@@ -1410,7 +1412,7 @@ const canvasItems: AnyRow[] = [
     className="
       relative flex items-center justify-center
       h-8 w-20
-      bg-zinc-800 border border-zinc-800 rounded-2xl shadow-2xl
+      bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl
     "
   >
     <button

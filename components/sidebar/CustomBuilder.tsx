@@ -175,7 +175,7 @@ const isUploadValid =
 
 
 return (
-  <div className="flex flex-col gap-2 mt-1 h-full min-h-0">
+  <div className="flex flex-col gap-2 mt-1 h-full min-h-0 overflow-y-auto no-scrollbar pb-10">
 
 
 <div
@@ -194,11 +194,11 @@ return (
 </div>
 
 <div className="flex flex-col gap-1">
-  <div className="text-[10px] font-bold text-zinc-500">
+  <div className="text-[10px] font-bold">
     {t("customMenu.subtitle")}
   </div>
 
-<div className="text-[9px] leading-[1.45] text-zinc-500">
+<div className="text-[9px] leading-[1.45] text-zinc-400">
   <div>
     • Dimensions : min {displayMin} {unitLabel} / max {displayMax} {unitLabel}
   </div>
@@ -579,12 +579,12 @@ className={`
   {t("customMenu.importTitle")}
 </div>
 
-<div className="text-[10px] font-bold text-zinc-500">
+<div className="text-[10px] font-bold">
   {t("customMenu.importSubtitle")}
 </div>
   </div>
 
-<div className="text-[9px] leading-[1.45] text-zinc-500 -mt-1">
+<div className="text-[9px] leading-[1.45] text-zinc-400 -mt-1">
   <div>• {t("customMenu.formats")}</div>
   <div>• {t("customMenu.maxSize")}</div>
   <div>• {t("customMenu.imageDimensions")}</div>
