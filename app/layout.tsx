@@ -17,7 +17,7 @@ const SITE_URL = "https://makeyourboard.com";
 const SITE_NAME = "MakeYourBoard";
 const SITE_TITLE = "MakeYourBoard | Guitar Pedalboard Builder";
 const SITE_DESCRIPTION =
-  "Design your guitar pedalboard with real pedal sizes, drag-and-drop layout, power calculation, and high-quality export. Free and easy to use.";
+  "Free online guitar pedalboard builder and planner. Design your setup from thousands of pedals, drag-and-drop layout, power supply compatibility, cable clearance checks and high-quality exports.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
