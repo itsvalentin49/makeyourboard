@@ -21,9 +21,9 @@ import SidebarLogo from "@/components/sidebar/SidebarLogo";
 import BuyOnline from "@/components/sidebar/BuyOnline";
 import { mmToIn, formatWeight } from "@/utils/units";
 import { getTranslator } from "@/utils/i18n";
-import PedalSpecs from "@/components/sidebar/PedalSpecs";
-import BoardSpecs from "@/components/sidebar/BoardSpecs";
-import PowerSpecs from "@/components/sidebar/PowerSpecs";
+import SpecsPedal from "@/components/sidebar/SpecsPedals";
+import SpecsBoards from "@/components/sidebar/SpecsBoards";
+import SpecsPower from "@/components/sidebar/SpecsPower";
 import SearchPedals from "@/components/sidebar/SearchPedals";
 import SearchBoards from "@/components/sidebar/SearchBoards";
 import CustomBuilder from "@/components/sidebar/CustomBuilder";
@@ -644,7 +644,7 @@ className={`
   selectedPedal.type === "power" || selectedPedal.capacity
 ) ? (
 
-<PowerSpecs
+<SpecsPower
   selectedPower={selectedPedal}
   units={units}
   language={language}
@@ -661,7 +661,7 @@ className={`
 
 ) : selectedPedal ? (
 
-<PedalSpecs
+<SpecsPedal
   selectedPedal={selectedPedal}
   selectedInstanceId={selectedInstanceId}
   units={units}
@@ -679,7 +679,7 @@ className={`
 
 ) : selectedBoardDetails ? (
 
-<BoardSpecs
+<SpecsBoards
   selectedBoardDetails={selectedBoardDetails}
   units={units}
   language={language}

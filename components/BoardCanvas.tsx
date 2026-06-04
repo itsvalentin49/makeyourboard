@@ -1460,7 +1460,7 @@ const canvasItems: AnyRow[] = [
     }}
     className="
       flex items-center justify-center gap-2
-      h-8 px-4
+      h-8 w-20
       bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl
       text-[10px] font-mono font-bold uppercase
     "
@@ -1590,7 +1590,7 @@ className={`
     z-50
     ${
       isMobile
-        ? "fixed left-1/2 bottom-6 -translate-x-1/2"
+        ? "fixed left-1/2 bottom-16 -translate-x-1/2"
         : "absolute bottom-12 left-1/2 -translate-x-1/2"
     }
   `}>
@@ -1773,7 +1773,7 @@ className={`
     z-50
     ${
       isMobile
-        ? "fixed left-1/2 bottom-6 -translate-x-1/2"
+        ? "fixed left-1/2 bottom-16 -translate-x-1/2"
         : "absolute bottom-12 left-1/2 -translate-x-1/2"
     }
   `}>
@@ -1988,7 +1988,7 @@ className={`
     z-50
     ${
       isMobile
-        ? "fixed left-1/2 bottom-6 -translate-x-1/2"
+        ? "fixed left-1/2 bottom-16 -translate-x-1/2"
         : "absolute bottom-12 left-1/2 -translate-x-1/2"
     }
   `}>
@@ -2043,7 +2043,7 @@ className={`
     z-50
     ${
       isMobile
-        ? "fixed left-1/2 bottom-6 -translate-x-1/2"
+        ? "fixed left-1/2 bottom-16 -translate-x-1/2"
         : "absolute bottom-12 left-1/2 -translate-x-1/2"
     }
   `}>
