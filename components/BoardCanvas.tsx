@@ -1459,12 +1459,16 @@ className="
       closeBottomPanels();
       setShowMobileMenu((v) => !v);
     }}
-    className="
-      flex items-center justify-center gap-2
-      h-8 w-20
-      bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl
-      text-[10px] font-mono font-bold uppercase
-    "
+className="
+  flex items-center justify-center gap-2
+  h-8 w-20
+  bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl
+  text-[10px] font-mono font-bold uppercase
+  cursor-pointer
+  transition-all duration-200
+  hover:scale-105 hover:border-blue-500
+  active:scale-95
+"
   >
     Menu
   </button>
