@@ -1416,20 +1416,21 @@ const canvasItems: AnyRow[] = [
   "
 >
 
-{isMobile && (
+{(
   <>
-    {/* ZOOM À GAUCHE */}
-    <div
-      className="
-        fixed
-        bottom-6
-        left-4
-        z-50
-        flex items-center justify-center
-        h-8 w-20
-        bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl
-      "
-    >
+    {/* ZOOM */}
+<div
+className="
+  fixed
+  bottom-6
+  left-4
+  z-50
+  flex items-center justify-center
+  h-8 w-20
+  bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl
+  lg:hidden
+"
+>
       <button
         onClick={zoomOut}
         disabled={isMinZoom}
@@ -1495,7 +1496,7 @@ const canvasItems: AnyRow[] = [
             setShowBoardsMenu(true);
             setShowMobileMenu(false);
           }}
-          className="w-full flex items-center gap-2 px-3 py-2 text-left"
+          className="w-full flex items-center gap-2 px-3 py-2 text-left rounded-lg transition-colors hover:bg-canvas"
         >
           <PanelsTopLeft size={14} className="text-blue-500" />
           {t("canvasControls.boards")}
@@ -1506,7 +1507,7 @@ const canvasItems: AnyRow[] = [
             setShowCableMenu(true);
             setShowMobileMenu(false);
           }}
-          className="w-full flex items-center gap-2 px-3 py-2 text-left"
+          className="w-full flex items-center gap-2 px-3 py-2 text-left rounded-lg transition-colors hover:bg-canvas"
         >
           <Cable size={14} className="text-red-500" />
           {t("canvasControls.cables")}
@@ -1517,7 +1518,7 @@ const canvasItems: AnyRow[] = [
             setShowPower(true);
             setShowMobileMenu(false);
           }}
-          className="w-full flex items-center gap-2 px-3 py-2 text-left"
+          className="w-full flex items-center gap-2 px-3 py-2 text-left rounded-lg transition-colors hover:bg-canvas"
         >
           <Zap size={14} className="text-yellow-500" />
           {t("canvasControls.power")}
@@ -1528,7 +1529,7 @@ const canvasItems: AnyRow[] = [
             setShowExportPanel(true);
             setShowMobileMenu(false);
           }}
-          className="w-full flex items-center gap-2 px-3 py-2 text-left"
+          className="w-full flex items-center gap-2 px-3 py-2 text-left rounded-lg transition-colors hover:bg-canvas"
         >
           <Download size={14} className="text-green-500" />
           {t("export.button")}
@@ -1539,7 +1540,7 @@ const canvasItems: AnyRow[] = [
             setShowSettings(true);
             setShowMobileMenu(false);
           }}
-          className="w-full flex items-center gap-2 px-3 py-2 text-left"
+          className="w-full flex items-center gap-2 px-3 py-2 text-left rounded-lg transition-colors hover:bg-canvas"
         >
           <Settings size={14} />
           {t("settings.title")}
@@ -1565,7 +1566,7 @@ const canvasItems: AnyRow[] = [
     setShowCableMenu(false);
   }}
 className={`
-  ${isMobile ? "hidden" : "relative flex"}
+  hidden
   items-center justify-center gap-2
   ${isMobile ? "h-8 w-20 text-[9px]" : "h-10 w-28 text-[11px]"}
   bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl
@@ -1588,11 +1589,7 @@ className={`
 
     <div ref={boardsMenuRef} className={`
     z-50
-    ${
-      isMobile
-        ? "fixed left-1/2 bottom-16 -translate-x-1/2"
-        : "absolute bottom-12 left-1/2 -translate-x-1/2"
-    }
+fixed right-4 bottom-16
   `}>
       <div
         className="
@@ -1750,7 +1747,7 @@ onClick={() => {
   setShowSettings(false);
 }}
 className={`
-  ${isMobile ? "hidden" : "relative flex"}
+  hidden
   items-center justify-center gap-2
   ${isMobile ? "h-8 w-20 text-[9px]" : "h-10 w-28 text-[11px]"}
   bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl
@@ -1771,11 +1768,7 @@ className={`
 {showCableMenu && (
         <div className={`
     z-50
-    ${
-      isMobile
-        ? "fixed left-1/2 bottom-16 -translate-x-1/2"
-        : "absolute bottom-12 left-1/2 -translate-x-1/2"
-    }
+fixed right-4 bottom-16
   `}>
     <div
       className="
@@ -1877,7 +1870,7 @@ className={`
     setShowSettings(false);
   }}
 className={`
-  ${isMobile ? "hidden" : "relative flex"}
+  hidden
   items-center justify-center gap-2
   ${isMobile ? "h-8 w-20 text-[9px]" : "h-10 w-28 text-[11px]"}
   bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl
@@ -1903,11 +1896,7 @@ className={`
     <div className="fixed inset-0 z-40 pointer-events-none" />
       <div className={`
     z-50
-    ${
-      isMobile
-        ? "fixed left-1/2 bottom-16 -translate-x-1/2"
-        : "absolute bottom-12 left-1/2 -translate-x-1/2"
-    }
+fixed right-4 bottom-16
   `}>
 
       <PowerSetup
@@ -1966,7 +1955,7 @@ className={`
     });
   }}
 className={`
-  ${isMobile ? "hidden" : "relative flex"}
+  hidden
   items-center justify-center gap-2
   ${isMobile ? "h-8 w-20 text-[9px]" : "h-10 w-28 text-[11px]"}
   bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl
@@ -1986,11 +1975,7 @@ className={`
       <div className="fixed inset-0 z-40 pointer-events-none" />
       <div className={`
     z-50
-    ${
-      isMobile
-        ? "fixed left-1/2 bottom-16 -translate-x-1/2"
-        : "absolute bottom-12 left-1/2 -translate-x-1/2"
-    }
+fixed right-4 bottom-16
   `}>
         <ExportPanel
           boardPedals={activeProject.boardPedals}
@@ -2021,7 +2006,7 @@ className={`
       setShowCableMenu(false);
     }}
 className={`
-  ${isMobile ? "hidden" : "relative flex"}
+  hidden
   items-center justify-center gap-2
   ${isMobile ? "h-8 w-20 text-[9px]" : "h-10 w-28 text-[11px]"}
   bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl
@@ -2041,11 +2026,7 @@ className={`
 
       <div className={`
     z-50
-    ${
-      isMobile
-        ? "fixed left-1/2 bottom-16 -translate-x-1/2"
-        : "absolute bottom-12 left-1/2 -translate-x-1/2"
-    }
+fixed right-4 bottom-16
   `}>
         <div className="w-64 bg-zinc-900 border border-zinc-800 rounded-xl shadow-2xl p-4">
           <div className="flex items-center gap-2 text-xs uppercase tracking-wider font-bold mb-6">
