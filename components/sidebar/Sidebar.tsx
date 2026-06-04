@@ -102,6 +102,7 @@ type Props = {
   setUnits: (v: "metric" | "imperial") => void;
 
   // NEW
+  isMobile?: boolean;
   hideLogo?: boolean;
 };
 
@@ -154,12 +155,14 @@ export default function Sidebar({
   setMakeOpen,
   contactOpen,
   setContactOpen,
+  isMobile = false,
   hideLogo = false,
   lastSelectedPedal,
   lastSelectedBoard,
   setLastSelectedPedal,
   lastSelectedPower,
   setLastSelectedPower,
+  
 }: Props) {
 
   const t = getTranslator(language);
@@ -448,24 +451,22 @@ const addPower = (p: any) => {
     }, {});
   };
 
-  return (
-  <>
-
-    <div
-  className="
+return (
+  <div
+className={`
   relative z-40 w-full lg:w-76 shrink-0
   bg-zinc-800
   px-6 pt-3 pb-6 flex flex-col gap-4 lg:gap-6
   overflow-hidden touch-pan-y
   h-full
-"
-  style={{ WebkitOverflowScrolling: "touch" }}
-  onClick={(e) => {
-    e.stopPropagation();
-    setShowPedalResults(false);
-    setShowBoardResults(false);
-  }}
-    >
+`}
+    style={{ WebkitOverflowScrolling: "touch" }}
+    onClick={(e) => {
+      e.stopPropagation();
+      setShowPedalResults(false);
+      setShowBoardResults(false);
+    }}
+  >
 
 {/* Desktop logo only */}
 <div className="hidden lg:block">
@@ -858,7 +859,6 @@ const addPower = (p: any) => {
 <div className="mt-auto" />
 
         </div>
-  </>
 );
 }
 

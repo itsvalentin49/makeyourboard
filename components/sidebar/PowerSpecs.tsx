@@ -148,7 +148,7 @@ export default function PowerSpecs({
         </div>
 
         {/* STATUS */}
-        <div className="flex items-center py-1 border-b border-zinc-900">
+        <div className="flex items-center py-1">
           <span className="text-[10px] uppercase font-bold tracking-wider whitespace-nowrap">
             {t("power.status.label")}
           </span>
@@ -169,7 +169,7 @@ export default function PowerSpecs({
         </div>
 
         {/* BRAND */}
-        <div className="flex items-center py-1 border-b border-zinc-900">
+        <div className="flex items-center py-1">
           <span className="text-[10px] uppercase font-bold tracking-wider whitespace-nowrap">
             {t("power.brand")}
           </span>
@@ -182,7 +182,7 @@ export default function PowerSpecs({
         </div>
 
         {/* MODEL */}
-        <div className="flex items-center py-1 border-b border-zinc-900">
+        <div className="flex items-center py-1">
           <span className="text-[10px] uppercase font-bold tracking-wider whitespace-nowrap">
             {t("power.model")}
           </span>
@@ -195,7 +195,7 @@ export default function PowerSpecs({
         </div>
 
         {/* YEAR */}
-        <div className="flex items-center py-1 border-b border-zinc-900">
+        <div className="flex items-center py-1">
           <span className="text-[10px] uppercase font-bold tracking-wider whitespace-nowrap">
             {t("power.year")}
           </span>
@@ -208,7 +208,7 @@ export default function PowerSpecs({
         </div>
 
         {/* OUTPUTS */}
-        <div className="flex items-center py-1 border-b border-zinc-900">
+        <div className="flex items-center py-1">
           <span className="text-[10px] uppercase font-bold tracking-wider whitespace-nowrap">
             {t("power.outputs")}
           </span>
@@ -221,7 +221,7 @@ export default function PowerSpecs({
         </div>
 
         {/* ISOLATED */}
-        <div className="flex items-center py-1 border-b border-zinc-900">
+        <div className="flex items-center py-1">
           <span className="text-[10px] uppercase font-bold tracking-wider whitespace-nowrap">
             {t("power.isolated")}
           </span>
@@ -234,7 +234,7 @@ export default function PowerSpecs({
         </div>
 
         {/* CAPACITY */}
-        <div className="flex items-center py-1 border-b border-zinc-900">
+        <div className="flex items-center py-1">
           <span className="text-[10px] uppercase font-bold tracking-wider whitespace-nowrap">
             {t("power.capacity")}
           </span>
@@ -247,7 +247,7 @@ export default function PowerSpecs({
         </div>
 
         {/* VOLTAGE */}
-        <div className="flex items-center py-1 border-b border-zinc-900">
+        <div className="flex items-center py-1">
           <span className="text-[10px] uppercase font-bold tracking-wider whitespace-nowrap">
             {t("power.voltage")}
           </span>
@@ -260,7 +260,7 @@ export default function PowerSpecs({
         </div>
 
         {/* DIMENSIONS */}
-        <div className="flex items-center py-1 border-b border-zinc-900">
+        <div className="flex items-center py-1">
           <span className="text-[10px] uppercase font-bold tracking-wider whitespace-nowrap">
             {t("power.dimensions")}
           </span>
@@ -277,7 +277,7 @@ export default function PowerSpecs({
         </div>
 
         {/* WEIGHT */}
-        <div className="flex items-center py-1 border-b border-zinc-900">
+        <div className="flex items-center py-1">
           <span className="text-[10px] uppercase font-bold tracking-wider whitespace-nowrap">
             {t("power.weight")}
           </span>
@@ -290,7 +290,7 @@ export default function PowerSpecs({
         </div>
 
         {/* ORIGIN */}
-        <div className="flex items-center py-1 border-b border-zinc-900">
+        <div className="flex items-center py-1">
           <span className="text-[10px] uppercase font-bold tracking-wider whitespace-nowrap">
             {t("power.origin")}
           </span>

@@ -260,6 +260,15 @@ export default function BoardCanvas({
 
   const t = getTranslator(language);
   const [showSettings, setShowSettings] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const closeBottomPanels = () => {
+  setShowBoardsMenu(false);
+  setShowCableMenu(false);
+  setShowPower(false);
+  setShowExportPanel(false);
+  setShowSettings(false);
+  setShowList(false);
+};
   const [knob] = useImage("/images/knob.png");
   const [footswitch] = useImage("/images/footswitch.png");
   const currentZoom = activeProject.zoom || 100;
@@ -1407,38 +1416,143 @@ const canvasItems: AnyRow[] = [
   "
 >
 
-  {isMobile && (
-  <div
+{isMobile && (
+  <>
+    {/* ZOOM À GAUCHE */}
+    <div
+      className="
+        fixed
+        bottom-6
+        left-4
+        z-50
+        flex items-center justify-center
+        h-8 w-20
+        bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl
+      "
+    >
+      <button
+        onClick={zoomOut}
+        disabled={isMinZoom}
+        className="absolute left-2"
+      >
+        <Minus size={12} />
+      </button>
+
+      <span className="text-[10px] font-black">
+        {displayZoomPercent}%
+      </span>
+
+      <button
+        onClick={zoomIn}
+        disabled={isMaxZoom}
+        className="absolute right-2"
+      >
+        <Plus size={12} />
+      </button>
+    </div>
+
+ {/* MENU À DROITE */}
+<div className="fixed bottom-6 right-4 z-50">
+  <button
+    onClick={() => {
+      closeBottomPanels();
+      setShowMobileMenu((v) => !v);
+    }}
     className="
-      relative flex items-center justify-center
-      h-8 w-20
+      flex items-center justify-center gap-2
+      h-8 px-4
       bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl
+      text-[10px] font-mono font-bold uppercase
     "
   >
-    <button
-      onClick={zoomOut}
-      disabled={isMinZoom}
-      className="absolute left-2"
-    >
-      <Minus size={12} />
-    </button>
+    Menu
+  </button>
 
-    <span className="text-[10px] font-black">
-      {displayZoomPercent}%
-    </span>
+  {showMobileMenu && (
+    <>
+      <div
+        className="fixed inset-0 z-40"
+        onClick={() => setShowMobileMenu(false)}
+      />
 
-    <button
-      onClick={zoomIn}
-      disabled={isMaxZoom}
-      className="absolute right-2"
-    >
-      <Plus size={12} />
-    </button>
-  </div>
+      <div
+        className="
+          absolute
+          bottom-12
+          right-0
+          z-50
+          w-56
+          bg-zinc-900
+          border border-zinc-800
+          rounded-xl
+          shadow-2xl
+          p-2
+        "
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          onClick={() => {
+            setShowBoardsMenu(true);
+            setShowMobileMenu(false);
+          }}
+          className="w-full flex items-center gap-2 px-3 py-2 text-left"
+        >
+          <PanelsTopLeft size={14} className="text-blue-500" />
+          {t("canvasControls.boards")}
+        </button>
+
+        <button
+          onClick={() => {
+            setShowCableMenu(true);
+            setShowMobileMenu(false);
+          }}
+          className="w-full flex items-center gap-2 px-3 py-2 text-left"
+        >
+          <Cable size={14} className="text-red-500" />
+          {t("canvasControls.cables")}
+        </button>
+
+        <button
+          onClick={() => {
+            setShowPower(true);
+            setShowMobileMenu(false);
+          }}
+          className="w-full flex items-center gap-2 px-3 py-2 text-left"
+        >
+          <Zap size={14} className="text-yellow-500" />
+          {t("canvasControls.power")}
+        </button>
+
+        <button
+          onClick={() => {
+            setShowExportPanel(true);
+            setShowMobileMenu(false);
+          }}
+          className="w-full flex items-center gap-2 px-3 py-2 text-left"
+        >
+          <Download size={14} className="text-green-500" />
+          {t("export.button")}
+        </button>
+
+        <button
+          onClick={() => {
+            setShowSettings(true);
+            setShowMobileMenu(false);
+          }}
+          className="w-full flex items-center gap-2 px-3 py-2 text-left"
+        >
+          <Settings size={14} />
+          {t("settings.title")}
+        </button>
+      </div>
+    </>
+  )}
+</div>
+  </>
 )}
 
-{/* BOUTON BOARDS */}
-<div className={isMobile ? "hidden" : "relative"}>
+{/* BOARDS */}
+<div className="relative">
 <button
    ref={boardsButtonRef}
     onClick={() => {
@@ -1450,15 +1564,16 @@ const canvasItems: AnyRow[] = [
     setShowSignalPath(false);
     setShowCableMenu(false);
   }}
-  className="
-    relative flex items-center justify-center gap-2
-    h-9 md:h-10 w-24 md:w-28
-    bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl
-    text-[11px] font-mono font-bold uppercase
-    transition-all duration-200
-    hover:scale-105 hover:border-blue-500 active:scale-95
-    cursor-pointer
-  "
+className={`
+  ${isMobile ? "hidden" : "relative flex"}
+  items-center justify-center gap-2
+  ${isMobile ? "h-8 w-20 text-[9px]" : "h-10 w-28 text-[11px]"}
+  bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl
+  font-mono font-bold uppercase
+  transition-all duration-200
+  hover:scale-105 hover:border-blue-500 active:scale-95
+  cursor-pointer
+`}
 >
 <PanelsTopLeft
   size={16}
@@ -1475,7 +1590,7 @@ const canvasItems: AnyRow[] = [
     z-50
     ${
       isMobile
-        ? "fixed left-1/2 bottom-[50px] -translate-x-1/2"
+        ? "fixed left-1/2 bottom-6 -translate-x-1/2"
         : "absolute bottom-12 left-1/2 -translate-x-1/2"
     }
   `}>
@@ -1622,7 +1737,7 @@ className="
 </div>
 
 
-{/* BOUTON CABLES / JACKS */}
+{/* CABLES */}
 <div className="relative">
   <button
     type="button"
@@ -1635,7 +1750,8 @@ onClick={() => {
   setShowSettings(false);
 }}
 className={`
-  relative flex items-center justify-center gap-2
+  ${isMobile ? "hidden" : "relative flex"}
+  items-center justify-center gap-2
   ${isMobile ? "h-8 w-20 text-[9px]" : "h-10 w-28 text-[11px]"}
   bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl
   font-mono font-bold uppercase
@@ -1657,7 +1773,7 @@ className={`
     z-50
     ${
       isMobile
-        ? "fixed left-1/2 bottom-[50px] -translate-x-1/2"
+        ? "fixed left-1/2 bottom-6 -translate-x-1/2"
         : "absolute bottom-12 left-1/2 -translate-x-1/2"
     }
   `}>
@@ -1749,7 +1865,7 @@ className={`
 </div>
 
 
-      {/* TPOWER*/}
+      {/* POWER*/}
 <div className="relative">
 <button
   onClick={() => {
@@ -1761,7 +1877,8 @@ className={`
     setShowSettings(false);
   }}
 className={`
-  relative flex items-center justify-center gap-2
+  ${isMobile ? "hidden" : "relative flex"}
+  items-center justify-center gap-2
   ${isMobile ? "h-8 w-20 text-[9px]" : "h-10 w-28 text-[11px]"}
   bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl
   font-mono font-bold uppercase
@@ -1788,7 +1905,7 @@ className={`
     z-50
     ${
       isMobile
-        ? "fixed left-1/2 bottom-[50px] -translate-x-1/2"
+        ? "fixed left-1/2 bottom-16 -translate-x-1/2"
         : "absolute bottom-12 left-1/2 -translate-x-1/2"
     }
   `}>
@@ -1848,8 +1965,9 @@ className={`
       return next;
     });
   }}
-  className={`
-  relative flex items-center justify-center gap-2
+className={`
+  ${isMobile ? "hidden" : "relative flex"}
+  items-center justify-center gap-2
   ${isMobile ? "h-8 w-20 text-[9px]" : "h-10 w-28 text-[11px]"}
   bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl
   font-mono font-bold uppercase
@@ -1870,7 +1988,7 @@ className={`
     z-50
     ${
       isMobile
-        ? "fixed left-1/2 bottom-[50px] -translate-x-1/2"
+        ? "fixed left-1/2 bottom-6 -translate-x-1/2"
         : "absolute bottom-12 left-1/2 -translate-x-1/2"
     }
   `}>
@@ -1903,7 +2021,8 @@ className={`
       setShowCableMenu(false);
     }}
 className={`
-  relative flex items-center justify-center gap-2
+  ${isMobile ? "hidden" : "relative flex"}
+  items-center justify-center gap-2
   ${isMobile ? "h-8 w-20 text-[9px]" : "h-10 w-28 text-[11px]"}
   bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl
   font-mono font-bold uppercase
@@ -1924,7 +2043,7 @@ className={`
     z-50
     ${
       isMobile
-        ? "fixed left-1/2 bottom-[50px] -translate-x-1/2"
+        ? "fixed left-1/2 bottom-6 -translate-x-1/2"
         : "absolute bottom-12 left-1/2 -translate-x-1/2"
     }
   `}>

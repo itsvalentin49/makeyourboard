@@ -408,7 +408,7 @@
     "setup": "Setup",
     "pedalboard": "Pedalboard",
     "boards": "Boards",
-    "pedalboards": "Pedalboards",
+    "pedalboards": "Boards",
     "newBoard": "New board",
     "cables": "Cables",
     "power": "Power",
@@ -428,7 +428,8 @@
     "powerText": "Make sure your power supply is compatible with your pedals and powerful enough.",
     "shareTitle": "Download your pedalboard",
     "shareText": "Export your pedalboard as a PNG to save or share it.",
-    "ok": "OK"
+    "ok": "OK",
+    "dontShowAgain": "Don't show again"
   }
   
 

@@ -405,7 +405,7 @@
     "setup": "Setup",
     "pedalboard": "Pedalboard",
     "boards": "Boards",
-    "pedalboards": "Pedalboard",
+    "pedalboards": "Boards",
     "newBoard": "Nuova board",
     "jacks": "Jacks",
     "cables": "Cavi",
@@ -426,7 +426,8 @@
     "powerText": "Verifica che il tuo alimentatore sia compatibile con i pedali e abbastanza potente.",
     "shareTitle": "Scarica la tua pedalboard",
     "shareText": "Esporta la tua pedalboard in PNG per salvarla o condividerla.",
-    "ok": "OK"
+    "ok": "OK",
+    "dontShowAgain": "Non mostrare più"
   }
   
 }

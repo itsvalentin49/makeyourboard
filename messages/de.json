@@ -405,7 +405,7 @@
     "setup": "Setup",
     "pedalboard": "Pedalboard",
     "boards": "Boards",
-    "pedalboards": "Pedalboards",
+    "pedalboards": "Boards",
     "newBoard": "Neues Board",
     "jacks": "Jacks",
     "cables": "Kabel",
@@ -426,6 +426,7 @@
     "powerText": "Stelle sicher, dass dein Netzteil mit deinen Pedalen kompatibel und ausreichend leistungsstark ist.",
     "shareTitle": "Pedalboard herunterladen",
     "shareText": "Exportiere dein Pedalboard als PNG, um es zu speichern oder zu teilen.",
-    "ok": "OK"
+    "ok": "OK",
+    "dontShowAgain": "Nicht mehr anzeigen"
   }
 }

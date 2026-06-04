@@ -110,7 +110,7 @@ return (
 
 {/* STATUT */}
 {!isCustomBoard && (
-  <div className="flex items-center py-1 border-b border-zinc-900">
+  <div className="flex items-center py-1">
 
     <span className="text-[10px] uppercase font-bold tracking-wider whitespace-nowrap">
       {t("board.status.label")}
@@ -137,7 +137,7 @@ return (
 
 {/* MARQUE */}
 {!isCustomBoard && (
-  <div className="flex items-center py-1 border-b border-zinc-900">
+  <div className="flex items-center py-1">
 
     <span className="text-[10px] uppercase font-bold tracking-wider whitespace-nowrap">
       {t("board.brand")}
@@ -154,7 +154,7 @@ return (
 
 {/* MODÈLE */}
 {!isCustomBoard && (
-  <div className="flex items-center py-1 border-b border-zinc-900">
+  <div className="flex items-center py-1">
 
     <span className="text-[10px] uppercase font-bold tracking-wider whitespace-nowrap">
       {t("board.model")}
@@ -171,7 +171,7 @@ return (
 
 {/* YEAR */}
 {!isCustomBoard && (
-  <div className="flex items-center py-1 border-b border-zinc-900">
+  <div className="flex items-center py-1">
 
     <span className="text-[10px] uppercase font-bold tracking-wider whitespace-nowrap">
       {t("board.year")}
@@ -188,7 +188,7 @@ return (
 
 {/* MATÉRIAU */}
 {!isCustomBoard && (
-  <div className="flex items-center py-1 border-b border-zinc-900">
+  <div className="flex items-center py-1">
 
     <span className="text-[10px] uppercase font-bold tracking-wider whitespace-nowrap">
       {t("board.material.label")}
@@ -207,7 +207,7 @@ return (
 
 {/* PROFIL */}
 {!isCustomBoard && (
-  <div className="flex items-center py-1 border-b border-zinc-900">
+  <div className="flex items-center py-1">
 
     <span className="text-[10px] uppercase font-bold tracking-wider whitespace-nowrap">
       {t("board.profile.label")}
@@ -225,7 +225,7 @@ return (
 )}
 
 {/* DIMENSIONS */}
-<div className="flex items-center py-1 border-b border-zinc-900">
+<div className="flex items-center py-1">
 
   <span className="text-[10px] uppercase font-bold tracking-wider whitespace-nowrap">
     {t("board.dimensions")}
@@ -245,7 +245,7 @@ return (
 
 {/* POIDS */}
 {!isCustomBoard && (
-  <div className="flex items-center py-1 border-b border-zinc-900">
+  <div className="flex items-center py-1">
 
     <span className="text-[10px] uppercase font-bold tracking-wider whitespace-nowrap">
       {t("board.weight")}

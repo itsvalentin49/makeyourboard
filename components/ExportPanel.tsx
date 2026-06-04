@@ -611,7 +611,7 @@ return (
   >
     {/* TITLE */}
     <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider">
-      <Download size={14} className= "text-blue-500" />
+      <Download size={14} className= "text-green-500" />
       {t("export.title")}
     </div>
 

@@ -428,6 +428,7 @@
     "powerText": "确认你的电源与效果器兼容，并且功率足够。",
     "shareTitle": "下载你的 pedalboard",
     "shareText": "将你的 pedalboard 导出为 PNG，方便保存或分享。",
-    "ok": "OK"
+    "ok": "OK",
+    "dontShowAgain": "不再显示"
   }
 }

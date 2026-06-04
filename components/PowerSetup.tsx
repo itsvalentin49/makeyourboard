@@ -76,7 +76,7 @@ export default function PowerSetup({
     <div
   className="
     w-[calc(100vw-32px)]
-    max-w-[350px]
+    max-w-[400px]
     bg-zinc-900
     border
     border-zinc-800
@@ -105,7 +105,7 @@ export default function PowerSetup({
                       <img
                         src={p.image || p.image_url || p.photo}
                         alt={p.name}
-                        className="w-full max-w-[200px] object-contain"
+                        className="w-full max-w-[150px] object-contain"
                       />
                     </div>
                   </div>
@@ -194,12 +194,12 @@ export default function PowerSetup({
               key={i}
               className="grid grid-cols-[auto_1fr_auto] items-end text-[11px] leading-none"
             >
-              <div className="flex items-center gap-1 whitespace-nowrap">
-                <span className="text-zinc-500 font-bold">
-                  {a.pedal.brand || "Custom"}
-                </span>
-                <span>{a.pedal.name}</span>
-              </div>
+<div className="flex items-center gap-1 whitespace-nowrap">
+  <span className="text-zinc-500 font-bold">
+    {a.pedal.brand || "Custom"}
+  </span>
+  <span>{a.pedal.name}</span>
+</div>
 
               <div className="mx-2 border-b border-dotted border-zinc-600 mb-[2px]" />
 

@@ -997,6 +997,7 @@ className={`absolute top-[calc(64px+env(safe-area-inset-top))] left-0 right-0 bo
                   setCustomDepth={setCustomDepth}
                   customColor={customColor}
                   setCustomColor={setCustomColor}
+                  
                 
                   addPedal={(p) => {
                     addPedal(p);

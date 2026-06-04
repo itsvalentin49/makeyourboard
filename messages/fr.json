@@ -400,7 +400,7 @@
     "setup": "Setup",
     "pedalboard": "Pedalboard",
     "boards": "Boards",
-    "pedalboards": "Pedalboards",
+    "pedalboards": "Boards",
     "newBoard": "Nouveau board",
     "jacks": "Jacks",
     "cables": "Câbles",
@@ -421,7 +421,8 @@
     "powerText": "Vérifiez que votre alimentation est compatible avec vos pédales et suffisamment puissante.",
     "shareTitle": "Téléchargez votre Pedalboard",
     "shareText": "Exportez votre pedalboard en PNG pour le sauvegarder ou le partager.",
-    "ok": "OK"
+    "ok": "OK",
+    "dontShowAgain": "Ne plus afficher"
   }
 
 }

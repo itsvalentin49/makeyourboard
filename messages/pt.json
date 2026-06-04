@@ -405,7 +405,7 @@
     "setup": "Setup",
     "pedalboard": "Pedalboard",
     "boards": "Boards",
-    "pedalboards": "Pedalboards",
+    "pedalboards": "Boards",
     "newBoard": "Novo board",
     "jacks": "Jacks",
     "cables": "Cabos",
@@ -426,6 +426,7 @@
     "powerText": "Verifique se a sua fonte de alimentação é compatível com os seus pedais e suficientemente potente.",
     "shareTitle": "Transferir a sua pedalboard",
     "shareText": "Exporte a sua pedalboard em PNG para a guardar ou partilhar.",
-    "ok": "OK"
+    "ok": "OK",
+    "dontShowAgain": "Não mostrar novamente"
   }
 }

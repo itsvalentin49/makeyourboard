@@ -26,8 +26,8 @@ export default function SidebarLogo({ compact = false }: Props) {
       <div
         className={
           compact
-            ? "mt-1 text-zinc-500 text-[7px] font-bold tracking-[0.28em] uppercase leading-none whitespace-nowrap"
-            : "mt-1 text-zinc-500 text-[10px] font-bold tracking-[0.37em] uppercase leading-none whitespace-nowrap"
+            ? "mt-1 text-[7px] font-bold tracking-[0.28em] uppercase leading-none whitespace-nowrap"
+            : "mt-1 text-[10px] font-bold tracking-[0.37em] uppercase leading-none whitespace-nowrap"
         }
       >
         Guitar Pedalboard Builder

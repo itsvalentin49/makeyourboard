@@ -9,43 +9,38 @@ type Props = {
   forceClose?: boolean;
 };
 
-export function HelpGuide({
-  t,
-  mobile = false,
-  forceClose = false,
-}: Props) {
-  const [open, setOpen] = useState(true);
+export function HelpGuide({ t, mobile = false, forceClose = false }: Props) {
+  const [open, setOpen] = useState(false);
+  const [dontShowAgain, setDontShowAgain] = useState(false);
 
   useEffect(() => {
-    if (forceClose) {
-      setOpen(false);
-    }
+    const hidden = localStorage.getItem("myb_help_hidden");
+    if (hidden !== "true") setOpen(true);
+  }, []);
+
+  useEffect(() => {
+    if (forceClose) setOpen(false);
   }, [forceClose]);
+
+  const closeGuide = () => {
+    if (dontShowAgain) {
+      localStorage.setItem("myb_help_hidden", "true");
+    }
+    setOpen(false);
+  };
 
   if (!open) return null;
 
   return (
     <div className="absolute inset-0 z-[300] flex items-center justify-center">
-      <div
-        className="
-          fixed inset-0 z-[70]
-        "
-        onClick={() => setOpen(false)}
-      />
+      <div className="fixed inset-0 z-[70]" onClick={closeGuide} />
 
       <div
         className={`
           relative z-[90]
           ${mobile ? "w-[calc(100vw-32px)]" : "w-[520px]"}
-          max-w-[520px]
-          rounded-2xl
-          bg-zinc-900
-          border
-          border-zinc-800
-          shadow-2xl
-          pt-6
-          px-5
-          pb-5
+          max-w-[520px] rounded-2xl bg-zinc-900 border border-zinc-800
+          shadow-2xl pt-6 px-5 pb-5
         `}
         onClick={(e) => e.stopPropagation()}
       >
@@ -89,22 +84,23 @@ export function HelpGuide({
           </div>
         </div>
 
+        <label className="mt-6 flex items-center gap-2 text-[11px] font-bold text-zinc-300">
+          <input
+            type="checkbox"
+            checked={dontShowAgain}
+            onChange={(e) => setDontShowAgain(e.target.checked)}
+            className="h-4 w-4 accent-blue-600"
+          />
+          {t("help.dontShowAgain")}
+        </label>
+
         <button
           type="button"
-          onClick={() => setOpen(false)}
+          onClick={closeGuide}
           className="
-            mt-8
-            h-8
-            w-full
-            rounded-md
-            bg-blue-600
-            !text-white
-            text-[11px]
-            font-black
-            uppercase
-            tracking-wide
-            transition-colors
-            hover:bg-blue-500
+            mt-4 h-8 w-full rounded-md bg-blue-600 !text-white
+            text-[11px] font-black uppercase tracking-wide
+            transition-colors hover:bg-blue-500
           "
         >
           {t("help.ok")}
