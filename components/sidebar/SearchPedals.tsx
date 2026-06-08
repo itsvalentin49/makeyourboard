@@ -157,7 +157,13 @@ export default function SearchPedals({
         <div className="flex flex-col gap-2.5 overflow-y-auto no-scrollbar pb-6 min-h-0">
           {visiblePedals.length > 0 ? (
             visiblePedals.map((p) => {
-              const img = p.image || p.image_url || p.photo;
+              const originalImg = p.image || p.image_url || p.photo;
+              const img =
+                p.thumbnail ||
+                p.image ||
+                p.image_url ||
+                p.photo ||
+                null;
               const isNew = isNewPedal(p.year);
 
               return (
