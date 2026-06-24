@@ -209,10 +209,12 @@ export default function SearchBoards({
                   <div className="w-[50px] h-[34px] shrink-0 flex items-center justify-center">
                     {img ? (
                       <img
-                        src={img}
-                        alt={`${b.brand || ""} ${b.name || ""}`}
-                        className="max-w-full max-h-full object-contain"
-                      />
+                      src={img}
+                      alt={`${b.brand || ""} ${b.name || ""}`}
+                      loading="lazy"
+                      decoding="async"
+                      className="max-w-full max-h-full object-contain"
+                    />
                     ) : (
                       <div className="w-12 h-6 rounded-md bg-zinc-700" />
                     )}

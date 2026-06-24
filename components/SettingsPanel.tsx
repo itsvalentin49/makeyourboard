@@ -9,6 +9,7 @@ type Background = {
   label: string;
   type: "css" | "image";
   src?: string;
+  thumbSrc?: string;
 };
 
 type Props = {
@@ -560,15 +561,17 @@ return (
           >
 
             {/* IMAGE */}
-            {bg.type === "image" ? (
-              <img
-                src={bg.src}
-                alt={bg.label}
-                className="absolute inset-0 w-full h-full object-cover"
-              />
-            ) : (
-              <div className="absolute inset-0 bg-canvas" />
-            )}
+            {bg.type === "image" && bg.thumbSrc ? (
+  <img
+    src={bg.thumbSrc}
+    alt={bg.label}
+    loading="lazy"
+    decoding="async"
+    className="absolute inset-0 w-full h-full object-cover"
+  />
+) : (
+  <div className="absolute inset-0 bg-canvas" />
+)}
 
             {/* OVERLAY */}
             <div className="absolute inset-0 bg-black/20" />

@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 
 dotenv.config({ path: ".env.local" });
+
 import { createClient } from "@supabase/supabase-js";
 import sharp from "sharp";
 
@@ -11,31 +12,32 @@ const supabase = createClient(
 
 const THUMB_BUCKET = "pedals-thumbs";
 
-async function main() {
-  const { data: pedals, error } = await supabase
-    .from("pedals")
+const TABLES = ["pedals", "power"];
+
+async function generateForTable(tableName: string) {
+  const { data: items, error } = await supabase
+    .from(tableName)
     .select("id, image, thumbnail")
     .is("thumbnail", null);
 
   if (error) {
-    throw error;
+    console.error(`Erreur table ${tableName}:`, error.message);
+    return;
   }
 
-  console.log(`Pédales à traiter : ${pedals?.length || 0}`);
+  console.log(`${tableName} à traiter : ${items?.length || 0}`);
 
-  for (const pedal of pedals || []) {
-    if (!pedal.image) continue;
+  for (const item of items || []) {
+    if (!item.image) continue;
 
-    const filename = pedal.image.split("/").pop()?.split("?")[0];
-
+    const filename = item.image.split("/").pop()?.split("?")[0];
     if (!filename) continue;
 
-    console.log("Création :", filename);
+    console.log(`[${tableName}] Création :`, filename);
 
-    const response = await fetch(pedal.image);
-
+    const response = await fetch(item.image);
     if (!response.ok) {
-      console.error("Impossible de télécharger :", pedal.image);
+      console.error(`[${tableName}] Impossible de télécharger :`, item.image);
       continue;
     }
 
@@ -59,7 +61,7 @@ async function main() {
       });
 
     if (uploadError) {
-      console.error("Erreur upload :", filename, uploadError.message);
+      console.error(`[${tableName}] Erreur upload :`, filename, uploadError.message);
       continue;
     }
 
@@ -68,16 +70,22 @@ async function main() {
       .getPublicUrl(thumbPath);
 
     const { error: updateError } = await supabase
-      .from("pedals")
+      .from(tableName)
       .update({ thumbnail: publicData.publicUrl })
-      .eq("id", pedal.id);
+      .eq("id", item.id);
 
     if (updateError) {
-      console.error("Erreur update DB :", filename, updateError.message);
+      console.error(`[${tableName}] Erreur update DB :`, filename, updateError.message);
       continue;
     }
 
-    console.log("OK :", filename);
+    console.log(`[${tableName}] OK :`, filename);
+  }
+}
+
+async function main() {
+  for (const table of TABLES) {
+    await generateForTable(table);
   }
 
   console.log("Terminé.");

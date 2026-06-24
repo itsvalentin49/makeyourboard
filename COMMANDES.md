@@ -2,28 +2,50 @@
 
 ## Lancer le projet
 
+```bash
 npm run dev
+```
 
-## Générer les thumbnails des pédales
-
-npx tsx scripts/generate-pedal-thumbnails.ts
-
-## Si le script s'arrête à 1000 pédales
-
-Relancer simplement :
+## Générer les thumbnails
 
 npx tsx scripts/generate-pedal-thumbnails.ts
+```
 
-jusqu'à obtenir :
+## Vider le cache Next.js
 
-Pédales à traiter : 0
+```bash
+rm -rf .next
+npm run dev
+```
 
-## Build de production
+## Réinstaller les dépendances
 
+```bash
+rm -rf node_modules
+rm package-lock.json
+npm install
+```
+
+## Reset complet
+
+```bash
+rm -rf .next
+rm -rf node_modules
+rm package-lock.json
+npm install
+npm run dev
+```
+
+## Build production
+
+```bash
 npm run build
+```
 
 ## Déploiement
 
+```bash
 git add .
-git commit -m "..."
+git commit -m "message"
 git push
+```

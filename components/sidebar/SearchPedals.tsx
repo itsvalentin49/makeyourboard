@@ -35,7 +35,7 @@ function isNewPedal(value: any): boolean {
   today.setHours(0, 0, 0, 0);
 
   const limitDate = new Date(today);
-  limitDate.setDate(today.getDate() - 60);
+  limitDate.setDate(today.getDate() - 40);
 
   releaseDate.setHours(0, 0, 0, 0);
 
@@ -158,12 +158,7 @@ export default function SearchPedals({
           {visiblePedals.length > 0 ? (
             visiblePedals.map((p) => {
               const originalImg = p.image || p.image_url || p.photo;
-              const img =
-                p.thumbnail ||
-                p.image ||
-                p.image_url ||
-                p.photo ||
-                null;
+              const img = p.thumbnail || null;
               const isNew = isNewPedal(p.year);
 
               return (
@@ -188,10 +183,12 @@ export default function SearchPedals({
                 >
                     <div className="w-[40px] h-[34px] shrink-0 flex items-center justify-center">                    {img ? (
                       <img
-                        src={img}
-                        alt={`${p.brand || ""} ${p.name || ""}`}
-                        className="max-w-full max-h-full object-contain"
-                      />
+  src={img}
+  alt={`${p.brand || ""} ${p.name || ""}`}
+  loading="lazy"
+  decoding="async"
+  className="max-w-full max-h-full object-contain"
+/>
                     ) : (
                       <div className="w-9 h-9 rounded-md bg-zinc-700" />
                     )}

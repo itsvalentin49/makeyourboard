@@ -88,6 +88,7 @@ activeProject: {
 
   BACKGROUNDS: Background[];
   canvasBg: string;
+  selectedBackgroundSrc?: string;
   setCanvasBg: (v: string) => void;
   showIntro?: boolean;
   isMobile?: boolean;
@@ -226,6 +227,7 @@ export default function BoardCanvas({
   setContactOpen,
   BACKGROUNDS = [],
   canvasBg,
+  selectedBackgroundSrc,
   setCanvasBg,
   showIntro,
   isMobile = false,
@@ -269,8 +271,8 @@ export default function BoardCanvas({
   setShowSettings(false);
   setShowList(false);
 };
-  const [knob] = useImage("/images/knob.png");
-  const [footswitch] = useImage("/images/footswitch.png");
+  const [knob] = useImage("/images/knob.webp");
+  const [footswitch] = useImage("/images/footswitch.webp");
   const currentZoom = activeProject.zoom || 100;
   const zoomPercent = Math.round(currentZoom);
   const displayZoomPercent = Math.round(zoomPercent * 0.75 - 25);
@@ -1151,9 +1153,7 @@ const canvasItems: AnyRow[] = [
       canvasBg === "neutral"
         ? undefined
         : {
-            backgroundImage: `url(${
-              BACKGROUNDS.find((b) => b.id === canvasBg)?.src
-            })`,
+            backgroundImage: `url(${selectedBackgroundSrc})`,
             backgroundSize: "auto 100%",
             backgroundPosition: "center",
             backgroundRepeat: "no-repeat",

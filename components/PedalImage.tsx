@@ -40,9 +40,7 @@ export default function PedalImage({
   marginRef,
 }: PedalImageProps) {
   const [img, setImg] = useState<HTMLImageElement | null>(null);
-  const [proportionalHeight, setProportionalHeight] = useState(0);
-
-  const imageRef = useRef<any>(null);
+  const [renderSize, setRenderSize] = useState({w: width, h: depth,});
   const lastSize = useRef({ w: 0, h: 0 });
 
   const rawData = String(jacksLocation || "").toLowerCase();
@@ -52,8 +50,8 @@ export default function PedalImage({
   const hasBottom = rawData.includes("down") || rawData.includes("bottom");
 
   // ✅ plus de ZOOM_FACTOR ici
-  const scaledWidth = width;
-  const scaledHeight = depth;
+  const scaledWidth = renderSize.w;
+  const scaledHeight = renderSize.h;
 
   const marginRect = {
     x: hasLeft ? -MARGIN_SIZE : 0,
@@ -67,19 +65,6 @@ export default function PedalImage({
   useEffect(() => {
   let objectUrl: string | null = null;
   let cancelled = false;
-
-  const finalW = width;
-  const finalH = depth;
-
-  // ✅ évite spam + stabilise displaySizes
-  if (
-    lastSize.current.w !== finalW ||
-    lastSize.current.h !== finalH
-  ) {
-    lastSize.current = { w: finalW, h: finalH };
-    setProportionalHeight(finalH);
-    if (onSizeReady) onSizeReady(finalW, finalH);
-  }
 
   const loadImage = async () => {
     let finalUrl = url || null;
@@ -102,13 +87,38 @@ if (imageId) {
     image.crossOrigin = "anonymous";
     image.src = finalUrl;
 
-    image.onload = () => {
-      if (!cancelled) setImg(image);
-    };
+image.onload = () => {
+  if (cancelled) return;
 
-    image.onerror = () => {
-      if (!cancelled) setImg(null);
-    };
+  const ratio = image.naturalHeight / image.naturalWidth;
+
+  const finalW = Number(width) || 80;
+  const finalH = Math.round(finalW * ratio);
+
+  setImg(image);
+  setRenderSize({ w: finalW, h: finalH });
+
+  if (
+    lastSize.current.w !== finalW ||
+    lastSize.current.h !== finalH
+  ) {
+    lastSize.current = { w: finalW, h: finalH };
+    if (onSizeReady) onSizeReady(finalW, finalH);
+  }
+};
+
+image.onerror = () => {
+  if (cancelled) return;
+
+  setImg(null);
+
+  const finalW = Number(width) || 80;
+  const finalH = Number(depth) || 120;
+
+  setRenderSize({ w: finalW, h: finalH });
+
+  if (onSizeReady) onSizeReady(finalW, finalH);
+};
   };
 
   loadImage();
@@ -133,7 +143,7 @@ if (imageId) {
   <Rect
     ref={marginRef} // 👈 ICI
     x={marginRect.x - (scaledWidth / 2)}
-    y={marginRect.y - (proportionalHeight / 2)}
+    y={marginRect.y - (scaledHeight / 2)}
           width={marginRect.w}
           height={marginRect.h}
           stroke={isColliding ? "#ef4444" : "#22c55e"} 
@@ -148,9 +158,9 @@ if (imageId) {
       {!img ? (
         <Rect
           x={-scaledWidth / 2}
-          y={-proportionalHeight / 2}
+          y={-scaledHeight / 2}
+          height={scaledHeight}
           width={scaledWidth}
-          height={proportionalHeight}
           fill={color || (isBoard ? "#18181b" : "#27272a")}
           stroke={color ? "rgba(255,255,255,0.3)" : "#3f3f46"}
           strokeWidth={1}
@@ -160,9 +170,9 @@ if (imageId) {
         <KonvaImage
           image={img}
           x={-scaledWidth / 2}
-          y={-proportionalHeight / 2}
+          y={-scaledHeight / 2}
+          height={scaledHeight}
           width={scaledWidth}
-          height={proportionalHeight}
           listening={listening}
           cornerRadius={isBoard ? 0 : 3}
         />
@@ -172,10 +182,10 @@ if (imageId) {
       {!img && name && (
         <Text
           x={-scaledWidth / 2}
-          y={-proportionalHeight / 2}
+          y={-scaledHeight / 2}
+          height={scaledHeight}
           text={name}
           width={scaledWidth}
-          height={proportionalHeight}
           align="center"
           verticalAlign="middle"
           fill="white"

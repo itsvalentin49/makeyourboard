@@ -169,8 +169,8 @@ const getRenderItems = (): AnyRow[] =>
     minY: number,
     loadImage: (src: string) => Promise<HTMLImageElement>
   ) => {
-    const knobImg = await loadImage("/images/knob.png");
-    const footswitchImg = await loadImage("/images/footswitch.png");
+    const knobImg = await loadImage("/images/knob.webp");
+    const footswitchImg = await loadImage("/images/footswitch.webp");
 
     for (const item of getRenderItems()) {
       const size = displaySizes[Number(item.instanceId)];

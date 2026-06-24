@@ -63,6 +63,16 @@ export default function PedalBoardAppClient() {
   const canvasContainerRef = useRef<HTMLDivElement | null>(null);
   const { pedalsLibrary, boardsLibrary, powerLibrary } = useLibrary();
 
+
+
+
+const [projects, setProjects] = useState<Project[]>([]);
+const [activeProjectId, setActiveProjectId] = useState<number | null>(null);
+const [workingBoard, setWorkingBoard] = useState<Project>(DEFAULT_WORKING_BOARD);
+const [editingProjectId, setEditingProjectId] = useState<number | null>(null);
+const [tempName, setTempName] = useState<string>("");
+const [canvasBg, setCanvasBg] = useState<string>("neutral");
+
 const BACKGROUNDS = React.useMemo(() => [
   {
     id: "neutral",
@@ -73,33 +83,23 @@ const BACKGROUNDS = React.useMemo(() => [
     id: "wood",
     label: "Wood",
     type: "image" as const,
-    src: "/backgrounds/wood.webp",
+    thumbSrc: "/backgrounds/wood-thumb.webp",
   },
   {
     id: "steel",
     label: "Steel",
     type: "image" as const,
-    src: "/backgrounds/steel.webp",
+    thumbSrc: "/backgrounds/steel-thumb.webp",
   },
 ], []);
 
-// ✅ PRELOAD DES IMAGES (ULTRA IMPORTANT)
-  useEffect(() => {
-    BACKGROUNDS.forEach((bg) => {
-      if (bg.type === "image" && bg.src) {
-        const img = new Image();
-        img.src = bg.src;
-      }
-    });
-  }, [BACKGROUNDS]);
+const selectedBackgroundSrc =
+  canvasBg === "wood"
+    ? "/backgrounds/wood-full.webp"
+    : canvasBg === "steel"
+      ? "/backgrounds/steel-full.webp"
+      : undefined;
 
-
-const [projects, setProjects] = useState<Project[]>([]);
-const [activeProjectId, setActiveProjectId] = useState<number | null>(null);
-const [workingBoard, setWorkingBoard] = useState<Project>(DEFAULT_WORKING_BOARD);
-const [editingProjectId, setEditingProjectId] = useState<number | null>(null);
-const [tempName, setTempName] = useState<string>("");
-const [canvasBg, setCanvasBg] = useState<string>("neutral");
 const [language, setLanguage] = useState<Language>("en");
 const t = getTranslator(language);
 const [units, setUnits] = useState<Units>("metric");
@@ -850,6 +850,7 @@ return (
           setContactOpen={setContactOpen}
           BACKGROUNDS={BACKGROUNDS}
           canvasBg={canvasBg}
+          selectedBackgroundSrc={selectedBackgroundSrc}
           setCanvasBg={setCanvasBg}
           showIntro={isFirstBoard && isBoardEmpty}
           isMobile={isMobileDevice}
@@ -874,6 +875,7 @@ return (
           setSettingsOpen={setSettingsOpen}
           setLanguage={setLanguage}
           setUnits={setUnits}
+          
         />
       </div>
     </div>
@@ -916,6 +918,7 @@ return (
             setContactOpen={setContactOpen}
             BACKGROUNDS={BACKGROUNDS}
             canvasBg={canvasBg}
+            selectedBackgroundSrc={selectedBackgroundSrc}
             setCanvasBg={setCanvasBg}
             showIntro={isFirstBoard && isBoardEmpty}
             rotatePedal={rotatePedal}

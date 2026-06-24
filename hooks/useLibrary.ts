@@ -106,27 +106,6 @@ export function useLibrary() {
         setLoading(true);
         setLibraryError(null);
 
-        // ===============================
-        // 1️⃣ Check local cache
-        // ===============================
-        const cached = localStorage.getItem("myb_library");
-
-        if (cached && process.env.NODE_ENV === "production") {
-          const parsed = JSON.parse(cached);
-
-          if (!cancelled) {
-            setPedalsLibrary(parsed.pedals || []);
-            setBoardsLibrary(parsed.boards || []);
-            setPowerLibrary(parsed.power || []);
-            setLoading(false);
-          }
-
-          return;
-        }
-
-        // ===============================
-        // 2️⃣ Fetch from Supabase
-        // ===============================
         const [pedals, boards, power] = await Promise.all([
 
           fetchTable("pedals", ["brand", "name"]),
@@ -140,17 +119,7 @@ export function useLibrary() {
         setBoardsLibrary(boards);
         setPowerLibrary(power);
 
-        // ===============================
-        // 3️⃣ Save cache
-        // ===============================
-        localStorage.setItem(
-          "myb_library",
-          JSON.stringify({
-            pedals,
-            boards,
-            power,
-          })
-        );
+
 
       } catch (err) {
         if (cancelled) return;
