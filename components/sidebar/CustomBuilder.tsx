@@ -66,6 +66,7 @@ export default function CustomBuilder({
 }: Props) {
 
   const [showPicker, setShowPicker] = useState(false);
+  const [customMode, setCustomMode] = useState<"custom" | "upload">("custom");
   const PRESET_COLORS = [
   "#111111", "#ffffff", "#b91c1c", "#92400e", "#065f46", "#1e3a8a",
   "#6b21a8", "#374151", "#facc15", "#ea580c", "#be185d"
@@ -177,32 +178,55 @@ const isUploadValid =
 return (
   <div className="flex flex-col gap-2 mt-1 h-full min-h-0 overflow-y-auto no-scrollbar pb-10">
 
+    <div className="relative grid grid-cols-2 h-[35px] rounded-lg bg-zinc-950 border border-zinc-800 overflow-hidden">
+  <div
+    className={`
+      absolute top-0 h-full w-1/2 rounded-md bg-blue-600
+      transition-transform duration-200 ease-out
+      ${customMode === "upload" ? "translate-x-full" : "translate-x-0"}
+    `}
+  />
 
-<div
-  className="
-    w-full
-    text-[11px] !text-white font-black uppercase
-    py-2 rounded-md
-    bg-blue-600
-    text-center
-    cursor-default
-  "
->
-  {customType === "board"
-  ? t("customMenu.boardTitle")
-  : t("customMenu.pedalTitle")}
+  <button
+    type="button"
+    onClick={() => setCustomMode("custom")}
+    className="relative z-10 text-[9px] font-black uppercase tracking-wide"
+  >
+    {t("customMenu.modeCustom")}
+  </button>
+
+  <button
+    type="button"
+    onClick={() => setCustomMode("upload")}
+    className="relative z-10 text-[9px] font-black uppercase tracking-wide"
+  >
+    {t("customMenu.modeImport")}
+  </button>
 </div>
+
+
+{customMode === "custom" && (
+  <>
+
+
 
 <div className="flex flex-col gap-1">
+
   <div className="text-[10px] font-bold">
-    {t("customMenu.subtitle")}
+    {customType === "board"
+      ? t("customMenu.boardSubtitle")
+      : t("customMenu.pedalSubtitle")}
   </div>
 
-<div className="text-[9px] leading-[1.45] text-zinc-400">
-  <div>
-    • Dimensions : min {displayMin} {unitLabel} / max {displayMax} {unitLabel}
-  </div>
-</div>
+  <div className="text-[9px] leading-[1.45] text-zinc-400">
+    <div>
+      • {t("custom.dimensionError")
+        .replace("{min}", String(displayMin))
+        .replace("{max}", String(displayMax))
+        .replaceAll("{unit}", unitLabel)}
+    </div>
+    </div>
+
 </div>
 
 
@@ -564,25 +588,18 @@ className={`
           
 
         )}
-        <div className="flex flex-col gap-2 pt-10">
+
+      </div>
+  </>
+)}
+
+{customMode === "upload" && (
   <div className="flex flex-col gap-2">
-<div
-  className="
-    w-full
-    text-[11px] font-black uppercase
-    py-2 rounded-md
-    bg-blue-600 !text-white
-    text-center
-    cursor-default
-  "
->
-  {t("customMenu.importTitle")}
-</div>
+
 
 <div className="text-[10px] font-bold">
   {t("customMenu.importSubtitle")}
 </div>
-  </div>
 
 <div className="text-[9px] leading-[1.45] text-zinc-400 -mt-1">
   <div>• {t("customMenu.formats")}</div>
@@ -758,9 +775,10 @@ className={`group w-full text-[10px] font-black uppercase py-2 mt-2 rounded-md t
 </span>
   </button>
 </div>
+)}
 
       </div>
 
-    </div>
+
   );
 }

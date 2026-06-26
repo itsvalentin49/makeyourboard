@@ -20,34 +20,33 @@ export default function BuyOnline({
 
   if (!selectedPedal) return null;
 
-  const status = (selectedPedal.status || "").toLowerCase();
-  let stores: string[] = [];
 
-  if (status.includes("discontinued")) {
-    stores = ["reverb"];
-  } else {
 
-    if (isUSA) {
-      stores = ["sweetwater", "reverb"];
-    }
 
-    else if (isEurope) {
+const status = (selectedPedal.status || "").toLowerCase();
+let stores: string[] = [];
 
-      if (selectedPedal?.thomann) {
-        stores.push("thomann");
-      }
-
-      if (selectedPedal?.woodbrass) {
-        stores.push("woodbrass");
-      }
-
-      stores.push("reverb");
-    }
-
-    else {
-      stores = ["reverb"];
-    }
+if (status.includes("discontinued")) {
+  stores = ["reverb"];
+} else {
+  if (selectedPedal?.thomann) {
+    stores.push("thomann");
   }
+
+  if (selectedPedal?.sweetwater) {
+  stores.push("sweetwater");
+  }
+
+  if (selectedPedal?.woodbrass) {
+    stores.push("woodbrass");
+  }
+
+  stores.push("reverb");
+}
+
+
+
+
 
   return (
     <div className="mt-8">
@@ -95,10 +94,10 @@ export default function BuyOnline({
           if (!url) return null;
 
           const storeData = {
-            sweetwater: { label: "Sweetwater", logo: "/logos/sweetwater.png" },
-            woodbrass: { label: "Woodbrass", logo: "/logos/woodbrass.png" },
-            reverb: { label: "Reverb", logo: "/logos/reverb.png" },
-            thomann: { label: "Thomann", logo: "/logos/thomann.png" },
+            sweetwater: { label: "Sweetwater", logo: "/logos/sweetwater.webp" },
+            woodbrass: { label: "Woodbrass", logo: "/logos/woodbrass.webp" },
+            reverb: { label: "Reverb", logo: "/logos/reverb.webp" },
+            thomann: { label: "Thomann", logo: "/logos/thomann.webp" },
           };
 
           const data = storeData[store as keyof typeof storeData];
@@ -123,7 +122,7 @@ export default function BuyOnline({
               <img
                 src={data.logo}
                 alt={data.label}
-                className="w-5 h-5 object-contain transition-transform duration-200 group-hover:scale-110"
+                className="w-6 h-6 object-contain transition-transform duration-200 group-hover:scale-110"
               />
 
               <span className="

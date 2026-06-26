@@ -391,7 +391,8 @@
 "customMenu": {
   "pedalTitle": "自定义效果器",
   "boardTitle": "自定义效果器板",
-  "subtitle": "创建自定义效果器或效果器板。",
+  "pedalSubtitle": "创建自定义单块效果器。",
+  "boardSubtitle": "创建自定义效果器板。",
   "importTitle": "导入图片",
   "importSubtitle": "从电脑导入一个效果器。",
   "formats": "支持格式：PNG、JPG、WEBP",
@@ -400,7 +401,9 @@
   "chooseImage": "选择图片",
   "voltage": "电压 (V)",
   "current": "电流消耗 (mA)",
-  "add": "添加"
+  "add": "添加",
+  "modeCustom": "自定义",
+  "modeImport": "导入"
 },
 
   "canvasControls": {

@@ -49,9 +49,11 @@ export default function PedalImage({
   const hasTop    = rawData.includes("top");
   const hasBottom = rawData.includes("down") || rawData.includes("bottom");
 
-  // ✅ plus de ZOOM_FACTOR ici
+
   const scaledWidth = renderSize.w;
   const scaledHeight = renderSize.h;
+
+  const hideHardware = width < 70 && depth < 70;
 
   const marginRect = {
     x: hasLeft ? -MARGIN_SIZE : 0,
@@ -90,10 +92,15 @@ if (imageId) {
 image.onload = () => {
   if (cancelled) return;
 
-  const ratio = image.naturalHeight / image.naturalWidth;
-
   const finalW = Number(width) || 80;
-  const finalH = Math.round(finalW * ratio);
+
+  const isFreeSizeCustom =
+    finalUrl?.includes("custom-board") ||
+    finalUrl?.includes("custom-pedal");
+
+  const finalH = isFreeSizeCustom
+    ? Number(depth) || 120
+    : Math.round(finalW * (image.naturalHeight / image.naturalWidth));
 
   setImg(image);
   setRenderSize({ w: finalW, h: finalH });

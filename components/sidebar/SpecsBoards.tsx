@@ -4,6 +4,7 @@ import React from "react";
 import { RotateCw, Trash2, ArrowUp, ArrowDown } from "lucide-react";
 import { mmToIn, formatWeight } from "@/utils/units";
 import type { Language } from "@/utils/i18n";
+import BuyOnline from "./BuyOnline";
 
 type Props = {
   selectedBoardDetails: any;
@@ -278,103 +279,17 @@ return (
 )}
       </div>
 
-      {/* BUY ONLINE */}
-      {!isCustomBoard && selectedBoardDetails && (
-        <div className="mt-8">
-
-<div className="mb-4">
-  <div
-    className="
-      w-full
-      text-[11px] font-black uppercase
-      py-2 rounded-md
-      bg-blue-600 !text-white
-      text-center
-      cursor-default
-    "
-  >
-    {t("sidebar.buyOnline")}
+{!isCustomBoard && (
+  <div className="-mt-3">
+    <BuyOnline
+      selectedPedal={selectedBoardDetails}
+      isUSA={isUSA}
+      isEurope={isEurope}
+      buildThomannUrl={buildThomannUrl}
+      t={t}
+    />
   </div>
-</div>
-
-          <div className="flex flex-col">
-            {(
-              (selectedBoardDetails.status || "")
-                .toLowerCase()
-                .includes("discontinued") ||
-              !hasBoardCommercialLinks
-                ? ["reverb"]
-                : [...getStoresForCountry(), "reverb"]
-            ).map((store) => {
-
-              let url = "";
-
-              if (store === "reverb") {
-                url = `https://reverb.com/marketplace?query=${encodeURIComponent(
-                  selectedBoardDetails.brand + " " + selectedBoardDetails.name
-                )}`;
-              }
-
-              if (store === "sweetwater") {
-                url = selectedBoardDetails.sweetwater;
-              }
-
-              if (store === "woodbrass") {
-                url = selectedBoardDetails.woodbrass;
-              }
-
-              if (store.includes("thomann")) {
-                url = buildThomannUrl(selectedBoardDetails.thomann);
-              }
-
-              if (!url) return null;
-
-              const storeData = {
-                sweetwater: { label: "Sweetwater", logo: "/logos/sweetwater.png" },
-                woodbrass: { label: "Woodbrass", logo: "/logos/woodbrass.png" },
-                reverb: { label: "Reverb", logo: "/logos/reverb.png" },
-                thomann: { label: "Thomann", logo: "/logos/thomann.png" },
-              };
-
-              const key = store.includes("thomann") ? "thomann" : store;
-              const data = storeData[key as keyof typeof storeData];
-
-              return (
-                <a
-                  key={store}
-                  href={url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="
-                    flex items-center gap-3
-                    px-3 py-2
-                    rounded-lg
-                    transition-all duration-200 ease-out
-                    hover:bg-zinc-900
-                    hover:scale-[1.02]
-                    active:scale-[0.98]
-                    group
-                  "
-                >
-                  <img
-                    src={data.logo}
-                    alt={data.label}
-                    className="w-5 h-5 object-contain transition-transform duration-200 group-hover:scale-110"
-                  />
-                  <span className="
-                    text-[12px] font-semibold text-zinc-300
-                    transition-all duration-200
-                    group-hover:text-white
-                    group-hover:translate-x-1
-                  ">
-                    {data.label}
-                  </span>
-                </a>
-              );
-            })}
-          </div>
-        </div>
-      )}
+)}
 
     </div>
   );

@@ -389,7 +389,8 @@
   "customMenu": {
     "pedalTitle": "Individuelles Pedal",
     "boardTitle": "Individuelles Pedalboard",
-    "subtitle": "Erstelle ein eigenes Pedal oder Pedalboard.",
+    "pedalSubtitle": "Erstelle ein individuelles Pedal.",
+    "boardSubtitle": "Erstelle ein individuelles Pedalboard.",
     "importTitle": "Bild importieren",
     "importSubtitle": "Importiere ein Pedal von deinem Computer.",
     "formats": "Akzeptierte Formate: PNG, JPG, WEBP",
@@ -398,7 +399,9 @@
     "chooseImage": "Bild auswählen",
     "voltage": "Spannung (V)",
     "current": "Stromaufnahme (mA)",
-    "add": "Hinzufügen"
+    "add": "Hinzufügen",
+    "modeCustom": "Anpassen",
+    "modeImport": "Importieren"
   },
 
   "canvasControls": {

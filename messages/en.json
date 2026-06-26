@@ -192,7 +192,7 @@
     "nameOptional": "Name",
     "namePlaceholder": "Name (Fuzz)",
     "enterDimensions": "Dimensions",
-    "dimensionError": "Allowed dimensions: min {min} {unit} / max {max} {unit}",
+    "dimensionError": "Dimensions: min {min} {unit} / max {max} {unit}",
     "width": "Width",
     "depth": "Depth",
     "color": "Color",
@@ -392,7 +392,8 @@
   "customMenu": {
     "pedalTitle": "Custom Pedal",
     "boardTitle": "Custom Board",
-    "subtitle": "Create a custom pedal or pedalboard.",
+    "pedalSubtitle": "Create a custom pedal.",
+    "boardSubtitle": "Create a custom board.",
     "importTitle": "Import an Image",
     "importSubtitle": "Import a pedal from your computer.",
     "formats": "Accepted formats: PNG, JPG, WEBP",
@@ -401,7 +402,9 @@
     "chooseImage": "Choose an Image",
     "voltage": "Voltage (V)",
     "current": "Current Draw (mA)",
-    "add": "Add"
+    "add": "Add",
+    "modeCustom": "Custom",
+    "modeImport": "Import"
   },
 
   "canvasControls": {

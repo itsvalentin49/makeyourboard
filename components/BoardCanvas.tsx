@@ -2476,6 +2476,10 @@ isColliding={
         const size = displaySizes[p.instanceId];
         const hasColor = !!p.color;
 
+        const hideHardware =
+        size.w < 70 &&
+        size.h < 70;
+
         const SMALL_KNOB = 25;
         const MEDIUM_KNOB = 25;
         const LARGE_KNOB = 25;
@@ -2510,31 +2514,35 @@ isColliding={
               />
             )}
 
-            {Array.from({ length: knobCount }).map((_, i) => {
-              const offsetFromCenter =
-                (i - (knobCount - 1) / 2) * spacing * spread;
+{!hideHardware && (
+  <>
+    {Array.from({ length: knobCount }).map((_, i) => {
+      const offsetFromCenter =
+        (i - (knobCount - 1) / 2) * spacing * spread;
 
-              return (
-                <KonvaImage
-                  key={i}
-                  image={knob}
-                  width={knobSize}
-                  height={knobSize}
-                  x={offsetFromCenter - knobSize / 2}
-                  y={knobY}
-                  listening={false}
-                />
-              );
-            })}
+      return (
+        <KonvaImage
+          key={i}
+          image={knob}
+          width={knobSize}
+          height={knobSize}
+          x={offsetFromCenter - knobSize / 2}
+          y={knobY}
+          listening={false}
+        />
+      );
+    })}
 
-            <KonvaImage
-              image={footswitch}
-              width={footswitchSize}
-              height={footswitchSize}
-              x={-footswitchSize / 2}
-              y={size.h / 2 - 30}
-              listening={false}
-            />
+    <KonvaImage
+      image={footswitch}
+      width={footswitchSize}
+      height={footswitchSize}
+      x={-footswitchSize / 2}
+      y={size.h / 2 - 30}
+      listening={false}
+    />
+  </>
+)}
           </>
         );
       })()}

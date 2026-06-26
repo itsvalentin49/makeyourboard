@@ -189,7 +189,7 @@
     "nameOptional": "Nome",
     "namePlaceholder": "Nome (Fuzz)",
     "enterDimensions": "Dimensioni",
-    "dimensionError": "Dimensioni consentite: min {min} {unit} / max {max} {unit}",
+    "dimensionError": "Dimensioni : min {min} {unit} / max {max} {unit}",
     "width": "Larghezza",
     "depth": "Profondità",
     "color": "Colore",
@@ -389,7 +389,8 @@
   "customMenu": {
     "pedalTitle": "Pedale personalizzato",
     "boardTitle": "Pedaliera personalizzata",
-    "subtitle": "Crea un pedale o una pedaliera su misura.",
+    "pedalSubtitle": "Crea un pedale personalizzato.",
+    "boardSubtitle": "Crea una pedaliera personalizzata.",
     "importTitle": "Importa un'immagine",
     "importSubtitle": "Importa un pedale dal tuo computer.",
     "formats": "Formati accettati: PNG, JPG, WEBP",
@@ -398,7 +399,9 @@
     "chooseImage": "Scegli un'immagine",
     "voltage": "Voltaggio (V)",
     "current": "Assorbimento (mA)",
-    "add": "Aggiungi"
+    "add": "Aggiungi",
+    "modeCustom": "Personalizza",
+    "modeImport": "Importa"
   },
 
   "canvasControls": {

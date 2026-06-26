@@ -600,8 +600,8 @@ image:
       item?.image_url ||
       item?.photo ||
       (itemType === "pedal"
-        ? "/images/custom-pedal.png"
-        : "/images/custom-board.png"),
+        ? "/images/custom-pedal.webp"
+        : "/images/custom-board.webp"),
 
 image_url:
   item?.imageId
