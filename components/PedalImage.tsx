@@ -53,8 +53,6 @@ export default function PedalImage({
   const scaledWidth = renderSize.w;
   const scaledHeight = renderSize.h;
 
-  const hideHardware = width < 70 && depth < 70;
-
   const marginRect = {
     x: hasLeft ? -MARGIN_SIZE : 0,
     y: hasTop ? -MARGIN_SIZE : 0,

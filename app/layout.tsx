@@ -102,16 +102,6 @@ export default function RootLayout({
 
   return (
     <html lang="en" className="light">
-      <head>
-        <link rel="preload" as="image" href="/backgrounds/wood.webp" />
-        <link rel="preload" as="image" href="/backgrounds/carpet.webp" />
-        <link rel="preload" as="image" href="/backgrounds/stripes.webp" />
-        <link rel="preload" as="image" href="/backgrounds/fabric.webp" />
-        <link rel="preload" as="image" href="/backgrounds/houndstooth.webp" />
-        <link rel="preload" as="image" href="/backgrounds/steel.webp" />
-        <link rel="preload" as="image" href="/backgrounds/coast.webp" />
-      </head>
-
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[var(--background)] text-[var(--foreground)]`}
         style={{

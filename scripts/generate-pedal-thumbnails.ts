@@ -16,9 +16,9 @@ const TABLES = ["pedals", "power"];
 
 async function generateForTable(tableName: string) {
   const { data: items, error } = await supabase
-    .from(tableName)
-    .select("id, image, thumbnail")
-    .is("thumbnail", null);
+  .from(tableName)
+  .select("id, image, thumbnail")
+  .or("thumbnail.is.null,thumbnail.eq.");
 
   if (error) {
     console.error(`Erreur table ${tableName}:`, error.message);

@@ -635,6 +635,7 @@ const handleStageClick = (e: any) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const boardsMenuRef = useRef<HTMLDivElement>(null);
   const boardsButtonRef = useRef<HTMLButtonElement>(null);
+  const confirmDeleteRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<any>(null);
   const rafRef = useRef<number | null>(null);
   const wheelTimeout = useRef<any>(null);
@@ -694,6 +695,7 @@ const handleStageClick = (e: any) => {
   const [showSignalPath, setShowSignalPath] = useState(false);
   const [showCableMenu, setShowCableMenu] = useState(false);
   const [showBoardsMenu, setShowBoardsMenu] = useState(false);
+  const [confirmDeleteProjectId, setConfirmDeleteProjectId] = useState<number | null>(null);
   useEffect(() => {
   if (!showBoardsMenu) return;
 
@@ -712,6 +714,25 @@ const handleStageClick = (e: any) => {
     document.removeEventListener("mousedown", handleClickOutsideBoards);
   };
 }, [showBoardsMenu]);
+
+useEffect(() => {
+  if (confirmDeleteProjectId === null) return;
+
+  const handleClickOutsideConfirm = (e: MouseEvent) => {
+    const target = e.target as Node;
+
+    if (confirmDeleteRef.current?.contains(target)) return;
+
+    setConfirmDeleteProjectId(null);
+  };
+
+  document.addEventListener("mousedown", handleClickOutsideConfirm);
+
+  return () => {
+    document.removeEventListener("mousedown", handleClickOutsideConfirm);
+  };
+}, [confirmDeleteProjectId]);
+
   const [collisionReady, setCollisionReady] = useState(false);
   const [showList, setShowList] = useState(false);
   const [showOutputs, setShowOutputs] = useState(false);
@@ -1687,16 +1708,9 @@ className="
 <button
   type="button"
   onClick={(e) => {
-    e.stopPropagation();
-
-    const confirmed = window.confirm(
-      t("tabs.confirmDelete")
-    );
-
-    if (confirmed) {
-      deleteProject?.(project.id, e);
-    }
-  }}
+  e.stopPropagation();
+  setConfirmDeleteProjectId(project.id);
+}}
   className="px-1.5 py-2 opacity-60 hover:opacity-100 transition-opacity group/delete"
 >
   <X
@@ -1707,6 +1721,59 @@ className="
 "
   />
 </button>
+
+{confirmDeleteProjectId === project.id && (
+  <div
+    ref={confirmDeleteRef}
+    className="
+      absolute right-0 bottom-full mb-2
+      w-full rounded-xl
+      bg-zinc-900 border border-zinc-700
+      p-3 shadow-xl z-50
+    "
+    onClick={(e) => e.stopPropagation()}
+  >
+    <div className="text-[11px] font-bold mb-3">
+      {t("tabs.confirmDelete")}
+    </div>
+
+    <div className="flex gap-2 justify-end">
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          setConfirmDeleteProjectId(null);
+        }}
+        className="
+          px-3 py-1.5 rounded-md
+          bg-zinc-800 hover:bg-canvas transition-colors
+          text-[10px] font-black uppercase
+        "
+      >
+        {t("tabs.cancel")}
+      </button>
+
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          deleteProject?.(project.id, e);
+          setConfirmDeleteProjectId(null);
+        }}
+        className="
+          px-3 py-1.5 rounded-md
+          bg-red-600 hover:bg-red-500
+          !text-white
+          text-[10px] font-black uppercase
+        "
+      >
+        {t("pedal.actions.delete")}
+      </button>
+    </div>
+  </div>
+)}
+
+
 </div>
 
 
