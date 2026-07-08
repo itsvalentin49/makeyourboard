@@ -25,6 +25,14 @@ type Props = {
   deletePedal: (id: number) => void;
 };
 
+function hasValue(value: any) {
+  if (value == null) return false;
+
+  const v = String(value).trim();
+
+  return v !== "" && v.toUpperCase() !== "N/A";
+}
+
 export default function PowerSpecs({
   selectedPower,
   units,
@@ -46,17 +54,17 @@ export default function PowerSpecs({
     <div className="flex flex-col gap-1 animate-in slide-in-from-left duration-300 px-1">
 
       {selectedInstanceId !== null && (
-  <div className="space-y-4 mt-4 mb-4">
-    <div className="w-full text-[11px] font-black uppercase py-2 rounded-md bg-blue-600 !text-white text-center cursor-default">
-      {t("pedal.actions.title")}
-    </div>
+        <div className="space-y-4 mt-4 mb-4">
+          <div className="w-full text-[11px] font-black uppercase py-2 rounded-md bg-blue-600 !text-white text-center cursor-default">
+            {t("pedal.actions.title")}
+          </div>
 
-<div className="grid grid-cols-4 gap-2">
+          <div className="grid grid-cols-4 gap-2">
 
-  {/* ROTATE */}
-  <button
-    onClick={() => rotatePedal(selectedInstanceId)}
-    className="
+            {/* ROTATE */}
+            <button
+              onClick={() => rotatePedal(selectedInstanceId)}
+              className="
       h-[40px]
       flex items-center justify-center
       bg-zinc-950
@@ -67,14 +75,14 @@ export default function PowerSpecs({
       hover:bg-canvas
       active:scale-[0.98]
     "
-  >
-    <RotateCw size={17} strokeWidth={2.5} />
-  </button>
+            >
+              <RotateCw size={17} strokeWidth={2.5} />
+            </button>
 
-  {/* DELETE */}
-  <button
-    onClick={() => deletePedal(selectedInstanceId)}
-    className="
+            {/* DELETE */}
+            <button
+              onClick={() => deletePedal(selectedInstanceId)}
+              className="
       h-[40px]
       flex items-center justify-center
       bg-zinc-950
@@ -85,14 +93,14 @@ export default function PowerSpecs({
       hover:bg-canvas
       active:scale-[0.98]
     "
-  >
-    <Trash2 size={17} strokeWidth={2.5} />
-  </button>
+            >
+              <Trash2 size={17} strokeWidth={2.5} />
+            </button>
 
-  {/* FRONT */}
-  <button
-    onClick={() => movePedalFront(selectedInstanceId)}
-    className="
+            {/* FRONT */}
+            <button
+              onClick={() => movePedalFront(selectedInstanceId)}
+              className="
       h-[40px]
       flex items-center justify-center
       bg-zinc-950
@@ -103,14 +111,14 @@ export default function PowerSpecs({
       hover:bg-canvas
       active:scale-[0.98]
     "
-  >
-    <ArrowUp size={17} strokeWidth={2.5} />
-  </button>
+            >
+              <ArrowUp size={17} strokeWidth={2.5} />
+            </button>
 
-  {/* BACK */}
-  <button
-    onClick={() => movePedalBack(selectedInstanceId)}
-    className="
+            {/* BACK */}
+            <button
+              onClick={() => movePedalBack(selectedInstanceId)}
+              className="
       h-[40px]
       flex items-center justify-center
       bg-zinc-950
@@ -121,13 +129,13 @@ export default function PowerSpecs({
       hover:bg-canvas
       active:scale-[0.98]
     "
-  >
-    <ArrowDown size={17} strokeWidth={2.5} />
-  </button>
+            >
+              <ArrowDown size={17} strokeWidth={2.5} />
+            </button>
 
-</div>
-  </div>
-)}
+          </div>
+        </div>
+      )}
 
       {/* HEADER */}
       <div className="space-y-0.5 border-zinc-900">
@@ -156,11 +164,10 @@ export default function PowerSpecs({
           <div className="flex-1 border-b border-dotted border-zinc-600 mx-2 translate-y-[3.5px]" />
 
           <span
-            className={`text-[9px] px-2 py-0.5 rounded-full font-black uppercase whitespace-nowrap ${
-              (selectedPower.status || "").toLowerCase().includes("active")
+            className={`text-[9px] px-2 py-0.5 rounded-full font-black uppercase whitespace-nowrap ${(selectedPower.status || "").toLowerCase().includes("active")
                 ? "bg-green-500/20 text-green-500"
                 : "bg-red-500/20 text-red-500"
-            }`}
+              }`}
           >
             {selectedPower.status
               ? t(`power.status.${selectedPower.status.toLowerCase()}`)
@@ -271,8 +278,8 @@ export default function PowerSpecs({
             {units === "metric"
               ? `${selectedPower.width} x ${selectedPower.depth} mm`
               : `${mmToIn(selectedPower.width).toFixed(2)} x ${mmToIn(
-                  selectedPower.depth
-                ).toFixed(2)} in`}
+                selectedPower.depth
+              ).toFixed(2)} in`}
           </span>
         </div>
 
@@ -303,14 +310,15 @@ export default function PowerSpecs({
         </div>
 
         {/* MANUAL */}
-        <div className="flex items-center py-1 border-zinc-900">
-          <span className="text-[10px] uppercase font-bold tracking-wider whitespace-nowrap">
-            {t("power.manual")}
-          </span>
+        {hasValue(selectedPower.manual) && (
+          <div className="flex items-center py-1 border-zinc-900">
 
-          <div className="flex-1 border-b border-dotted border-zinc-600 mx-2 translate-y-[3.5px]" />
+            <span className="text-[10px] uppercase font-bold tracking-wider whitespace-nowrap">
+              {t("power.manual")}
+            </span>
 
-          {selectedPower.manual ? (
+            <div className="flex-1 border-b border-dotted border-zinc-600 mx-2 translate-y-[3.5px]" />
+
             <a
               href={selectedPower.manual}
               target="_blank"
@@ -319,25 +327,22 @@ export default function PowerSpecs({
             >
               PDF <ExternalLink size={10} />
             </a>
-          ) : (
-            <span className="text-[11px] font-bold whitespace-nowrap">
-              N/A
-            </span>
-          )}
-        </div>
+
+          </div>
+        )}
       </div>
 
 
-{/* BUY ONLINE */}
-<div className="-mt-3">
-  <BuyOnline
-    selectedPedal={selectedPower}
-    isUSA={isUSA}
-    isEurope={isEurope}
-    buildThomannUrl={buildThomannUrl}
-    t={t}
-  />
-</div>
+      {/* BUY ONLINE */}
+      <div className="-mt-3">
+        <BuyOnline
+          selectedPedal={selectedPower}
+          isUSA={isUSA}
+          isEurope={isEurope}
+          buildThomannUrl={buildThomannUrl}
+          t={t}
+        />
+      </div>
     </div>
   );
 }

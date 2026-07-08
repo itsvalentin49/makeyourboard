@@ -22,17 +22,13 @@ type Props = {
 
 const POPULAR_POWER_SUPPLIES = [
   "Cioks DC7",
-  "Cioks SOL",
   "Strymon Zuma",
   "Strymon Ojai",
   "Voodoo Lab Pedal Power 2 Plus",
   "Voodoo Lab Pedal Power ISO-5",
-  "Voodoo Lab Pedal Power 3 Plus",
   "Truetone 1 SPOT Pro CS6",
   "Truetone 1 SPOT Pro CS7",
-  "Truetone 1 SPOT Pro CS12",
-  "MXR M238 Iso-Brick",
-  "MXR Mini Iso-Brick",
+  "MXR DC Brick | M237",
   "Walrus Audio Canvas Power HP",
 ];
 
@@ -167,13 +163,13 @@ export default function SearchPower({
           <div className="text-[11px] font-black uppercase tracking-wide text-zinc-300">
             {isSearching
               ? t("powerMenu.results").replace(
-                  "{count}",
-                  String(visiblePower.length)
-                )
+                "{count}",
+                String(visiblePower.length)
+              )
               : t("powerMenu.count").replace(
-                  "{count}",
-                  String(powerLibrary.length)
-                )}
+                "{count}",
+                String(powerLibrary.length)
+              )}
           </div>
 
           {!isSearching && (
@@ -193,7 +189,6 @@ export default function SearchPower({
                   key={p.id}
                   type="button"
                   onClick={() => {
-                    setPowerSearch("");
                     addPower(p);
                     setShowPowerResults(false);
                   }}
@@ -211,12 +206,12 @@ export default function SearchPower({
                   <div className="w-[50px] h-[34px] shrink-0 flex items-center justify-center">
                     {img ? (
                       <img
-                      src={img}
-                      alt={`${p.brand || ""} ${p.name || ""}`}
-                      loading="lazy"
-                      decoding="async"
-                      className="max-w-full max-h-full object-contain"
-                    />
+                        src={img}
+                        alt={`${p.brand || ""} ${p.name || ""}`}
+                        loading="lazy"
+                        decoding="async"
+                        className="max-w-full max-h-full object-contain"
+                      />
                     ) : (
                       <div className="w-12 h-6 rounded-md bg-zinc-700" />
                     )}

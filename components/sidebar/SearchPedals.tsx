@@ -35,7 +35,7 @@ function isNewPedal(value: any): boolean {
   today.setHours(0, 0, 0, 0);
 
   const limitDate = new Date(today);
-  limitDate.setDate(today.getDate() - 40);
+  limitDate.setDate(today.getDate() - 60);
 
   releaseDate.setHours(0, 0, 0, 0);
 
@@ -90,15 +90,15 @@ export default function SearchPedals({
           className="absolute left-4 text-[#6f6a5d]"
         />
 
-<input
-  ref={pedalInputRef}
-  type="text"
-  autoComplete="off"
-  autoCorrect="off"
-  autoCapitalize="off"
-  spellCheck={false}
-  placeholder={t("pedalsMenu.searchPlaceholder")}
-  className="
+        <input
+          ref={pedalInputRef}
+          type="text"
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="off"
+          spellCheck={false}
+          placeholder={t("pedalsMenu.searchPlaceholder")}
+          className="
     w-full h-[30px]
     bg-white !text-black placeholder:!text-zinc-500
     rounded-md
@@ -106,17 +106,17 @@ export default function SearchPedals({
     text-[12px] font-bold
     outline-none
   "
-  value={pedalSearch}
-  onClick={(e) => {
-    e.stopPropagation();
-    setShowBoardResults(false);
-    setShowPedalResults(true);
-  }}
-  onChange={(e) => {
-    setPedalSearch(e.target.value);
-    setShowPedalResults(true);
-  }}
-/>
+          value={pedalSearch}
+          onClick={(e) => {
+            e.stopPropagation();
+            setShowBoardResults(false);
+            setShowPedalResults(true);
+          }}
+          onChange={(e) => {
+            setPedalSearch(e.target.value);
+            setShowPedalResults(true);
+          }}
+        />
 
         {pedalSearch && (
           <button
@@ -140,19 +140,19 @@ export default function SearchPedals({
       </div>
 
       <div className="flex flex-col gap-3 min-h-0 flex-1 overflow-hidden">
-<div className="px-1 shrink-0">
-  <div className="text-[11px] font-black uppercase tracking-wide text-zinc-300">
-    {isSearching
-      ? t("pedalsMenu.results").replace("{count}", String(visiblePedals.length))
-      : t("pedalsMenu.count").replace("{count}", String(pedalsLibrary.length))}
-  </div>
+        <div className="px-1 shrink-0">
+          <div className="text-[11px] font-black uppercase tracking-wide text-zinc-300">
+            {isSearching
+              ? t("pedalsMenu.results").replace("{count}", String(visiblePedals.length))
+              : t("pedalsMenu.count").replace("{count}", String(pedalsLibrary.length))}
+          </div>
 
-  {!isSearching && (
-    <div className="mt-1 text-[10px] font-bold text-zinc-500">
-      {t("pedalsMenu.latest")}
-    </div>
-  )}
-</div>
+          {!isSearching && (
+            <div className="mt-1 text-[10px] font-bold text-zinc-500">
+              {t("pedalsMenu.latest")}
+            </div>
+          )}
+        </div>
 
         <div className="flex flex-col gap-2.5 overflow-y-auto no-scrollbar pb-6 min-h-0">
           {visiblePedals.length > 0 ? (
@@ -166,7 +166,6 @@ export default function SearchPedals({
                   key={p.id}
                   type="button"
                   onClick={() => {
-                    setPedalSearch("");
                     addPedal(p);
                     setShowPedalResults(false);
                   }}
@@ -181,17 +180,17 @@ export default function SearchPedals({
                     shrink-0
                   "
                 >
-                    <div className="w-[40px] h-[34px] shrink-0 flex items-center justify-center">                    {img ? (
-                      <img
-  src={img}
-  alt={`${p.brand || ""} ${p.name || ""}`}
-  loading="lazy"
-  decoding="async"
-  className="max-w-full max-h-full object-contain"
-/>
-                    ) : (
-                      <div className="w-9 h-9 rounded-md bg-zinc-700" />
-                    )}
+                  <div className="w-[40px] h-[34px] shrink-0 flex items-center justify-center">                    {img ? (
+                    <img
+                      src={img}
+                      alt={`${p.brand || ""} ${p.name || ""}`}
+                      loading="lazy"
+                      decoding="async"
+                      className="max-w-full max-h-full object-contain"
+                    />
+                  ) : (
+                    <div className="w-9 h-9 rounded-md bg-zinc-700" />
+                  )}
                   </div>
 
                   <div className="min-w-0 flex-1">
@@ -203,15 +202,15 @@ export default function SearchPedals({
 
                     </div>
 
-<div className="flex items-center gap-1.5 text-[10px] font-bold text-zinc-300 leading-tight mt-0.5">
-  <span>{p.brand}</span>
+                    <div className="flex items-center gap-1.5 text-[10px] font-bold text-zinc-300 leading-tight mt-0.5">
+                      <span>{p.brand}</span>
 
-  {isNew && (
-    <span className="text-[8px] font-black uppercase tracking-wider text-green-500">
-      {t("pedalsMenu.new")}
-    </span>
-  )}
-</div>
+                      {isNew && (
+                        <span className="text-[8px] font-black uppercase tracking-wider text-green-500">
+                          {t("pedalsMenu.new")}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </button>
               );

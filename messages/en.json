@@ -19,18 +19,14 @@
     "power": "Power",
     "custom": "Custom"
   },
-
   "canvasIntro": {
     "title": "Make Your Board",
     "subtitle": "Guitar Pedalboard Builder",
     "desktopText": "Select pedals, boards and power supplies from the left panel.\nDrag, drop and arrange them to build your perfect setup.\nCheck your power setup and share your board with friends.",
     "mobileText": "Select pedals, boards and power supplies from the left panel.\nDrag, drop and arrange them to build your perfect setup.\nCheck your power setup and share your board with friends."
   },
-
-
   "pedal": {
     "features": "Specifications",
-
     "actions": {
       "title": "Actions",
       "rotate": "Rotate",
@@ -38,17 +34,14 @@
       "moveFront": "Move Front",
       "moveBack": "Move Back"
     },
-    
     "brand": "Brand",
     "model": "Model",
     "year": "Year",
-
     "status": {
       "label": "Status",
       "active": "Active",
       "discontinued": "Discontinued"
     },
-
     "type": {
       "label": "Type",
       "A/B Box": "A/B Box",
@@ -66,6 +59,7 @@
       "Delay": "Delay",
       "DI": "DI",
       "Distortion": "Distortion",
+      "Doubler": "Doubler",
       "Drum Machine": "Drum Machine",
       "Envelope Filter": "Envelope Filter",
       "Equalizer": "EQ",
@@ -86,7 +80,7 @@
       "Octaver": "Octaver",
       "Overdrive": "Overdrive",
       "Phaser": "Phaser",
-      "Pitch": "Pitc Shifter",
+      "Pitch": "Pitch Shifter",
       "Power Amp": "Power Amp",
       "Power Supply": "Power Supply",
       "Preamp": "Preamp",
@@ -110,7 +104,6 @@
       "Wireless System": "Wireless System",
       "Whammy": "Whammy"
     },
-
     "circuit": {
       "label": "Circuit",
       "Digital": "Digital",
@@ -118,7 +111,6 @@
       "Hybrid": "Hybrid",
       "N/A": "N/A"
     },
-
     "bypass": {
       "label": "Bypass",
       "True Bypass": "True Bypass",
@@ -126,7 +118,6 @@
       "Switchable": "Switchable",
       "N/A": "N/A"
     },
-
     "power": {
       "label": "Power",
       "AC": "AC",
@@ -138,6 +129,7 @@
       "9-15V DC": "9-15V DC",
       "9-24V DC": "9-24V DC",
       "18V DC": "18V DC",
+      "19V DC": "19V DC",
       "24V DC": "24V DC",
       "48V DC": "48V DC",
       "9-18V DC": "9-18V DC",
@@ -146,25 +138,21 @@
       "USB": "USB",
       "N/A": "N/A"
     },
-
     "draw": "Current draw",
     "dimensions": "Dimensions",
     "weight": "Weight",
     "origin": "Origin",
     "manual": "Manual"
   },
-
   "board": {
     "status": {
       "label": "Status",
       "active": "Active",
       "discontinued": "Discontinued"
     },
-
     "brand": "Brand",
     "model": "Model",
     "year": "Year",
-
     "material": {
       "label": "Material",
       "Aluminium": "Aluminium",
@@ -172,19 +160,16 @@
       "Plastic": "Plastic",
       "Plywood": "Plywood"
     },
-
     "profile": {
       "label": "Profile",
       "Flat": "Flat",
       "Angled": "Angled",
       "N/A": "N/A"
     },
-
     "dimensions": "Dimensions",
     "weight": "Weight",
     "origin": "Origin"
   },
-
   "custom": {
     "title": "Custom",
     "selectType": "Select pedal or board",
@@ -200,7 +185,6 @@
     "addPedal": "Add",
     "addBoard": "Add"
   },
-
   "settings": {
     "title": "Settings",
     "background": "Background",
@@ -208,18 +192,15 @@
     "units": "Unit",
     "theme": "Theme",
     "about": "About us",
-
     "unitsOptions": {
       "metric": "Metric",
       "imperial": "Imperial"
     },
-
     "themeOptions": {
       "dark": "Dark",
       "light": "Light"
     }
   },
-
   "backgrounds": {
     "neutral": "Neutral",
     "wood": "Herringbone Wood",
@@ -230,23 +211,19 @@
     "coast": "Summer Vibes",
     "houndstooth": "Houndstooth"
   },
-
   "canvas": {
     "totalDraw": "Total draw",
     "totalWeight": "Total weight"
   },
-
   "footer": {
     "feedback": "Contact",
     "donate": "Support"
   },
-
   "tabs": {
     "confirmDelete": "Are you sure you want to delete this pedalboard?",
     "yes": "Yes",
     "cancel": "Cancel"
   },
-
   "contact": {
     "title": "Contact",
     "subtitle": "We typically respond within one business day.",
@@ -261,7 +238,6 @@
     "errorRequired": "Please fill in all fields.",
     "errorInvalidEmail": "Please enter a valid email address.",
     "errorGeneric": "Something went wrong. Please try again.",
-
     "types": {
       "question": "Question",
       "request": "Request",
@@ -269,7 +245,6 @@
       "other": "Other"
     }
   },
-
   "export": {
     "button": "Export",
     "title": "Export image",
@@ -280,7 +255,6 @@
     "white": "White (JPG)",
     "download": "Download"
   },
-
   "share": {
     "button": "Share",
     "title": "Share Your Pedalboard",
@@ -289,12 +263,10 @@
     "copy": "Copy link",
     "copied": "Copied"
   },
-
   "list": {
     "button": "List",
     "title": "Pedalboard"
   },
-
   "power": {
     "button": "Power",
     "check": "Check Power",
@@ -318,33 +290,27 @@
     "yes": "Yes",
     "no": "No"
   },
-
   "powerSetup": {
     "title": "Power Setup",
-
     "outputs": {
       "fixed": "Fixed output",
       "fixed_plural": "Fixed outputs",
       "switchable": "Switchable output",
       "switchable_plural": "Switchable outputs"
     },
-
     "sections": {
       "pedals": "Pedals",
       "recommendation": "Recommendation"
     },
-
     "status": {
       "compatible": "All pedals are compatible with your power supply.",
       "notCompatible": "Your power supply is not compatible with all pedals."
     },
-
     "empty": {
       "noPedals": "No pedals.",
       "title": "Add your first pedal to start your setup.",
       "subtitle": "Use the sidebar on the left to search and add pedals."
     },
-
     "recommendation": {
       "perfect": "Your board is perfectly powered. Let's rock 🤘",
       "daisy": "You can power multiple pedals with a daisy chain.",
@@ -356,14 +322,12 @@
       "upgrade": "Use a suitable power supply or plug the incompatible pedal into a dedicated wall adapter.",
       "tuner": "Your tuner can power multiple pedals using a daisy chain 🤘",
       "singleAdapter": "You can use a {voltage}V power adapter with a current rating higher than {draw}mA.",
-      "battery9v": "You can also use a 9V battery if the pedal supports battery operation." 
+      "battery9v": "You can also use a 9V battery if the pedal supports battery operation."
     }
   },
-
   "search": {
     "noResults": "No results"
   },
-
   "pedalsMenu": {
     "title": "Pedals",
     "searchPlaceholder": "Search...",
@@ -373,7 +337,6 @@
     "new": "NEW",
     "newReleases": "New Releases"
   },
-
   "boardsMenu": {
     "title": "Pedalboards",
     "searchPlaceholder": "Search...",
@@ -381,7 +344,6 @@
     "popular": "Most used pedalboards.",
     "results": "{count} results"
   },
-
   "powerMenu": {
     "title": "Power Supplies",
     "searchPlaceholder": "Search...",
@@ -389,7 +351,6 @@
     "popular": "Most used power supplies.",
     "results": "{count} results"
   },
-
   "customMenu": {
     "pedalTitle": "Custom Pedal",
     "boardTitle": "Custom Board",
@@ -407,7 +368,6 @@
     "modeCustom": "Custom",
     "modeImport": "Import"
   },
-
   "canvasControls": {
     "min": "MIN",
     "max": "MAX",
@@ -421,7 +381,6 @@
     "cableClearance": "Cable Clearance",
     "cableClearanceDescription": "Check if pedals have enough room for cables."
   },
-
   "help": {
     "title": "Quick Guide",
     "open": "Open guide",
@@ -437,6 +396,4 @@
     "ok": "OK",
     "dontShowAgain": "Don't show again"
   }
-  
-
 }

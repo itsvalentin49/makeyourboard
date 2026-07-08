@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/react";
+import { headers } from "next/headers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -75,11 +76,14 @@ export const viewport = {
   viewportFit: "cover",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const headersList = await headers();
+  const country = headersList.get("x-vercel-ip-country") || "FR";
+
   const structuredDataWebsite = {
     "@context": "https://schema.org",
     "@type": "WebSite",
@@ -109,6 +113,12 @@ export default function RootLayout({
           paddingBottom: "env(safe-area-inset-bottom)",
         }}
       >
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.__MYB_COUNTRY__ = ${JSON.stringify(country)};`,
+          }}
+        />
+
         {children}
 
         <script

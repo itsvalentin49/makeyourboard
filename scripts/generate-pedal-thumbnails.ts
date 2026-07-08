@@ -12,13 +12,13 @@ const supabase = createClient(
 
 const THUMB_BUCKET = "pedals-thumbs";
 
-const TABLES = ["pedals", "power"];
+const TABLES = ["pedals", "power", "boards"];
 
 async function generateForTable(tableName: string) {
   const { data: items, error } = await supabase
-  .from(tableName)
-  .select("id, image, thumbnail")
-  .or("thumbnail.is.null,thumbnail.eq.");
+    .from(tableName)
+    .select("id, image, thumbnail")
+    .or("thumbnail.is.null,thumbnail.eq.");
 
   if (error) {
     console.error(`Erreur table ${tableName}:`, error.message);

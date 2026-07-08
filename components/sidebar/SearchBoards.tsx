@@ -19,21 +19,15 @@ type Props = {
 };
 
 const POPULAR_BOARDS = [
-  "Pedaltrain Nano",
   "Pedaltrain Nano +",
   "Pedaltrain Metro 16",
-  "Pedaltrain Metro 20",
   "Pedaltrain Classic JR",
-  "Pedaltrain Novo 18",
   "RockBoard DUO 2.1",
   "RockBoard TRES 3.1",
   "RockBoard QUAD 4.2",
   "Daddario XPND 2 Core",
   "Temple Audio Duo 17 GM",
-  "Temple Audio Duo 24 GM",
   "Harley Benton Spaceship 40",
-  "Harley Benton Spaceship 60",
-  "Harley Benton Spaceship 80",
 ];
 
 function normalize(value: any) {
@@ -165,13 +159,13 @@ export default function SearchBoards({
           <div className="text-[11px] font-black uppercase tracking-wide text-zinc-300">
             {isSearching
               ? t("boardsMenu.results").replace(
-                  "{count}",
-                  String(visibleBoards.length)
-                )
+                "{count}",
+                String(visibleBoards.length)
+              )
               : t("boardsMenu.count").replace(
-                  "{count}",
-                  String(boardsLibrary.length)
-                )}
+                "{count}",
+                String(boardsLibrary.length)
+              )}
           </div>
 
           {!isSearching && (
@@ -191,7 +185,6 @@ export default function SearchBoards({
                   key={b.id}
                   type="button"
                   onClick={() => {
-                    setBoardSearch("");
                     selectBoard(b);
                     setShowBoardResults(false);
                   }}
@@ -209,12 +202,12 @@ export default function SearchBoards({
                   <div className="w-[50px] h-[34px] shrink-0 flex items-center justify-center">
                     {img ? (
                       <img
-                      src={img}
-                      alt={`${b.brand || ""} ${b.name || ""}`}
-                      loading="lazy"
-                      decoding="async"
-                      className="max-w-full max-h-full object-contain"
-                    />
+                        src={img}
+                        alt={`${b.brand || ""} ${b.name || ""}`}
+                        loading="lazy"
+                        decoding="async"
+                        className="max-w-full max-h-full object-contain"
+                      />
                     ) : (
                       <div className="w-12 h-6 rounded-md bg-zinc-700" />
                     )}

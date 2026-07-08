@@ -1,34 +1,31 @@
 {
-"sidebar": {
-  "searchPedal": "Rechercher une pédale",
-  "searchBoard": "Rechercher un pedalboard",
-  "buyOnline": "Acheter en ligne",
-  "addPedal": "Ajouter une pédale",
-  "addBoard": "Ajouter un pedalboard",
-  "addPedalTitle": "Pédales",
-  "addPedalButton": "Ajouter",
-  "addBoardTitle": "Pedalboards",
-  "addBoardButton": "Ajouter",
-  "addPowerTitle": "Alimentations",
-  "searchPower": "Rechercher une alimentation",
-  "addPowerSupplyButton": "Ajouter",
-  "noPowerFound": "Aucune alimentation trouvée",
-  "back": "Retour",
-  "pedals": "Pédales",
-  "boards": "Boards",
-  "power": "Power",
-  "custom": "Custom"
+  "sidebar": {
+    "searchPedal": "Rechercher une pédale",
+    "searchBoard": "Rechercher un pedalboard",
+    "buyOnline": "Acheter en ligne",
+    "addPedal": "Ajouter une pédale",
+    "addBoard": "Ajouter un pedalboard",
+    "addPedalTitle": "Pédales",
+    "addPedalButton": "Ajouter",
+    "addBoardTitle": "Pedalboards",
+    "addBoardButton": "Ajouter",
+    "addPowerTitle": "Alimentations",
+    "searchPower": "Rechercher une alimentation",
+    "addPowerSupplyButton": "Ajouter",
+    "noPowerFound": "Aucune alimentation trouvée",
+    "back": "Retour",
+    "pedals": "Pédales",
+    "boards": "Boards",
+    "power": "Power",
+    "custom": "Custom"
   },
-
   "canvasIntro": {
     "title": "Make Your Board",
     "subtitle": "Planificateur de Pedalboard",
     "desktopText": "Sélectionnez des pédales, pedalboards et alimentations dans le panneau de gauche.\nGlissez, déposez et organisez-les pour créer votre setup parfait.\nVérifiez votre alimentation et partagez votre pedalboard avec vos amis.",
     "mobileText": "Sélectionnez des pédales, pedalboards et alimentations dans le panneau de gauche.\nGlissez, déposez et organisez-les pour créer votre setup parfait.\nVérifiez votre alimentation et partagez votre pedalboard avec vos amis."
   },
-
   "pedal": {
-
     "features": "Caractéristiques",
     "actions": {
       "title": "Actions",
@@ -36,7 +33,7 @@
       "delete": "Supprimer",
       "moveFront": "Premier-plan",
       "moveBack": "Arrière-plan"
-      },
+    },
     "brand": "Marque",
     "model": "Modèle",
     "year": "Année",
@@ -45,8 +42,7 @@
       "active": "En production",
       "discontinued": "Arrêté"
     },
-
-   "type": {
+    "type": {
       "label": "Type",
       "A/B Box": "Boîtier A/B",
       "Accessory": "Accessoire",
@@ -63,6 +59,7 @@
       "Delay": "Delay",
       "DI": "DI",
       "Distortion": "Distorsion",
+      "Doubler": "Doubleur",
       "Drum Machine": "Boîte à rythmes",
       "Envelope Filter": "Enveloppe Filter",
       "Equalizer": "EQ",
@@ -107,7 +104,6 @@
       "Wireless System": "Système sans fil",
       "Whammy": "Whammy"
     },
-
     "circuit": {
       "label": "Circuit",
       "Digital": "Numérique",
@@ -115,7 +111,6 @@
       "Hybrid": "Hybride",
       "N/A": "N/A"
     },
-
     "bypass": {
       "label": "Bypass",
       "True Bypass": "True Bypass",
@@ -123,7 +118,6 @@
       "Switchable": "Commutable",
       "N/A": "N/A"
     },
-
     "power": {
       "label": "Alimentation",
       "AC": "AC",
@@ -135,6 +129,7 @@
       "9-15V DC": "9-15V DC",
       "9-24V DC": "9-24V DC",
       "18V DC": "18V DC",
+      "19V DC": "19V DC",
       "24V DC": "24V DC",
       "48V DC": "48V DC",
       "9-18V DC": "9-18V DC",
@@ -143,26 +138,21 @@
       "USB": "USB",
       "N/A": "N/A"
     },
-
     "draw": "Consommation",
     "dimensions": "Dimensions",
     "weight": "Poids",
     "origin": "Origine",
     "manual": "Manuel"
   },
-
   "board": {
-
     "status": {
       "label": "Statut",
       "active": "En production",
       "discontinued": "Arrêté"
     },
-
     "brand": "Marque",
     "model": "Modèle",
     "year": "Année",
-
     "material": {
       "label": "Matériau",
       "Aluminium": "Aluminium",
@@ -170,54 +160,47 @@
       "Plastic": "Plastique",
       "Plywood": "Contreplaqué"
     },
-
     "profile": {
       "label": "Profil",
       "Flat": "Plat",
       "Angled": "Incliné",
       "N/A": "N/A"
     },
-
     "dimensions": "Dimensions",
     "weight": "Poids",
     "origin": "Origine"
   },
-
-"custom": {
-  "title": "Custom",
-  "selectType": "Sélectionner pédale ou board",
-  "pedal": "Pédale",
-  "board": "Board",
-  "nameOptional": "Nom",
-  "namePlaceholder": "Nom (Fuzz)",
-  "enterDimensions": "Dimensions",
-  "dimensionError": "Dimensions : min {min} {unit} / max {max} {unit}",
-  "width": "Largeur",
-  "depth": "Profondeur",
-  "color": "Couleur",
-  "addPedal": "Ajouter",
-  "addBoard": "Ajouter"
-  }, 
-
-"settings": {
-  "title": "Paramètres",
-  "background": "Arrière-plan",
-  "language": "Langue",
-  "units": "Unité",
-  "theme": "Thème",
-  "about": "À propos",
-
-  "unitsOptions": {
-    "metric": "Métrique",
-    "imperial": "Impérial"
+  "custom": {
+    "title": "Custom",
+    "selectType": "Sélectionner pédale ou board",
+    "pedal": "Pédale",
+    "board": "Board",
+    "nameOptional": "Nom",
+    "namePlaceholder": "Nom (Fuzz)",
+    "enterDimensions": "Dimensions",
+    "dimensionError": "Dimensions : min {min} {unit} / max {max} {unit}",
+    "width": "Largeur",
+    "depth": "Profondeur",
+    "color": "Couleur",
+    "addPedal": "Ajouter",
+    "addBoard": "Ajouter"
   },
-  
-  "themeOptions": {
-    "dark": "Sombre",
-    "light": "Clair"
-  }
-},
-
+  "settings": {
+    "title": "Paramètres",
+    "background": "Arrière-plan",
+    "language": "Langue",
+    "units": "Unité",
+    "theme": "Thème",
+    "about": "À propos",
+    "unitsOptions": {
+      "metric": "Métrique",
+      "imperial": "Impérial"
+    },
+    "themeOptions": {
+      "dark": "Sombre",
+      "light": "Clair"
+    }
+  },
   "backgrounds": {
     "neutral": "Neutre",
     "wood": "Parquet",
@@ -226,23 +209,19 @@
     "stage": "Scène",
     "flightcase": "Flightcase"
   },
-
   "canvas": {
     "totalDraw": "Conso. totale",
     "totalWeight": "Poids total"
   },
-
   "footer": {
     "feedback": "Contact",
     "donate": "Soutenir"
   },
-
   "tabs": {
     "confirmDelete": "Êtes-vous sûr de vouloir supprimer ce pedalboard ?",
     "yes": "Oui",
     "cancel": "Annuler"
   },
-
   "contact": {
     "title": "Contact",
     "subtitle": "Nous répondons généralement sous un jour ouvré.",
@@ -257,7 +236,6 @@
     "errorRequired": "Veuillez remplir tous les champs.",
     "errorInvalidEmail": "Veuillez entrer une adresse email valide.",
     "errorGeneric": "Une erreur est survenue. Veuillez réessayer.",
-
     "types": {
       "question": "Question",
       "request": "Demande",
@@ -265,7 +243,6 @@
       "other": "Autre"
     }
   },
-
   "export": {
     "button": "Export",
     "title": "Exporter l’image",
@@ -276,7 +253,6 @@
     "white": "Blanc (JPG)",
     "download": "Télécharger"
   },
-
   "share": {
     "button": "Partager",
     "title": "Partager votre Board",
@@ -285,58 +261,54 @@
     "copy": "Copier le lien",
     "copied": "Copié"
   },
-
   "list": {
     "button": "Liste",
     "title": "Pedalboard"
   },
-
   "power": {
-      "button": "Alimentation",
-      "check": "Vérifier l’alimentation",
-      "features": "Caractéristiques",
-      "status": { "label": "Statut", "active": "En production", "discontinued": "Arrêté" },
-      "brand": "Marque",
-      "model": "Modèle",
-      "year": "Année",
-      "capacity": "Courant total",
-      "outputs": "Nombre de sorties",
-      "voltage": "Tension",
-      "isolated": "Sorties isolées",
-      "dimensions": "Dimensions",
-      "weight": "Poids",
-      "origin": "Origine",
-      "manual": "Manuel",
-      "yes": "Oui",
-      "no": "Non"
+    "button": "Alimentation",
+    "check": "Vérifier l’alimentation",
+    "features": "Caractéristiques",
+    "status": {
+      "label": "Statut",
+      "active": "En production",
+      "discontinued": "Arrêté"
     },
-
+    "brand": "Marque",
+    "model": "Modèle",
+    "year": "Année",
+    "capacity": "Courant total",
+    "outputs": "Nombre de sorties",
+    "voltage": "Tension",
+    "isolated": "Sorties isolées",
+    "dimensions": "Dimensions",
+    "weight": "Poids",
+    "origin": "Origine",
+    "manual": "Manuel",
+    "yes": "Oui",
+    "no": "Non"
+  },
   "powerSetup": {
     "title": "Alimentation",
-
     "outputs": {
       "fixed": "sortie fixe",
       "fixed_plural": "sorties fixes",
       "switchable": "sortie commutable",
       "switchable_plural": "sorties commutables"
     },
-
     "sections": {
       "pedals": "Pédales",
       "recommendation": "Recommandation"
     },
-
     "status": {
       "compatible": "Toutes les pédales sont compatibles avec votre alimentation.",
       "notCompatible": "Votre alimentation n'est pas compatible avec toutes les pédales."
     },
-
     "empty": {
       "noPedals": "Aucune pédale.",
       "title": "Ajoutez votre première pédale pour commencer.",
       "subtitle": "Utilisez la barre latérale pour rechercher et ajouter des pédales."
     },
-
     "recommendation": {
       "perfect": "Votre pedalboard est parfaitement alimenté. Let's rock 🤘",
       "daisy": "Vous pouvez alimenter plusieurs pédales avec une daisy chain.",
@@ -351,11 +323,9 @@
       "battery9v": "Vous pouvez aussi utiliser une pile 9V si la pédale permet un fonctionnement sur pile."
     }
   },
-
   "search": {
     "noResults": "Aucun résultat"
   },
-
   "pedalsMenu": {
     "title": "Pédales",
     "searchPlaceholder": "Rechercher...",
@@ -365,7 +335,6 @@
     "new": "NEW",
     "newReleases": "Nouveautés"
   },
-
   "boardsMenu": {
     "title": "Pedalboards",
     "searchPlaceholder": "Rechercher...",
@@ -373,15 +342,13 @@
     "popular": "Pedalboards les plus utilisés.",
     "results": "{count} résultats"
   },
-
   "powerMenu": {
     "title": "Alimentations",
     "searchPlaceholder": "Rechercher...",
     "count": "{count} alimentations",
     "popular": "Alimentations les plus utilisées.",
-    "results": "{count} résultats"  
+    "results": "{count} résultats"
   },
-
   "customMenu": {
     "pedalTitle": "Pédale personnalisée",
     "boardTitle": "Board personnalisé",
@@ -399,7 +366,6 @@
     "modeCustom": "Personnaliser",
     "modeImport": "Importer"
   },
-
   "canvasControls": {
     "min": "MIN",
     "max": "MAX",
@@ -414,7 +380,6 @@
     "cableClearance": "Passage des câbles",
     "cableClearanceDescription": "Vérifiez l’espace disponible pour les câbles."
   },
-
   "help": {
     "title": "Guide rapide",
     "open": "Ouvrir le guide",
@@ -430,5 +395,4 @@
     "ok": "OK",
     "dontShowAgain": "Ne plus afficher"
   }
-
 }

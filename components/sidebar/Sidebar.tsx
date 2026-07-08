@@ -109,7 +109,7 @@ type Props = {
 export default function Sidebar({
   pedalsLibrary,
   boardsLibrary,
-  powerLibrary, 
+  powerLibrary,
   showPedalResults,
   setShowPedalResults,
   showBoardResults,
@@ -162,7 +162,7 @@ export default function Sidebar({
   setLastSelectedPedal,
   lastSelectedPower,
   setLastSelectedPower,
-  
+
 }: Props) {
 
   const t = getTranslator(language);
@@ -174,8 +174,8 @@ export default function Sidebar({
     it: "Italiano",
     pt: "Português",
     zh: "中文",
-};
-  
+  };
+
   const minMm = customType === "pedal" ? 30 : 100;
   const maxMm = customType === "pedal" ? 300 : 1000;
 
@@ -191,12 +191,12 @@ export default function Sidebar({
       : Math.round(mmToIn(maxMm) * 10) / 10;
 
   const minValue =
-  units === "metric" ? minMm : mmToIn(minMm);
+    units === "metric" ? minMm : mmToIn(minMm);
   const maxValue =
-  units === "metric" ? maxMm : mmToIn(maxMm);
+    units === "metric" ? maxMm : mmToIn(maxMm);
 
   const [activeSidebarTab, setActiveSidebarTab] =
-  React.useState<"pedals" | "boards" | "power" | "custom">("pedals");
+    React.useState<"pedals" | "boards" | "power" | "custom">("pedals");
 
   // Convert UI values to mm for validation
   const widthMm =
@@ -225,47 +225,23 @@ export default function Sidebar({
   const withUnit = (label: string) =>
     `${label} (${unitLabel})`;
   const isCustomPedal =
-  selectedPedal?.brand === "Custom" ||
-  selectedPedal?.slug === "custom-upload";
+    selectedPedal?.brand === "Custom" ||
+    selectedPedal?.slug === "custom-upload";
   const isCustomBoard = selectedBoardDetails?.brand === "Custom";
-  const [country, setCountry] = React.useState<string>("FR");
+  const [country] = React.useState<string>(() => {
+    if (typeof window === "undefined") return "FR";
+
+    return (window as any).__MYB_COUNTRY__ || "FR";
+  });
   const USA_COUNTRIES = ["US"];
 
   const EUROPE_COUNTRIES = [
-    "FR","DE","NL","ES","IT","PT","BE","AT","DK","SE","NO","FI","PL","CZ","SK",
-    "HU","RO","BG","HR","SI","EE","LV","LT","LU","IE","GR"
+    "FR", "DE", "NL", "ES", "IT", "PT", "BE", "AT", "DK", "SE", "NO", "FI", "PL", "CZ", "SK",
+    "HU", "RO", "BG", "HR", "SI", "EE", "LV", "LT", "LU", "IE", "GR"
   ];
 
   const isUSA = USA_COUNTRIES.includes(country.toUpperCase());
   const isEurope = EUROPE_COUNTRIES.includes(country.toUpperCase());
-
-React.useEffect(() => {
-  let cancelled = false;
-
-  const loadCountry = async () => {
-    try {
-      const res = await fetch("https://ipapi.co/json/");
-
-      if (!res.ok) throw new Error("ipapi failed");
-
-      const data = await res.json();
-
-      if (!cancelled && data?.country) {
-        setCountry(data.country);
-      }
-    } catch (err) {
-      console.warn("Geo lookup failed, fallback to DE");
-      if (!cancelled) setCountry("DE");
-    }
-  };
-
-  loadCountry();
-
-  return () => {
-    cancelled = true;
-  };
-}, []);
-  
   const [bgOpen, setBgOpen] = React.useState(false);
   const bgRef = React.useRef<HTMLDivElement>(null);
   const [langOpen, setLangOpen] = React.useState(false);
@@ -285,580 +261,577 @@ React.useEffect(() => {
   const [contactType, setContactType] = React.useState("question");
   const [contactTypeOpen, setContactTypeOpen] = React.useState(false);
   const contactTypeRef = React.useRef<HTMLDivElement>(null);
-  
+
 
   const CONTACT_TYPES = [
-  { value: "question", label: t("contact.types.question") },
-  { value: "request", label: t("contact.types.request") },
-  { value: "bug", label: t("contact.types.bug") },
-  { value: "other", label: t("contact.types.other") },
-];
+    { value: "question", label: t("contact.types.question") },
+    { value: "request", label: t("contact.types.request") },
+    { value: "bug", label: t("contact.types.bug") },
+    { value: "other", label: t("contact.types.other") },
+  ];
   const [contactMessage, setContactMessage] = React.useState("");
   const isValidEmail = (email: string) => {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   };
   const [contactLoading, setContactLoading] = React.useState(false);
   const [contactSuccess, setContactSuccess] = React.useState(false);
 
   React.useEffect(() => {
-  if (contactSuccess) {
-    const timer = setTimeout(() => {
-      setContactSuccess(false);
-      setContactOpen(false);
-    }, 2000);
+    if (contactSuccess) {
+      const timer = setTimeout(() => {
+        setContactSuccess(false);
+        setContactOpen(false);
+      }, 2000);
 
-    return () => clearTimeout(timer);
-  }
-}, [contactSuccess]);
+      return () => clearTimeout(timer);
+    }
+  }, [contactSuccess]);
   const [contactError, setContactError] = React.useState("");
   const [honeypot, setHoneypot] = React.useState("");
 
 
   const getStoresForCountry = () => {
-  const c = country.toUpperCase();
+    const c = country.toUpperCase();
 
-  const americas = ["US", "CA", "MX", "BR", "AR", "CL", "CO", "PE"];
-  if (americas.includes(c)) {
-    return ["sweetwater"];
-  }
+    const americas = ["US", "CA", "MX", "BR", "AR", "CL", "CO", "PE"];
+    if (americas.includes(c)) {
+      return ["sweetwater"];
+    }
 
-  if (c === "FR") {
-    return ["woodbrass", "thomann"];
-  }
+    if (c === "FR") {
+      return ["woodbrass", "thomann"];
+    }
 
-  if (c === "NL") return ["thomann_nl"];
-  if (c === "DE") return ["thomann_de"];
-  if (c === "ES") return ["thomann_es"];
-  if (c === "IT") return ["thomann_it"];
-  if (c === "PT") return ["thomann_pt"];
+    if (c === "NL") return ["thomann_nl"];
+    if (c === "DE") return ["thomann_de"];
+    if (c === "ES") return ["thomann_es"];
+    if (c === "IT") return ["thomann_it"];
+    if (c === "PT") return ["thomann_pt"];
 
-  return ["thomann_de"];
-};
-
-const isDiscontinued =
-  (selectedPedal?.status || "")
-    .toLowerCase()
-    .includes("discontinued");
-
-const hasPedalCommercialLinks = Boolean(
-  selectedPedal?.sweetwater ||
-  selectedPedal?.woodbrass ||
-  selectedPedal?.thomann
-);
-
-const hasBoardCommercialLinks = Boolean(
-  selectedBoardDetails?.sweetwater ||
-  selectedBoardDetails?.woodbrass ||
-  selectedBoardDetails?.thomann
-);
-
-const buildThomannUrl = (slug: string) => {
-  const map: Record<string, string> = {
-    FR: "thomann.fr",
-    NL: "thomann.nl",
-    DE: "thomann.de",
-    ES: "thomann.es",
-    IT: "thomann.it",
-    PT: "thomann.pt",
+    return ["thomann_de"];
   };
 
+  const isDiscontinued =
+    (selectedPedal?.status || "")
+      .toLowerCase()
+      .includes("discontinued");
 
-  const domain = map[country.toUpperCase()] || "thomann.de";
+  const hasPedalCommercialLinks = Boolean(
+    selectedPedal?.sweetwater ||
+    selectedPedal?.woodbrass ||
+    selectedPedal?.thomann
+  );
 
-  return `https://www.${domain}/${slug}`;
-};
+  const hasBoardCommercialLinks = Boolean(
+    selectedBoardDetails?.sweetwater ||
+    selectedBoardDetails?.woodbrass ||
+    selectedBoardDetails?.thomann
+  );
 
-React.useEffect(() => {
-  if (showPedalResults) {
-    pedalInputRef.current?.focus();
-  }
-}, [showPedalResults]);
+  const buildThomannUrl = (slug: string) => {
+    const map: Record<string, string> = {
+      FR: "thomann.fr",
+      NL: "thomann.nl",
+      DE: "thomann.de",
+      ES: "thomann.es",
+      IT: "thomann.it",
+      PT: "thomann.pt",
+    };
 
-React.useEffect(() => {
-  if (showBoardResults) {
-    boardInputRef.current?.focus();
-  }
-}, [showBoardResults]);
+
+    const domain = map[country.toUpperCase()] || "thomann.de";
+
+    return `https://www.${domain}/${slug}`;
+  };
 
   React.useEffect(() => {
-  const handleClickOutside = (e: MouseEvent) => {
-    const target = e.target as Node;
-
-    if (bgRef.current && !bgRef.current.contains(target)) {
-      setBgOpen(false);
+    if (showPedalResults) {
+      pedalInputRef.current?.focus();
     }
+  }, [showPedalResults]);
 
-    if (langRef.current && !langRef.current.contains(target)) {
-      setLangOpen(false);
+  React.useEffect(() => {
+    if (showBoardResults) {
+      boardInputRef.current?.focus();
     }
+  }, [showBoardResults]);
 
-    if (contactTypeRef.current && !contactTypeRef.current.contains(target)) {
-      setContactTypeOpen(false);
-    }
+  React.useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as Node;
 
-    if (powerDropdownRef.current && !powerDropdownRef.current.contains(target)) {
-      setShowPowerResults(false);
+      if (bgRef.current && !bgRef.current.contains(target)) {
+        setBgOpen(false);
+      }
+
+      if (langRef.current && !langRef.current.contains(target)) {
+        setLangOpen(false);
+      }
+
+      if (contactTypeRef.current && !contactTypeRef.current.contains(target)) {
+        setContactTypeOpen(false);
+      }
+
+      if (powerDropdownRef.current && !powerDropdownRef.current.contains(target)) {
+        setShowPowerResults(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+
+  const addPower = (p: any) => {
+    const currentLastPedal = lastSelectedPedal; // On sauvegarde la pédale actuelle
+    const powerItem = { ...p, type: "power" };
+
+    setLastSelectedPower(powerItem);
+    addPedal(powerItem);
+
+    // On restaure immédiatement la pédale pour que le bouton bleu Pedal ne change pas
+    if (currentLastPedal) {
+      setTimeout(() => setLastSelectedPedal(currentLastPedal), 0);
     }
   };
-
-  document.addEventListener("mousedown", handleClickOutside);
-  return () => {
-    document.removeEventListener("mousedown", handleClickOutside);
-  };
-}, []);
-
-
-const addPower = (p: any) => {
-  const currentLastPedal = lastSelectedPedal; // On sauvegarde la pédale actuelle
-  const powerItem = { ...p, type: "power" };
-
-  setLastSelectedPower(powerItem); 
-  addPedal(powerItem); 
-
-  // On restaure immédiatement la pédale pour que le bouton bleu Pedal ne change pas
-  if (currentLastPedal) {
-    setTimeout(() => setLastSelectedPedal(currentLastPedal), 0);
-  }
-};
 
   const groupItems = (items: AnyRow[], filter: string) => {
 
-  return items.reduce((acc: Record<string, AnyRow[]>, item) => {
-    if (filter) {
-  const terms = filter
-    .toLowerCase()
-    .split(" ")
-    .filter(Boolean);
+    return items.reduce((acc: Record<string, AnyRow[]>, item) => {
+      if (filter) {
+        const terms = filter
+          .toLowerCase()
+          .split(" ")
+          .filter(Boolean);
 
-  const haystack = `${item.brand ?? ""} ${item.name ?? ""} ${item.type ?? ""}`.toLowerCase();
-
-
-  const matchesAll = terms.every((t) => haystack.includes(t));
-
-  if (!matchesAll) {
-    return acc;
-  }
-}
+        const haystack = `${item.brand ?? ""} ${item.name ?? ""} ${item.type ?? ""}`.toLowerCase();
 
 
+        const matchesAll = terms.every((t) => haystack.includes(t));
 
-    const key = item.brand || "Other";
+        if (!matchesAll) {
+          return acc;
+        }
+      }
 
-    if (!acc[key]) acc[key] = [];
-    acc[key].push(item);
 
-    return acc;
+
+      const key = item.brand || "Other";
+
+      if (!acc[key]) acc[key] = [];
+      acc[key].push(item);
+
+      return acc;
     }, {});
   };
 
-return (
-  <div
-className={`
+  return (
+    <div
+      className={`
   relative z-40 w-full lg:w-76 shrink-0
   bg-zinc-800
   px-6 pt-3 pb-6 flex flex-col gap-4 lg:gap-6
   overflow-hidden touch-pan-y
   h-full
 `}
-    style={{ WebkitOverflowScrolling: "touch" }}
-    onClick={(e) => {
-      e.stopPropagation();
-      setShowPedalResults(false);
-      setShowBoardResults(false);
-    }}
-  >
+      style={{ WebkitOverflowScrolling: "touch" }}
+      onClick={(e) => {
+        e.stopPropagation();
+        setShowPedalResults(false);
+        setShowBoardResults(false);
+      }}
+    >
 
-{/* Desktop logo only */}
-<div className="hidden lg:block">
-  <SidebarLogo />
-</div>
+      {/* Desktop logo only */}
+      <div className="hidden lg:block">
+        <SidebarLogo />
+      </div>
 
 
       {contactOpen ? (
-  <div className="flex flex-col gap-6 animate-in slide-in-from-left duration-300 px-1">
-    
-{/* TITLE → DESKTOP ONLY */}
-<div className="hidden lg:block">
-  <div className="space-y-1 mt-4">
-    <h2 className="text-[16px] font-black leading-tight">
-      {t("contact.title")}
-    </h2>
-  </div>
-</div>
+        <div className="flex flex-col gap-6 animate-in slide-in-from-left duration-300 px-1">
 
-<>
-        {/* EMAIL */}
-        <div className="flex flex-col gap-1">
-          <label className="text-[10px] uppercase font-black tracking-widest">
-            {t("contact.email")}
-          </label>
-          <input
-            type="email"
-            value={contactEmail}
-            onChange={(e) => setContactEmail(e.target.value)}
-            className="bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-[11px] focus:border-blue-500 outline-none"
-            placeholder={t("contact.placeholderEmail")}
-          />
-        </div>
+          {/* TITLE → DESKTOP ONLY */}
+          <div className="hidden lg:block">
+            <div className="space-y-1 mt-4">
+              <h2 className="text-[16px] font-black leading-tight">
+                {t("contact.title")}
+              </h2>
+            </div>
+          </div>
 
-        {/* TYPE */}
-<div className="flex flex-col gap-1 relative" ref={contactTypeRef}>
-  <label className="text-[10px] uppercase font-black tracking-widest">
-    {t("contact.type")}
-  </label>
+          <>
+            {/* EMAIL */}
+            <div className="flex flex-col gap-1">
+              <label className="text-[10px] uppercase font-black tracking-widest">
+                {t("contact.email")}
+              </label>
+              <input
+                type="email"
+                value={contactEmail}
+                onChange={(e) => setContactEmail(e.target.value)}
+                className="bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-[11px] focus:border-blue-500 outline-none"
+                placeholder={t("contact.placeholderEmail")}
+              />
+            </div>
 
-  <button
-    type="button"
-    onClick={() => setContactTypeOpen((v) => !v)}
-    className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2
+            {/* TYPE */}
+            <div className="flex flex-col gap-1 relative" ref={contactTypeRef}>
+              <label className="text-[10px] uppercase font-black tracking-widest">
+                {t("contact.type")}
+              </label>
+
+              <button
+                type="button"
+                onClick={() => setContactTypeOpen((v) => !v)}
+                className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2
                text-[11px] text-left text-zinc-400
                flex items-center justify-between
                hover:border-zinc-600 transition-colors"
-  >
-    <span>
-      {CONTACT_TYPES.find(t => t.value === contactType)?.label}
-    </span>
+              >
+                <span>
+                  {CONTACT_TYPES.find(t => t.value === contactType)?.label}
+                </span>
 
-    <ChevronDown
-      size={14}
-      className={`text-zinc-500 transition-transform ${
-        contactTypeOpen ? "rotate-180" : ""
-      }`}
-    />
-  </button>
+                <ChevronDown
+                  size={14}
+                  className={`text-zinc-500 transition-transform ${contactTypeOpen ? "rotate-180" : ""
+                    }`}
+                />
+              </button>
 
-  {contactTypeOpen && (
-    <div className="absolute top-full mt-1 w-full bg-zinc-950 border border-zinc-800 rounded-lg overflow-hidden z-50">
-      {CONTACT_TYPES.map((type) => (
-        <button
-          key={type.value}
-          onClick={() => {
-            setContactType(type.value);
-            setContactTypeOpen(false);
-          }}
-          className="w-full px-3 py-2 text-left text-[11px] hover:bg-canvas"
-        >
-          {type.label}
-        </button>
-      ))}
-    </div>
-  )}
-</div>
+              {contactTypeOpen && (
+                <div className="absolute top-full mt-1 w-full bg-zinc-950 border border-zinc-800 rounded-lg overflow-hidden z-50">
+                  {CONTACT_TYPES.map((type) => (
+                    <button
+                      key={type.value}
+                      onClick={() => {
+                        setContactType(type.value);
+                        setContactTypeOpen(false);
+                      }}
+                      className="w-full px-3 py-2 text-left text-[11px] hover:bg-canvas"
+                    >
+                      {type.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
 
-        {/* MESSAGE */}
-        <div className="flex flex-col gap-1">
-          <label className="text-[10px] uppercase font-black tracking-widest">
-            {t("contact.message")}
-          </label>
-          <textarea
-            value={contactMessage}
-            onChange={(e) => setContactMessage(e.target.value)}
-            rows={5}
-            className="bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-[11px] focus:border-blue-500 outline-none resize-none"
-            placeholder={t("contact.placeholderMessage")}
-          />
+            {/* MESSAGE */}
+            <div className="flex flex-col gap-1">
+              <label className="text-[10px] uppercase font-black tracking-widest">
+                {t("contact.message")}
+              </label>
+              <textarea
+                value={contactMessage}
+                onChange={(e) => setContactMessage(e.target.value)}
+                rows={5}
+                className="bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-[11px] focus:border-blue-500 outline-none resize-none"
+                placeholder={t("contact.placeholderMessage")}
+              />
+            </div>
+
+            {/* HONEYPOT (anti-spam) */}
+            <input
+              type="text"
+              value={honeypot}
+              onChange={(e) => setHoneypot(e.target.value)}
+              style={{ display: "none" }}
+              tabIndex={-1}
+              autoComplete="off"
+            />
+
+            {contactError && (
+              <div className="text-red-500 text-[11px] font-bold">
+                {contactError}
+              </div>
+            )}
+
+            {/* SEND BUTTON */}
+            <button
+              disabled={contactLoading || contactSuccess}
+              onClick={async () => {
+                setContactError("");
+                // Anti-spam check
+                if (honeypot) {
+                  return;
+                }
+
+                if (!contactEmail || !contactMessage) {
+                  setContactError(t("contact.errorRequired"));
+                  return;
+                }
+
+                if (!isValidEmail(contactEmail)) {
+                  setContactError(t("contact.errorInvalidEmail"));
+                  return;
+                }
+
+                try {
+                  setContactLoading(true);
+
+                  const res = await fetch("/api/contact", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      email: contactEmail,
+                      subject: "MakeYourBoard Contact",
+                      message: contactMessage,
+                      type: contactType,
+                      honeypot,
+                    }),
+                  });
+
+                  if (!res.ok) {
+                    throw new Error("Failed to send message");
+                  }
+
+                  setContactSuccess(true);
+                  setContactEmail("");
+                  setContactMessage("");
+                } catch (err) {
+                  setContactError(t("contact.errorGeneric"));
+                } finally {
+                  setContactLoading(false);
+                }
+              }}
+              className={`w-full mt-2 text-[10px] font-black uppercase py-2 rounded-lg transition-all duration-300 ${contactSuccess
+                ? "bg-emerald-500 text-white animate-in zoom-in duration-300"
+                : contactLoading
+                  ? "bg-zinc-700 text-zinc-400 cursor-not-allowed"
+                  : "bg-blue-600 hover:bg-blue-500 !text-white"
+                }`}
+            >
+              {contactSuccess
+                ? `✓ ${t("contact.sent")}`
+                : contactLoading
+                  ? t("contact.sending")
+                  : t("contact.send")}
+            </button>
+          </>
         </div>
 
-        {/* HONEYPOT (anti-spam) */}
-<input
-  type="text"
-  value={honeypot}
-  onChange={(e) => setHoneypot(e.target.value)}
-  style={{ display: "none" }}
-  tabIndex={-1}
-  autoComplete="off"
-/>
+      ) : selectedPedal && (
+        selectedPedal.type === "power" || selectedPedal.capacity
+      ) ? (
 
-        {contactError && (
-          <div className="text-red-500 text-[11px] font-bold">
-            {contactError}
+        <SpecsPower
+          selectedPower={selectedPedal}
+          units={units}
+          language={language}
+          t={t}
+          isUSA={isUSA}
+          isEurope={isEurope}
+          buildThomannUrl={buildThomannUrl}
+          selectedInstanceId={selectedInstanceId}
+          rotatePedal={rotatePedal}
+          movePedalFront={movePedalFront}
+          movePedalBack={movePedalBack}
+          deletePedal={deletePedal}
+        />
+
+      ) : selectedPedal ? (
+
+        <SpecsPedal
+          selectedPedal={selectedPedal}
+          selectedInstanceId={selectedInstanceId}
+          units={units}
+          language={language}
+          t={t}
+          isCustomPedal={isCustomPedal}
+          isUSA={isUSA}
+          isEurope={isEurope}
+          buildThomannUrl={buildThomannUrl}
+          rotatePedal={rotatePedal}
+          movePedalFront={movePedalFront}
+          movePedalBack={movePedalBack}
+          deletePedal={deletePedal}
+        />
+
+      ) : selectedBoardDetails ? (
+
+        <SpecsBoards
+          selectedBoardDetails={selectedBoardDetails}
+          units={units}
+          language={language}
+          t={t}
+          isCustomBoard={isCustomBoard}
+          buildThomannUrl={buildThomannUrl}
+          getStoresForCountry={getStoresForCountry}
+          hasBoardCommercialLinks={hasBoardCommercialLinks}
+          selectedBoardInstanceId={selectedBoardInstanceId}
+          rotateBoard={rotateBoard}
+          moveBoardFront={moveBoardFront}
+          moveBoardBack={moveBoardBack}
+          deleteBoard={deleteBoard}
+          isUSA={isUSA}
+          isEurope={isEurope}
+        />
+
+      ) : (
+
+        // LIBRARY (default view)
+        <div className="px-1 flex flex-col gap-4 flex-1 overflow-hidden">
+
+          <div className="shrink-0">
+            <div className="grid grid-cols-4 gap-2">
+              {[
+
+                {
+                  key: "pedals",
+                  label: t("sidebar.pedals"),
+                  icon: AudioWaveform,
+                },
+                {
+                  key: "boards",
+                  label: t("sidebar.boards"),
+                  icon: PanelsTopLeft,
+                },
+                {
+                  key: "power",
+                  label: t("sidebar.power"),
+                  icon: Zap,
+                },
+                {
+                  key: "custom",
+                  label: t("sidebar.custom"),
+                  icon: PencilRuler,
+                },
+
+
+              ].map((tab) => {
+                const Icon = tab.icon;
+                const active = activeSidebarTab === tab.key;
+
+                return (
+                  <button
+                    key={tab.key}
+                    type="button"
+                    onClick={() => {
+                      setActiveSidebarTab(tab.key as any);
+                      setShowPedalResults(false);
+                      setShowBoardResults(false);
+                      setShowPowerResults(false);
+                    }}
+                    className={`h-[72px] rounded-2xl flex flex-col items-center justify-center gap-2 transition-all ${active
+                      ? "bg-zinc-950"
+                      : "bg-transparent hover:bg-canvas"
+                      }`}
+                  >
+                    <Icon
+                      size={24}
+                      strokeWidth={1.8}
+                      className={
+                        tab.key === "pedals"
+                          ? "text-green-500"
+                          : tab.key === "boards"
+                            ? "text-blue-500"
+                            : tab.key === "power"
+                              ? "text-yellow-500"
+                              : tab.key === "custom"
+                                ? "text-purple-500"
+                                : ""
+                      }
+                    />
+                    <span className="text-[11px] font-black">
+                      {tab.label}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
-        )}
 
-        {/* SEND BUTTON */}
-        <button
-          disabled={contactLoading || contactSuccess}
-          onClick={async () => {
-            setContactError("");
-            // Anti-spam check
-            if (honeypot) {
-              return;
-            }
+          {activeSidebarTab === "pedals" && (
+            <SearchPedals
+              pedalsLibrary={pedalsLibrary}
+              pedalSearch={pedalSearch}
+              setPedalSearch={setPedalSearch}
+              showPedalResults={showPedalResults}
+              setShowPedalResults={setShowPedalResults}
+              setShowBoardResults={setShowBoardResults}
+              addPedal={(p) => {
+                setLastSelectedPedal(p);
+                addPedal(p);
+              }}
+              pedalInputRef={pedalInputRef}
+              t={t}
+              groupItems={groupItems}
+            />
+          )}
 
-            if (!contactEmail || !contactMessage) {
-              setContactError(t("contact.errorRequired"));
-              return;
-            }
+          {activeSidebarTab === "boards" && (
+            <SearchBoards
+              boardsLibrary={boardsLibrary}
+              boardSearch={boardSearch}
+              setBoardSearch={setBoardSearch}
+              showBoardResults={showBoardResults}
+              setShowBoardResults={setShowBoardResults}
+              setShowPedalResults={setShowPedalResults}
+              selectBoard={selectBoard}
+              boardInputRef={boardInputRef}
+              t={t}
+              groupItems={groupItems}
+            />
+          )}
 
-            if (!isValidEmail(contactEmail)) {
-              setContactError(t("contact.errorInvalidEmail"));
-              return;
-            }
+          {activeSidebarTab === "power" && (
+            <SearchPower
+              powerLibrary={powerLibrary}
+              powerSearch={powerSearch}
+              setPowerSearch={setPowerSearch}
+              showPowerResults={showPowerResults}
+              setShowPowerResults={setShowPowerResults}
+              setShowPedalResults={setShowPedalResults}
+              setShowBoardResults={setShowBoardResults}
+              addPower={(p) => {
+                addPower(p);
+              }}
+              powerInputRef={powerInputRef}
+              powerDropdownRef={powerDropdownRef}
+              t={t}
+              groupItems={groupItems}
+            />
+          )}
 
-            try {
-              setContactLoading(true);
-
-              const res = await fetch("/api/contact", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                email: contactEmail,
-                subject: "MakeYourBoard Contact",
-                message: contactMessage,
-                type: contactType,
-                honeypot,
-              }),
-              });
-
-              if (!res.ok) {
-                throw new Error("Failed to send message");
-              }
-
-              setContactSuccess(true);
-              setContactEmail("");
-              setContactMessage("");
-            } catch (err) {
-              setContactError(t("contact.errorGeneric"));
-            } finally {
-              setContactLoading(false);
-            }
-          }}
-          className={`w-full mt-2 text-[10px] font-black uppercase py-2 rounded-lg transition-all duration-300 ${
-          contactSuccess
-            ? "bg-emerald-500 text-white animate-in zoom-in duration-300"
-            : contactLoading
-            ? "bg-zinc-700 text-zinc-400 cursor-not-allowed"
-            : "bg-blue-600 hover:bg-blue-500 !text-white"
-        }`}
-        >
-          {contactSuccess
-            ? `✓ ${t("contact.sent")}`
-            : contactLoading
-            ? t("contact.sending")
-            : t("contact.send")}
-        </button>
-</>
-</div>
-
-) : selectedPedal && (
-  selectedPedal.type === "power" || selectedPedal.capacity
-) ? (
-
-<SpecsPower
-  selectedPower={selectedPedal}
-  units={units}
-  language={language}
-  t={t}
-  isUSA={isUSA}
-  isEurope={isEurope}
-  buildThomannUrl={buildThomannUrl}
-  selectedInstanceId={selectedInstanceId}
-  rotatePedal={rotatePedal}
-  movePedalFront={movePedalFront}
-  movePedalBack={movePedalBack}
-  deletePedal={deletePedal}
-/>
-
-) : selectedPedal ? (
-
-<SpecsPedal
-  selectedPedal={selectedPedal}
-  selectedInstanceId={selectedInstanceId}
-  units={units}
-  language={language}
-  t={t}
-  isCustomPedal={isCustomPedal}
-  isUSA={isUSA}
-  isEurope={isEurope}
-  buildThomannUrl={buildThomannUrl}
-  rotatePedal={rotatePedal}
-  movePedalFront={movePedalFront}
-  movePedalBack={movePedalBack}
-  deletePedal={deletePedal}
-/>
-
-) : selectedBoardDetails ? (
-
-<SpecsBoards
-  selectedBoardDetails={selectedBoardDetails}
-  units={units}
-  language={language}
-  t={t}
-  isCustomBoard={isCustomBoard}
-  buildThomannUrl={buildThomannUrl}
-  getStoresForCountry={getStoresForCountry}
-  hasBoardCommercialLinks={hasBoardCommercialLinks}
-  selectedBoardInstanceId={selectedBoardInstanceId}
-  rotateBoard={rotateBoard}
-  moveBoardFront={moveBoardFront}
-  moveBoardBack={moveBoardBack}
-  deleteBoard={deleteBoard}
-  isUSA={isUSA}
-  isEurope={isEurope}
-/>
-
-) : (
-
-// LIBRARY (default view)
-<div className="px-1 flex flex-col gap-4 flex-1 overflow-hidden">
-
-  <div className="shrink-0">
-    <div className="grid grid-cols-4 gap-2">
-    {[
-
-{
-  key: "pedals",
-  label: t("sidebar.pedals"),
-  icon: AudioWaveform,
-},
-{
-  key: "boards",
-  label: t("sidebar.boards"),
-  icon: PanelsTopLeft,
-},
-{
-  key: "power",
-  label: t("sidebar.power"),
-  icon: Zap,
-},
-{
-  key: "custom",
-  label: t("sidebar.custom"),
-  icon: PencilRuler,
-},
-
-
-    ].map((tab) => {
-      const Icon = tab.icon;
-      const active = activeSidebarTab === tab.key;
-
-      return (
-        <button
-          key={tab.key}
-          type="button"
-          onClick={() => {
-            setActiveSidebarTab(tab.key as any);
-            setShowPedalResults(false);
-            setShowBoardResults(false);
-            setShowPowerResults(false);
-          }}
-          className={`h-[72px] rounded-2xl flex flex-col items-center justify-center gap-2 transition-all ${
-            active
-              ? "bg-zinc-950"
-              : "bg-transparent hover:bg-canvas"
-          }`}
-        >
-          <Icon
-  size={24}
-  strokeWidth={1.8}
-  className={
-    tab.key === "pedals"
-      ? "text-green-500"
-      : tab.key === "boards"
-      ? "text-blue-500"
-      : tab.key === "power"
-      ? "text-yellow-500"
-      : tab.key === "custom"
-      ? "text-purple-500"
-      : ""
-  }
-/>
-          <span className="text-[11px] font-black">
-            {tab.label}
-          </span>
-        </button>
-      );
-    })}
-  </div>
-</div>
-
-{activeSidebarTab === "pedals" && (
-  <SearchPedals
-    pedalsLibrary={pedalsLibrary}
-    pedalSearch={pedalSearch}
-    setPedalSearch={setPedalSearch}
-    showPedalResults={showPedalResults}
-    setShowPedalResults={setShowPedalResults}
-    setShowBoardResults={setShowBoardResults}
-    addPedal={(p) => {
-      setLastSelectedPedal(p);
-      addPedal(p);
-    }}
-    pedalInputRef={pedalInputRef}
-    t={t}
-    groupItems={groupItems}
-  />
-)}
-
-{activeSidebarTab === "boards" && (
-  <SearchBoards
-    boardsLibrary={boardsLibrary}
-    boardSearch={boardSearch}
-    setBoardSearch={setBoardSearch}
-    showBoardResults={showBoardResults}
-    setShowBoardResults={setShowBoardResults}
-    setShowPedalResults={setShowPedalResults}
-    selectBoard={selectBoard}
-    boardInputRef={boardInputRef}
-    t={t}
-    groupItems={groupItems}
-  />
-)}
-
-{activeSidebarTab === "power" && (
-  <SearchPower
-    powerLibrary={powerLibrary}
-    powerSearch={powerSearch}
-    setPowerSearch={setPowerSearch}
-    showPowerResults={showPowerResults}
-    setShowPowerResults={setShowPowerResults}
-    setShowPedalResults={setShowPedalResults}
-    setShowBoardResults={setShowBoardResults}
-    addPower={(p) => {
-      addPower(p);
-    }}
-    powerInputRef={powerInputRef}
-    powerDropdownRef={powerDropdownRef}
-    t={t}
-    groupItems={groupItems}
-  />
-)}
-
-{activeSidebarTab === "custom" && (
-  <CustomBuilder
-    customType={customType}
-    setCustomType={setCustomType}
-    customName={customName}
-    setCustomName={setCustomName}
-    customColor={customColor}
-    setCustomColor={setCustomColor}
-    customWidth={customWidth}
-    setCustomWidth={setCustomWidth}
-    customDepth={customDepth}
-    setCustomDepth={setCustomDepth}
-    addCustomItem={addCustomItem}
-    isPedalValid={isPedalValid}
-    isBoardValid={isBoardValid}
-    minValue={minValue}
-    maxValue={maxValue}
-    displayMin={displayMin}
-    displayMax={displayMax}
-    units={units}
-    unitLabel={unitLabel}
-    withUnit={withUnit}
-    t={t}
-  />
-)}
+          {activeSidebarTab === "custom" && (
+            <CustomBuilder
+              customType={customType}
+              setCustomType={setCustomType}
+              customName={customName}
+              setCustomName={setCustomName}
+              customColor={customColor}
+              setCustomColor={setCustomColor}
+              customWidth={customWidth}
+              setCustomWidth={setCustomWidth}
+              customDepth={customDepth}
+              setCustomDepth={setCustomDepth}
+              addCustomItem={addCustomItem}
+              isPedalValid={isPedalValid}
+              isBoardValid={isBoardValid}
+              minValue={minValue}
+              maxValue={maxValue}
+              displayMin={displayMin}
+              displayMax={displayMax}
+              units={units}
+              unitLabel={unitLabel}
+              withUnit={withUnit}
+              t={t}
+            />
+          )}
 
 
 
 
         </div>
       )}
-             {/* PUSH TO BOTTOM (desktop only) */}
-<div className="mt-auto" />
+      {/* PUSH TO BOTTOM (desktop only) */}
+      <div className="mt-auto" />
 
-        </div>
-);
+    </div>
+  );
 }
 

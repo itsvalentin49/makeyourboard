@@ -19,14 +19,12 @@
     "power": "Fuente",
     "custom": "Custom"
   },
-
   "canvasIntro": {
     "title": "Make Your Board",
     "subtitle": "Planificador de Pedalboard",
     "desktopText": "Selecciona pedales, pedalboards y fuentes de alimentación desde el panel izquierdo.\nArrastra y colócalos para crear tu configuración perfecta.\nComprueba la alimentación y comparte tu pedalboard con otros.",
     "mobileText": "Selecciona pedales, pedalboards y fuentes de alimentación desde el panel izquierdo.\nArrastra y colócalos para crear tu configuración perfecta.\nComprueba la alimentación y comparte tu pedalboard con otros."
   },
-
   "pedal": {
     "features": "Especificaciones",
     "actions": {
@@ -35,17 +33,15 @@
       "delete": "Eliminar",
       "moveFront": "Mover delante",
       "moveBack": "Mover detrás"
-      },
+    },
     "brand": "Marca",
     "model": "Modelo",
     "year": "Año",
-
     "status": {
       "label": "Estado",
       "active": "Activo",
       "discontinued": "Descatalogado"
     },
-
     "type": {
       "label": "Tipo",
       "A/B Box": "A/B Box",
@@ -63,6 +59,7 @@
       "Delay": "Delay",
       "DI": "DI",
       "Distortion": "Distorsión",
+      "Doubler": "Duplicador",
       "Drum Machine": "Caja de ritmos",
       "Envelope Filter": "Filtro envolvente",
       "Equalizer": "Ecualizador",
@@ -107,7 +104,6 @@
       "Wireless System": "Sistema inalámbrico",
       "Whammy": "Whammy"
     },
-
     "circuit": {
       "label": "Circuito",
       "Digital": "Digital",
@@ -115,7 +111,6 @@
       "Hybrid": "Híbrido",
       "N/A": "N/A"
     },
-
     "bypass": {
       "label": "Bypass",
       "True Bypass": "True Bypass",
@@ -123,7 +118,6 @@
       "Switchable": "Conmutable",
       "N/A": "N/A"
     },
-
     "power": {
       "label": "Alimentación",
       "AC": "AC",
@@ -135,6 +129,7 @@
       "9-15V DC": "9-15V DC",
       "9-24V DC": "9-24V DC",
       "18V DC": "18V DC",
+      "19V DC": "19V DC",
       "24V DC": "24V DC",
       "48V DC": "48V DC",
       "9-18V DC": "9-18V DC",
@@ -143,25 +138,21 @@
       "USB": "USB",
       "N/A": "N/A"
     },
-
     "draw": "Consumo",
     "dimensions": "Dimensiones",
     "weight": "Peso",
     "origin": "Origen",
     "manual": "Manual"
   },
-
   "board": {
     "status": {
       "label": "Estado",
       "active": "Activo",
       "discontinued": "Descatalogado"
     },
-
     "brand": "Marca",
     "model": "Modelo",
     "year": "Año",
-
     "material": {
       "label": "Material",
       "Aluminium": "Aluminio",
@@ -169,19 +160,16 @@
       "Plastic": "Plástico",
       "Plywood": "Madera contrachapada"
     },
-
     "profile": {
       "label": "Perfil",
       "Flat": "Plano",
       "Angled": "Inclinado",
       "N/A": "N/A"
     },
-
     "dimensions": "Dimensiones",
     "weight": "Peso",
     "origin": "Origen"
   },
-
   "custom": {
     "title": "Personalizado",
     "selectType": "Seleccionar pedal o pedalera",
@@ -197,7 +185,6 @@
     "addPedal": "Añadir",
     "addBoard": "Añadir"
   },
-
   "settings": {
     "title": "Configuración",
     "background": "Fondo",
@@ -205,18 +192,15 @@
     "units": "Unidad",
     "theme": "Tema",
     "about": "Sobre nosotros",
-
     "unitsOptions": {
       "metric": "Métrico",
       "imperial": "Imperial"
     },
-
     "themeOptions": {
       "dark": "Oscuro",
       "light": "Claro"
     }
   },
-
   "backgrounds": {
     "neutral": "Neutro",
     "wood": "Madera espiga",
@@ -227,23 +211,19 @@
     "coast": "Vibes de verano",
     "houndstooth": "Pata de gallo"
   },
-
   "canvas": {
     "totalDraw": "Consumo total",
     "totalWeight": "Peso total"
   },
-
   "footer": {
     "feedback": "Contacto",
     "donate": "Apoyar"
   },
-
   "tabs": {
     "confirmDelete": "¿Seguro que quieres eliminar esta pedalera?",
     "yes": "Sí",
     "cancel": "Cancelar"
   },
-
   "contact": {
     "title": "Contacto",
     "subtitle": "Normalmente respondemos en un día laborable.",
@@ -258,7 +238,6 @@
     "errorRequired": "Por favor completa todos los campos.",
     "errorInvalidEmail": "Introduce un email válido.",
     "errorGeneric": "Algo salió mal. Inténtalo de nuevo.",
-
     "types": {
       "question": "Pregunta",
       "request": "Solicitud",
@@ -266,7 +245,6 @@
       "other": "Otro"
     }
   },
-
   "export": {
     "button": "Exportar",
     "title": "Exportar imagen",
@@ -277,7 +255,6 @@
     "white": "Blanco (JPG)",
     "download": "Descargar"
   },
-
   "share": {
     "button": "Compartir",
     "title": "Comparte tu pedalboard",
@@ -286,12 +263,10 @@
     "copy": "Copiar enlace",
     "copied": "Copiado"
   },
-
   "list": {
     "button": "Lista",
     "title": "Pedalboard"
   },
-
   "power": {
     "button": "Power",
     "check": "Comprobar alimentación",
@@ -315,32 +290,26 @@
     "yes": "Sí",
     "no": "No"
   },
-
   "powerSetup": {
     "title": "Configuración de alimentación",
-
     "outputs": {
       "fixed": "Salida fija",
       "fixed_plural": "Salidas fijas",
       "switchable": "Salida conmutable",
       "switchable_plural": "Salidas conmutables"
     },
-
     "sections": {
       "pedals": "Pedales",
       "recommendation": "Recomendación"
     },
-
     "status": {
       "compatible": "Todos los pedales son compatibles con tu fuente de alimentación.",
       "notCompatible": "Tu fuente de alimentación no es compatible con todos los pedales."
     },
-
     "empty": {
       "title": "Añade tu primer pedal para empezar.",
       "subtitle": "Usa el panel izquierdo para buscar y añadir pedales."
     },
-
     "recommendation": {
       "perfect": "Tu pedalboard está perfectamente alimentada. 🤘",
       "daisy": "Puedes alimentar varios pedales con un cable daisy chain.",
@@ -355,11 +324,9 @@
       "battery9v": "También puedes usar una pila de 9V si el pedal permite funcionar con pila."
     }
   },
-
   "search": {
     "noResults": "Sin resultados"
   },
-
   "pedalsMenu": {
     "title": "Pedales",
     "searchPlaceholder": "Buscar...",
@@ -369,7 +336,6 @@
     "new": "NEW",
     "newReleases": "Novedades"
   },
-
   "boardsMenu": {
     "title": "Pedaleras",
     "searchPlaceholder": "Buscar...",
@@ -377,7 +343,6 @@
     "popular": "Pedaleras más utilizadas.",
     "results": "{count} resultados"
   },
-
   "powerMenu": {
     "title": "Fuentes de alimentación",
     "searchPlaceholder": "Buscar...",
@@ -385,7 +350,6 @@
     "popular": "Fuentes de alimentación más utilizadas.",
     "results": "{count} resultados"
   },
-
   "customMenu": {
     "pedalTitle": "Pedal personalizado",
     "boardTitle": "Pedalera personalizada",
@@ -403,7 +367,6 @@
     "modeCustom": "Personalizar",
     "modeImport": "Importar"
   },
-
   "canvasControls": {
     "min": "MÍN",
     "max": "MÁX",
@@ -418,7 +381,6 @@
     "cableClearance": "Espacio para cables",
     "cableClearanceDescription": "Comprueba que los pedales tengan suficiente espacio para los cables."
   },
-
   "help": {
     "title": "Guía rápida",
     "open": "Abrir guía",

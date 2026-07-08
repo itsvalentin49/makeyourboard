@@ -19,17 +19,14 @@
     "power": "电源",
     "custom": "自定义"
   },
-
   "canvasIntro": {
     "title": "Make Your Board",
     "subtitle": "吉他效果器板制作工具",
     "desktopText": "从左侧面板选择效果器、效果器板和电源。\n拖放并排列它们，打造你的理想配置。\n检查供电设置，并与朋友分享你的效果器板。",
     "mobileText": "从左侧面板选择效果器、效果器板和电源。\n拖放并排列它们，打造你的理想配置。\n检查供电设置，并与朋友分享你的效果器板。"
   },
-
   "pedal": {
     "features": "规格",
-
     "actions": {
       "title": "操作",
       "rotate": "旋转",
@@ -37,17 +34,14 @@
       "moveFront": "移到前面",
       "moveBack": "移到后面"
     },
-
     "brand": "品牌",
     "model": "型号",
     "year": "年份",
-
     "status": {
       "label": "状态",
       "active": "在售",
       "discontinued": "已停产"
     },
-
     "type": {
       "label": "类型",
       "A/B Box": "A/B 切换盒",
@@ -65,6 +59,7 @@
       "Delay": "延迟",
       "DI": "DI",
       "Distortion": "失真",
+      "Doubler": "倍增器",
       "Drum Machine": "鼓机",
       "Envelope Filter": "包络滤波器",
       "Equalizer": "均衡器",
@@ -109,7 +104,6 @@
       "Wireless System": "无线系统",
       "Whammy": "Whammy"
     },
-
     "circuit": {
       "label": "电路",
       "Digital": "数字",
@@ -117,7 +111,6 @@
       "Hybrid": "混合",
       "N/A": "无"
     },
-
     "bypass": {
       "label": "旁路",
       "True Bypass": "真旁路",
@@ -125,7 +118,6 @@
       "Switchable": "可切换",
       "N/A": "无"
     },
-
     "power": {
       "label": "供电",
       "AC": "AC",
@@ -137,6 +129,7 @@
       "9-15V DC": "9-15V DC",
       "9-24V DC": "9-24V DC",
       "18V DC": "18V DC",
+      "19V DC": "19V DC",
       "24V DC": "24V DC",
       "48V DC": "48V DC",
       "9-18V DC": "9-18V DC",
@@ -145,25 +138,21 @@
       "USB": "USB",
       "N/A": "无"
     },
-
     "draw": "电流消耗",
     "dimensions": "尺寸",
     "weight": "重量",
     "origin": "产地",
     "manual": "说明书"
   },
-
   "board": {
     "status": {
       "label": "状态",
       "active": "在售",
       "discontinued": "已停产"
     },
-
     "brand": "品牌",
     "model": "型号",
     "year": "年份",
-
     "material": {
       "label": "材质",
       "Aluminium": "铝",
@@ -171,19 +160,16 @@
       "Plastic": "塑料",
       "Plywood": "胶合板"
     },
-
     "profile": {
       "label": "结构",
       "Flat": "平面",
       "Angled": "倾斜",
       "N/A": "无"
     },
-
     "dimensions": "尺寸",
     "weight": "重量",
     "origin": "产地"
   },
-
   "custom": {
     "title": "自定义",
     "selectType": "选择效果器或效果器板",
@@ -199,7 +185,6 @@
     "addPedal": "添加",
     "addBoard": "添加"
   },
-
   "settings": {
     "title": "设置",
     "background": "背景",
@@ -207,18 +192,15 @@
     "units": "单位",
     "theme": "主题",
     "about": "关于我们",
-
     "unitsOptions": {
       "metric": "公制",
       "imperial": "英制"
     },
-
     "themeOptions": {
       "dark": "深色",
       "light": "浅色"
     }
   },
-
   "backgrounds": {
     "neutral": "中性",
     "wood": "人字木纹",
@@ -229,23 +211,19 @@
     "coast": "夏日氛围",
     "houndstooth": "千鸟格"
   },
-
   "canvas": {
     "totalDraw": "总电流",
     "totalWeight": "总重量"
   },
-
   "footer": {
     "feedback": "联系",
     "donate": "支持"
   },
-
   "tabs": {
     "confirmDelete": "确定要删除这个效果器板吗？",
     "yes": "是",
     "cancel": "取消"
   },
-
   "contact": {
     "title": "联系",
     "subtitle": "我们通常会在一个工作日内回复。",
@@ -260,7 +238,6 @@
     "errorRequired": "请填写所有字段。",
     "errorInvalidEmail": "请输入有效的电子邮箱地址。",
     "errorGeneric": "出现错误。请重试。",
-
     "types": {
       "question": "问题",
       "request": "请求",
@@ -268,7 +245,6 @@
       "other": "其他"
     }
   },
-
   "export": {
     "button": "导出",
     "title": "导出图片",
@@ -279,7 +255,6 @@
     "white": "白色（JPG）",
     "download": "下载"
   },
-
   "share": {
     "button": "分享",
     "title": "分享你的效果器板",
@@ -288,12 +263,10 @@
     "copy": "复制链接",
     "copied": "已复制"
   },
-
   "list": {
     "button": "列表",
     "title": "效果器板"
   },
-
   "power": {
     "button": "电源",
     "check": "检查供电",
@@ -317,33 +290,27 @@
     "yes": "是",
     "no": "否"
   },
-
   "powerSetup": {
     "title": "供电设置",
-
     "outputs": {
       "fixed": "固定输出",
       "fixed_plural": "固定输出",
       "switchable": "可切换输出",
       "switchable_plural": "可切换输出"
     },
-
     "sections": {
       "pedals": "效果器",
       "recommendation": "建议"
     },
-
     "status": {
       "compatible": "所有效果器都与你的电源兼容。",
       "notCompatible": "你的电源并不兼容所有效果器。"
     },
-
     "empty": {
       "noPedals": "没有效果器。",
       "title": "添加第一个效果器开始搭建。",
       "subtitle": "使用左侧边栏搜索并添加效果器。"
     },
-
     "recommendation": {
       "perfect": "你的效果器板供电完全正常。Let's rock 🤘",
       "daisy": "你可以使用菊链为多个效果器供电。",
@@ -358,11 +325,9 @@
       "battery9v": "如果该效果器支持电池供电，也可以使用 9V 电池。"
     }
   },
-
   "search": {
     "noResults": "无结果"
   },
-
   "pedalsMenu": {
     "title": "效果器",
     "searchPlaceholder": "搜索...",
@@ -372,7 +337,6 @@
     "new": "新品",
     "newReleases": "新品发布"
   },
-
   "boardsMenu": {
     "title": "效果器板",
     "searchPlaceholder": "搜索...",
@@ -380,7 +344,6 @@
     "popular": "最常用的效果器板。",
     "results": "{count} 个结果"
   },
-
   "powerMenu": {
     "title": "电源",
     "searchPlaceholder": "搜索...",
@@ -388,25 +351,23 @@
     "popular": "最常用的电源。",
     "results": "{count} 个结果"
   },
-
-"customMenu": {
-  "pedalTitle": "自定义效果器",
-  "boardTitle": "自定义效果器板",
-  "pedalSubtitle": "创建自定义单块效果器。",
-  "boardSubtitle": "创建自定义效果器板。",
-  "importTitle": "导入图片",
-  "importSubtitle": "从电脑导入一个效果器。",
-  "formats": "支持格式：PNG、JPG、WEBP",
-  "maxSize": "最大文件大小：1 MB",
-  "imageDimensions": "尺寸：最小 30 mm / 最大 500 mm",
-  "chooseImage": "选择图片",
-  "voltage": "电压 (V)",
-  "current": "电流消耗 (mA)",
-  "add": "添加",
-  "modeCustom": "自定义",
-  "modeImport": "导入"
-},
-
+  "customMenu": {
+    "pedalTitle": "自定义效果器",
+    "boardTitle": "自定义效果器板",
+    "pedalSubtitle": "创建自定义单块效果器。",
+    "boardSubtitle": "创建自定义效果器板。",
+    "importTitle": "导入图片",
+    "importSubtitle": "从电脑导入一个效果器。",
+    "formats": "支持格式：PNG、JPG、WEBP",
+    "maxSize": "最大文件大小：1 MB",
+    "imageDimensions": "尺寸：最小 30 mm / 最大 500 mm",
+    "chooseImage": "选择图片",
+    "voltage": "电压 (V)",
+    "current": "电流消耗 (mA)",
+    "add": "添加",
+    "modeCustom": "自定义",
+    "modeImport": "导入"
+  },
   "canvasControls": {
     "min": "最小",
     "max": "最大",
@@ -421,7 +382,6 @@
     "cableClearance": "线缆空间",
     "cableClearanceDescription": "检查效果器是否有足够空间连接线缆。"
   },
-
   "help": {
     "title": "快速指南",
     "open": "打开指南",

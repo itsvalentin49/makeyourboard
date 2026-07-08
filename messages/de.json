@@ -19,14 +19,12 @@
     "power": "Netzteil",
     "custom": "Custom"
   },
-
   "canvasIntro": {
     "title": "Make Your Board",
     "subtitle": "Gitarren-Pedalboard-Planer",
     "desktopText": "Wählen Sie Pedale, Boards und Netzteile im linken Bereich aus.\nZiehen Sie sie per Drag & Drop, um Ihr perfektes Setup zu erstellen.\nÜberprüfen Sie Ihre Stromversorgung und teilen Sie Ihr Board mit anderen.",
     "mobileText": "Wählen Sie Pedale, Boards und Netzteile im linken Bereich aus.\nZiehen Sie sie per Drag & Drop, um Ihr perfektes Setup zu erstellen.\nÜberprüfen Sie Ihre Stromversorgung und teilen Sie Ihr Board mit anderen."
   },
-
   "pedal": {
     "features": "Spezifikationen",
     "actions": {
@@ -35,17 +33,15 @@
       "delete": "Löschen",
       "moveFront": "Nach vorne",
       "moveBack": "Nach hinten"
-      },
+    },
     "brand": "Marke",
     "model": "Modell",
     "year": "Jahr",
-
     "status": {
       "label": "Status",
       "active": "Aktiv",
       "discontinued": "Eingestellt"
     },
-
     "type": {
       "label": "Typ",
       "A/B Box": "A/B Box",
@@ -63,6 +59,7 @@
       "Delay": "Delay",
       "DI": "DI",
       "Distortion": "Distortion",
+      "Doubler": "Doppler",
       "Drum Machine": "Drumcomputer",
       "Envelope Filter": "Envelope Filter",
       "Equalizer": "Equalizer",
@@ -107,7 +104,6 @@
       "Wireless System": "Drahtlossystem",
       "Whammy": "Whammy"
     },
-
     "circuit": {
       "label": "Schaltung",
       "Digital": "Digital",
@@ -115,7 +111,6 @@
       "Hybrid": "Hybrid",
       "N/A": "N/A"
     },
-
     "bypass": {
       "label": "Bypass",
       "True Bypass": "True Bypass",
@@ -123,7 +118,6 @@
       "Switchable": "Umschaltbar",
       "N/A": "N/A"
     },
-
     "power": {
       "label": "Stromversorgung",
       "AC": "AC",
@@ -135,6 +129,7 @@
       "9-15V DC": "9-15V DC",
       "9-24V DC": "9-24V DC",
       "18V DC": "18V DC",
+      "19V DC": "19V DC",
       "24V DC": "24V DC",
       "48V DC": "48V DC",
       "9-18V DC": "9-18V DC",
@@ -143,25 +138,21 @@
       "USB": "USB",
       "N/A": "N/A"
     },
-
     "draw": "Stromverbrauch",
     "dimensions": "Abmessungen",
     "weight": "Gewicht",
     "origin": "Herkunft",
     "manual": "Handbuch"
   },
-
   "board": {
     "status": {
       "label": "Status",
       "active": "Aktiv",
       "discontinued": "Eingestellt"
     },
-
     "brand": "Marke",
     "model": "Modell",
     "year": "Jahr",
-
     "material": {
       "label": "Material",
       "Aluminium": "Aluminium",
@@ -169,19 +160,16 @@
       "Plastic": "Kunststoff",
       "Plywood": "Sperrholz"
     },
-
     "profile": {
       "label": "Profil",
       "Flat": "Flach",
       "Angled": "Gewinkelt",
       "N/A": "N/A"
     },
-
     "dimensions": "Abmessungen",
     "weight": "Gewicht",
     "origin": "Herkunft"
   },
-
   "custom": {
     "title": "Custom",
     "selectType": "Pedal oder Board auswählen",
@@ -197,7 +185,6 @@
     "addPedal": "Hinzufügen",
     "addBoard": "Hinzufügen"
   },
-
   "settings": {
     "title": "Einstellungen",
     "background": "Hintergrund",
@@ -205,18 +192,15 @@
     "units": "Einheit",
     "theme": "Design",
     "about": "Über uns",
-
     "unitsOptions": {
       "metric": "Metrisch",
       "imperial": "Imperial"
     },
-
     "themeOptions": {
       "dark": "Dunkel",
       "light": "Hell"
     }
   },
-
   "backgrounds": {
     "neutral": "Neutral",
     "wood": "Fischgrät-Holz",
@@ -227,23 +211,19 @@
     "coast": "Sommer-Vibes",
     "houndstooth": "Hahnentritt"
   },
-
   "canvas": {
     "totalDraw": "Gesamtverbrauch",
     "totalWeight": "Gesamtgewicht"
   },
-
   "footer": {
     "feedback": "Kontakt",
     "donate": "Unterstützen"
   },
-
   "tabs": {
     "confirmDelete": "Möchtest du dieses Pedalboard wirklich löschen?",
     "yes": "Ja",
     "cancel": "Abbrechen"
   },
-
   "contact": {
     "title": "Kontakt",
     "subtitle": "Wir antworten in der Regel innerhalb eines Werktages.",
@@ -258,7 +238,6 @@
     "errorRequired": "Bitte fülle alle Felder aus.",
     "errorInvalidEmail": "Bitte gib eine gültige E-Mail-Adresse ein.",
     "errorGeneric": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
-
     "types": {
       "question": "Frage",
       "request": "Anfrage",
@@ -266,7 +245,6 @@
       "other": "Sonstiges"
     }
   },
-
   "export": {
     "button": "Export",
     "title": "Bild exportieren",
@@ -277,7 +255,6 @@
     "white": "Weiß (JPG)",
     "download": "Herunterladen"
   },
-
   "share": {
     "button": "Teilen",
     "title": "Dein Pedalboard teilen",
@@ -286,12 +263,10 @@
     "copy": "Link kopieren",
     "copied": "Kopiert"
   },
-
   "list": {
     "button": "Liste",
     "title": "Pedalboard"
   },
-
   "power": {
     "button": "Power",
     "check": "Strom prüfen",
@@ -315,33 +290,27 @@
     "yes": "Ja",
     "no": "Nein"
   },
-
   "powerSetup": {
     "title": "Stromversorgung Setup",
-
     "outputs": {
       "fixed": "Fester Ausgang",
       "fixed_plural": "Feste Ausgänge",
       "switchable": "Umschaltbarer Ausgang",
       "switchable_plural": "Umschaltbare Ausgänge"
     },
-
     "sections": {
       "pedals": "Pedale",
       "recommendation": "Empfehlung"
     },
-
     "status": {
       "compatible": "Alle Pedale sind mit deinem Netzteil kompatibel.",
       "notCompatible": "Dein Netzteil ist nicht mit allen Pedalen kompatibel."
     },
-
     "empty": {
       "noPedals": "Keine Pedale.",
       "title": "Füge dein erstes Pedal hinzu, um zu starten.",
       "subtitle": "Nutze die Seitenleiste links, um Pedale zu suchen und hinzuzufügen."
     },
-
     "recommendation": {
       "perfect": "Dein Board ist perfekt versorgt. Let's rock 🤘",
       "daisy": "Du kannst mehrere Pedale mit einem Daisy-Chain-Kabel versorgen.",
@@ -356,11 +325,9 @@
       "battery9v": "Du kannst auch eine 9V-Batterie verwenden, wenn das Pedal den Batteriebetrieb unterstützt."
     }
   },
-
   "search": {
     "noResults": "Keine Ergebnisse"
   },
-
   "pedalsMenu": {
     "title": "Pedale",
     "searchPlaceholder": "Suchen...",
@@ -370,7 +337,6 @@
     "new": "NEW",
     "newReleases": "Neuheiten"
   },
-
   "boardsMenu": {
     "title": "Pedalboards",
     "searchPlaceholder": "Suchen...",
@@ -378,7 +344,6 @@
     "popular": "Die beliebtesten Pedalboards.",
     "results": "{count} Ergebnisse"
   },
-
   "powerMenu": {
     "title": "Netzteile",
     "searchPlaceholder": "Suchen...",
@@ -386,7 +351,6 @@
     "popular": "Die beliebtesten Netzteile.",
     "results": "{count} Ergebnisse"
   },
-
   "customMenu": {
     "pedalTitle": "Individuelles Pedal",
     "boardTitle": "Individuelles Pedalboard",
@@ -404,7 +368,6 @@
     "modeCustom": "Anpassen",
     "modeImport": "Importieren"
   },
-
   "canvasControls": {
     "min": "MIN",
     "max": "MAX",
@@ -419,7 +382,6 @@
     "cableClearance": "Kabelabstand",
     "cableClearanceDescription": "Prüfe, ob genügend Platz für die Kabel vorhanden ist."
   },
-
   "help": {
     "title": "Kurzanleitung",
     "open": "Anleitung öffnen",
