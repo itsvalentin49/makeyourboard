@@ -27,6 +27,7 @@
   },
   "pedal": {
     "features": "Spezifikationen",
+    "description": "Beschreibung",
     "actions": {
       "title": "Aktionen",
       "rotate": "Drehen",
@@ -176,7 +177,7 @@
     "pedal": "Pedal",
     "board": "Pedalboard",
     "nameOptional": "Name",
-    "namePlaceholder": "Name (Fuzz)",
+    "namePlaceholder": "Name",
     "enterDimensions": "Abmessungen",
     "dimensionError": "Erlaubte Maße: min. {min} {unit} / max. {max} {unit}",
     "width": "Breite",
@@ -203,13 +204,8 @@
   },
   "backgrounds": {
     "neutral": "Neutral",
-    "wood": "Fischgrät-Holz",
-    "carpet": "Blauer Damast",
-    "steel": "Stahl",
-    "fabric": "Baumwollstoff",
-    "stripes": "Blaue Streifen",
-    "coast": "Sommer-Vibes",
-    "houndstooth": "Hahnentritt"
+    "wood": "Holz",
+    "steel": "Aluminium"
   },
   "canvas": {
     "totalDraw": "Gesamtverbrauch",
@@ -354,19 +350,21 @@
   "customMenu": {
     "pedalTitle": "Individuelles Pedal",
     "boardTitle": "Individuelles Pedalboard",
-    "pedalSubtitle": "Erstelle ein individuelles Pedal.",
-    "boardSubtitle": "Erstelle ein individuelles Pedalboard.",
+    "pedalSubtitle": "Erstelle ein individuelles Pedal",
+    "boardSubtitle": "Erstelle ein individuelles Pedalboard",
     "importTitle": "Bild importieren",
-    "importSubtitle": "Importiere ein Pedal von deinem Computer.",
+    "importSubtitle": "Importiere ein Pedal",
     "formats": "Akzeptierte Formate: PNG, JPG, WEBP",
-    "maxSize": "Max. Größe: 1 MB",
+    "maxSize": "Max. Größe: 300 Ko",
     "imageDimensions": "Abmessungen: min. 30 mm / max. 500 mm",
     "chooseImage": "Bild auswählen",
     "voltage": "Spannung (V)",
     "current": "Stromaufnahme (mA)",
     "add": "Hinzufügen",
     "modeCustom": "Anpassen",
-    "modeImport": "Importieren"
+    "modeImport": "Importieren",
+    "jackLocations": "Buchsen",
+    "powerLocations": "Strom"
   },
   "canvasControls": {
     "min": "MIN",
@@ -396,5 +394,30 @@
     "shareText": "Exportiere dein Pedalboard als PNG, um es zu speichern oder zu teilen.",
     "ok": "OK",
     "dontShowAgain": "Nicht mehr anzeigen"
+  },
+  "colors": {
+    "aluminium": "Aluminium",
+    "black": "Schwarz",
+    "white": "Weiß",
+    "red": "Rot",
+    "brown": "Braun",
+    "green": "Grün",
+    "blue": "Blau",
+    "purple": "Violett",
+    "gray": "Grau",
+    "yellow": "Gelb",
+    "orange": "Orange",
+    "pink": "Rosa"
+  },
+  "locations": {
+    "top": "Oben",
+    "right": "Rechts",
+    "bottom": "Unten",
+    "left": "Links"
+  },
+  "boardTextures": {
+    "black": "Schwarz",
+    "wood": "Holz",
+    "aluminium": "Aluminium"
   }
 }

@@ -65,15 +65,34 @@ body {
 /* =========================
    TEXT OVERRIDES
    ========================= */
-.text-zinc-100 { color: var(--zinc-100) !important; }
-.text-zinc-200 { color: var(--zinc-200) !important; }
-.text-zinc-300 { color: var(--zinc-300) !important; }
-.text-zinc-400 { color: var(--zinc-400) !important; }
-.text-zinc-500 { color: var(--zinc-500) !important; }
-.text-zinc-600 { color: var(--zinc-600) !important; }
+.text-zinc-100 {
+  color: var(--zinc-100) !important;
+}
+
+.text-zinc-200 {
+  color: var(--zinc-200) !important;
+}
+
+.text-zinc-300 {
+  color: var(--zinc-300) !important;
+}
+
+.text-zinc-400 {
+  color: var(--zinc-400) !important;
+}
+
+.text-zinc-500 {
+  color: var(--zinc-500) !important;
+}
+
+.text-zinc-600 {
+  color: var(--zinc-600) !important;
+}
 
 .text-blue-400,
-.text-blue-500 { color: var(--blue) !important; }
+.text-blue-500 {
+  color: var(--blue) !important;
+}
 
 
 
@@ -83,21 +102,49 @@ body {
    BACKGROUND OVERRIDES
    ========================= */
 
-.bg-zinc-200 { background-color: var(--zinc-200) !important; }
-.bg-zinc-950 { background-color: var(--zinc-950) !important; }
-.bg-zinc-950\/80 { background-color: var(--zinc-950) !important; }
+.bg-zinc-200 {
+  background-color: var(--zinc-200) !important;
+}
 
-.bg-zinc-900 { background-color: var(--zinc-900) !important; }
-.bg-zinc-900\/60 { background-color: var(--zinc-900) !important; }
-.bg-zinc-900\/80 { background-color: var(--zinc-900) !important; }
+.bg-zinc-950 {
+  background-color: var(--zinc-950) !important;
+}
 
-.bg-zinc-800 { background-color: var(--zinc-800) !important; }
-.bg-zinc-800\/60 { background-color: var(--zinc-800) !important; }
+.bg-zinc-950\/80 {
+  background-color: var(--zinc-950) !important;
+}
 
-.bg-black { background-color: var(--zinc-950) !important; }
-.bg-black\/90 { background-color: var(--zinc-950) !important; }
+.bg-zinc-900 {
+  background-color: var(--zinc-900) !important;
+}
 
-.bg-blue-500 { background-color: var(--blue) !important; }
+.bg-zinc-900\/60 {
+  background-color: var(--zinc-900) !important;
+}
+
+.bg-zinc-900\/80 {
+  background-color: var(--zinc-900) !important;
+}
+
+.bg-zinc-800 {
+  background-color: var(--zinc-800) !important;
+}
+
+.bg-zinc-800\/60 {
+  background-color: var(--zinc-800) !important;
+}
+
+.bg-black {
+  background-color: var(--zinc-950) !important;
+}
+
+.bg-black\/90 {
+  background-color: var(--zinc-950) !important;
+}
+
+.bg-blue-500 {
+  background-color: var(--blue) !important;
+}
 
 /* badges */
 .bg-green-500\/10 {
@@ -111,9 +158,17 @@ body {
 /* =========================
    BORDER OVERRIDES
    ========================= */
-.border-zinc-900 { border-color: var(--zinc-900) !important; }
-.border-zinc-800 { border-color: var(--zinc-800) !important; }
-.border-zinc-800\/60 { border-color: var(--zinc-800) !important; }
+.border-zinc-900 {
+  border-color: var(--zinc-900) !important;
+}
+
+.border-zinc-800 {
+  border-color: var(--zinc-800) !important;
+}
+
+.border-zinc-800\/60 {
+  border-color: var(--zinc-800) !important;
+}
 
 /* =========================
    HOVER
@@ -182,16 +237,16 @@ input[type="number"] {
 .pill-ui {
   backdrop-filter: blur(8px);
   border-radius: 1rem;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
 
-  background-color: rgba(255,255,255,0.8);
+  background-color: rgba(255, 255, 255, 0.8);
   border: 1px solid var(--zinc-300);
   color: var(--foreground);
 }
 
 /* DARK (default) */
 html:not(.light) .pill-ui {
-  background-color: rgba(9,9,11,0.8);
+  background-color: rgba(9, 9, 11, 0.8);
   border: 1px solid var(--zinc-800);
   color: var(--foreground);
 }
@@ -201,33 +256,37 @@ html:not(.light) .pill-ui {
   backdrop-filter: blur(8px);
   border-radius: 9999px;
   padding: 0 8px;
-  box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
 
-  background-color: rgba(255,255,255,0.9);
+  background-color: rgba(255, 255, 255, 0.9);
   border: 1px solid var(--zinc-300);
   color: var(--foreground);
 }
 
 html:not(.light) .pill-ui-sm {
-  background-color: rgba(9,9,11,0.9);
+  background-color: rgba(9, 9, 11, 0.9);
   border: 1px solid var(--zinc-700);
   color: var(--foreground);
 }
 
 .bg-canvas {
-  background-color: var(--zinc-600); /* DARK */
+  background-color: var(--zinc-600);
+  /* DARK */
 }
 
 .light .bg-canvas {
-  background-color: var(--zinc-600); /* same as dark */
+  background-color: var(--zinc-600);
+  /* same as dark */
 }
 
 .bg-tab {
-  background-color: var(--zinc-600); /* dark */
+  background-color: var(--zinc-600);
+  /* dark */
 }
 
 .light .bg-tab {
-  background-color: var(--zinc-200); /* light */
+  background-color: var(--zinc-200);
+  /* light */
 }
 
 /* =========================
@@ -239,7 +298,7 @@ html:not(.light) .pill-ui-sm {
 }
 
 .light .hover\:bg-canvas:hover {
-  background-color: var(--zinc-200) !important;
+  background-color: var(--zinc-600) !important;
 }
 
 /* =========================
@@ -325,6 +384,7 @@ html:not(.light) textarea::placeholder {
   color: #0a0a0a !important;
   opacity: 1;
 }
+
 .border-canvas {
   border-color: var(--zinc-600) !important;
 }
@@ -361,4 +421,34 @@ html.light .bg-green-700 {
 
 html.light .hover\:bg-green-600:hover {
   background-color: #4ade80 !important;
+}
+
+/* Onglet actif */
+.bg-tab {
+  background-color: var(--zinc-600);
+}
+
+.light .bg-tab {
+  background-color: #ffffff;
+}
+
+/* Hover uniquement sur les appareils disposant d'une vraie souris */
+@media (hover: hover) and (pointer: fine) {
+  .sidebar-tab-hover:hover {
+    background-color: var(--zinc-600);
+  }
+
+  .light .sidebar-tab-hover:hover {
+    background-color: #ffffff;
+  }
+}
+
+/* Bordure claire en dark mode */
+html:not(.light) .border-zinc-700 {
+  border-color: var(--zinc-500) !important;
+}
+
+/* Bordure foncée en light mode */
+.light .border-zinc-700 {
+  border-color: var(--zinc-400) !important;
 }

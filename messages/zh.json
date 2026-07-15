@@ -27,6 +27,7 @@
   },
   "pedal": {
     "features": "规格",
+    "description": "描述",
     "actions": {
       "title": "操作",
       "rotate": "旋转",
@@ -176,7 +177,7 @@
     "pedal": "效果器",
     "board": "效果器板",
     "nameOptional": "名称",
-    "namePlaceholder": "名称（Fuzz）",
+    "namePlaceholder": "名称",
     "enterDimensions": "尺寸",
     "dimensionError": "允许尺寸：最小 {min} {unit} / 最大 {max} {unit}",
     "width": "宽度",
@@ -203,13 +204,8 @@
   },
   "backgrounds": {
     "neutral": "中性",
-    "wood": "人字木纹",
-    "carpet": "蓝色锦缎",
-    "steel": "铁纹钢板",
-    "fabric": "棉质织物",
-    "stripes": "蓝色条纹",
-    "coast": "夏日氛围",
-    "houndstooth": "千鸟格"
+    "wood": "木材",
+    "steel": "铝材"
   },
   "canvas": {
     "totalDraw": "总电流",
@@ -354,19 +350,21 @@
   "customMenu": {
     "pedalTitle": "自定义效果器",
     "boardTitle": "自定义效果器板",
-    "pedalSubtitle": "创建自定义单块效果器。",
-    "boardSubtitle": "创建自定义效果器板。",
+    "pedalSubtitle": "创建自定义单块效果器",
+    "boardSubtitle": "创建自定义效果器板",
     "importTitle": "导入图片",
-    "importSubtitle": "从电脑导入一个效果器。",
+    "importSubtitle": "从电脑导入",
     "formats": "支持格式：PNG、JPG、WEBP",
-    "maxSize": "最大文件大小：1 MB",
+    "maxSize": "最大文件大小：300 Ko",
     "imageDimensions": "尺寸：最小 30 mm / 最大 500 mm",
     "chooseImage": "选择图片",
     "voltage": "电压 (V)",
     "current": "电流消耗 (mA)",
     "add": "添加",
     "modeCustom": "自定义",
-    "modeImport": "导入"
+    "modeImport": "导入",
+    "jackLocations": "接口",
+    "powerLocations": "电源"
   },
   "canvasControls": {
     "min": "最小",
@@ -396,5 +394,30 @@
     "shareText": "将你的 pedalboard 导出为 PNG，方便保存或分享。",
     "ok": "OK",
     "dontShowAgain": "不再显示"
+  },
+  "colors": {
+    "aluminium": "铝色",
+    "black": "黑色",
+    "white": "白色",
+    "red": "红色",
+    "brown": "棕色",
+    "green": "绿色",
+    "blue": "蓝色",
+    "purple": "紫色",
+    "gray": "灰色",
+    "yellow": "黄色",
+    "orange": "橙色",
+    "pink": "粉色"
+  },
+  "locations": {
+    "top": "顶部",
+    "right": "右侧",
+    "bottom": "底部",
+    "left": "左侧"
+  },
+  "boardTextures": {
+    "black": "黑色",
+    "wood": "木质",
+    "aluminum": "铝制"
   }
 }

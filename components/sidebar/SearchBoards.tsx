@@ -15,19 +15,25 @@ type Props = {
   selectBoard: (b: AnyRow) => void;
   boardInputRef: React.RefObject<HTMLInputElement | null>;
   t: (key: string) => string;
-  groupItems: (items: AnyRow[], filter: string) => Record<string, AnyRow[]>;
+  groupItems: (
+    items: AnyRow[],
+    filter: string
+  ) => Record<string, AnyRow[]>;
 };
 
 const POPULAR_BOARDS = [
+  "Pedaltrain Classic JR",
   "Pedaltrain Nano +",
   "Pedaltrain Metro 16",
-  "Pedaltrain Classic JR",
-  "RockBoard DUO 2.1",
   "RockBoard TRES 3.1",
   "RockBoard QUAD 4.2",
-  "Daddario XPND 2 Core",
+  "Temple Audio Solo 18 GM",
   "Temple Audio Duo 17 GM",
   "Harley Benton Spaceship 40",
+  "Aclam Smart Track XS2 Free",
+  "Daddario XPND 2 Core",
+  "Mono Cases Rail Small",
+  "Creation Music Company Elevation 24",
 ];
 
 function normalize(value: any) {
@@ -50,55 +56,107 @@ export default function SearchBoards({
   const visibleBoards = useMemo(() => {
     const terms = search.split(" ").filter(Boolean);
 
-    let list = boardsLibrary.filter((b) => {
+    const list = boardsLibrary.filter((board) => {
       if (!terms.length) {
-        const fullName = normalize(`${b.brand ?? ""} ${b.name ?? ""}`);
-        const nameOnly = normalize(b.name);
+        const fullName = normalize(
+          `${board.brand ?? ""} ${board.name ?? ""}`
+        );
+
+        const nameOnly = normalize(board.name);
 
         return POPULAR_BOARDS.some((popular) => {
           const popularName = normalize(popular);
-          return fullName === popularName || nameOnly === popularName;
+
+          return (
+            fullName === popularName ||
+            nameOnly === popularName
+          );
         });
       }
 
-      const haystack =
-        `${b.brand ?? ""} ${b.name ?? ""} ${b.type ?? ""}`.toLowerCase();
+      const haystack = `
+        ${board.brand ?? ""}
+        ${board.name ?? ""}
+        ${board.type ?? ""}
+      `.toLowerCase();
 
-      return terms.every((term) => haystack.includes(term));
+      return terms.every((term) =>
+        haystack.includes(term)
+      );
     });
 
     if (!isSearching) {
       return list.sort((a, b) => {
-        const fullA = normalize(`${a.brand ?? ""} ${a.name ?? ""}`);
+        const fullA = normalize(
+          `${a.brand ?? ""} ${a.name ?? ""}`
+        );
+
         const nameA = normalize(a.name);
 
-        const fullB = normalize(`${b.brand ?? ""} ${b.name ?? ""}`);
+        const fullB = normalize(
+          `${b.brand ?? ""} ${b.name ?? ""}`
+        );
+
         const nameB = normalize(b.name);
 
-        const indexA = POPULAR_BOARDS.findIndex((popular) => {
-          const p = normalize(popular);
-          return fullA === p || nameA === p;
-        });
+        const indexA = POPULAR_BOARDS.findIndex(
+          (popular) => {
+            const normalizedPopular = normalize(popular);
 
-        const indexB = POPULAR_BOARDS.findIndex((popular) => {
-          const p = normalize(popular);
-          return fullB === p || nameB === p;
-        });
+            return (
+              fullA === normalizedPopular ||
+              nameA === normalizedPopular
+            );
+          }
+        );
+
+        const indexB = POPULAR_BOARDS.findIndex(
+          (popular) => {
+            const normalizedPopular = normalize(popular);
+
+            return (
+              fullB === normalizedPopular ||
+              nameB === normalizedPopular
+            );
+          }
+        );
 
         return indexA - indexB;
       });
     }
 
     return list.sort((a, b) => {
-      const brandA = String(a.brand || "").localeCompare(String(b.brand || ""));
+      const brandA = String(a.brand || "").localeCompare(
+        String(b.brand || "")
+      );
+
       if (brandA !== 0) return brandA;
-      return String(a.name || "").localeCompare(String(b.name || ""));
+
+      return String(a.name || "").localeCompare(
+        String(b.name || "")
+      );
     });
   }, [boardsLibrary, search, isSearching]);
 
   return (
-    <div className="flex flex-col gap-4 mt-1 h-full min-h-0">
-      <div className="relative flex items-center shrink-0">
+    <div className="flex flex-col mt-4 h-full min-h-0">
+      {/* COMPTEUR AU-DESSUS DE LA BARRE DE RECHERCHE */}
+      <div className="px-1 mb-2 shrink-0">
+        <div className="text-[11px] font-black uppercase tracking-wide">
+          {isSearching
+            ? t("boardsMenu.results").replace(
+              "{count}",
+              String(visibleBoards.length)
+            )
+            : t("boardsMenu.count").replace(
+              "{count}",
+              String(boardsLibrary.length)
+            )}
+        </div>
+      </div>
+
+      {/* BARRE DE RECHERCHE */}
+      <div className="relative flex items-center mb-4 shrink-0">
         <Search
           size={15}
           strokeWidth={2.5}
@@ -112,23 +170,31 @@ export default function SearchBoards({
           autoCorrect="off"
           autoCapitalize="off"
           spellCheck={false}
-          placeholder={t("boardsMenu.searchPlaceholder")}
+          placeholder={t(
+            "boardsMenu.searchPlaceholder"
+          )}
           className="
-            w-full h-[30px]
-            bg-white !text-black placeholder:!text-zinc-500
+            w-full
+            h-[30px]
+            bg-white
+            !text-black
+            placeholder:!text-zinc-500
             rounded-md
-            pl-12 pr-11
-            text-[12px] font-bold
+            pl-12
+            pr-11
+            text-[12px]
+            font-bold
             outline-none
           "
           value={boardSearch}
-          onClick={(e) => {
-            e.stopPropagation();
+          onClick={(event) => {
+            event.stopPropagation();
+
             setShowPedalResults(false);
             setShowBoardResults(true);
           }}
-          onChange={(e) => {
-            setBoardSearch(e.target.value);
+          onChange={(event) => {
+            setBoardSearch(event.target.value);
             setShowBoardResults(true);
           }}
         />
@@ -136,90 +202,114 @@ export default function SearchBoards({
         {boardSearch && (
           <button
             type="button"
-            onClick={(e) => {
-              e.stopPropagation();
+            onClick={(event) => {
+              event.stopPropagation();
+
               setBoardSearch("");
               boardInputRef.current?.focus();
             }}
             className="
-              absolute right-4
-              flex items-center justify-center
+              absolute
+              right-4
+              flex
+              items-center
+              justify-center
               text-[#6f6a5d]
               hover:opacity-70
               transition-opacity
             "
+            aria-label="Effacer la recherche"
           >
             <X size={15} strokeWidth={3} />
           </button>
         )}
       </div>
 
-      <div className="flex flex-col gap-3 min-h-0 flex-1 overflow-hidden">
-        <div className="px-1 shrink-0">
-          <div className="text-[11px] font-black uppercase tracking-wide text-zinc-300">
-            {isSearching
-              ? t("boardsMenu.results").replace(
-                "{count}",
-                String(visibleBoards.length)
-              )
-              : t("boardsMenu.count").replace(
-                "{count}",
-                String(boardsLibrary.length)
-              )}
+      {/* RÉSULTATS */}
+      <div className="flex flex-col gap-1 min-h-0 flex-1 overflow-hidden">
+        {/* TEXTE BOARDS POPULAIRES */}
+        {!isSearching && (
+          <div className="px-1 shrink-0 text-[10px] font-bold text-zinc-500">
+            {t("boardsMenu.popular")}
           </div>
+        )}
 
-          {!isSearching && (
-            <div className="mt-1 text-[10px] font-bold text-zinc-500">
-              {t("boardsMenu.popular")}
-            </div>
-          )}
-        </div>
-
-        <div className="flex flex-col gap-2.5 overflow-y-auto no-scrollbar pb-6 min-h-0">
+        {/* LISTE */}
+        <div className="flex flex-col gap-0 overflow-y-auto no-scrollbar pb-6 min-h-0">
           {visibleBoards.length > 0 ? (
-            visibleBoards.map((b) => {
-              const img = b.image || b.image_url || b.photo;
+            visibleBoards.map((board) => {
+              const image = board.thumbnail || null;
 
               return (
                 <button
-                  key={b.id}
+                  key={board.id}
                   type="button"
                   onClick={() => {
-                    selectBoard(b);
+                    selectBoard(board);
                     setShowBoardResults(false);
                   }}
                   className="
-                    w-full min-h-[50px]
-                    rounded-xl
-                    bg-zinc-950 hover:bg-canvas
-                    px-3 py-1.5
-                    flex items-center gap-3
+                    relative
+                    w-full
+                    min-h-[48px]
+                    rounded-lg
+                    bg-zinc-800
+                    hover:bg-canvas
+                    pl-[72px]
+                    pr-2
+                    py-1
+                    flex
+                    items-center
                     text-left
                     transition-colors
                     shrink-0
+                    overflow-hidden
                   "
                 >
-                  <div className="w-[50px] h-[34px] shrink-0 flex items-center justify-center">
-                    {img ? (
+                  {/* IMAGE COMPLÈTEMENT À GAUCHE */}
+                  <div
+                    className="
+                      absolute
+                      left-0
+                      top-1/2
+                      -translate-y-1/2
+                      w-[64px]
+                      h-[42px]
+                      flex
+                      items-center
+                      justify-center
+                      pointer-events-none
+                      overflow-hidden
+                    "
+                  >
+                    {image ? (
                       <img
-                        src={img}
-                        alt={`${b.brand || ""} ${b.name || ""}`}
+                        src={image}
+                        alt={`${board.brand || ""} ${board.name || ""}`}
                         loading="lazy"
                         decoding="async"
-                        className="max-w-full max-h-full object-contain"
+                        className="
+                          block
+                          max-w-[60px]
+                          max-h-[38px]
+                          object-contain
+                        "
                       />
                     ) : (
                       <div className="w-12 h-6 rounded-md bg-zinc-700" />
                     )}
                   </div>
 
-                  <div className="min-w-0 flex-1">
-                    <div className="text-[12px] font-black leading-tight">
-                      {b.name}
-                    </div>
+                  {/* TEXTE */}
+                  <div className="min-w-0 flex items-center flex-1">
+                    <div className="min-w-0 flex-1">
+                      <div className="text-[12px] font-black leading-tight truncate">
+                        {board.brand}
+                      </div>
 
-                    <div className="text-[10px] font-bold text-zinc-300 leading-tight mt-0.5">
-                      {b.brand}
+                      <div className="text-[10px] font-bold text-zinc-300 leading-tight mt-0.5 line-clamp-2">
+                        {board.name}
+                      </div>
                     </div>
                   </div>
                 </button>

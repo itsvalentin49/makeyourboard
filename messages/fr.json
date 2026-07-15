@@ -16,8 +16,9 @@
     "back": "Retour",
     "pedals": "Pédales",
     "boards": "Boards",
-    "power": "Power",
-    "custom": "Custom"
+    "power": "Alim.",
+    "custom": "Custom",
+    "import": "Importer"
   },
   "canvasIntro": {
     "title": "Make Your Board",
@@ -27,6 +28,7 @@
   },
   "pedal": {
     "features": "Caractéristiques",
+    "description": "Description",
     "actions": {
       "title": "Actions",
       "rotate": "Tourner",
@@ -176,7 +178,7 @@
     "pedal": "Pédale",
     "board": "Board",
     "nameOptional": "Nom",
-    "namePlaceholder": "Nom (Fuzz)",
+    "namePlaceholder": "Nom",
     "enterDimensions": "Dimensions",
     "dimensionError": "Dimensions : min {min} {unit} / max {max} {unit}",
     "width": "Largeur",
@@ -203,11 +205,8 @@
   },
   "backgrounds": {
     "neutral": "Neutre",
-    "wood": "Parquet",
-    "marble": "Marbre",
-    "rug": "Tapis",
-    "stage": "Scène",
-    "flightcase": "Flightcase"
+    "wood": "Bois",
+    "steel": "Aluminium"
   },
   "canvas": {
     "totalDraw": "Conso. totale",
@@ -352,31 +351,33 @@
   "customMenu": {
     "pedalTitle": "Pédale personnalisée",
     "boardTitle": "Board personnalisé",
-    "pedalSubtitle": "Créez une pédale sur mesure.",
-    "boardSubtitle": "Créez un board sur mesure.",
+    "pedalSubtitle": "Créez une pédale sur mesure",
+    "boardSubtitle": "Créez un board sur mesure",
     "importTitle": "Importer une image",
-    "importSubtitle": "Importez une pédale depuis votre ordinateur.",
+    "importSubtitle": "Importez une pédale",
     "formats": "Formats acceptés : PNG, JPG, WEBP",
-    "maxSize": "Poids max : 1 Mo",
+    "maxSize": "Poids max : 300 Ko",
     "imageDimensions": "Dimensions : min 30 mm / max 500 mm",
     "chooseImage": "Choisir une image",
     "voltage": "Voltage (V)",
     "current": "Ampérage (mA)",
     "add": "Ajouter",
     "modeCustom": "Personnaliser",
-    "modeImport": "Importer"
+    "modeImport": "Importer",
+    "jackLocations": "Jacks",
+    "powerLocations": "Alimentation"
   },
   "canvasControls": {
     "min": "MIN",
     "max": "MAX",
     "setup": "Setup",
-    "pedalboard": "Pedalboard",
-    "boards": "Boards",
-    "pedalboards": "Boards",
-    "newBoard": "Nouveau board",
+    "pedalboard": "Pedalboards",
+    "boards": "Pedalboards",
+    "pedalboards": "Pedalboards",
+    "newBoard": "Nouveau pedalboard",
     "jacks": "Jacks",
     "cables": "Câbles",
-    "power": "Power",
+    "power": "Alimentation",
     "cableClearance": "Passage des câbles",
     "cableClearanceDescription": "Vérifiez l’espace disponible pour les câbles."
   },
@@ -394,5 +395,30 @@
     "shareText": "Exportez votre pedalboard en PNG pour le sauvegarder ou le partager.",
     "ok": "OK",
     "dontShowAgain": "Ne plus afficher"
+  },
+  "colors": {
+    "aluminium": "Aluminium",
+    "black": "Noir",
+    "white": "Blanc",
+    "red": "Rouge",
+    "brown": "Marron",
+    "green": "Vert",
+    "blue": "Bleu",
+    "purple": "Violet",
+    "gray": "Gris",
+    "yellow": "Jaune",
+    "orange": "Orange",
+    "pink": "Rose"
+  },
+  "locations": {
+    "top": "Haut",
+    "right": "Droite",
+    "bottom": "Bas",
+    "left": "Gauche"
+  },
+  "boardTextures": {
+    "black": "Noir",
+    "wood": "Bois",
+    "aluminium": "Aluminium"
   }
 }

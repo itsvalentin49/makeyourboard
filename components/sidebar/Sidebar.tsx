@@ -14,6 +14,7 @@ import {
   Zap,
   PencilRuler,
   AudioWaveform,
+  Upload
 } from "lucide-react";
 import type { Language } from "@/utils/i18n";
 
@@ -28,6 +29,7 @@ import SearchPedals from "@/components/sidebar/SearchPedals";
 import SearchBoards from "@/components/sidebar/SearchBoards";
 import CustomBuilder from "@/components/sidebar/CustomBuilder";
 import SearchPower from "@/components/sidebar/SearchPower";
+import ImportBuilder from "@/components/sidebar/ImportBuilder";
 
 
 type AnyRow = Record<string, any>;
@@ -196,7 +198,7 @@ export default function Sidebar({
     units === "metric" ? maxMm : mmToIn(maxMm);
 
   const [activeSidebarTab, setActiveSidebarTab] =
-    React.useState<"pedals" | "boards" | "power" | "custom">("pedals");
+    React.useState<"pedals" | "boards" | "power" | "custom" | "import">("pedals");
 
   // Convert UI values to mm for validation
   const widthMm =
@@ -224,9 +226,13 @@ export default function Sidebar({
   const unitLabel = units === "metric" ? "mm" : "in";
   const withUnit = (label: string) =>
     `${label} (${unitLabel})`;
-  const isCustomPedal =
-    selectedPedal?.brand === "Custom" ||
+  const isImportedPedal =
     selectedPedal?.slug === "custom-upload";
+
+  const isCustomPedal =
+    selectedPedal?.brand === "Custom" &&
+    !isImportedPedal;
+
   const isCustomBoard = selectedBoardDetails?.brand === "Custom";
   const [country] = React.useState<string>(() => {
     if (typeof window === "undefined") return "FR";
@@ -445,7 +451,7 @@ export default function Sidebar({
     >
 
       {/* Desktop logo only */}
-      <div className="hidden lg:block">
+      <div className="hidden lg:block mb-2">
         <SidebarLogo />
       </div>
 
@@ -642,13 +648,10 @@ export default function Sidebar({
           language={language}
           t={t}
           isCustomPedal={isCustomPedal}
+          isImportedPedal={isImportedPedal}
           isUSA={isUSA}
           isEurope={isEurope}
           buildThomannUrl={buildThomannUrl}
-          rotatePedal={rotatePedal}
-          movePedalFront={movePedalFront}
-          movePedalBack={movePedalBack}
-          deletePedal={deletePedal}
         />
 
       ) : selectedBoardDetails ? (
@@ -677,7 +680,7 @@ export default function Sidebar({
         <div className="px-1 flex flex-col gap-4 flex-1 overflow-hidden">
 
           <div className="shrink-0">
-            <div className="grid grid-cols-4 gap-2">
+            <div className="grid grid-cols-5 gap-1">
               {[
 
                 {
@@ -700,6 +703,11 @@ export default function Sidebar({
                   label: t("sidebar.custom"),
                   icon: PencilRuler,
                 },
+                {
+                  key: "import",
+                  label: t("sidebar.import"),
+                  icon: Upload,
+                },
 
 
               ].map((tab) => {
@@ -716,13 +724,27 @@ export default function Sidebar({
                       setShowBoardResults(false);
                       setShowPowerResults(false);
                     }}
-                    className={`h-[72px] rounded-2xl flex flex-col items-center justify-center gap-2 transition-all ${active
-                      ? "bg-zinc-950"
-                      : "bg-transparent hover:bg-canvas"
-                      }`}
+                    className={`
+  h-[50px]
+  min-w-0
+  rounded-xl
+  flex flex-col
+  items-center
+  justify-center
+  gap-1.5
+  transition-colors
+  duration-150
+  select-none
+  touch-manipulation
+  [-webkit-tap-highlight-color:transparent]
+  ${active
+                        ? "bg-tab"
+                        : "bg-transparent sidebar-tab-hover"
+                      }
+`}
                   >
                     <Icon
-                      size={24}
+                      size={28}
                       strokeWidth={1.8}
                       className={
                         tab.key === "pedals"
@@ -733,10 +755,12 @@ export default function Sidebar({
                               ? "text-yellow-500"
                               : tab.key === "custom"
                                 ? "text-purple-500"
-                                : ""
+                                : tab.key === "import"
+                                  ? "text-orange-500"
+                                  : ""
                       }
                     />
-                    <span className="text-[11px] font-black">
+                    <span className="text-[9px] font-black whitespace-nowrap leading-none">
                       {tab.label}
                     </span>
                   </button>
@@ -818,6 +842,15 @@ export default function Sidebar({
               displayMax={displayMax}
               units={units}
               unitLabel={unitLabel}
+              withUnit={withUnit}
+              t={t}
+            />
+          )}
+
+          {activeSidebarTab === "import" && (
+            <ImportBuilder
+              addCustomItem={addCustomItem}
+              units={units}
               withUnit={withUnit}
               t={t}
             />

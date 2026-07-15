@@ -17,7 +17,8 @@
     "pedals": "Pedals",
     "boards": "Boards",
     "power": "Power",
-    "custom": "Custom"
+    "custom": "Custom",
+    "import": "Import"
   },
   "canvasIntro": {
     "title": "Make Your Board",
@@ -27,6 +28,7 @@
   },
   "pedal": {
     "features": "Specifications",
+    "description": "Description",
     "actions": {
       "title": "Actions",
       "rotate": "Rotate",
@@ -121,6 +123,8 @@
     "power": {
       "label": "Power",
       "AC": "AC",
+      "4-9V DC": "4-9V DC",
+      "6-18V DC": "6-18V DC",
       "8-20V DC": "8-20V DC",
       "9-20V DC": "9-20V DC",
       "9V DC": "9V DC",
@@ -176,7 +180,7 @@
     "pedal": "Pedal",
     "board": "Board",
     "nameOptional": "Name",
-    "namePlaceholder": "Name (Fuzz)",
+    "namePlaceholder": "Name",
     "enterDimensions": "Dimensions",
     "dimensionError": "Dimensions: min {min} {unit} / max {max} {unit}",
     "width": "Width",
@@ -203,13 +207,8 @@
   },
   "backgrounds": {
     "neutral": "Neutral",
-    "wood": "Herringbone Wood",
-    "carpet": "Blue Damask",
-    "steel": "Iron Steel",
-    "fabric": "Cotton Fabric",
-    "stripes": "Blue Stripes",
-    "coast": "Summer Vibes",
-    "houndstooth": "Houndstooth"
+    "wood": "Wood",
+    "steel": "Aluminium"
   },
   "canvas": {
     "totalDraw": "Total draw",
@@ -354,19 +353,21 @@
   "customMenu": {
     "pedalTitle": "Custom Pedal",
     "boardTitle": "Custom Board",
-    "pedalSubtitle": "Create a custom pedal.",
-    "boardSubtitle": "Create a custom board.",
+    "pedalSubtitle": "Create a custom pedal",
+    "boardSubtitle": "Create a custom board",
     "importTitle": "Import an Image",
-    "importSubtitle": "Import a pedal from your computer.",
+    "importSubtitle": "Import a pedal",
     "formats": "Accepted formats: PNG, JPG, WEBP",
-    "maxSize": "Max size: 1 MB",
+    "maxSize": "Max size: 300 Ko",
     "imageDimensions": "Dimensions: min 30 mm / max 500 mm",
     "chooseImage": "Choose an Image",
     "voltage": "Voltage (V)",
     "current": "Current Draw (mA)",
     "add": "Add",
     "modeCustom": "Custom",
-    "modeImport": "Import"
+    "modeImport": "Import",
+    "jackLocations": "Jacks",
+    "powerLocations": "Power"
   },
   "canvasControls": {
     "min": "MIN",
@@ -395,5 +396,30 @@
     "shareText": "Export your pedalboard as a PNG to save or share it.",
     "ok": "OK",
     "dontShowAgain": "Don't show again"
+  },
+  "colors": {
+    "aluminium": "Aluminum",
+    "black": "Black",
+    "white": "White",
+    "red": "Red",
+    "brown": "Brown",
+    "green": "Green",
+    "blue": "Blue",
+    "purple": "Purple",
+    "gray": "Gray",
+    "yellow": "Yellow",
+    "orange": "Orange",
+    "pink": "Pink"
+  },
+  "locations": {
+    "top": "Top",
+    "right": "Right",
+    "bottom": "Bottom",
+    "left": "Left"
+  },
+  "boardTextures": {
+    "black": "Black",
+    "wood": "Wood",
+    "aluminium": "Aluminium"
   }
 }

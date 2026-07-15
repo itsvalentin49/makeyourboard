@@ -27,6 +27,7 @@
   },
   "pedal": {
     "features": "Specifiche",
+    "description": "Descrizione",
     "actions": {
       "title": "Azioni",
       "rotate": "Ruota",
@@ -176,7 +177,7 @@
     "pedal": "Pedale",
     "board": "Pedaliera",
     "nameOptional": "Nome",
-    "namePlaceholder": "Nome (Fuzz)",
+    "namePlaceholder": "Nome",
     "enterDimensions": "Dimensioni",
     "dimensionError": "Dimensioni : min {min} {unit} / max {max} {unit}",
     "width": "Larghezza",
@@ -203,13 +204,8 @@
   },
   "backgrounds": {
     "neutral": "Neutro",
-    "wood": "Legno a spina di pesce",
-    "carpet": "Damascato blu",
-    "steel": "Acciaio",
-    "fabric": "Tessuto in cotone",
-    "stripes": "Righe blu",
-    "coast": "Vibes estive",
-    "houndstooth": "Pied-de-poule"
+    "wood": "Legno",
+    "steel": "Alluminio"
   },
   "canvas": {
     "totalDraw": "Consumo totale",
@@ -354,19 +350,21 @@
   "customMenu": {
     "pedalTitle": "Pedale personalizzato",
     "boardTitle": "Pedaliera personalizzata",
-    "pedalSubtitle": "Crea un pedale personalizzato.",
-    "boardSubtitle": "Crea una pedaliera personalizzata.",
+    "pedalSubtitle": "Crea un pedale personalizzato",
+    "boardSubtitle": "Crea una pedaliera personalizzata",
     "importTitle": "Importa un'immagine",
-    "importSubtitle": "Importa un pedale dal tuo computer.",
+    "importSubtitle": "Importa un pedale",
     "formats": "Formati accettati: PNG, JPG, WEBP",
-    "maxSize": "Dimensione max: 1 MB",
+    "maxSize": "Dimensione max: 300 Ko",
     "imageDimensions": "Dimensioni: min 30 mm / max 500 mm",
     "chooseImage": "Scegli un'immagine",
     "voltage": "Voltaggio (V)",
     "current": "Assorbimento (mA)",
     "add": "Aggiungi",
     "modeCustom": "Personalizza",
-    "modeImport": "Importa"
+    "modeImport": "Importa",
+    "jackLocations": "Jack",
+    "powerLocations": "Alimentazione"
   },
   "canvasControls": {
     "min": "MIN",
@@ -396,5 +394,30 @@
     "shareText": "Esporta la tua pedalboard in PNG per salvarla o condividerla.",
     "ok": "OK",
     "dontShowAgain": "Non mostrare più"
+  },
+  "colors": {
+    "aluminium": "Alluminio",
+    "black": "Nero",
+    "white": "Bianco",
+    "red": "Rosso",
+    "brown": "Marrone",
+    "green": "Verde",
+    "blue": "Blu",
+    "purple": "Viola",
+    "gray": "Grigio",
+    "yellow": "Giallo",
+    "orange": "Arancione",
+    "pink": "Rosa"
+  },
+  "locations": {
+    "top": "Alto",
+    "right": "Destra",
+    "bottom": "Basso",
+    "left": "Sinistra"
+  },
+  "boardTextures": {
+    "black": "Nero",
+    "wood": "Legno",
+    "aluminium": "Alluminio"
   }
 }

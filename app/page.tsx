@@ -1,4 +1,4 @@
-import PedalBoardAppClient from "@/components/PedalBoardAppClient";
+import BoardEditor from "@/components/BoardEditor";
 
 export default function Page() {
   return (
@@ -33,7 +33,7 @@ export default function Page() {
       </div>
 
       {/* APP */}
-      <PedalBoardAppClient />
+      <BoardEditor />
     </>
   );
 }
