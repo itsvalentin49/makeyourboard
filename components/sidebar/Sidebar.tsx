@@ -9,12 +9,6 @@ import {
   RotateCw,
   ShoppingCart,
   Trash2,
-  CircuitBoard,
-  PanelsTopLeft,
-  Zap,
-  PencilRuler,
-  AudioWaveform,
-  Upload
 } from "lucide-react";
 import type { Language } from "@/utils/i18n";
 
@@ -199,6 +193,31 @@ export default function Sidebar({
 
   const [activeSidebarTab, setActiveSidebarTab] =
     React.useState<"pedals" | "boards" | "power" | "custom" | "import">("pedals");
+
+  const [isLightTheme, setIsLightTheme] = React.useState(true);
+
+  React.useEffect(() => {
+    const html = document.documentElement;
+
+    const updateTheme = () => {
+      setIsLightTheme(html.classList.contains("light"));
+    };
+
+    // Vérification initiale
+    updateTheme();
+
+    // Surveillance des changements de classe sur <html>
+    const observer = new MutationObserver(updateTheme);
+
+    observer.observe(html, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
 
   // Convert UI values to mm for validation
   const widthMm =
@@ -681,50 +700,54 @@ export default function Sidebar({
 
           <div className="shrink-0">
             <div className="grid grid-cols-5 gap-1">
-              {[
+              {
+                [
+                  {
+                    key: "pedals",
+                    label: t("sidebar.pedals"),
+                    lightImage: "/images/tab-pedal2-light.webp",
+                    darkImage: "/images/tab-pedal2-dark.webp",
+                  },
+                  {
+                    key: "boards",
+                    label: t("sidebar.boards"),
+                    lightImage: "/images/tab-board-light.webp",
+                    darkImage: "/images/tab-board-dark.webp",
+                  },
+                  {
+                    key: "power",
+                    label: t("sidebar.power"),
+                    lightImage: "/images/tab-power2-light.webp",
+                    darkImage: "/images/tab-power2-dark.webp",
+                  },
+                  {
+                    key: "custom",
+                    label: t("sidebar.custom"),
+                    lightImage: "/images/tab-custom-light.webp",
+                    darkImage: "/images/tab-custom-dark.webp",
+                  },
+                  {
+                    key: "import",
+                    label: t("sidebar.import"),
+                    lightImage: "/images/tab-import-light.webp",
+                    darkImage: "/images/tab-import-dark.webp",
+                  },
+                ]
 
-                {
-                  key: "pedals",
-                  label: t("sidebar.pedals"),
-                  icon: AudioWaveform,
-                },
-                {
-                  key: "boards",
-                  label: t("sidebar.boards"),
-                  icon: PanelsTopLeft,
-                },
-                {
-                  key: "power",
-                  label: t("sidebar.power"),
-                  icon: Zap,
-                },
-                {
-                  key: "custom",
-                  label: t("sidebar.custom"),
-                  icon: PencilRuler,
-                },
-                {
-                  key: "import",
-                  label: t("sidebar.import"),
-                  icon: Upload,
-                },
+                  .map((tab) => {
+                    const active = activeSidebarTab === tab.key;
 
-
-              ].map((tab) => {
-                const Icon = tab.icon;
-                const active = activeSidebarTab === tab.key;
-
-                return (
-                  <button
-                    key={tab.key}
-                    type="button"
-                    onClick={() => {
-                      setActiveSidebarTab(tab.key as any);
-                      setShowPedalResults(false);
-                      setShowBoardResults(false);
-                      setShowPowerResults(false);
-                    }}
-                    className={`
+                    return (
+                      <button
+                        key={tab.key}
+                        type="button"
+                        onClick={() => {
+                          setActiveSidebarTab(tab.key as any);
+                          setShowPedalResults(false);
+                          setShowBoardResults(false);
+                          setShowPowerResults(false);
+                        }}
+                        className={`
   h-[50px]
   min-w-0
   rounded-xl
@@ -738,34 +761,28 @@ export default function Sidebar({
   touch-manipulation
   [-webkit-tap-highlight-color:transparent]
   ${active
-                        ? "bg-tab"
-                        : "bg-transparent sidebar-tab-hover"
-                      }
+                            ? "bg-tab"
+                            : "bg-transparent sidebar-tab-hover"
+                          }
 `}
-                  >
-                    <Icon
-                      size={28}
-                      strokeWidth={1.8}
-                      className={
-                        tab.key === "pedals"
-                          ? "text-green-500"
-                          : tab.key === "boards"
-                            ? "text-blue-500"
-                            : tab.key === "power"
-                              ? "text-yellow-500"
-                              : tab.key === "custom"
-                                ? "text-purple-500"
-                                : tab.key === "import"
-                                  ? "text-orange-500"
-                                  : ""
-                      }
-                    />
-                    <span className="text-[9px] font-black whitespace-nowrap leading-none">
-                      {tab.label}
-                    </span>
-                  </button>
-                );
-              })}
+                      >
+                        <img
+                          src={isLightTheme ? tab.darkImage : tab.lightImage}
+                          alt=""
+                          aria-hidden="true"
+                          draggable={false}
+                          className="
+    w-[28px]
+    h-[28px]
+    object-contain
+    pointer-events-none
+    select-none
+  "
+                        />
+
+                      </button>
+                    );
+                  })}
             </div>
           </div>
 

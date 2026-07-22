@@ -263,6 +263,28 @@ export default function BoardCanvas({
   const t = getTranslator(language);
   const [showSettings, setShowSettings] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [isLightTheme, setIsLightTheme] = useState(true);
+
+  useEffect(() => {
+    const html = document.documentElement;
+
+    const updateTheme = () => {
+      setIsLightTheme(html.classList.contains("light"));
+    };
+
+    updateTheme();
+
+    const observer = new MutationObserver(updateTheme);
+
+    observer.observe(html, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
   const closeBottomPanels = () => {
     setShowBoardsMenu(false);
     setShowCableMenu(false);
@@ -1601,7 +1623,17 @@ export default function BoardCanvas({
                           }}
                           className="w-full flex items-center gap-2 px-3 py-2 text-left rounded-lg transition-colors hover:bg-canvas"
                         >
-                          <PanelsTopLeft size={14} className="text-blue-500" />
+                          <img
+                            src={
+                              isLightTheme
+                                ? "/images/tab-board-dark.webp"
+                                : "/images/tab-board-light.webp"
+                            }
+                            alt=""
+                            aria-hidden="true"
+                            draggable={false}
+                            className="w-[18px] h-[18px] object-contain shrink-0"
+                          />
                           {t("canvasControls.boards")}
                         </button>
 
@@ -1612,7 +1644,17 @@ export default function BoardCanvas({
                           }}
                           className="w-full flex items-center gap-2 px-3 py-2 text-left rounded-lg transition-colors hover:bg-canvas"
                         >
-                          <Cable size={14} className="text-red-500" />
+                          <img
+                            src={
+                              isLightTheme
+                                ? "/images/tab-cables-dark.webp"
+                                : "/images/tab-cables-light.webp"
+                            }
+                            alt=""
+                            aria-hidden="true"
+                            draggable={false}
+                            className="w-[18px] h-[18px] object-contain shrink-0"
+                          />
                           {t("canvasControls.cables")}
                         </button>
 
@@ -1623,7 +1665,17 @@ export default function BoardCanvas({
                           }}
                           className="w-full flex items-center gap-2 px-3 py-2 text-left rounded-lg transition-colors hover:bg-canvas"
                         >
-                          <Zap size={14} className="text-yellow-500" />
+                          <img
+                            src={
+                              isLightTheme
+                                ? "/images/tab-power2-dark.webp"
+                                : "/images/tab-power2-light.webp"
+                            }
+                            alt=""
+                            aria-hidden="true"
+                            draggable={false}
+                            className="w-[18px] h-[18px] object-contain shrink-0"
+                          />
                           {t("canvasControls.power")}
                         </button>
 
@@ -1634,7 +1686,17 @@ export default function BoardCanvas({
                           }}
                           className="w-full flex items-center gap-2 px-3 py-2 text-left rounded-lg transition-colors hover:bg-canvas"
                         >
-                          <Download size={14} className="text-green-500" />
+                          <img
+                            src={
+                              isLightTheme
+                                ? "/images/tab-export-dark.webp"
+                                : "/images/tab-export-light.webp"
+                            }
+                            alt=""
+                            aria-hidden="true"
+                            draggable={false}
+                            className="w-[18px] h-[18px] object-contain shrink-0"
+                          />
                           {t("export.button")}
                         </button>
 
@@ -1645,7 +1707,17 @@ export default function BoardCanvas({
                           }}
                           className="w-full flex items-center gap-2 px-3 py-2 text-left rounded-lg transition-colors hover:bg-canvas"
                         >
-                          <Settings size={14} />
+                          <img
+                            src={
+                              isLightTheme
+                                ? "/images/tab-settings-dark.webp"
+                                : "/images/tab-settings-light.webp"
+                            }
+                            alt=""
+                            aria-hidden="true"
+                            draggable={false}
+                            className="w-[18px] h-[18px] object-contain shrink-0"
+                          />
                           {t("settings.title")}
                         </button>
                       </div>
@@ -1702,7 +1774,6 @@ fixed right-4 bottom-16
                       onClick={(e) => e.stopPropagation()}
                     >
                       <div className="flex items-center gap-2 text-xs uppercase tracking-wider font-bold px-2 pb-3">
-                        <PanelsTopLeft size={14} className="text-blue-500" />
                         {t("canvasControls.pedalboards")}
                       </div>
 
@@ -1731,7 +1802,7 @@ fixed right-4 bottom-16
                                   if (e.key === "Enter") saveName?.();
                                   if (e.key === "Escape") saveName?.();
                                 }}
-                                className="flex-1 bg-transparent outline-none px-3 py-2 text-[11px] font-bold uppercase tracking-wide"
+                                className="flex-1 bg-transparent outline-none px-3 py-2 text-[10px] font-bold uppercase tracking-wide"
                               />
                             ) : (
                               <button
@@ -1744,7 +1815,7 @@ fixed right-4 bottom-16
                                   e.stopPropagation();
                                   startEditing?.(project, e);
                                 }}
-                                className="flex-1 text-left px-3 py-2 text-[11px] font-bold uppercase tracking-wide"
+                                className="flex-1 text-left px-3 py-2 text-[10px] font-bold uppercase tracking-wide"
                               >
                                 {project.name || `Board ${index + 1}`}
                               </button>
@@ -1759,7 +1830,7 @@ fixed right-4 bottom-16
                                   e.stopPropagation();
                                   startEditing?.(project, e);
                                 }}
-                                className="px-1.5 py-2 opacity-60 hover:opacity-100 transition-opacity group/edit"
+                                className="px-1.5 py-2 transition-opacity group/edit"
                               >
                                 <svg
                                   xmlns="http://www.w3.org/2000/svg"
@@ -1788,7 +1859,7 @@ fixed right-4 bottom-16
                                   e.stopPropagation();
                                   setConfirmDeleteProjectId(project.id);
                                 }}
-                                className="px-1.5 py-2 opacity-60 hover:opacity-100 transition-opacity group/delete"
+                                className="px-1.5 py-2 transition-opacity group/delete"
                               >
                                 <X
                                   size={14}
@@ -1870,10 +1941,24 @@ fixed right-4 bottom-16
                             setShowBoardsMenu(false);
                           }}
                           className="
-              mt-1 w-full px-3 py-2 rounded-lg text-[10px] font-black uppercase
-              bg-zinc-950 hover:bg-canvas transition-colors
-              flex items-center justify-center gap-2
-            "
+    mt-1
+    w-full
+    h-[36px]
+    px-3
+    rounded-lg
+    border
+    border-blue-500
+    bg-blue-500/10
+    text-[10px]
+    font-black
+    uppercase
+    flex
+    items-center
+    justify-center
+    gap-2
+    transition-colors
+    hover:bg-blue-500/15
+  "
                         >
                           <Plus size={14} />
                           {t("canvasControls.newBoard")}
@@ -1931,7 +2016,6 @@ fixed right-4 bottom-16
                     onClick={(e) => e.stopPropagation()}
                   >
                     <div className="flex items-center gap-2 text-xs uppercase tracking-wider font-bold">
-                      <Cable size={14} className="text-red-500" />
                       {t("canvasControls.cables")}
                     </div>
 
@@ -1945,7 +2029,7 @@ fixed right-4 bottom-16
         "
                     >
                       <div className="pr-2">
-                        <div className="text-[11px] font-black uppercase tracking-wide">
+                        <div className="text-[10px] font-bold uppercase tracking-wide">
                           {t("canvasControls.cableClearance")}
                         </div>
 
@@ -2182,7 +2266,6 @@ fixed right-4 bottom-16
   `}>
                     <div className="w-64 bg-zinc-900 border border-zinc-800 rounded-xl shadow-2xl p-4">
                       <div className="flex items-center gap-2 text-xs uppercase tracking-wider font-bold mb-6">
-                        <Settings size={14} />
                         {t("settings.title")}
                       </div>
 

@@ -47,6 +47,7 @@
     "type": {
       "label": "Type",
       "A/B Box": "A/B Box",
+      "ABY Switcher": "ABY Switcher",
       "Accessory": "Accessory",
       "Acoustic": "Acoustic",
       "Amp Simulator": "Amp Simulator",
@@ -376,7 +377,7 @@
     "pedalboard": "Pedalboard",
     "boards": "Boards",
     "pedalboards": "Boards",
-    "newBoard": "New board",
+    "newBoard": "New",
     "cables": "Cables",
     "power": "Power",
     "cableClearance": "Cable Clearance",

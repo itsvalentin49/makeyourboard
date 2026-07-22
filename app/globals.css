@@ -443,12 +443,10 @@ html.light .hover\:bg-green-600:hover {
   }
 }
 
-/* Bordure claire en dark mode */
-html:not(.light) .border-zinc-700 {
+.border-zinc-700 {
   border-color: var(--zinc-500) !important;
 }
 
-/* Bordure foncée en light mode */
 .light .border-zinc-700 {
-  border-color: var(--zinc-400) !important;
+  border-color: var(--zinc-700) !important;
 }

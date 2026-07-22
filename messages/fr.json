@@ -47,6 +47,7 @@
     "type": {
       "label": "Type",
       "A/B Box": "Boîtier A/B",
+      "ABY Switcher": "ABY Switcher",
       "Accessory": "Accessoire",
       "Acoustic": "Acoustique",
       "Acoustic Simulator": "Simulateur acoustique",
@@ -374,7 +375,7 @@
     "pedalboard": "Pedalboards",
     "boards": "Pedalboards",
     "pedalboards": "Pedalboards",
-    "newBoard": "Nouveau pedalboard",
+    "newBoard": "Nouveau",
     "jacks": "Jacks",
     "cables": "Câbles",
     "power": "Alimentation",

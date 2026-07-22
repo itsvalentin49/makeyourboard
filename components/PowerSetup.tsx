@@ -74,7 +74,7 @@ export default function PowerSetup({
 }: Props) {
   return (
     <div
-  className="
+      className="
     w-[calc(100vw-32px)]
     max-w-[400px]
     bg-zinc-900
@@ -84,16 +84,15 @@ export default function PowerSetup({
     shadow-2xl
     p-4
   "
->
+    >
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-2 text-xs uppercase tracking-wider font-bold">
-          <Zap size={14} className="text-yellow-500" />
           {t("powerSetup.title")}
         </div>
       </div>
 
       {powerUnits.length > 0 && (
-        <div className="mb-5">
+        <div className="mb-1">
           <div className="space-y-6">
             {powerUnits.map((p, index) => {
               const outputs = extractOutputs(p.details);
@@ -135,15 +134,15 @@ export default function PowerSetup({
                               {o.count}{" "}
                               {o.isSwitch
                                 ? t(
-                                    o.count > 1
-                                      ? "powerSetup.outputs.switchable_plural"
-                                      : "powerSetup.outputs.switchable"
-                                  )
+                                  o.count > 1
+                                    ? "powerSetup.outputs.switchable_plural"
+                                    : "powerSetup.outputs.switchable"
+                                )
                                 : t(
-                                    o.count > 1
-                                      ? "powerSetup.outputs.fixed_plural"
-                                      : "powerSetup.outputs.fixed"
-                                  )}
+                                  o.count > 1
+                                    ? "powerSetup.outputs.fixed_plural"
+                                    : "powerSetup.outputs.fixed"
+                                )}
                             </div>
 
                             <div className="space-y-[2px]">
@@ -176,66 +175,66 @@ export default function PowerSetup({
         </div>
       )}
 
-      <div className="mb-1 mt-6 text-[12px] uppercase tracking-wider font-bold">
-  {t("powerSetup.sections.pedals")}
-</div>
+      <div className="mb-1 mt-6 text-[10px] uppercase tracking-wide font-bold">
+        {t("powerSetup.sections.pedals")}
+      </div>
 
-{!hasPedals && (
-  <div className="mb-4 text-[12px] text-blue-500">
-    {t("powerSetup.empty.noPedals")}
-  </div>
-)}
+      {!hasPedals && (
+        <div className="mb-4 text-[12px] text-blue-500">
+          {t("powerSetup.empty.noPedals")}
+        </div>
+      )}
 
-{hasPedals && (
-  <div className="mb-5">
-    <div className="space-y-2">
-      {pedalAssignments.map((a, i) => (
-            <div
-              key={i}
-              className="grid grid-cols-[auto_1fr_auto] items-end text-[11px] leading-none"
-            >
-<div className="flex items-center gap-1 whitespace-nowrap">
-  <span className="text-zinc-500 font-bold">
-    {a.pedal.brand || "Custom"}
-  </span>
-  <span>{a.pedal.name}</span>
-</div>
+      {hasPedals && (
+        <div className="mb-5">
+          <div className="space-y-2">
+            {pedalAssignments.map((a, i) => (
+              <div
+                key={i}
+                className="grid grid-cols-[auto_1fr_auto] items-end text-[11px] leading-none"
+              >
+                <div className="flex items-center gap-1 whitespace-nowrap">
+                  <span className="text-zinc-500 font-bold">
+                    {a.pedal.brand || "Custom"}
+                  </span>
+                  <span>{a.pedal.name}</span>
+                </div>
 
-              <div className="mx-2 border-b border-dotted border-zinc-600 mb-[2px]" />
+                <div className="mx-2 border-b border-dotted border-zinc-600 mb-[2px]" />
 
-              <div className="text-[11px] whitespace-nowrap text-right">
-                <span
-                  className={
-                    !hasPower
-                      ? ""
-                      : a.ok
-                      ? "text-green-600"
-                      : "text-red-500"
-                  }
-                >
-                  {Number(a.pedal.voltage) || 9}V /{" "}
-                  {Number(a.pedal.draw) || 0}mA
-                </span>
+                <div className="text-[11px] whitespace-nowrap text-right">
+                  <span
+                    className={
+                      !hasPower
+                        ? ""
+                        : a.ok
+                          ? "text-green-600"
+                          : "text-red-500"
+                    }
+                  >
+                    {Number(a.pedal.voltage) || 9}V /{" "}
+                    {Number(a.pedal.draw) || 0}mA
+                  </span>
+                </div>
               </div>
-            </div>
-      ))}
-    </div>
-  </div>
-)}
+            ))}
+          </div>
+        </div>
+      )}
 
-{hasPedals && powerMessage && (
-  <div className="flex items-center justify-between -mt-4">
-    <div className={`text-[12px] ${powerMessageColor}`}>
-      {powerMessage}
-    </div>
-  </div>
-)}
+      {hasPedals && powerMessage && (
+        <div className="flex items-center justify-between -mt-6">
+          <div className={`text-[12px] ${powerMessageColor}`}>
+            {powerMessage}
+          </div>
+        </div>
+      )}
 
-      <div className="mb-2 mt-6 text-[12px] uppercase tracking-wider font-bold">
+      <div className="mb-1 mt-6 text-[10px] uppercase tracking-wide font-bold">
         {t("powerSetup.sections.recommendation")}
       </div>
 
-      <div className="space-y-3 text-[12px]">
+      <div className="space-y-2 text-[12px] -mt-1">
         {!hasPedals && (
           <>
             <div className="text-blue-400">

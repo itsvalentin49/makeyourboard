@@ -715,7 +715,7 @@ export default function CustomBuilder({
             className="
               relative
               z-10
-              text-[10px]
+              text-[9px]
               font-black
               uppercase
               tracking-wide
@@ -732,7 +732,7 @@ export default function CustomBuilder({
             className="
               relative
               z-10
-              text-[10px]
+              text-[9px]
               font-black
               uppercase
               tracking-wide

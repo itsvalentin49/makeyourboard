@@ -347,28 +347,23 @@ export default function PedalSpecs({
   return (
     <div
       className="
-        h-full
-        min-h-0
-        overflow-y-auto
-        overflow-x-hidden
-        flex
-        flex-col
-        gap-5
-        animate-in
-        slide-in-from-left
-        duration-300
-        px-1
-        pb-8
+    h-full
+    min-h-0
+    overflow-y-auto
+    overflow-x-hidden
+    flex
+    flex-col
+    gap-5
+    animate-in
+    slide-in-from-left
+    duration-300
+    px-1
+    pb-0
 
-        [scrollbar-width:thin]
-        [scrollbar-color:#3f3f46_transparent]
-
-        [&::-webkit-scrollbar]:w-1.5
-        [&::-webkit-scrollbar-track]:bg-transparent
-        [&::-webkit-scrollbar-thumb]:bg-zinc-700
-        [&::-webkit-scrollbar-thumb]:rounded-full
-        hover:[&::-webkit-scrollbar-thumb]:bg-zinc-600
-      "
+    [scrollbar-width:none]
+    [-ms-overflow-style:none]
+    [&::-webkit-scrollbar]:hidden
+  "
     >
       {/* HERO PRODUIT */}
       <div className="shrink-0 flex flex-col items-center pt-2">
