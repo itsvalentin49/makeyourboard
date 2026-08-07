@@ -317,6 +317,11 @@ export default function PedalSpecs({
   const depth =
     Number(selectedPedal.depth) || 0;
 
+  const isHorizontalPedal =
+    width > 0 &&
+    depth > 0 &&
+    width > depth;
+
   const dimensions =
     units === "metric"
       ? `${width} x ${depth} mm`
@@ -366,17 +371,26 @@ export default function PedalSpecs({
   "
     >
       {/* HERO PRODUIT */}
-      <div className="shrink-0 flex flex-col items-center pt-2">
+      <div className="shrink-0 flex flex-col items-center pt-1">
         <div className="w-full min-h-[150px] flex items-center justify-center mb-4">
           {image && (
             <img
               src={image}
               alt={`${brand} ${name}`}
-              className="
-                max-w-[140px]
-                max-h-[140px]
-                object-contain
-              "
+              className="object-contain"
+              style={
+                isHorizontalPedal
+                  ? {
+                    width: "180px",
+                    height: "auto",
+                    maxHeight: "140px",
+                  }
+                  : {
+                    width: "auto",
+                    height: "140px",
+                    maxWidth: "140px",
+                  }
+              }
               loading="lazy"
               decoding="async"
               draggable={false}
@@ -404,7 +418,6 @@ export default function PedalSpecs({
             {typeTags.length > 0 && (
               <div className="flex items-center gap-1.5 flex-wrap mt-2">
                 {typeTags
-                  .slice(0, 2)
                   .map((tag) => (
                     <span
                       key={tag}
@@ -433,12 +446,12 @@ export default function PedalSpecs({
 
       {/* DESCRIPTION */}
       {hasValue(overview) && (
-        <div className="shrink-0 flex flex-col gap-2">
+        <div className="w-full min-w-0 shrink-0 flex flex-col gap-2">
           <div className="text-[15px] font-black">
             {t("pedal.description")}
           </div>
 
-          <p className="text-[12px] leading-relaxed text-pretty">
+          <p className="w-full max-w-none text-[12px] leading-relaxed whitespace-normal break-words">
             {overview}
           </p>
         </div>

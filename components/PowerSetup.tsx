@@ -203,18 +203,24 @@ export default function PowerSetup({
                 <div className="mx-2 border-b border-dotted border-zinc-600 mb-[2px]" />
 
                 <div className="text-[11px] whitespace-nowrap text-right">
-                  <span
-                    className={
-                      !hasPower
-                        ? ""
-                        : a.ok
-                          ? "text-green-600"
-                          : "text-red-500"
-                    }
-                  >
-                    {Number(a.pedal.voltage) || 9}V /{" "}
-                    {Number(a.pedal.draw) || 0}mA
-                  </span>
+                  {String(a.pedal.power || "").toLowerCase() === "passive" ? (
+                    <span className="">
+                      {t("pedal.power.Passive")}
+                    </span>
+                  ) : (
+                    <span
+                      className={
+                        !hasPower
+                          ? ""
+                          : a.ok
+                            ? "text-green-600"
+                            : "text-red-500"
+                      }
+                    >
+                      {Number(a.pedal.voltage) || 9}V /{" "}
+                      {Number(a.pedal.draw) || 0}mA
+                    </span>
+                  )}
                 </div>
               </div>
             ))}

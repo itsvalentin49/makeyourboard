@@ -367,15 +367,17 @@ export default function BoardSpecs({
       {/* HERO BOARD */}
       <div className="shrink-0 flex flex-col items-center pt-2">
         {image && (
-          <div className="w-full flex items-center justify-center mb-4">
+          <div className="w-full min-h-[150px] flex items-center justify-center mb-4">
             <img
               src={image}
               alt={`${brand} ${name}`}
-              className="
-                max-w-[250px]
-                max-h-[170px]
-                object-contain
-              "
+              className="object-contain"
+              style={{
+                width: "200px",
+                height: "auto",
+                maxHeight: "145px",
+                maxWidth: "100%",
+              }}
               loading="lazy"
               decoding="async"
               draggable={false}

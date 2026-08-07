@@ -89,14 +89,81 @@ export default function SearchPedals({
         return terms.every((term) => haystack.includes(term));
       })
       .sort((a, b) => {
-        const brandA = String(a.brand || "").localeCompare(
-          String(b.brand || "")
+        const brandA = String(a.brand || "").toLowerCase();
+        const brandB = String(b.brand || "").toLowerCase();
+
+        const nameA = String(a.name || "").toLowerCase();
+        const nameB = String(b.name || "").toLowerCase();
+
+        const typeA = String(a.type || "").toLowerCase();
+        const typeB = String(b.type || "").toLowerCase();
+
+        function getSearchScore(
+          brand: string,
+          name: string,
+          type: string
+        ) {
+          // 1. La marque correspond exactement
+          if (brand === search) return 0;
+
+          // 2. La marque commence par la recherche
+          if (brand.startsWith(search)) return 1;
+
+          // 3. La marque contient la recherche
+          if (brand.includes(search)) return 2;
+
+          // 4. Le nom correspond exactement
+          if (name === search) return 3;
+
+          // 5. Le nom commence par la recherche
+          if (name.startsWith(search)) return 4;
+
+          // 6. Le nom contient la recherche
+          if (name.includes(search)) return 5;
+
+          // 7. Le type correspond exactement
+          if (type === search) return 6;
+
+          // 8. Le type contient la recherche
+          if (type.includes(search)) return 7;
+
+          return 8;
+        }
+
+        const scoreA = getSearchScore(
+          brandA,
+          nameA,
+          typeA
         );
 
-        if (brandA !== 0) return brandA;
+        const scoreB = getSearchScore(
+          brandB,
+          nameB,
+          typeB
+        );
 
-        return String(a.name || "").localeCompare(
-          String(b.name || "")
+        if (scoreA !== scoreB) {
+          return scoreA - scoreB;
+        }
+
+        const brandComparison = brandA.localeCompare(
+          brandB,
+          undefined,
+          {
+            sensitivity: "base",
+          }
+        );
+
+        if (brandComparison !== 0) {
+          return brandComparison;
+        }
+
+        return nameA.localeCompare(
+          nameB,
+          undefined,
+          {
+            sensitivity: "base",
+          }
         );
       });
   }, [pedalsLibrary, search, isSearching]);

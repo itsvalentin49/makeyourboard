@@ -261,17 +261,20 @@ export default function SpecsPower({
       {/* HERO PRODUIT */}
       <div className="shrink-0 flex flex-col items-center pt-2">
         {image && (
-          <div className="w-full flex items-center justify-center mb-4">
+          <div className="w-full min-h-[150px] flex items-center justify-center mb-4">
             <img
               src={image}
               alt={`${brand} ${name}`}
-              className="
-                max-w-[170px]
-                max-h-[140px]
-                object-contain
-              "
+              className="object-contain"
+              style={{
+                width: "180px",
+                height: "auto",
+                maxHeight: "135px",
+                maxWidth: "100%",
+              }}
               loading="lazy"
               decoding="async"
+              draggable={false}
             />
           </div>
         )}

@@ -457,7 +457,7 @@ export default function Sidebar({
       className={`
   relative z-40 w-full lg:w-76 shrink-0
   bg-zinc-800
-  px-6 pt-3 pb-6 flex flex-col gap-4 lg:gap-6
+  px-6 pt-3 pb-6 flex flex-col gap-4
   overflow-hidden touch-pan-y
   h-full
 `}
@@ -470,7 +470,7 @@ export default function Sidebar({
     >
 
       {/* Desktop logo only */}
-      <div className="hidden lg:block mb-2">
+      <div className="hidden lg:block">
         <SidebarLogo />
       </div>
 
@@ -696,10 +696,10 @@ export default function Sidebar({
       ) : (
 
         // LIBRARY (default view)
-        <div className="px-1 flex flex-col gap-4 flex-1 overflow-hidden">
+        <div className="px-1 mt-4 flex flex-col gap-4 flex-1 overflow-hidden">
 
           <div className="shrink-0">
-            <div className="grid grid-cols-5 gap-1">
+            <div className="grid grid-cols-5 gap-1.5">
               {
                 [
                   {
@@ -737,6 +737,35 @@ export default function Sidebar({
                   .map((tab) => {
                     const active = activeSidebarTab === tab.key;
 
+                    const tabStyle: Record<
+                      string,
+                      {
+                        background: string;
+                      }
+                    > = {
+                      pedals: {
+                        background: "#F4F2FF",
+                      },
+
+                      boards: {
+                        background: "#F2F7FC",
+                      },
+
+                      power: {
+                        background: "#FFF7DC",
+                      },
+
+                      custom: {
+                        background: "#FFF0E7",
+                      },
+
+                      import: {
+                        background: "#ECF9EF",
+                      },
+                    };
+
+                    const style = tabStyle[tab.key];
+
                     return (
                       <button
                         key={tab.key}
@@ -747,42 +776,56 @@ export default function Sidebar({
                           setShowBoardResults(false);
                           setShowPowerResults(false);
                         }}
-                        className={`
-  h-[50px]
-  min-w-0
-  rounded-xl
-  flex flex-col
-  items-center
-  justify-center
-  gap-1.5
-  transition-colors
-  duration-150
-  select-none
-  touch-manipulation
-  [-webkit-tap-highlight-color:transparent]
-  ${active
-                            ? "bg-tab"
-                            : "bg-transparent sidebar-tab-hover"
-                          }
-`}
+                        style={{
+                          width: "100%",
+                          aspectRatio: "1 / 1",
+                          borderRadius: "14px",
+                          background: style.background,
+
+                          border: active
+                            ? "2px solid #FFFFFF"
+                            : "1px solid rgba(0,0,0,0.035)",
+
+                          boxShadow: "none",
+
+                          transform: "scale(1)",
+
+                          transition:
+                            "transform 140ms ease-out, border-color 140ms ease-out",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.transform = "scale(1.05)";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.transform = "scale(1)";
+                        }}
+                        className="
+        min-w-0
+        flex
+        items-center
+        justify-center
+        select-none
+        touch-manipulation
+        [-webkit-tap-highlight-color:transparent]
+      "
                       >
                         <img
-                          src={isLightTheme ? tab.darkImage : tab.lightImage}
+                          src={tab.darkImage}
                           alt=""
                           aria-hidden="true"
                           draggable={false}
                           className="
-    w-[28px]
-    h-[28px]
-    object-contain
-    pointer-events-none
-    select-none
-  "
+          w-[28px]
+          h-[28px]
+          object-contain
+          pointer-events-none
+          select-none
+        "
                         />
-
                       </button>
                     );
-                  })}
+                  })
+              }
             </div>
           </div>
 

@@ -1282,239 +1282,324 @@ export default function BoardCanvas({
       )}
 
 
-      {!viewer && selectedInstanceId !== null && overlayPosition && (
-        <div
-          className="
-      absolute
-      z-[80]
-      flex
-      items-center
-      gap-2
-    "
-          style={{
-            left: overlayPosition.x,
-            top: Math.max(8, overlayPosition.y - 44),
-            transform: "translateX(-50%)",
-          }}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <button
-            onClick={() => rotatePedal(selectedInstanceId)}
+      {!viewer &&
+        overlayPosition &&
+        (selectedInstanceId !== null || selectedBoardInstanceId !== null) && (
+          <div
+            key={`actions-${selectedInstanceId ?? `board-${selectedBoardInstanceId}`}`}
             className="
-  w-9 h-9
-  rounded-xl
-  border border-zinc-700
-  bg-zinc-950
-  flex items-center justify-center
-  shadow-lg
-  hover:scale-105
-  active:scale-95
-  transition-all
-"
-          >
-            <RotateCw size={12} />
-          </button>
-
-          <button
-            onClick={() => deletePedal(selectedInstanceId)}
-            className="
-  w-9 h-9
-  rounded-xl
-  border border-zinc-700
-  bg-zinc-950
-  flex items-center justify-center
-  shadow-lg
-  hover:scale-105
-  active:scale-95
-  transition-all
-"
-          >
-            <Trash2 size={12} />
-          </button>
-
-          <button
-            onClick={() => {
-              const maxZ = Math.max(
-                0,
-                ...activeProject.boardPedals.map((p) => Number(p.zIndex) || 0),
-                ...(activeProject.selectedBoards || []).map((b) => Number(b.zIndex) || 0)
-              );
-
-              updateActiveProject({
-                boardPedals: activeProject.boardPedals.map((p) =>
-                  p.instanceId === selectedInstanceId
-                    ? { ...p, zIndex: maxZ + 1 }
-                    : p
-                ),
-              });
+        absolute
+        z-[80]
+        flex
+        items-center
+        gap-1
+      "
+            style={{
+              left: overlayPosition.x,
+              top: Math.max(8, overlayPosition.y - 44),
+              transform: "translateX(-50%)",
             }}
-            className="
-  w-9 h-9
-  rounded-xl
-  border border-zinc-700
-  bg-zinc-950
-  flex items-center justify-center
-  shadow-lg
-  hover:scale-105
-  active:scale-95
-  transition-all
-"
+            onClick={(e) => e.stopPropagation()}
           >
-            <ArrowUp size={12} />
-          </button>
+            {/* ROTATE */}
+            <div
+              className="relative w-10 h-10"
+              onMouseEnter={(e) => {
+                const button = e.currentTarget.querySelector("button");
 
-          <button
-            onClick={() => {
-              const minZ = Math.min(
-                0,
-                ...activeProject.boardPedals.map((p) => Number(p.zIndex) || 0),
-                ...(activeProject.selectedBoards || []).map((b) => Number(b.zIndex) || 0)
-              );
+                if (button) {
+                  button.style.width = "40px";
+                  button.style.height = "40px";
+                }
+              }}
+              onMouseLeave={(e) => {
+                const button = e.currentTarget.querySelector("button");
 
-              updateActiveProject({
-                boardPedals: activeProject.boardPedals.map((p) =>
-                  p.instanceId === selectedInstanceId
-                    ? { ...p, zIndex: minZ - 1 }
-                    : p
-                ),
-              });
-            }}
-            className="
-  w-9 h-9
-  rounded-xl
-  border border-zinc-700
-  bg-zinc-950
-  flex items-center justify-center
-  shadow-lg
-  hover:scale-105
-  active:scale-95
-  transition-all
-"
-          >
-            <ArrowDown size={12} />
-          </button>
-        </div>
-      )}
+                if (button) {
+                  button.style.width = "36px";
+                  button.style.height = "36px";
+                }
+              }}
+            >
+              <button
+                type="button"
+                aria-label="Rotate"
+                onClick={() => {
+                  if (selectedInstanceId !== null) {
+                    rotatePedal(selectedInstanceId);
+                  } else if (selectedBoardInstanceId !== null) {
+                    rotateBoard(selectedBoardInstanceId);
+                  }
+                }}
+                style={{
+                  position: "absolute",
+                  left: "50%",
+                  top: "50%",
+                  width: "36px",
+                  height: "36px",
+                  transform: "translate(-50%, -50%)",
+                  transition: "width 140ms ease-out, height 140ms ease-out",
+                }}
+                className="
+            rounded-xl
+            border border-zinc-700
+            bg-zinc-950
+            shadow-lg
+            p-0
+          "
+              />
 
+              <RotateCw
+                strokeWidth={2}
+                style={{
+                  position: "absolute",
+                  left: "50%",
+                  top: "50%",
+                  width: "15px",
+                  height: "15px",
+                  transform: "translate(-50%, -50%)",
+                  pointerEvents: "none",
+                  display: "block",
+                }}
+              />
+            </div>
 
-      {!viewer && selectedBoardInstanceId !== null && overlayPosition && (
-        <div
-          className="
-  absolute
-  z-[80]
-  flex
-  items-center
-  gap-2
-"
-          style={{
-            left: overlayPosition.x,
-            top: Math.max(8, overlayPosition.y - 44),
-            transform: "translateX(-50%)",
-          }}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <button
-            onClick={() => rotateBoard(selectedBoardInstanceId)}
-            className="
-  w-9 h-9
-  rounded-xl
-  border border-zinc-700
-  bg-zinc-950
-  flex items-center justify-center
-  shadow-lg
-  hover:scale-105
-  active:scale-95
-  transition-all
-"
-          >
-            <RotateCw size={12} />
-          </button>
+            {/* DELETE */}
+            <div
+              className="relative w-10 h-10"
+              onMouseEnter={(e) => {
+                const button = e.currentTarget.querySelector("button");
 
-          <button
-            onClick={() => deleteBoard(selectedBoardInstanceId)}
-            className="
-  w-9 h-9
-  rounded-xl
-  border border-zinc-700
-  bg-zinc-950
-  flex items-center justify-center
-  shadow-lg
-  hover:scale-105
-  active:scale-95
-  transition-all
-"
-          >
-            <Trash2 size={12} />
-          </button>
+                if (button) {
+                  button.style.width = "40px";
+                  button.style.height = "40px";
+                }
+              }}
+              onMouseLeave={(e) => {
+                const button = e.currentTarget.querySelector("button");
 
-          <button
-            onClick={() => {
-              const maxZ = Math.max(
-                0,
-                ...activeProject.boardPedals.map((p) => Number(p.zIndex) || 0),
-                ...(activeProject.selectedBoards || []).map(
-                  (b) => Number(b.zIndex) || 0
-                )
-              );
+                if (button) {
+                  button.style.width = "36px";
+                  button.style.height = "36px";
+                }
+              }}
+            >
+              <button
+                type="button"
+                aria-label="Delete"
+                onClick={() => {
+                  if (selectedInstanceId !== null) {
+                    deletePedal(selectedInstanceId);
+                  } else if (selectedBoardInstanceId !== null) {
+                    deleteBoard(selectedBoardInstanceId);
+                  }
+                }}
+                style={{
+                  position: "absolute",
+                  left: "50%",
+                  top: "50%",
+                  width: "36px",
+                  height: "36px",
+                  transform: "translate(-50%, -50%)",
+                  transition: "width 140ms ease-out, height 140ms ease-out",
+                }}
+                className="
+            rounded-xl
+            border border-zinc-700
+            bg-zinc-950
+            shadow-lg
+            p-0
+          "
+              />
 
-              updateActiveProject({
-                selectedBoards: (activeProject.selectedBoards || []).map((b) =>
-                  b.instanceId === selectedBoardInstanceId
-                    ? { ...b, zIndex: maxZ + 1 }
-                    : b
-                ),
-              });
-            }}
-            className="
-  w-9 h-9
-  rounded-xl
-  border border-zinc-700
-  bg-zinc-950
-  flex items-center justify-center
-  shadow-lg
-  hover:scale-105
-  active:scale-95
-  transition-all
-"
-          >
-            <ArrowUp size={12} />
-          </button>
+              <Trash2
+                strokeWidth={2}
+                style={{
+                  position: "absolute",
+                  left: "50%",
+                  top: "50%",
+                  width: "15px",
+                  height: "15px",
+                  transform: "translate(-50%, -50%)",
+                  pointerEvents: "none",
+                  display: "block",
+                }}
+              />
+            </div>
 
-          <button
-            onClick={() => {
-              const minZ = Math.min(
-                0,
-                ...activeProject.boardPedals.map((p) => Number(p.zIndex) || 0),
-                ...(activeProject.selectedBoards || []).map(
-                  (b) => Number(b.zIndex) || 0
-                )
-              );
+            {/* FRONT */}
+            <div
+              className="relative w-10 h-10"
+              onMouseEnter={(e) => {
+                const button = e.currentTarget.querySelector("button");
 
-              updateActiveProject({
-                selectedBoards: (activeProject.selectedBoards || []).map((b) =>
-                  b.instanceId === selectedBoardInstanceId
-                    ? { ...b, zIndex: minZ - 1 }
-                    : b
-                ),
-              });
-            }}
-            className="
-  w-9 h-9
-  rounded-xl
-  border border-zinc-700
-  bg-zinc-950
-  flex items-center justify-center
-  shadow-lg
-  hover:scale-105
-  active:scale-95
-  transition-all
-"
-          >
-            <ArrowDown size={12} />
-          </button>
-        </div>
-      )}
+                if (button) {
+                  button.style.width = "40px";
+                  button.style.height = "40px";
+                }
+              }}
+              onMouseLeave={(e) => {
+                const button = e.currentTarget.querySelector("button");
 
+                if (button) {
+                  button.style.width = "36px";
+                  button.style.height = "36px";
+                }
+              }}
+            >
+              <button
+                type="button"
+                aria-label="Bring to front"
+                onClick={() => {
+                  const maxZ = Math.max(
+                    0,
+                    ...activeProject.boardPedals.map(
+                      (p) => Number(p.zIndex) || 0
+                    ),
+                    ...(activeProject.selectedBoards || []).map(
+                      (b) => Number(b.zIndex) || 0
+                    )
+                  );
+
+                  if (selectedInstanceId !== null) {
+                    updateActiveProject({
+                      boardPedals: activeProject.boardPedals.map((p) =>
+                        p.instanceId === selectedInstanceId
+                          ? { ...p, zIndex: maxZ + 1 }
+                          : p
+                      ),
+                    });
+                  } else if (selectedBoardInstanceId !== null) {
+                    updateActiveProject({
+                      selectedBoards: (activeProject.selectedBoards || []).map(
+                        (b) =>
+                          b.instanceId === selectedBoardInstanceId
+                            ? { ...b, zIndex: maxZ + 1 }
+                            : b
+                      ),
+                    });
+                  }
+                }}
+                style={{
+                  position: "absolute",
+                  left: "50%",
+                  top: "50%",
+                  width: "36px",
+                  height: "36px",
+                  transform: "translate(-50%, -50%)",
+                  transition: "width 140ms ease-out, height 140ms ease-out",
+                }}
+                className="
+            rounded-xl
+            border border-zinc-700
+            bg-zinc-950
+            shadow-lg
+            p-0
+          "
+              />
+
+              <ArrowUp
+                strokeWidth={2}
+                style={{
+                  position: "absolute",
+                  left: "50%",
+                  top: "50%",
+                  width: "15px",
+                  height: "15px",
+                  transform: "translate(-50%, -50%)",
+                  pointerEvents: "none",
+                  display: "block",
+                }}
+              />
+            </div>
+
+            {/* BACK */}
+            <div
+              className="relative w-10 h-10"
+              onMouseEnter={(e) => {
+                const button = e.currentTarget.querySelector("button");
+
+                if (button) {
+                  button.style.width = "40px";
+                  button.style.height = "40px";
+                }
+              }}
+              onMouseLeave={(e) => {
+                const button = e.currentTarget.querySelector("button");
+
+                if (button) {
+                  button.style.width = "36px";
+                  button.style.height = "36px";
+                }
+              }}
+            >
+              <button
+                type="button"
+                aria-label="Send to back"
+                onClick={() => {
+                  const minZ = Math.min(
+                    0,
+                    ...activeProject.boardPedals.map(
+                      (p) => Number(p.zIndex) || 0
+                    ),
+                    ...(activeProject.selectedBoards || []).map(
+                      (b) => Number(b.zIndex) || 0
+                    )
+                  );
+
+                  if (selectedInstanceId !== null) {
+                    updateActiveProject({
+                      boardPedals: activeProject.boardPedals.map((p) =>
+                        p.instanceId === selectedInstanceId
+                          ? { ...p, zIndex: minZ - 1 }
+                          : p
+                      ),
+                    });
+                  } else if (selectedBoardInstanceId !== null) {
+                    updateActiveProject({
+                      selectedBoards: (activeProject.selectedBoards || []).map(
+                        (b) =>
+                          b.instanceId === selectedBoardInstanceId
+                            ? { ...b, zIndex: minZ - 1 }
+                            : b
+                      ),
+                    });
+                  }
+                }}
+                style={{
+                  position: "absolute",
+                  left: "50%",
+                  top: "50%",
+                  width: "36px",
+                  height: "36px",
+                  transform: "translate(-50%, -50%)",
+                  transition: "width 140ms ease-out, height 140ms ease-out",
+                }}
+                className="
+            rounded-xl
+            border border-zinc-700
+            bg-zinc-950
+            shadow-lg
+            p-0
+          "
+              />
+
+              <ArrowDown
+                strokeWidth={2}
+                style={{
+                  position: "absolute",
+                  left: "50%",
+                  top: "50%",
+                  width: "15px",
+                  height: "15px",
+                  transform: "translate(-50%, -50%)",
+                  pointerEvents: "none",
+                  display: "block",
+                }}
+              />
+            </div>
+          </div>
+        )}
 
 
 
@@ -1575,24 +1660,65 @@ export default function BoardCanvas({
 
                 {/* MENU À DROITE */}
                 <div className="fixed bottom-6 right-4 z-50">
-                  <button
-                    onClick={() => {
-                      closeBottomPanels();
-                      setShowMobileMenu((v) => !v);
-                    }}
-                    className="
-  flex items-center justify-center gap-2
-  h-8 w-20
-  bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl
-  text-[10px] font-mono font-bold uppercase
-  cursor-pointer
-  transition-all duration-200
-  hover:scale-105 hover:border-blue-500
-  active:scale-95
-"
-                  >
-                    Menu
-                  </button>
+                  <div className="w-[84px] h-9 flex items-center justify-center">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        closeBottomPanels();
+                        setShowMobileMenu((v) => !v);
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.width = "84px";
+                        e.currentTarget.style.height = "36px";
+
+                        const label = e.currentTarget.querySelector("span");
+
+                        if (label) {
+                          label.style.fontSize = "11px";
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.width = "80px";
+                        e.currentTarget.style.height = "32px";
+
+                        const label = e.currentTarget.querySelector("span");
+
+                        if (label) {
+                          label.style.fontSize = "10px";
+                        }
+                      }}
+                      style={{
+                        width: "80px",
+                        height: "32px",
+                        transition: "width 140ms ease-out, height 140ms ease-out",
+                      }}
+                      className="
+        bg-zinc-900
+        border border-zinc-800
+        rounded-2xl
+        shadow-2xl
+        flex
+        items-center
+        justify-center
+        p-0
+        cursor-pointer
+        font-mono
+        font-bold
+        uppercase
+      "
+                    >
+                      <span
+                        style={{
+                          fontSize: "10px",
+                          lineHeight: 1,
+                          pointerEvents: "none",
+                          display: "block",
+                        }}
+                      >
+                        Menu
+                      </span>
+                    </button>
+                  </div>
 
                   {showMobileMenu && (
                     <>
