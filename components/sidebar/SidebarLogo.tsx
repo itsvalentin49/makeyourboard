@@ -4,20 +4,22 @@ type Props = {
   compact?: boolean;
 };
 
-export default function SidebarLogo({ compact = false }: Props) {
+export default function SidebarLogo({
+  compact = false,
+}: Props) {
   return (
     <div
       className={
         compact
-          ? "select-none"
-          : "px-1 pb-0 pt-2 select-none"
+          ? "select-none flex flex-col items-center"
+          : "pb-0 pt-2 select-none flex flex-col items-center"
       }
     >
       <div
         className={
           compact
-            ? "text-[22px] font-black tracking-tight leading-none"
-            : "text-[34px] font-black tracking-tight leading-none"
+            ? "w-fit text-[22px] font-black tracking-tight leading-none"
+            : "w-fit text-[34px] font-black tracking-tight leading-none"
         }
       >
         MakeYourBoard
@@ -26,8 +28,8 @@ export default function SidebarLogo({ compact = false }: Props) {
       <div
         className={
           compact
-            ? "mt-1 text-[7px] font-bold tracking-[0.28em] uppercase leading-none whitespace-nowrap"
-            : "mt-1 text-[10px] font-bold tracking-[0.37em] uppercase leading-none whitespace-nowrap"
+            ? "w-fit mt-1 text-[7px] font-bold tracking-[0.28em] uppercase leading-none whitespace-nowrap"
+            : "w-fit mt-1 text-[10px] font-bold tracking-[0.37em] uppercase leading-none whitespace-nowrap"
         }
       >
         Guitar Pedalboard Builder

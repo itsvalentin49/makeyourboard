@@ -289,8 +289,10 @@
     "no": "否"
   },
   "powerSetup": {
-    "title": "供电设置",
-    "outputs": {
+    "title": "电源设置",
+    "output": "输出",
+    "outputs": "输出",
+    "outputs_other": {
       "fixed": "固定输出",
       "fixed_plural": "固定输出",
       "switchable": "可切换输出",

@@ -81,7 +81,6 @@ export default function PowerSetup({
     border
     border-zinc-800
     rounded-xl
-    shadow-2xl
     p-4
   "
     >
@@ -100,7 +99,7 @@ export default function PowerSetup({
               return (
                 <div key={index} className="space-y-4">
                   <div className="w-full flex justify-center">
-                    <div className="overflow-hidden rounded-md">
+                    <div className="overflow-hidden rounded-sm">
                       <img
                         src={p.image || p.image_url || p.photo}
                         alt={p.name}
@@ -110,8 +109,13 @@ export default function PowerSetup({
                   </div>
 
                   <div className="text-center">
-                    <div className="text-[14px] font-semibold leading-tight mb-3">
-                      {p.brand} {p.name}
+                    <div className="text-[14px] leading-tight mb-3">
+                      <span className="font-bold">
+                        {p.brand}
+                      </span>{" "}
+                      <span className="font-normal">
+                        {p.name}
+                      </span>
                     </div>
 
                     <div
@@ -129,19 +133,19 @@ export default function PowerSetup({
                         }));
 
                         return (
-                          <div key={i} className="space-y-2 text-center">
-                            <div className="text-[10px] text-zinc-500 uppercase tracking-wide">
+                          <div key={i} className="space-y-1 text-center">
+                            <div className="text-[10px] font-bold uppercase tracking-wide">
                               {o.count}{" "}
                               {o.isSwitch
                                 ? t(
                                   o.count > 1
-                                    ? "powerSetup.outputs.switchable_plural"
-                                    : "powerSetup.outputs.switchable"
+                                    ? "powerSetup.outputs_other.switchable_plural"
+                                    : "powerSetup.outputs_other.switchable"
                                 )
                                 : t(
                                   o.count > 1
-                                    ? "powerSetup.outputs.fixed_plural"
-                                    : "powerSetup.outputs.fixed"
+                                    ? "powerSetup.outputs_other.fixed_plural"
+                                    : "powerSetup.outputs_other.fixed"
                                 )}
                             </div>
 
@@ -194,17 +198,24 @@ export default function PowerSetup({
                 className="grid grid-cols-[auto_1fr_auto] items-end text-[11px] leading-none"
               >
                 <div className="flex items-center gap-1 whitespace-nowrap">
-                  <span className="text-zinc-500 font-bold">
+                  <span className="shrink-0">
+                    •
+                  </span>
+
+                  <span className="font-bold">
                     {a.pedal.brand || "Custom"}
                   </span>
-                  <span>{a.pedal.name}</span>
+
+                  <span>
+                    {a.pedal.name}
+                  </span>
                 </div>
 
                 <div className="mx-2 border-b border-dotted border-zinc-600 mb-[2px]" />
 
                 <div className="text-[11px] whitespace-nowrap text-right">
                   {String(a.pedal.power || "").toLowerCase() === "passive" ? (
-                    <span className="">
+                    <span>
                       {t("pedal.power.Passive")}
                     </span>
                   ) : (
@@ -284,13 +295,13 @@ export default function PowerSetup({
                     )}
 
                     {isMixedWithMultipleDigital && (
-                      <div className="text-yellow-400">
+                      <div className="text-yellow-500">
                         {t("powerSetup.recommendation.isolated")}
                       </div>
                     )}
 
                     {isLargeBoard && (
-                      <div className="text-yellow-400">
+                      <div className="text-yellow-500">
                         {t("powerSetup.recommendation.isolated")}
                       </div>
                     )}

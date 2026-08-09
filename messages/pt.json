@@ -289,8 +289,10 @@
     "no": "Não"
   },
   "powerSetup": {
-    "title": "Configuração de alimentação",
-    "outputs": {
+    "title": "Alimentação",
+    "output": "Saída",
+    "outputs": "Saídas",
+    "outputs_other": {
       "fixed": "Saída fixa",
       "fixed_plural": "Saídas fixas",
       "switchable": "Saída comutável",

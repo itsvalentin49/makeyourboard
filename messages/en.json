@@ -293,7 +293,9 @@
   },
   "powerSetup": {
     "title": "Power Setup",
-    "outputs": {
+    "output": "Output",
+    "outputs": "Outputs",
+    "outputs_other": {
       "fixed": "Fixed output",
       "fixed_plural": "Fixed outputs",
       "switchable": "Switchable output",

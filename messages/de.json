@@ -289,8 +289,10 @@
     "no": "Nein"
   },
   "powerSetup": {
-    "title": "Stromversorgung Setup",
-    "outputs": {
+    "title": "Stromversorgung",
+    "output": "Ausgang",
+    "outputs": "Ausgänge",
+    "outputs_other": {
       "fixed": "Fester Ausgang",
       "fixed_plural": "Feste Ausgänge",
       "switchable": "Umschaltbarer Ausgang",

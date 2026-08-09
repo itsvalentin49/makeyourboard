@@ -289,12 +289,14 @@
     "no": "No"
   },
   "powerSetup": {
-    "title": "Configurazione alimentazione",
-    "outputs": {
+    "title": "Alimentazione",
+    "output": "Uscita",
+    "outputs": "Uscite",
+    "outputs_other": {
       "fixed": "Uscita fissa",
       "fixed_plural": "Uscite fisse",
-      "switchable": "Uscita selezionabile",
-      "switchable_plural": "Uscite selezionabili"
+      "switchable": "Uscita commutabile",
+      "switchable_plural": "Uscite commutabili"
     },
     "sections": {
       "pedals": "Pedali",

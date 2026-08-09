@@ -2256,11 +2256,27 @@ fixed right-4 bottom-16
               {showPower && (
                 <>
                   <div className="fixed inset-0 z-40 pointer-events-none" />
-                  <div className={`
-    z-50
-fixed right-4 bottom-16
-  `}>
 
+                  <div
+                    className="
+    z-[100]
+    fixed
+    right-4
+    bottom-16
+
+    max-h-[calc(100dvh-80px)]
+    overflow-y-auto
+    overflow-x-hidden
+    overscroll-contain
+
+    [scrollbar-width:none]
+    [-ms-overflow-style:none]
+    [&::-webkit-scrollbar]:hidden
+  "
+                    onWheel={(e) => {
+                      e.stopPropagation();
+                    }}
+                  >
                     <PowerSetup
                       t={t}
                       powerUnits={powerUnits}

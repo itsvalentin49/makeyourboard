@@ -25,16 +25,16 @@ type Props = {
 
 const POPULAR_POWER_SUPPLIES = [
   "Cioks DC7 V2",
-  "Cioks Sol",
   "Strymon Zuma",
-  "Strymon Ojai",
-  "Voodoo Lab Pedal Power 2 Plus",
   "Voodoo Lab Pedal Power 3",
+  "Cioks Sol",
+  "Strymon Ojai",
   "Truetone 1 SPOT Pro CS6",
-  "Truetone 1 SPOT Pro CS7",
   "Harley Benton PowerPlant ISO-2 Pro",
+  "Voodoo Lab Pedal Power X8",
   "MXR DC Brick | M237",
-  "Walrus Audio Canvas Power 5",
+  "Truetone 1 SPOT Pro CS12",
+  "Walrus Audio Canvas Power HP",
   "Fender Engine Room LVL8",
 ];
 
@@ -241,8 +241,12 @@ export default function SearchPower({
         {/* LISTE */}
         <div className="flex flex-col gap-0 overflow-y-auto no-scrollbar pb-6 min-h-0">
           {visiblePower.length > 0 ? (
-            visiblePower.map((power) => {
+            visiblePower.map((power, index) => {
               const image = power.thumbnail || null;
+              const podium =
+                !isSearching && index < 3
+                  ? ["🥇", "🥈", "🥉"][index]
+                  : null;
 
               return (
                 <button
@@ -316,6 +320,22 @@ export default function SearchPower({
                       </div>
                     </div>
                   </div>
+
+                  {podium && (
+                    <span
+                      className="
+      absolute
+      right-2
+      top-1/2
+      -translate-y-1/2
+      text-[18px]
+      leading-none
+      pointer-events-none
+    "
+                    >
+                      {podium}
+                    </span>
+                  )}
                 </button>
               );
             })

@@ -291,11 +291,13 @@
   },
   "powerSetup": {
     "title": "Alimentation",
-    "outputs": {
-      "fixed": "sortie fixe",
-      "fixed_plural": "sorties fixes",
-      "switchable": "sortie commutable",
-      "switchable_plural": "sorties commutables"
+    "output": "Sortie",
+    "outputs": "Sorties",
+    "outputs_other": {
+      "fixed": "Sortie fixe",
+      "fixed_plural": "Sorties fixes",
+      "switchable": "Sortie commutable",
+      "switchable_plural": "Sorties commutables"
     },
     "sections": {
       "pedals": "Pédales",

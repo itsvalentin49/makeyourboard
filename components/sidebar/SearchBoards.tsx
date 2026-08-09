@@ -25,14 +25,14 @@ const POPULAR_BOARDS = [
   "Pedaltrain Classic JR",
   "Pedaltrain Nano +",
   "Pedaltrain Metro 16",
+  "Temple Audio Duo 24 GM",
   "RockBoard TRES 3.1",
-  "RockBoard QUAD 4.2",
   "Temple Audio Solo 18 GM",
-  "Temple Audio Duo 17 GM",
-  "Harley Benton Spaceship 40",
-  "Aclam Smart Track XS2 Free",
+  "RockBoard QUAD 4.2",
   "Daddario XPND 2 Core",
   "Mono Cases Rail Small",
+  "Harley Benton Spaceship 40",
+  "Aclam Smart Track XS2 Free",
   "Creation Music Company Elevation 24",
 ];
 
@@ -237,8 +237,12 @@ export default function SearchBoards({
         {/* LISTE */}
         <div className="flex flex-col gap-0 overflow-y-auto no-scrollbar pb-6 min-h-0">
           {visibleBoards.length > 0 ? (
-            visibleBoards.map((board) => {
+            visibleBoards.map((board, index) => {
               const image = board.thumbnail || null;
+              const podium =
+                !isSearching && index < 3
+                  ? ["🥇", "🥈", "🥉"][index]
+                  : null;
 
               return (
                 <button
@@ -312,6 +316,22 @@ export default function SearchBoards({
                       </div>
                     </div>
                   </div>
+
+                  {podium && (
+                    <span
+                      className="
+      absolute
+      right-2
+      top-1/2
+      -translate-y-1/2
+      text-[18px]
+      leading-none
+      pointer-events-none
+    "
+                    >
+                      {podium}
+                    </span>
+                  )}
                 </button>
               );
             })
