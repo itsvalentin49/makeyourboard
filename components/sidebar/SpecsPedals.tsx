@@ -284,6 +284,19 @@ export default function PedalSpecs({
     t
   );
 
+  const normalizedPower = String(
+    selectedPedal.power || ""
+  )
+    .trim()
+    .toLowerCase();
+
+  const shouldShowDraw = ![
+    "ac",
+    "passive",
+    "usb",
+    "battery",
+  ].includes(normalizedPower);
+
   const status = hasValue(
     selectedPedal.status
   )
@@ -519,10 +532,12 @@ export default function PedalSpecs({
             value={power}
           />
 
-          <SpecRow
-            label={t("pedal.draw")}
-            value={draw}
-          />
+          {shouldShowDraw && (
+            <SpecRow
+              label={t("pedal.draw")}
+              value={draw}
+            />
+          )}
 
           <SpecRow
             label={t(

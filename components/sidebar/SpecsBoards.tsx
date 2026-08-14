@@ -386,51 +386,70 @@ export default function BoardSpecs({
         )}
 
         <div className="w-full min-w-0">
-          <div className="flex flex-col gap-0.5 min-w-0">
-            {/* MARQUE */}
+          {/* MARQUE + BADGE */}
+          <div
+            className="
+      flex
+      items-center
+      justify-between
+      gap-3
+      min-w-0
+    "
+          >
             {brand && (
-              <div className="text-[15px] font-black truncate">
+              <div
+                className="
+          text-[15px]
+          font-black
+          truncate
+          min-w-0
+        "
+              >
                 {brand}
               </div>
             )}
 
-            {/* NOM DU BOARD */}
-            {name && (
-              <div className="text-[12px] truncate">
-                {name}
-              </div>
-            )}
-
-            {/* BADGE TYPE */}
-            <div className="flex items-center gap-1.5 flex-wrap mt-2">
-              <span
-                className="
-                  px-2.5
-                  py-1
-                  rounded-full
-                  bg-white
-                  text-zinc-950
-                  text-[9px]
-                  font-black
-                  leading-none
-                  whitespace-nowrap
-                "
-              >
-                {boardType}
-              </span>
-            </div>
+            <span
+              className="
+        shrink-0
+        px-2.5
+        py-1
+        rounded-full
+        bg-white
+        text-zinc-950
+        text-[9px]
+        font-black
+        leading-none
+        whitespace-nowrap
+      "
+            >
+              {boardType}
+            </span>
           </div>
+
+          {/* NOM DU BOARD */}
+          {name && (
+            <div
+              className="
+        text-[12px]
+        truncate
+        mt-0.5
+      "
+            >
+              {name}
+            </div>
+          )}
         </div>
       </div>
 
       {/* DESCRIPTION */}
       {hasValue(overview) && (
-        <div className="shrink-0 flex flex-col gap-2">
+        <div className="w-full min-w-0 shrink-0 flex flex-col gap-2">
           <div className="text-[15px] font-black">
             {t("pedal.description")}
           </div>
 
-          <p className="text-[12px] leading-relaxed text-pretty">
+          <p className="w-full max-w-none text-[12px] leading-relaxed whitespace-normal break-words">
             {overview}
           </p>
         </div>

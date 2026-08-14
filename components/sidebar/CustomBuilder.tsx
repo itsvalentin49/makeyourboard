@@ -655,7 +655,7 @@ export default function CustomBuilder({
               : t("customMenu.pedalSubtitle")}
           </div>
 
-          <div className="text-[9px] leading-[1.45] text-zinc-400">
+          <div className="text-[9px] leading-[1.45]">
             •{" "}
             {t("custom.dimensionError")
               .replace(

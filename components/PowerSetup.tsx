@@ -44,6 +44,7 @@ type Props = {
   extraPedals: number;
   shouldShowNotEnough: boolean;
   shouldShowDaisy: boolean;
+  daisyPedalNames: string;
 
   extractOutputs: (details: string) => Output[];
 };
@@ -70,8 +71,428 @@ export default function PowerSetup({
   extraPedals,
   shouldShowNotEnough,
   shouldShowDaisy,
+  daisyPedalNames,
   extractOutputs,
 }: Props) {
+  const normalize = (value: any) =>
+    String(value ?? "")
+      .trim()
+      .toLowerCase();
+
+  const getTypes = (pedal: AnyRow): string[] => {
+    const rawType = pedal.type;
+
+    if (Array.isArray(rawType)) {
+      return rawType.map((type) => normalize(type)).filter(Boolean);
+    }
+
+    return String(rawType ?? "")
+      .split(/[,;/|]/)
+      .map((type) => normalize(type))
+      .filter(Boolean);
+  };
+
+  const formatPedalName = (pedal: AnyRow) =>
+    `${pedal.brand || "Custom"} ${pedal.name || ""}`.trim();
+
+  const getPedalVoltage = (pedal: AnyRow) =>
+    Number(pedal.voltage) || 9;
+
+  const getPedalDraw = (pedal: AnyRow) =>
+    Math.max(0, Number(pedal.draw) || 0);
+
+  const isExternallyPoweredPedal = (pedal: AnyRow) => {
+    const powerType = normalize(pedal.power);
+
+    return !["passive", "battery", "usb", "n/a"].includes(powerType);
+  };
+
+  const isAnalogPedal = (pedal: AnyRow) =>
+    normalize(pedal.circuit) === "analog";
+
+  const isDigitalPedal = (pedal: AnyRow) =>
+    normalize(pedal.circuit) === "digital";
+
+  const isOverdrivePedal = (pedal: AnyRow) =>
+    getTypes(pedal).includes("overdrive");
+
+  const isBossTunerWithDCOut = (pedal: AnyRow) => {
+    const brand = normalize(pedal.brand);
+    const name = normalize(pedal.name);
+
+    if (brand !== "boss") {
+      return false;
+    }
+
+    const model = name.split(/\s+/)[0];
+
+    return ["tu-3", "tu-3w", "tu-3s"].includes(model);
+  };
+
+  const poweredPedals = pedalAssignments
+    .map((assignment) => assignment.pedal)
+    .filter(isExternallyPoweredPedal);
+
+  /*
+   * Transforme les groupes de sorties de l'alimentation en sorties
+   * physiques individuelles.
+   *
+   * Exemple Canvas Power 5 :
+   * 4x 9V / 500 mA
+   * 1x 9/12/18V
+   *
+   * devient cinq sorties 9V utilisables.
+   */
+  const physicalOutputs = powerUnits.flatMap((powerUnit) => {
+    const outputs = extractOutputs(powerUnit.details || "");
+
+    return outputs.flatMap((output) => {
+      const result: {
+        voltage: number;
+        current: number;
+      }[] = [];
+
+      for (let outputIndex = 0; outputIndex < output.count; outputIndex++) {
+        output.voltages.forEach((voltage, voltageIndex) => {
+          const numericVoltage = Number(voltage);
+
+          if (!Number.isFinite(numericVoltage)) {
+            return;
+          }
+
+          const current =
+            Number(output.currents[voltageIndex] ?? output.currents[0]) || 0;
+
+          result.push({
+            voltage: numericVoltage,
+            current,
+          });
+        });
+      }
+
+      return result;
+    });
+  });
+
+  /*
+   * Pour les recommandations de splitter, on privilégie :
+   *
+   * 1. Overdrive analogique
+   * 2. Autre pédale analogique
+   * 3. Consommation la plus faible
+   *
+   * Les pédales numériques ne sont pas proposées en daisy chain.
+   */
+  const analogCandidates = poweredPedals
+    .filter(isAnalogPedal)
+    .sort((a, b) => {
+      const aOverdrivePriority = isOverdrivePedal(a) ? 0 : 1;
+      const bOverdrivePriority = isOverdrivePedal(b) ? 0 : 1;
+
+      if (aOverdrivePriority !== bOverdrivePriority) {
+        return aOverdrivePriority - bOverdrivePriority;
+      }
+
+      return getPedalDraw(a) - getPedalDraw(b);
+    });
+
+  const bossTunerWithDCOut =
+    poweredPedals.find(isBossTunerWithDCOut) || null;
+
+  /*
+   * Retrouve l'assignation électrique du TU-3 / TU-3W / TU-3S
+   * afin de connaître la capacité de la sortie qui l'alimente.
+   */
+  const bossTunerAssignment = bossTunerWithDCOut
+    ? pedalAssignments.find(
+      (assignment) => assignment.pedal === bossTunerWithDCOut
+    )
+    : undefined;
+
+  /*
+   * Courant disponible à 9V sur la sortie qui alimente l'accordeur.
+   */
+  const tunerOutputCapacity = (() => {
+    const output = bossTunerAssignment?.output;
+
+    if (!output) {
+      return 0;
+    }
+
+    const voltageIndex = output.voltages.findIndex(
+      (voltage) => Number(voltage) === 9
+    );
+
+    if (voltageIndex === -1) {
+      return 0;
+    }
+
+    return Number(
+      output.currents[voltageIndex] ?? output.currents[0]
+    ) || 0;
+  })();
+
+  /*
+   * Consommation propre de l'accordeur.
+   * Elle doit être incluse dans le courant total utilisé
+   * sur la sortie de l'alimentation.
+   */
+  const tunerDraw = bossTunerWithDCOut
+    ? getPedalDraw(bossTunerWithDCOut)
+    : 0;
+
+  /*
+   * Candidats pouvant être alimentés depuis le DC OUT :
+   * - analogiques
+   * - 9V
+   * - l'accordeur lui-même est exclu
+   *
+   * analogCandidates est déjà trié :
+   * 1. overdrives analogiques
+   * 2. autres analogiques
+   * 3. consommation la plus faible
+   */
+  const tunerCandidates =
+    bossTunerWithDCOut && extraPedals > 0
+      ? analogCandidates.filter(
+        (pedal) =>
+          pedal !== bossTunerWithDCOut &&
+          getPedalVoltage(pedal) === 9
+      )
+      : [];
+
+  /*
+   * On autorise au maximum 3 pédales supplémentaires
+   * sur le DC OUT du tuner.
+   *
+   * On ne prend que le nombre nécessaire pour résoudre
+   * le manque de sorties.
+   */
+  const maxTunerPedals = Math.min(
+    3,
+    extraPedals,
+    tunerCandidates.length
+  );
+
+  const tunerPoweredPedals: AnyRow[] = [];
+
+  let tunerChainDraw = tunerDraw;
+
+  for (const pedal of tunerCandidates) {
+    if (tunerPoweredPedals.length >= maxTunerPedals) {
+      break;
+    }
+
+    const pedalDraw = getPedalDraw(pedal);
+
+    if (
+      tunerOutputCapacity > 0 &&
+      tunerChainDraw + pedalDraw <= tunerOutputCapacity
+    ) {
+      tunerPoweredPedals.push(pedal);
+      tunerChainDraw += pedalDraw;
+    }
+  }
+
+  /*
+   * Chaque pédale alimentée depuis le DC OUT économise
+   * une sortie sur l'alimentation principale.
+   */
+  const tunerSavedOutputs = tunerPoweredPedals.length;
+
+  let remainingOutputsToSave = Math.max(
+    0,
+    extraPedals - tunerSavedOutputs
+  );
+
+  /*
+   * Les pédales déjà alimentées par le tuner sont retirées
+   * des candidats au splitter.
+   */
+  const splitterCandidates = analogCandidates.filter(
+    (pedal) =>
+      pedal !== bossTunerWithDCOut &&
+      !tunerPoweredPedals.includes(pedal)
+  );
+
+  const availableOutputCapacities = physicalOutputs
+    .filter((output) => output.voltage === 9)
+    .map((output) => output.current)
+    .filter((current) => current > 0)
+    .sort((a, b) => b - a);
+
+  type SplitterGroup = {
+    pedals: AnyRow[];
+    totalDraw: number;
+    outputCapacity: number;
+    savedOutputs: number;
+  };
+
+  const splitterGroups: SplitterGroup[] = [];
+
+  const unusedCandidates = [...splitterCandidates];
+
+  /*
+   * Chaque pédale supplémentaire placée sur une même sortie
+   * économise une sortie.
+   *
+   * 2 pédales = 1 sortie économisée
+   * 3 pédales = 2 sorties économisées
+   * 4 pédales = 3 sorties économisées
+   * etc.
+   */
+  for (const outputCapacity of availableOutputCapacities) {
+    if (remainingOutputsToSave <= 0) {
+      break;
+    }
+
+    if (unusedCandidates.length < 2) {
+      break;
+    }
+
+    const group: AnyRow[] = [];
+    let groupDraw = 0;
+
+    /*
+     * Pour économiser N sorties, il faut au maximum N + 1 pédales
+     * dans le groupe courant.
+     */
+    const maxPedalsNeeded = Math.min(
+      3,
+      remainingOutputsToSave + 1
+    );
+
+    for (let i = 0; i < unusedCandidates.length;) {
+      const pedal = unusedCandidates[i];
+
+      if (getPedalVoltage(pedal) !== 9) {
+        i++;
+        continue;
+      }
+
+      const pedalDraw = getPedalDraw(pedal);
+
+      if (
+        group.length < maxPedalsNeeded &&
+        groupDraw + pedalDraw <= outputCapacity
+      ) {
+        group.push(pedal);
+        groupDraw += pedalDraw;
+        unusedCandidates.splice(i, 1);
+      } else {
+        i++;
+      }
+
+      if (group.length >= maxPedalsNeeded) {
+        break;
+      }
+    }
+
+    if (group.length >= 2) {
+      const savedOutputs = group.length - 1;
+
+      splitterGroups.push({
+        pedals: group,
+        totalDraw: groupDraw,
+        outputCapacity,
+        savedOutputs,
+      });
+
+      remainingOutputsToSave = Math.max(
+        0,
+        remainingOutputsToSave - savedOutputs
+      );
+    } else {
+      /*
+       * Si on n'a pas réussi à former un groupe, on remet
+       * l'éventuelle pédale retirée dans les candidats.
+       */
+      unusedCandidates.unshift(...group);
+    }
+  }
+
+  const recommendationCanSolve =
+    extraPedals > 0 &&
+    remainingOutputsToSave === 0;
+
+  const formatPedalList = (pedals: AnyRow[]) => {
+    const names = pedals.map(formatPedalName);
+
+    if (names.length === 0) {
+      return "";
+    }
+
+    if (names.length === 1) {
+      return names[0];
+    }
+
+    if (names.length === 2) {
+      return `${names[0]} et ${names[1]}`;
+    }
+
+    return `${names.slice(0, -1).join(", ")} et ${names[names.length - 1]
+      }`;
+  };
+
+  const renderPedalName = (pedal: AnyRow) => (
+    <>
+      <span className="font-bold">
+        {pedal.brand || "Custom"}
+      </span>{" "}
+      <span>
+        {pedal.name || ""}
+      </span>
+    </>
+  );
+
+  const renderPedalList = (pedals: AnyRow[]) => (
+    <>
+      {pedals.map((pedal, index) => (
+        <React.Fragment key={index}>
+          {index > 0 &&
+            (index === pedals.length - 1
+              ? " et "
+              : ", ")}
+          {renderPedalName(pedal)}
+        </React.Fragment>
+      ))}
+    </>
+  );
+
+  const renderPedalSentence = (
+    text: string,
+    pedals: AnyRow[]
+  ) => {
+    const [before, after = ""] = text.split("{pedals}");
+
+    return (
+      <>
+        {before}
+        {renderPedalList(pedals)}
+        {after}
+      </>
+    );
+  };
+
+  const splitterPoweredPedals = splitterGroups.flatMap(
+    (group) => group.pedals
+  );
+
+  const individuallyPoweredPedals = poweredPedals.filter(
+    (pedal) =>
+      !tunerPoweredPedals.includes(pedal) &&
+      !splitterPoweredPedals.includes(pedal)
+  );
+
+  const splitterRecommendationText = splitterGroups
+    .map((group) =>
+      t("powerSetup.recommendation.splitterGroup")
+        .replace("{pedals}", formatPedalList(group.pedals))
+        .replace("{draw}", String(group.totalDraw))
+        .replace("{capacity}", String(group.outputCapacity))
+    )
+    .join(" ");
+
   return (
     <div
       className="
@@ -179,7 +600,7 @@ export default function PowerSetup({
         </div>
       )}
 
-      <div className="mb-1 mt-6 text-[10px] uppercase tracking-wide font-bold">
+      <div className="mb-1 mt-6 text-[11px] uppercase tracking-wide font-bold">
         {t("powerSetup.sections.pedals")}
       </div>
 
@@ -214,24 +635,56 @@ export default function PowerSetup({
                 <div className="mx-2 border-b border-dotted border-zinc-600 mb-[2px]" />
 
                 <div className="text-[11px] whitespace-nowrap text-right">
-                  {String(a.pedal.power || "").toLowerCase() === "passive" ? (
-                    <span>
-                      {t("pedal.power.Passive")}
-                    </span>
-                  ) : (
-                    <span
-                      className={
-                        !hasPower
-                          ? ""
-                          : a.ok
-                            ? "text-green-600"
-                            : "text-red-500"
-                      }
-                    >
-                      {Number(a.pedal.voltage) || 9}V /{" "}
-                      {Number(a.pedal.draw) || 0}mA
-                    </span>
-                  )}
+                  {(() => {
+                    const powerType = String(a.pedal.power || "").toLowerCase();
+
+                    if (powerType === "passive") {
+                      return (
+                        <span>
+                          {t("pedal.power.Passive")}
+                        </span>
+                      );
+                    }
+
+                    if (powerType === "battery") {
+                      return (
+                        <span>
+                          {t("pedal.power.Battery")}
+                        </span>
+                      );
+                    }
+
+                    if (powerType === "usb") {
+                      return (
+                        <span>
+                          {t("pedal.power.USB")}
+                        </span>
+                      );
+                    }
+
+                    if (powerType === "ac") {
+                      return (
+                        <span>
+                          {t("pedal.power.AC")}
+                        </span>
+                      );
+                    }
+
+                    return (
+                      <span
+                        className={
+                          !hasPower
+                            ? ""
+                            : a.ok
+                              ? "text-green-600"
+                              : "text-red-500"
+                        }
+                      >
+                        {Number(a.pedal.voltage) || 9}V /{" "}
+                        {Number(a.pedal.draw) || 0}mA
+                      </span>
+                    );
+                  })()}
                 </div>
               </div>
             ))}
@@ -240,18 +693,29 @@ export default function PowerSetup({
       )}
 
       {hasPedals && powerMessage && (
-        <div className="flex items-center justify-between -mt-6">
-          <div className={`text-[12px] ${powerMessageColor}`}>
-            {powerMessage}
+        <div className="flex items-center justify-between -mt-3">
+          <div
+            className={`text-[12px] ${extraPedals > 0
+              ? recommendationCanSolve
+                ? "text-green-600"
+                : "text-red-500"
+              : powerMessageColor
+              }`}
+          >
+            {extraPedals > 0
+              ? recommendationCanSolve
+                ? t("powerSetup.status.requiresSplitters")
+                : t("powerSetup.status.notEnoughOutputs")
+              : powerMessage}
           </div>
         </div>
       )}
 
-      <div className="mb-1 mt-6 text-[10px] uppercase tracking-wide font-bold">
+      <div className="mb-1 mt-6 text-[11px] uppercase tracking-wide font-bold">
         {t("powerSetup.sections.recommendation")}
       </div>
 
-      <div className="space-y-2 text-[12px] -mt-1">
+      <div className="space-y-2 text-[11px] -mt-1">
         {!hasPedals && (
           <>
             <div className="text-blue-400">
@@ -301,7 +765,7 @@ export default function PowerSetup({
                     )}
 
                     {isLargeBoard && (
-                      <div className="text-yellow-500">
+                      <div className="text-green-600">
                         {t("powerSetup.recommendation.isolated")}
                       </div>
                     )}
@@ -330,32 +794,102 @@ export default function PowerSetup({
                   </div>
                 )}
 
-                {shouldShowNotEnough && (
-                  <div>
-                    <div className="text-red-500">
-                      {t("powerSetup.recommendation.full")}
-                    </div>
-                    <div className="text-zinc-400">
-                      {t("powerSetup.recommendation.fullHint")}
-                    </div>
-                  </div>
-                )}
+                {extraPedals > 0 && (
+                  <>
+                    {recommendationCanSolve ? (
+                      <div className="space-y-3">
+                        {bossTunerWithDCOut && tunerPoweredPedals.length > 0 && (
+                          <div className="flex gap-2">
+                            <span className="text-[11px] font-bold shrink-0">1.</span>
 
-                {shouldShowDaisy && (
-                  <div>
-                    <div className="text-yellow-500">
-                      {t("powerSetup.recommendation.daisy")}
-                    </div>
-                    <div className="text-zinc-400">
-                      {t("powerSetup.recommendation.daisyHint")}
-                    </div>
-                  </div>
-                )}
+                            <div>
+                              <div className="text-[11px] font-bold">
+                                {t("powerSetup.recommendation.stepTunerTitle")}
+                              </div>
 
-                {extraPedals > 0 && hasDaisyChainTuner && (
-                  <div className="text-zinc-400 -mt-3">
-                    {t("powerSetup.recommendation.tuner")}
-                  </div>
+                              <div>
+                                {(() => {
+                                  const text = t("powerSetup.recommendation.stepTuner");
+
+                                  const [beforeTuner, afterTuner = ""] =
+                                    text.split("{tuner}");
+
+                                  const [betweenTunerAndPedals, afterPedals = ""] =
+                                    afterTuner.split("{pedals}");
+
+                                  return (
+                                    <>
+                                      {beforeTuner}
+
+                                      {renderPedalName(bossTunerWithDCOut)}
+
+                                      {betweenTunerAndPedals}
+
+                                      {renderPedalList(tunerPoweredPedals)}
+
+                                      {afterPedals}
+                                    </>
+                                  );
+                                })()}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {splitterGroups.map((group, index) => {
+                          const stepNumber =
+                            (tunerPoweredPedals.length > 0 ? 2 : 1) + index;
+
+                          return (
+                            <div key={index} className="flex gap-2">
+                              <span className="text-[11px] font-bold shrink-0">
+                                {stepNumber}.
+                              </span>
+
+                              <div>
+                                <div className="text-[11px] font-bold">
+                                  {t("powerSetup.recommendation.stepSplitterTitle")
+                                    .replace("{count}", String(group.pedals.length))}
+                                </div>
+
+                                <div>
+                                  {renderPedalSentence(
+                                    t("powerSetup.recommendation.stepSplitter"),
+                                    group.pedals
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+
+                        <div className="flex gap-2">
+                          <span className="text-[11px] font-bold shrink-0">
+                            {(tunerPoweredPedals.length > 0 ? 1 : 0) +
+                              splitterGroups.length +
+                              1}.
+                          </span>
+
+                          <div>
+                            <div className="text-[11px] font-bold">
+                              {t("powerSetup.recommendation.stepOthersTitle")}
+                            </div>
+
+                            <div>
+                              {renderPedalSentence(
+                                t("powerSetup.recommendation.individualOthers"),
+                                individuallyPoweredPedals
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div>
+                        {t("powerSetup.recommendation.cannotSolve")}
+                      </div>
+                    )}
+                  </>
                 )}
               </>
             )}

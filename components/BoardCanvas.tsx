@@ -263,6 +263,7 @@ export default function BoardCanvas({
   const t = getTranslator(language);
   const [showSettings, setShowSettings] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [renderMobileMenu, setRenderMobileMenu] = useState(false);
   const [isLightTheme, setIsLightTheme] = useState(true);
 
   useEffect(() => {
@@ -459,6 +460,16 @@ export default function BoardCanvas({
       const nameB = `${b.brand || ""} ${b.name || ""}`.toLowerCase();
       return nameA.localeCompare(nameB);
     });
+  const poweredPedals = pedals.filter((p) => {
+    const powerType = String(p.power || "").toLowerCase();
+
+    return (
+      powerType !== "passive" &&
+      powerType !== "battery"
+    );
+  });
+
+
   const hasPedals = pedals.length > 0;
   const powerUnits = activeProject.boardPedals.filter(p => p.type === "power");
 
@@ -504,16 +515,23 @@ export default function BoardCanvas({
     .reduce((acc, p) => acc + (Number(p.outputs) || 0), 0);
 
   // séparer digital / analog
-  const digitalPedals = pedals.filter(p => {
+  const digitalPedals = poweredPedals.filter(p => {
     const circuit = (p.circuit || "").toLowerCase();
     return circuit.includes("digital") || circuit.includes("dsp");
   });
 
-  const analogPedals = pedals.filter(p => !digitalPedals.includes(p));
+  const analogPedals = poweredPedals.filter(
+    p => !digitalPedals.includes(p)
+  );
+
+  const daisyPedalNames = analogPedals
+    .map((p) => p.name)
+    .filter(Boolean)
+    .join(", ");
 
   // 🔥 NOUVELLE LOGIQUE SIMPLE (UX PRO)
 
-  const pedalCount = pedals.length;
+  const pedalCount = poweredPedals.length;
   const digitalCount = digitalPedals.length;
 
   // règles
@@ -1261,14 +1279,14 @@ export default function BoardCanvas({
               setShowExportPanel(false);
               setShowSettings(false);
               setShowSignalPath(false);
-            }} className="relative flex items-center justify-center gap-2 h-9 w-24 md:h-10 md:w-28 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl text-[11px] font-mono font-bold uppercase transition-all hover:border-blue-500">
+            }} className="relative flex items-center justify-center gap-2 h-9 w-24 md:h-10 md:w-28 bg-zinc-900 border border-zinc-800 rounded-2xl text-[11px] font-mono font-bold uppercase transition-all hover:border-blue-500">
               <List size={16} className="text-blue-400" /> {t("canvasControls.setup")}
             </button>
             {showList && (
               <>
                 <div className="fixed inset-0 z-40 pointer-events-none" />
                 <div className="absolute bottom-12 left-0 z-50">
-                  <div className="w-72 max-h-80 overflow-y-auto bg-zinc-900 border border-zinc-800 rounded-xl shadow-2xl p-4 space-y-3" onClick={(e) => e.stopPropagation()}>
+                  <div className="w-72 max-h-80 overflow-y-auto bg-zinc-900 border border-zinc-800 rounded-xl p-4 space-y-3" onClick={(e) => e.stopPropagation()}>
                     <div className="text-xs uppercase tracking-wider font-bold">{t("canvasControls.pedalboard")}</div>
                     {[...activeProject.boardPedals].sort((a, b) => (a.brand || "").localeCompare(b.brand || "")).map((p, i) => (
                       <div key={i} className="text-sm "><span className="text-zinc-400">- {p.brand || "Custom"}</span> {p.name || "Unnamed"}</div>
@@ -1659,95 +1677,95 @@ export default function BoardCanvas({
                 </div>
 
                 {/* MENU À DROITE */}
-                <div className="fixed bottom-6 right-4 z-50">
-                  <div className="w-[84px] h-9 flex items-center justify-center">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        closeBottomPanels();
-                        setShowMobileMenu((v) => !v);
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.width = "84px";
-                        e.currentTarget.style.height = "36px";
-
-                        const label = e.currentTarget.querySelector("span");
-
-                        if (label) {
-                          label.style.fontSize = "11px";
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.width = "80px";
-                        e.currentTarget.style.height = "32px";
-
-                        const label = e.currentTarget.querySelector("span");
-
-                        if (label) {
-                          label.style.fontSize = "10px";
-                        }
-                      }}
-                      style={{
-                        width: "80px",
-                        height: "32px",
-                        transition: "width 140ms ease-out, height 140ms ease-out",
-                      }}
+                <div
+                  className="
+    fixed
+    bottom-6
+    right-4
+    z-50
+    flex
+    items-center
+    gap-2
+  "
+                >
+                  {/* ONGLETS — se déploient vers la gauche */}
+                  {renderMobileMenu && (
+                    <div
                       className="
-        bg-zinc-900
-        border border-zinc-800
-        rounded-2xl
-        shadow-2xl
-        flex
-        items-center
-        justify-center
-        p-0
-        cursor-pointer
-        font-mono
-        font-bold
-        uppercase
-      "
+    hidden
+    lg:flex
+    items-center
+    gap-2
+  "
+                      onClick={(e) => e.stopPropagation()}
                     >
-                      <span
+                      {/* PEDALBOARDS */}
+                      <div
+                        className="relative h-9 shrink-0 flex items-center justify-center px-4"
                         style={{
-                          fontSize: "10px",
-                          lineHeight: 1,
-                          pointerEvents: "none",
-                          display: "block",
+                          opacity: showMobileMenu ? 1 : 0,
+                          transform: showMobileMenu ? "translateX(0)" : "translateX(16px)",
+                          transition: "opacity 180ms ease-out, transform 180ms ease-out",
+                          transitionDelay: showMobileMenu ? "200ms" : "0ms",
+                          pointerEvents: showMobileMenu ? "auto" : "none",
+                        }}
+                        onMouseEnter={(e) => {
+                          const button = e.currentTarget.querySelector("button");
+
+                          if (button) {
+                            button.style.width = "calc(100% + 4px)";
+                            button.style.height = "36px";
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          const button = e.currentTarget.querySelector("button");
+
+                          if (button) {
+                            button.style.width = "100%";
+                            button.style.height = "32px";
+                          }
                         }}
                       >
-                        Menu
-                      </span>
-                    </button>
-                  </div>
-
-                  {showMobileMenu && (
-                    <>
-                      <div
-                        className="fixed inset-0 z-40"
-                        onClick={() => setShowMobileMenu(false)}
-                      />
-
-                      <div
-                        className="
-          absolute
-          bottom-12
-          right-0
-          z-50
-          w-56
-          bg-zinc-900
-          border border-zinc-800
-          rounded-xl
-          shadow-2xl
-          p-2
-        "
-                        onClick={(e) => e.stopPropagation()}
-                      >
+                        {/* FOND DU BOUTON : lui seul grossit */}
                         <button
+                          type="button"
                           onClick={() => {
+                            closeBottomPanels();
                             setShowBoardsMenu(true);
-                            setShowMobileMenu(false);
                           }}
-                          className="w-full flex items-center gap-2 px-3 py-2 text-left rounded-lg transition-colors hover:bg-canvas"
+                          style={{
+                            position: "absolute",
+                            left: "50%",
+                            top: "50%",
+                            width: "100%",
+                            height: "32px",
+                            transform: "translate(-50%, -50%)",
+                            transition: "width 140ms ease-out, height 140ms ease-out",
+                          }}
+                          className="
+      bg-zinc-900
+      border border-zinc-800
+      rounded-2xl
+      p-0
+      cursor-pointer
+    "
+                        />
+
+                        {/* CONTENU : ne grossit jamais */}
+                        <div
+                          className="
+      relative
+      z-10
+      flex
+      items-center
+      justify-center
+      gap-2
+      whitespace-nowrap
+      pointer-events-none
+      text-[10px]
+      font-bold
+      uppercase
+    "
                         >
                           <img
                             src={
@@ -1760,15 +1778,76 @@ export default function BoardCanvas({
                             draggable={false}
                             className="w-[18px] h-[18px] object-contain shrink-0"
                           />
-                          {t("canvasControls.boards")}
-                        </button>
 
+                          {t("canvasControls.boards")}
+                        </div>
+                      </div>
+
+                      {/* CÂBLES */}
+                      <div
+                        className="relative h-9 shrink-0 flex items-center justify-center px-4"
+                        style={{
+                          opacity: showMobileMenu ? 1 : 0,
+                          transform: showMobileMenu ? "translateX(0)" : "translateX(16px)",
+                          transition: "opacity 180ms ease-out, transform 180ms ease-out",
+                          transitionDelay: showMobileMenu ? "150ms" : "50ms",
+                          pointerEvents: showMobileMenu ? "auto" : "none",
+                        }}
+                        onMouseEnter={(e) => {
+                          const button = e.currentTarget.querySelector("button");
+
+                          if (button) {
+                            button.style.width = "calc(100% + 4px)";
+                            button.style.height = "36px";
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          const button = e.currentTarget.querySelector("button");
+
+                          if (button) {
+                            button.style.width = "100%";
+                            button.style.height = "32px";
+                          }
+                        }}
+                      >
                         <button
+                          type="button"
                           onClick={() => {
+                            closeBottomPanels();
                             setShowCableMenu(true);
-                            setShowMobileMenu(false);
                           }}
-                          className="w-full flex items-center gap-2 px-3 py-2 text-left rounded-lg transition-colors hover:bg-canvas"
+                          style={{
+                            position: "absolute",
+                            left: "50%",
+                            top: "50%",
+                            width: "100%",
+                            height: "32px",
+                            transform: "translate(-50%, -50%)",
+                            transition: "width 140ms ease-out, height 140ms ease-out",
+                          }}
+                          className="
+      bg-zinc-900
+      border border-zinc-800
+      rounded-2xl
+      p-0
+      cursor-pointer
+    "
+                        />
+
+                        <div
+                          className="
+      relative
+      z-10
+      flex
+      items-center
+      justify-center
+      gap-2
+      whitespace-nowrap
+      pointer-events-none
+      text-[10px]
+      font-bold
+      uppercase
+    "
                         >
                           <img
                             src={
@@ -1781,15 +1860,75 @@ export default function BoardCanvas({
                             draggable={false}
                             className="w-[18px] h-[18px] object-contain shrink-0"
                           />
-                          {t("canvasControls.cables")}
-                        </button>
 
+                          {t("canvasControls.cables")}
+                        </div>
+                      </div>
+                      {/* ALIMENTATION */}
+                      <div
+                        className="relative h-9 shrink-0 flex items-center justify-center px-4"
+                        style={{
+                          opacity: showMobileMenu ? 1 : 0,
+                          transform: showMobileMenu ? "translateX(0)" : "translateX(16px)",
+                          transition: "opacity 180ms ease-out, transform 180ms ease-out",
+                          transitionDelay: "100ms",
+                          pointerEvents: showMobileMenu ? "auto" : "none",
+                        }}
+                        onMouseEnter={(e) => {
+                          const button = e.currentTarget.querySelector("button");
+
+                          if (button) {
+                            button.style.width = "calc(100% + 4px)";
+                            button.style.height = "36px";
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          const button = e.currentTarget.querySelector("button");
+
+                          if (button) {
+                            button.style.width = "100%";
+                            button.style.height = "32px";
+                          }
+                        }}
+                      >
                         <button
+                          type="button"
                           onClick={() => {
+                            closeBottomPanels();
                             setShowPower(true);
-                            setShowMobileMenu(false);
                           }}
-                          className="w-full flex items-center gap-2 px-3 py-2 text-left rounded-lg transition-colors hover:bg-canvas"
+                          style={{
+                            position: "absolute",
+                            left: "50%",
+                            top: "50%",
+                            width: "100%",
+                            height: "32px",
+                            transform: "translate(-50%, -50%)",
+                            transition: "width 140ms ease-out, height 140ms ease-out",
+                          }}
+                          className="
+      bg-zinc-900
+      border border-zinc-800
+      rounded-2xl
+      p-0
+      cursor-pointer
+    "
+                        />
+
+                        <div
+                          className="
+      relative
+      z-10
+      flex
+      items-center
+      justify-center
+      gap-2
+      whitespace-nowrap
+      pointer-events-none
+      text-[10px]
+      font-bold
+      uppercase
+    "
                         >
                           <img
                             src={
@@ -1802,15 +1941,76 @@ export default function BoardCanvas({
                             draggable={false}
                             className="w-[18px] h-[18px] object-contain shrink-0"
                           />
-                          {t("canvasControls.power")}
-                        </button>
 
+                          {t("canvasControls.power")}
+                        </div>
+                      </div>
+
+                      {/* EXPORT */}
+                      <div
+                        className="relative h-9 shrink-0 flex items-center justify-center px-4"
+                        style={{
+                          opacity: showMobileMenu ? 1 : 0,
+                          transform: showMobileMenu ? "translateX(0)" : "translateX(16px)",
+                          transition: "opacity 180ms ease-out, transform 180ms ease-out",
+                          transitionDelay: showMobileMenu ? "50ms" : "150ms",
+                          pointerEvents: showMobileMenu ? "auto" : "none",
+                        }}
+                        onMouseEnter={(e) => {
+                          const button = e.currentTarget.querySelector("button");
+
+                          if (button) {
+                            button.style.width = "calc(100% + 4px)";
+                            button.style.height = "36px";
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          const button = e.currentTarget.querySelector("button");
+
+                          if (button) {
+                            button.style.width = "100%";
+                            button.style.height = "32px";
+                          }
+                        }}
+                      >
                         <button
+                          type="button"
                           onClick={() => {
+                            closeBottomPanels();
                             setShowExportPanel(true);
-                            setShowMobileMenu(false);
                           }}
-                          className="w-full flex items-center gap-2 px-3 py-2 text-left rounded-lg transition-colors hover:bg-canvas"
+                          style={{
+                            position: "absolute",
+                            left: "50%",
+                            top: "50%",
+                            width: "100%",
+                            height: "32px",
+                            transform: "translate(-50%, -50%)",
+                            transition: "width 140ms ease-out, height 140ms ease-out",
+                          }}
+                          className="
+      bg-zinc-900
+      border border-zinc-800
+      rounded-2xl
+      p-0
+      cursor-pointer
+    "
+                        />
+
+                        <div
+                          className="
+      relative
+      z-10
+      flex
+      items-center
+      justify-center
+      gap-2
+      whitespace-nowrap
+      pointer-events-none
+      text-[10px]
+      font-bold
+      uppercase
+    "
                         >
                           <img
                             src={
@@ -1823,15 +2023,76 @@ export default function BoardCanvas({
                             draggable={false}
                             className="w-[18px] h-[18px] object-contain shrink-0"
                           />
-                          {t("export.button")}
-                        </button>
 
+                          {t("export.button")}
+                        </div>
+                      </div>
+
+                      {/* PARAMÈTRES */}
+                      <div
+                        className="relative h-9 shrink-0 flex items-center justify-center px-4"
+                        style={{
+                          opacity: showMobileMenu ? 1 : 0,
+                          transform: showMobileMenu ? "translateX(0)" : "translateX(16px)",
+                          transition: "opacity 180ms ease-out, transform 180ms ease-out",
+                          transitionDelay: showMobileMenu ? "0ms" : "200ms",
+                          pointerEvents: showMobileMenu ? "auto" : "none",
+                        }}
+                        onMouseEnter={(e) => {
+                          const button = e.currentTarget.querySelector("button");
+
+                          if (button) {
+                            button.style.width = "calc(100% + 4px)";
+                            button.style.height = "36px";
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          const button = e.currentTarget.querySelector("button");
+
+                          if (button) {
+                            button.style.width = "100%";
+                            button.style.height = "32px";
+                          }
+                        }}
+                      >
                         <button
+                          type="button"
                           onClick={() => {
+                            closeBottomPanels();
                             setShowSettings(true);
-                            setShowMobileMenu(false);
                           }}
-                          className="w-full flex items-center gap-2 px-3 py-2 text-left rounded-lg transition-colors hover:bg-canvas"
+                          style={{
+                            position: "absolute",
+                            left: "50%",
+                            top: "50%",
+                            width: "100%",
+                            height: "32px",
+                            transform: "translate(-50%, -50%)",
+                            transition: "width 140ms ease-out, height 140ms ease-out",
+                          }}
+                          className="
+      bg-zinc-900
+      border border-zinc-800
+      rounded-2xl
+      p-0
+      cursor-pointer
+    "
+                        />
+
+                        <div
+                          className="
+      relative
+      z-10
+      flex
+      items-center
+      justify-center
+      gap-2
+      whitespace-nowrap
+      pointer-events-none
+      text-[10px]
+      font-bold
+      uppercase
+    "
                         >
                           <img
                             src={
@@ -1844,14 +2105,121 @@ export default function BoardCanvas({
                             draggable={false}
                             className="w-[18px] h-[18px] object-contain shrink-0"
                           />
+
                           {t("settings.title")}
-                        </button>
+                        </div>
                       </div>
-                    </>
+                    </div>
                   )}
+
+                  {renderMobileMenu && (
+                    <div
+                      className="relative h-9 shrink-0 flex items-center justify-center"
+                      style={{
+                        width: "18px",
+                        opacity: showMobileMenu ? 1 : 0,
+                        transform: showMobileMenu ? "translateX(3px)" : "translateX(11px)",
+                        transition: "opacity 180ms ease-out, transform 180ms ease-out",
+                        transitionDelay: showMobileMenu ? "0ms" : "200ms",
+                        pointerEvents: "none",
+                      }}
+                    >
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 14 14"
+                        aria-hidden="true"
+                        className="block"
+                      >
+                        <polygon
+                          points="2,7 12,1.5 12,12.5"
+                          fill="black"
+                        />
+                      </svg>
+                    </div>
+                  )}
+
+                  {/* BOUTON MENU */}
+                  <div
+                    className="relative w-[84px] h-9 shrink-0 flex items-center justify-center"
+                    onMouseEnter={(e) => {
+                      const button = e.currentTarget.querySelector("button");
+
+                      if (button) {
+                        button.style.width = "76px";
+                        button.style.height = "36px";
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      const button = e.currentTarget.querySelector("button");
+
+                      if (button) {
+                        button.style.width = "72px";
+                        button.style.height = "32px";
+                      }
+                    }}
+                  >
+                    {/* FOND DU BOUTON : lui seul grossit */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (showMobileMenu) {
+                          // FERMETURE
+                          setShowMobileMenu(false);
+                          closeBottomPanels();
+
+                          window.setTimeout(() => {
+                            setRenderMobileMenu(false);
+                          }, 400);
+                        } else {
+                          // OUVERTURE
+                          setRenderMobileMenu(true);
+
+                          requestAnimationFrame(() => {
+                            requestAnimationFrame(() => {
+                              setShowMobileMenu(true);
+                            });
+                          });
+                        }
+                      }}
+                      style={{
+                        position: "absolute",
+                        left: "50%",
+                        top: "50%",
+                        width: "72px",
+                        height: "32px",
+                        transform: "translate(-50%, -50%)",
+                        transition: "width 140ms ease-out, height 140ms ease-out",
+                      }}
+                      className="
+      bg-zinc-900
+      border border-black
+      rounded-2xl
+      p-0
+      cursor-pointer
+    "
+                    />
+
+                    {/* TEXTE : ne grossit jamais */}
+                    <div
+                      className="
+      relative
+      z-10
+      pointer-events-none
+      text-[10px]
+      font-bold
+      uppercase
+    "
+                    >
+                      Menu
+                    </div>
+                  </div>
+
                 </div>
+
               </>
             )}
+
 
             {/* BOARDS */}
             <div className="relative">
@@ -1888,13 +2256,18 @@ export default function BoardCanvas({
               {showBoardsMenu && (
                 <>
 
-                  <div ref={boardsMenuRef} className={`
+                  <div
+                    ref={boardsMenuRef}
+                    className="
     z-50
-fixed right-4 bottom-16
-  `}>
+    fixed
+    right-4
+  "
+                    style={{ bottom: "80px" }}
+                  >
                     <div
                       className="
-          w-64 bg-zinc-900 border border-zinc-800 rounded-xl shadow-2xl
+          w-64 bg-zinc-900 border border-zinc-800 rounded-xl
           p-3 flex flex-col gap-2
         "
                       onClick={(e) => e.stopPropagation()}
@@ -2129,14 +2502,18 @@ fixed right-4 bottom-16
               </button>
 
               {showCableMenu && (
-                <div className={`
-    z-50
-fixed right-4 bottom-16
-  `}>
+                <div
+                  className="
+      z-50
+      fixed
+      right-4
+    "
+                  style={{ bottom: "80px" }}
+                >
                   <div
                     className="
         relative
-        w-65 bg-zinc-900 border border-zinc-800 rounded-xl shadow-2xl
+        w-65 bg-zinc-900 border border-zinc-800 rounded-xl
         p-4 space-y-4
       "
                     onClick={(e) => e.stopPropagation()}
@@ -2262,7 +2639,6 @@ fixed right-4 bottom-16
     z-[100]
     fixed
     right-4
-    bottom-16
 
     max-h-[calc(100dvh-80px)]
     overflow-y-auto
@@ -2273,6 +2649,7 @@ fixed right-4 bottom-16
     [-ms-overflow-style:none]
     [&::-webkit-scrollbar]:hidden
   "
+                    style={{ bottom: "80px" }}
                     onWheel={(e) => {
                       e.stopPropagation();
                     }}
@@ -2299,6 +2676,7 @@ fixed right-4 bottom-16
                       extraPedals={extraPedals}
                       shouldShowNotEnough={shouldShowNotEnough}
                       shouldShowDaisy={shouldShowDaisy}
+                      daisyPedalNames={daisyPedalNames}
                       extractOutputs={extractOutputs}
                     />
                   </div>
@@ -2351,10 +2729,14 @@ fixed right-4 bottom-16
               {showExportPanel && (
                 <>
                   <div className="fixed inset-0 z-40 pointer-events-none" />
-                  <div className={`
-    z-50
-fixed right-4 bottom-16
-  `}>
+                  <div
+                    className="
+        z-50
+        fixed
+        right-4
+      "
+                    style={{ bottom: "80px" }}
+                  >
                     <ExportPanel
                       boardPedals={activeProject.boardPedals}
                       selectedBoards={activeProject.selectedBoards}
@@ -2373,6 +2755,7 @@ fixed right-4 bottom-16
 
             {/* SETTINGS */}
             <div className="relative">
+
               <button
                 type="button"
                 onClick={() => {
@@ -2402,11 +2785,15 @@ fixed right-4 bottom-16
                 <>
                   <div className="fixed inset-0 z-40 pointer-events-none" />
 
-                  <div className={`
-    z-50
-fixed right-4 bottom-16
-  `}>
-                    <div className="w-64 bg-zinc-900 border border-zinc-800 rounded-xl shadow-2xl p-4">
+                  <div
+                    className="
+        z-50
+        fixed
+        right-4
+      "
+                    style={{ bottom: "80px" }}
+                  >
+                    <div className="w-64 bg-zinc-900 border border-zinc-800 rounded-xl p-4">
                       <div className="flex items-center gap-2 text-xs uppercase tracking-wider font-bold mb-6">
                         {t("settings.title")}
                       </div>

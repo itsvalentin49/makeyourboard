@@ -701,39 +701,40 @@ export default function SpecsPower({
           DESCRIPTION
           ========================= */}
 
-      {hasValue(
-        overview
-      ) && (
+      {hasValue(overview) && (
+        <div
+          className="
+      shrink-0
+      flex
+      flex-col
+      gap-2
+      w-full
+      max-w-none
+    "
+        >
           <div
             className="
-            shrink-0
-            flex
-            flex-col
-            gap-2
-          "
+        text-[15px]
+        font-black
+      "
           >
-            <div
-              className="
-              text-[15px]
-              font-black
-            "
-            >
-              {t(
-                "pedal.description"
-              )}
-            </div>
-
-            <p
-              className="
-              text-[12px]
-              leading-relaxed
-              text-pretty
-            "
-            >
-              {overview}
-            </p>
+            {t(
+              "pedal.description"
+            )}
           </div>
-        )}
+
+          <p
+            className="
+        w-full
+        max-w-none
+        text-[12px]
+        leading-relaxed
+      "
+          >
+            {overview}
+          </p>
+        </div>
+      )}
 
       {/* =========================
           CARACTÉRISTIQUES

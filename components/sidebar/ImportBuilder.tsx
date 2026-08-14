@@ -147,7 +147,7 @@ export default function ImportBuilder({
                     {t("customMenu.importSubtitle")}
                 </div>
 
-                <div className="text-[9px] leading-[1.45] text-zinc-400">
+                <div className="text-[9px] leading-[1.45]">
                     <div>• {t("customMenu.formats")}</div>
                     <div>• {t("customMenu.maxSize")}</div>
                     <div>• {t("customMenu.imageDimensions")}</div>
@@ -376,27 +376,27 @@ export default function ImportBuilder({
             </div>
 
             {/* APERÇU */}
-            <div className="flex flex-col gap-2 mt-2">
-                <div className="text-[11px] font-black uppercase tracking-wide">
-                    {t("export.preview")}
-                </div>
+            {uploadImage && (
+                <div className="flex flex-col gap-2 mt-2">
+                    <div className="text-[11px] font-black uppercase tracking-wide">
+                        {t("export.preview")}
+                    </div>
 
-                <div
-                    className="
-            relative
-            h-[145px]
-            rounded-lg
-            border
-            border-zinc-800
-            bg-zinc-950
-            p-1
-            flex
-            items-center
-            justify-center
-            overflow-hidden
-          "
-                >
-                    {uploadImage && (
+                    <div
+                        className="
+        relative
+        h-[145px]
+        rounded-lg
+        border
+        border-zinc-800
+        bg-zinc-950
+        p-1
+        flex
+        items-center
+        justify-center
+        overflow-hidden
+      "
+                    >
                         <>
                             {/* IMAGE AU RATIO NATUREL */}
                             <img
@@ -409,12 +409,12 @@ export default function ImportBuilder({
                                 decoding="async"
                                 draggable={false}
                                 className="
-                  block
-                  w-full
-                  h-full
-                  object-contain
-                  pointer-events-none
-                "
+            block
+            w-full
+            h-full
+            object-contain
+            pointer-events-none
+          "
                             />
 
                             {/* SUPPRIMER L’IMAGE */}
@@ -423,30 +423,30 @@ export default function ImportBuilder({
                                 aria-label="Remove image"
                                 onClick={removeImage}
                                 className="
-                  absolute
-                  top-2
-                  right-2
-                  z-10
-                  w-[22px]
-                  h-[22px]
-                  rounded-full
-                  bg-zinc-950
-                  border
-                  border-zinc-700
-                  flex
-                  items-center
-                  justify-center
-                  hover:bg-zinc-900
-                  active:scale-95
-                  transition-all
-                "
+            absolute
+            top-2
+            right-2
+            z-10
+            w-[22px]
+            h-[22px]
+            rounded-full
+            bg-zinc-950
+            border
+            border-zinc-700
+            flex
+            items-center
+            justify-center
+            hover:bg-zinc-900
+            active:scale-95
+            transition-all
+          "
                             >
                                 <X size={11} strokeWidth={2.5} />
                             </button>
                         </>
-                    )}
+                    </div>
                 </div>
-            </div>
+            )}
 
             {/* AJOUTER */}
             <button

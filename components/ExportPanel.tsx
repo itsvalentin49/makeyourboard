@@ -304,31 +304,7 @@ export default function ExportPanel({
     }
   };
 
-  const drawExportLogo = async (
-    ctx: CanvasRenderingContext2D,
-    width: number,
-    height: number,
-    loadImage: (src: string) => Promise<HTMLImageElement>
-  ) => {
-    const logo = await loadImage("/logos/logo-export.png");
 
-    const LOGO_SIZE = Math.max(20, Math.min(width, height) * 0.06);
-    const MARGIN = 5;
-
-    ctx.save();
-
-    ctx.globalAlpha = 0.9;
-
-    ctx.drawImage(
-      logo,
-      width - LOGO_SIZE - MARGIN,
-      height - LOGO_SIZE - MARGIN,
-      LOGO_SIZE,
-      LOGO_SIZE
-    );
-
-    ctx.restore();
-  };
 
   // ===============================
   // 🖼️ PREVIEW RENDER
@@ -404,7 +380,6 @@ export default function ExportPanel({
       if (renderId !== previewRenderIdRef.current) return;
 
       await drawItems(tempCtx, width, height, minX, minY, loadImage);
-      await drawExportLogo(tempCtx, width, height, loadImage);
       if (renderId !== previewRenderIdRef.current) return;
 
       // ✅ seulement le dernier rendu autorisé est copié dans le preview
@@ -459,7 +434,6 @@ export default function ExportPanel({
 
       await drawBackground(ctx, width, height, loadImage, false);
       await drawItems(ctx, width, height, minX, minY, loadImage);
-      await drawExportLogo(ctx, width, height, loadImage);
 
       canvas.toBlob(
         (blob) => {
