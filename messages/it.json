@@ -303,26 +303,32 @@
       "recommendation": "Consiglio"
     },
     "status": {
-      "compatible": "Tutti i pedali sono compatibili con il tuo alimentatore.",
-      "notCompatible": "Il tuo alimentatore non è compatibile con tutti i pedali."
+      "compatible": "Tutti i pedali sono compatibili con questo alimentatore.",
+      "notCompatible": "Questo alimentatore non è compatibile con tutti i pedali.",
+      "requiresSplitter": "Tutti i pedali sono compatibili con questo alimentatore. Sarà necessario un cavo daisy chain per alimentare più pedali dalla stessa uscita.",
+      "requiresSplitters": "Tutti i pedali sono compatibili con questo alimentatore. Saranno necessari più cavi daisy chain per alimentare più pedali dalla stessa uscita.",
+      "notEnoughOutputs": "Questo alimentatore non dispone di abbastanza uscite per alimentare tutti i pedali."
     },
     "empty": {
       "noPedals": "Nessun pedale.",
       "title": "Aggiungi il tuo primo pedale per iniziare.",
-      "subtitle": "Usa la barra laterale a sinistra per cercare e aggiungere pedali."
+      "subtitle": "Usa la barra laterale per cercare e aggiungere pedali."
     },
     "recommendation": {
-      "perfect": "La tua pedaliera è alimentata perfettamente. Let's rock 🤘",
-      "daisy": "Puoi alimentare più pedali con un cavo daisy chain.",
-      "daisySimple": "Un daisy chain è sufficiente per alimentare i tuoi pedali.",
-      "daisyHint": "Usa un cavo splitter. Funziona meglio con pedali analogici. Quelli digitali possono generare rumore.",
-      "isolated": "Dovresti usare un alimentatore isolato.",
-      "full": "Il tuo alimentatore è al limite.",
-      "fullHint": "Aggiungi un'altra unità o passa a un modello con più uscite.",
-      "upgrade": "Usa un alimentatore adeguato o collega il pedale incompatibile a un alimentatore dedicato.",
-      "tuner": "Il tuo accordatore può alimentare più pedali con un daisy chain 🤘",
-      "singleAdapter": "Puoi usare un alimentatore da {voltage}V con un amperaggio superiore a {draw}mA.",
-      "battery9v": "Puoi anche usare una batteria da 9V se il pedale supporta il funzionamento a batteria."
+      "perfect": "La tua pedalboard è alimentata perfettamente. Let's rock 🤘",
+      "splitterGroup": "Puoi alimentare i pedali {pedals} con un cavo daisy chain dalla stessa uscita ({draw} mA totali su {capacity} mA disponibili).",
+      "tunerOutputGroup": "Usa l'uscita DC OUT del {tuner} per alimentare i pedali {pedals} ({draw} mA totali su {capacity} mA disponibili).",
+      "cannotSolve": "Usa un alimentatore aggiuntivo o un alimentatore con più uscite.",
+      "isolated": "Dovresti utilizzare un alimentatore isolato per la tua pedalboard.",
+      "upgrade": "Usa un alimentatore più potente o un alimentatore dedicato per il pedale incompatibile.",
+      "singleAdapter": "Puoi utilizzare un alimentatore da {voltage}V con un amperaggio superiore a {draw}mA.",
+      "battery9v": "Puoi anche utilizzare una batteria da 9V se il pedale supporta il funzionamento a batteria.",
+      "stepTunerTitle": "Utilizzare l'uscita DC OUT dell'accordatore",
+      "stepTuner": "Usa l'uscita DC OUT del {tuner} per alimentare i pedali {pedals}.",
+      "stepSplitterTitle": "Raggruppare {count} pedali analogici su un'uscita",
+      "stepSplitter": "Alimenta i pedali {pedals} dalla stessa uscita usando un cavo daisy chain. I pedali analogici generano generalmente poco rumore quando condividono la stessa alimentazione.",
+      "stepOthersTitle": "Collegare gli altri pedali a uscite dedicate",
+      "individualOthers": "Alimenta i pedali {pedals} da uscite separate. Utilizzare un'uscita dedicata per ogni pedale riduce il rischio di rumori indesiderati, soprattutto con i pedali digitali."
     }
   },
   "search": {

@@ -303,26 +303,32 @@
       "recommendation": "Recomendação"
     },
     "status": {
-      "compatible": "Todos os pedais são compatíveis com a sua fonte de alimentação.",
-      "notCompatible": "A sua fonte de alimentação não é compatível com todos os pedais."
+      "compatible": "Todos os pedais são compatíveis com esta fonte de alimentação.",
+      "notCompatible": "Esta fonte de alimentação não é compatível com todos os pedais.",
+      "requiresSplitter": "Todos os pedais são compatíveis com esta fonte de alimentação. Será necessário um cabo daisy chain para alimentar vários pedais a partir da mesma saída.",
+      "requiresSplitters": "Todos os pedais são compatíveis com esta fonte de alimentação. Serão necessários vários cabos daisy chain para alimentar vários pedais a partir da mesma saída.",
+      "notEnoughOutputs": "Esta fonte de alimentação não possui saídas suficientes para alimentar todos os pedais."
     },
     "empty": {
       "noPedals": "Nenhum pedal.",
-      "title": "Adicione o seu primeiro pedal para começar.",
-      "subtitle": "Use a barra lateral à esquerda para procurar e adicionar pedais."
+      "title": "Adicione seu primeiro pedal para começar.",
+      "subtitle": "Use a barra lateral para pesquisar e adicionar pedais."
     },
     "recommendation": {
-      "perfect": "O seu pedalboard está perfeitamente alimentado. Let's rock 🤘",
-      "daisy": "Pode alimentar vários pedais com um cabo daisy chain.",
-      "daisySimple": "Um daisy chain é suficiente para alimentar os seus pedais.",
-      "daisyHint": "Use um cabo splitter. Funciona melhor com pedais analógicos. Os digitais podem gerar ruído.",
-      "isolated": "Deve usar uma fonte de alimentação isolada.",
-      "full": "A sua fonte de alimentação está no limite.",
-      "fullHint": "Adicione outra unidade ou atualize para um modelo com mais saídas.",
-      "upgrade": "Use uma fonte adequada ou ligue o pedal incompatível a um adaptador dedicado.",
-      "tuner": "O seu afinador pode alimentar vários pedais com um daisy chain 🤘",
-      "singleAdapter": "Pode utilizar um adaptador de corrente de {voltage}V com uma amperagem superior a {draw}mA.",
-      "battery9v": "Também pode utilizar uma bateria de 9V se o pedal suportar funcionamento a bateria."
+      "perfect": "Seu pedalboard está perfeitamente alimentado. Let's rock 🤘",
+      "splitterGroup": "Você pode alimentar os pedais {pedals} com um cabo daisy chain na mesma saída ({draw} mA no total para {capacity} mA disponíveis).",
+      "tunerOutputGroup": "Use a saída DC OUT do {tuner} para alimentar os pedais {pedals} ({draw} mA no total para {capacity} mA disponíveis).",
+      "cannotSolve": "Use uma fonte de alimentação adicional ou uma fonte com mais saídas.",
+      "isolated": "Você deve usar uma fonte de alimentação isolada para seu pedalboard.",
+      "upgrade": "Use uma fonte de alimentação mais potente ou um adaptador dedicado para o pedal incompatível.",
+      "singleAdapter": "Você pode usar uma fonte de alimentação de {voltage}V com corrente superior a {draw}mA.",
+      "battery9v": "Você também pode usar uma bateria de 9V se o pedal permitir funcionamento com bateria.",
+      "stepTunerTitle": "Usar a saída DC OUT do afinador",
+      "stepTuner": "Use a saída DC OUT do {tuner} para alimentar os pedais {pedals}.",
+      "stepSplitterTitle": "Agrupar {count} pedais analógicos em uma saída",
+      "stepSplitter": "Alimente os pedais {pedals} pela mesma saída usando um cabo daisy chain. Pedais analógicos geralmente geram pouco ruído quando compartilham a mesma alimentação.",
+      "stepOthersTitle": "Conectar os outros pedais a saídas dedicadas",
+      "individualOthers": "Alimente os pedais {pedals} por saídas individuais. Usar uma saída dedicada para cada pedal reduz o risco de ruídos indesejados, especialmente com pedais digitais."
     }
   },
   "search": {

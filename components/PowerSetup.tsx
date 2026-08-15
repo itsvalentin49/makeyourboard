@@ -704,7 +704,9 @@ export default function PowerSetup({
           >
             {extraPedals > 0
               ? recommendationCanSolve
-                ? t("powerSetup.status.requiresSplitters")
+                ? splitterGroups.length === 1
+                  ? t("powerSetup.status.requiresSplitter")
+                  : t("powerSetup.status.requiresSplitters")
                 : t("powerSetup.status.notEnoughOutputs")
               : powerMessage}
           </div>

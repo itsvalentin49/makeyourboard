@@ -303,25 +303,32 @@
       "recommendation": "Recomendación"
     },
     "status": {
-      "compatible": "Todos los pedales son compatibles con tu fuente de alimentación.",
-      "notCompatible": "Tu fuente de alimentación no es compatible con todos los pedales."
+      "compatible": "Todos los pedales son compatibles con esta fuente de alimentación.",
+      "notCompatible": "Esta fuente de alimentación no es compatible con todos los pedales.",
+      "requiresSplitter": "Todos los pedales son compatibles con esta fuente de alimentación. Será necesario un cable daisy chain para alimentar varios pedales desde una misma salida.",
+      "requiresSplitters": "Todos los pedales son compatibles con esta fuente de alimentación. Serán necesarios varios cables daisy chain para alimentar varios pedales desde una misma salida.",
+      "notEnoughOutputs": "Esta fuente de alimentación no dispone de suficientes salidas para alimentar todos los pedales."
     },
     "empty": {
+      "noPedals": "No hay pedales.",
       "title": "Añade tu primer pedal para empezar.",
-      "subtitle": "Usa el panel izquierdo para buscar y añadir pedales."
+      "subtitle": "Utiliza la barra lateral para buscar y añadir pedales."
     },
     "recommendation": {
-      "perfect": "Tu pedalboard está perfectamente alimentada. 🤘",
-      "daisy": "Puedes alimentar varios pedales con un cable daisy chain.",
-      "daisySimple": "Un daisy chain es suficiente para alimentar tus pedales.",
-      "daisyHint": "Usa un cable divisor. Funciona mejor con pedales analógicos. Los digitales pueden generar ruido.",
-      "isolated": "Deberías usar una fuente de alimentación aislada.",
-      "full": "Tu fuente de alimentación está al límite.",
-      "fullHint": "Añade otra unidad o cambia a un modelo con más salidas.",
-      "upgrade": "Usa una fuente adecuada o conecta el pedal incompatible a un adaptador dedicado.",
-      "tuner": "Tu afinador puede alimentar varios pedales con un daisy chain 🤘",
-      "singleAdapter": "Puedes usar un adaptador de corriente de {voltage}V con un amperaje superior a {draw}mA.",
-      "battery9v": "También puedes usar una pila de 9V si el pedal permite funcionar con pila."
+      "perfect": "Tu pedalboard está perfectamente alimentada. Let's rock 🤘",
+      "splitterGroup": "Puedes alimentar los pedales {pedals} con un cable daisy chain desde una misma salida ({draw} mA en total para {capacity} mA disponibles).",
+      "tunerOutputGroup": "Utiliza la salida DC OUT del {tuner} para alimentar los pedales {pedals} ({draw} mA en total para {capacity} mA disponibles).",
+      "cannotSolve": "Utiliza una fuente de alimentación adicional o una con más salidas.",
+      "isolated": "Deberías utilizar una fuente de alimentación aislada para tu pedalboard.",
+      "upgrade": "Utiliza una fuente de alimentación más potente o un adaptador de corriente dedicado para el pedal incompatible.",
+      "singleAdapter": "Puedes utilizar un adaptador de corriente de {voltage}V con un amperaje superior a {draw}mA.",
+      "battery9v": "También puedes utilizar una pila de 9V si el pedal admite funcionamiento con pila.",
+      "stepTunerTitle": "Utilizar la salida DC OUT del afinador",
+      "stepTuner": "Utiliza la salida DC OUT del {tuner} para alimentar los pedales {pedals}.",
+      "stepSplitterTitle": "Agrupar {count} pedales analógicos en una salida",
+      "stepSplitter": "Alimenta los pedales {pedals} desde una misma salida mediante un cable daisy chain. Los pedales analógicos suelen generar poco ruido cuando comparten la misma fuente de alimentación.",
+      "stepOthersTitle": "Conectar los demás pedales a salidas dedicadas",
+      "individualOthers": "Alimenta los pedales {pedals} desde salidas individuales. Utilizar una salida dedicada para cada pedal reduce el riesgo de ruidos no deseados, especialmente con pedales digitales."
     }
   },
   "search": {
@@ -374,12 +381,12 @@
     "max": "MÁX",
     "setup": "Setup",
     "pedalboard": "Pedalboard",
-    "boards": "Boards",
-    "pedalboards": "Boards",
+    "boards": "Pedalboards",
+    "pedalboards": "Pedalboards",
     "newBoard": "Nuevo",
     "jacks": "Jacks",
     "cables": "Cables",
-    "power": "Power",
+    "power": "Alimentación",
     "cableClearance": "Espacio para cables",
     "cableClearanceDescription": "Comprueba que los pedales tengan suficiente espacio para los cables."
   },

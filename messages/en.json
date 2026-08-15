@@ -306,26 +306,32 @@
       "recommendation": "Recommendation"
     },
     "status": {
-      "compatible": "All pedals are compatible with your power supply.",
-      "notCompatible": "Your power supply is not compatible with all pedals."
+      "compatible": "All pedals are compatible with this power supply.",
+      "notCompatible": "This power supply is not compatible with all pedals.",
+      "requiresSplitter": "All pedals are compatible with this power supply. One daisy-chain cable will be required to power multiple pedals from the same output.",
+      "requiresSplitters": "All pedals are compatible with this power supply. Multiple daisy-chain cables will be required to power multiple pedals from the same output.",
+      "notEnoughOutputs": "This power supply does not have enough outputs to power all pedals."
     },
     "empty": {
       "noPedals": "No pedals.",
-      "title": "Add your first pedal to start your setup.",
-      "subtitle": "Use the sidebar on the left to search and add pedals."
+      "title": "Add your first pedal to get started.",
+      "subtitle": "Use the sidebar to search for and add pedals."
     },
     "recommendation": {
-      "perfect": "Your board is perfectly powered. Let's rock 🤘",
-      "daisy": "You can power multiple pedals with a daisy chain.",
-      "daisySimple": "A daisy chain is enough to power your pedals.",
-      "daisyHint": "Use a splitter cable. Works best with analog pedals. Digital ones can get noisy.",
-      "isolated": "You should use an isolated power supply for your board.",
-      "full": "Your power supply is fully loaded.",
-      "fullHint": "Add another unit or upgrade to a model with more outputs.",
-      "upgrade": "Use a suitable power supply or plug the incompatible pedal into a dedicated wall adapter.",
-      "tuner": "Your tuner can power multiple pedals using a daisy chain 🤘",
+      "perfect": "Your pedalboard is perfectly powered. Let's rock 🤘",
+      "splitterGroup": "You can power the {pedals} with a daisy chain cable from the same output ({draw} mA total for {capacity} mA available).",
+      "tunerOutputGroup": "Use the DC OUT of the {tuner} to power the {pedals} ({draw} mA total for {capacity} mA available).",
+      "cannotSolve": "Use an additional power supply or one with more outputs.",
+      "isolated": "You should use an isolated power supply for your pedalboard.",
+      "upgrade": "Use a more powerful power supply or a dedicated power adapter for the incompatible pedal.",
       "singleAdapter": "You can use a {voltage}V power adapter with a current rating higher than {draw}mA.",
-      "battery9v": "You can also use a 9V battery if the pedal supports battery operation."
+      "battery9v": "You can also use a 9V battery if the pedal supports battery operation.",
+      "stepTunerTitle": "Use the tuner's DC OUT",
+      "stepTuner": "Use the DC OUT of the {tuner} to power the {pedals}.",
+      "stepSplitterTitle": "Group {count} analog pedals on one output",
+      "stepSplitter": "Power the {pedals} from the same output using a daisy-chain cable. Analog pedals generally generate little noise when sharing the same power source.",
+      "stepOthersTitle": "Connect the other pedals to dedicated outputs",
+      "individualOthers": "Power the {pedals} from individual outputs. Using a dedicated output for each pedal reduces the risk of unwanted noise, especially with digital pedals."
     }
   },
   "search": {

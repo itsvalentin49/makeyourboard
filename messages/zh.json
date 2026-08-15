@@ -303,26 +303,32 @@
       "recommendation": "建议"
     },
     "status": {
-      "compatible": "所有效果器都与你的电源兼容。",
-      "notCompatible": "你的电源并不兼容所有效果器。"
+      "compatible": "所有效果器都与此电源兼容。",
+      "notCompatible": "此电源并不兼容所有效果器。",
+      "requiresSplitter": "所有效果器都与此电源兼容。需要使用一根菊链电源线，通过同一个输出为多块效果器供电。",
+      "requiresSplitters": "所有效果器都与此电源兼容。需要使用多根菊链电源线，通过同一个输出为多块效果器供电。",
+      "notEnoughOutputs": "此电源没有足够的输出接口为所有效果器供电。"
     },
     "empty": {
-      "noPedals": "没有效果器。",
-      "title": "添加第一个效果器开始搭建。",
-      "subtitle": "使用左侧边栏搜索并添加效果器。"
+      "noPedals": "暂无效果器。",
+      "title": "添加你的第一块效果器以开始使用。",
+      "subtitle": "使用侧边栏搜索并添加效果器。"
     },
     "recommendation": {
-      "perfect": "你的效果器板供电完全正常。Let's rock 🤘",
-      "daisy": "你可以使用菊链为多个效果器供电。",
-      "daisySimple": "一条菊链就足以为你的效果器供电。",
-      "daisyHint": "使用分线电源线。更适合模拟效果器，数字效果器可能会产生噪音。",
-      "isolated": "建议为你的效果器板使用隔离电源。",
-      "full": "你的电源已经满载。",
-      "fullHint": "添加另一台电源，或升级到输出更多的型号。",
-      "upgrade": "使用合适的电源，或将不兼容的效果器接入独立电源适配器。",
-      "tuner": "你的调音器可以通过菊链为多个效果器供电 🤘",
-      "singleAdapter": "你可以使用 {voltage}V 电源适配器，电流额定值需高于 {draw}mA。",
-      "battery9v": "如果该效果器支持电池供电，也可以使用 9V 电池。"
+      "perfect": "你的效果器板供电配置非常完善。Let's rock 🤘",
+      "splitterGroup": "你可以使用分线电源线从同一个输出为 {pedals} 供电（总电流 {draw} mA，可用电流 {capacity} mA）。",
+      "tunerOutputGroup": "使用 {tuner} 的 DC OUT 输出为 {pedals} 供电（总电流 {draw} mA，可用电流 {capacity} mA）。",
+      "cannotSolve": "请使用额外的电源，或使用拥有更多输出接口的电源。",
+      "isolated": "你的效果器板应使用隔离式电源。",
+      "upgrade": "请使用功率更高的电源，或为不兼容的效果器使用独立电源适配器。",
+      "singleAdapter": "你可以使用 {voltage}V、额定电流高于 {draw}mA 的电源适配器。",
+      "battery9v": "如果效果器支持电池供电，也可以使用 9V 电池。",
+      "stepTunerTitle": "使用调音器的 DC OUT 输出",
+      "stepTuner": "使用 {tuner} 的 DC OUT 输出为 {pedals} 供电。",
+      "stepSplitterTitle": "将 {count} 块模拟效果器连接到同一个输出",
+      "stepSplitter": "使用菊链电源线从同一个输出为 {pedals} 供电。模拟效果器共用同一路电源时通常只会产生很少的噪声。",
+      "stepOthersTitle": "将其他效果器连接到独立输出",
+      "individualOthers": "使用独立输出为 {pedals} 供电。每块效果器使用独立输出可以降低产生杂音的风险，尤其是数字效果器。"
     }
   },
   "search": {

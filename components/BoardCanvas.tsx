@@ -1684,27 +1684,28 @@ export default function BoardCanvas({
     right-4
     z-50
     flex
-    items-center
+    flex-col
+    items-end
     gap-2
   "
                 >
-                  {/* ONGLETS — se déploient vers la gauche */}
+                  {/* ONGLETS */}
                   {renderMobileMenu && (
                     <div
                       className="
-    hidden
-    lg:flex
-    items-center
-    gap-2
-  "
+      flex
+      flex-col
+      w-[150px]
+      gap-2
+    "
                       onClick={(e) => e.stopPropagation()}
                     >
                       {/* PEDALBOARDS */}
                       <div
-                        className="relative h-9 shrink-0 flex items-center justify-center px-4"
+                        className="relative w-full h-9 shrink-0 flex items-center px-4"
                         style={{
                           opacity: showMobileMenu ? 1 : 0,
-                          transform: showMobileMenu ? "translateX(0)" : "translateX(16px)",
+                          transform: showMobileMenu ? "translateY(0)" : "translateY(16px)",
                           transition: "opacity 180ms ease-out, transform 180ms ease-out",
                           transitionDelay: showMobileMenu ? "200ms" : "0ms",
                           pointerEvents: showMobileMenu ? "auto" : "none",
@@ -1785,7 +1786,7 @@ export default function BoardCanvas({
 
                       {/* CÂBLES */}
                       <div
-                        className="relative h-9 shrink-0 flex items-center justify-center px-4"
+                        className="relative w-full h-9 shrink-0 flex items-center px-4"
                         style={{
                           opacity: showMobileMenu ? 1 : 0,
                           transform: showMobileMenu ? "translateX(0)" : "translateX(16px)",
@@ -1866,7 +1867,7 @@ export default function BoardCanvas({
                       </div>
                       {/* ALIMENTATION */}
                       <div
-                        className="relative h-9 shrink-0 flex items-center justify-center px-4"
+                        className="relative w-full h-9 shrink-0 flex items-center px-4"
                         style={{
                           opacity: showMobileMenu ? 1 : 0,
                           transform: showMobileMenu ? "translateX(0)" : "translateX(16px)",
@@ -1948,7 +1949,7 @@ export default function BoardCanvas({
 
                       {/* EXPORT */}
                       <div
-                        className="relative h-9 shrink-0 flex items-center justify-center px-4"
+                        className="relative w-full h-9 shrink-0 flex items-center px-4"
                         style={{
                           opacity: showMobileMenu ? 1 : 0,
                           transform: showMobileMenu ? "translateX(0)" : "translateX(16px)",
@@ -2030,7 +2031,7 @@ export default function BoardCanvas({
 
                       {/* PARAMÈTRES */}
                       <div
-                        className="relative h-9 shrink-0 flex items-center justify-center px-4"
+                        className="relative w-full h-9 shrink-0 flex items-center px-4"
                         style={{
                           opacity: showMobileMenu ? 1 : 0,
                           transform: showMobileMenu ? "translateX(0)" : "translateX(16px)",
@@ -2112,32 +2113,6 @@ export default function BoardCanvas({
                     </div>
                   )}
 
-                  {renderMobileMenu && (
-                    <div
-                      className="relative h-9 shrink-0 flex items-center justify-center"
-                      style={{
-                        width: "18px",
-                        opacity: showMobileMenu ? 1 : 0,
-                        transform: showMobileMenu ? "translateX(3px)" : "translateX(11px)",
-                        transition: "opacity 180ms ease-out, transform 180ms ease-out",
-                        transitionDelay: showMobileMenu ? "0ms" : "200ms",
-                        pointerEvents: "none",
-                      }}
-                    >
-                      <svg
-                        width="14"
-                        height="14"
-                        viewBox="0 0 14 14"
-                        aria-hidden="true"
-                        className="block"
-                      >
-                        <polygon
-                          points="2,7 12,1.5 12,12.5"
-                          fill="black"
-                        />
-                      </svg>
-                    </div>
-                  )}
 
                   {/* BOUTON MENU */}
                   <div
@@ -2262,8 +2237,8 @@ export default function BoardCanvas({
     z-50
     fixed
     right-4
+    top-4
   "
-                    style={{ bottom: "80px" }}
                   >
                     <div
                       className="
@@ -2507,8 +2482,8 @@ export default function BoardCanvas({
       z-50
       fixed
       right-4
+      top-4
     "
-                  style={{ bottom: "80px" }}
                 >
                   <div
                     className="
@@ -2640,7 +2615,6 @@ export default function BoardCanvas({
     fixed
     right-4
 
-    max-h-[calc(100dvh-80px)]
     overflow-y-auto
     overflow-x-hidden
     overscroll-contain
@@ -2649,7 +2623,10 @@ export default function BoardCanvas({
     [-ms-overflow-style:none]
     [&::-webkit-scrollbar]:hidden
   "
-                    style={{ bottom: "80px" }}
+                    style={{
+                      top: "16px",
+                      bottom: "296px",
+                    }}
                     onWheel={(e) => {
                       e.stopPropagation();
                     }}
@@ -2734,8 +2711,9 @@ export default function BoardCanvas({
         z-50
         fixed
         right-4
+        top-4
       "
-                    style={{ bottom: "80px" }}
+
                   >
                     <ExportPanel
                       boardPedals={activeProject.boardPedals}
@@ -2790,8 +2768,9 @@ export default function BoardCanvas({
         z-50
         fixed
         right-4
+        top-4
       "
-                    style={{ bottom: "80px" }}
+
                   >
                     <div className="w-64 bg-zinc-900 border border-zinc-800 rounded-xl p-4">
                       <div className="flex items-center gap-2 text-xs uppercase tracking-wider font-bold mb-6">

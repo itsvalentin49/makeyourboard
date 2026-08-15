@@ -303,26 +303,32 @@
       "recommendation": "Empfehlung"
     },
     "status": {
-      "compatible": "Alle Pedale sind mit deinem Netzteil kompatibel.",
-      "notCompatible": "Dein Netzteil ist nicht mit allen Pedalen kompatibel."
+      "compatible": "Alle Pedale sind mit diesem Netzteil kompatibel.",
+      "notCompatible": "Dieses Netzteil ist nicht mit allen Pedalen kompatibel.",
+      "requiresSplitter": "Alle Pedale sind mit diesem Netzteil kompatibel. Ein Daisy-Chain-Kabel wird benötigt, um mehrere Pedale über denselben Ausgang mit Strom zu versorgen.",
+      "requiresSplitters": "Alle Pedale sind mit diesem Netzteil kompatibel. Mehrere Daisy-Chain-Kabel werden benötigt, um mehrere Pedale über denselben Ausgang mit Strom zu versorgen.",
+      "notEnoughOutputs": "Dieses Netzteil verfügt nicht über genügend Ausgänge, um alle Pedale mit Strom zu versorgen."
     },
     "empty": {
       "noPedals": "Keine Pedale.",
-      "title": "Füge dein erstes Pedal hinzu, um zu starten.",
-      "subtitle": "Nutze die Seitenleiste links, um Pedale zu suchen und hinzuzufügen."
+      "title": "Füge dein erstes Pedal hinzu, um zu beginnen.",
+      "subtitle": "Nutze die Seitenleiste, um Pedale zu suchen und hinzuzufügen."
     },
     "recommendation": {
-      "perfect": "Dein Board ist perfekt versorgt. Let's rock 🤘",
-      "daisy": "Du kannst mehrere Pedale mit einem Daisy-Chain-Kabel versorgen.",
-      "daisySimple": "Ein Daisy-Chain reicht aus, um deine Pedale zu versorgen.",
-      "daisyHint": "Verwende ein Splitter-Kabel. Funktioniert am besten mit analogen Pedalen. Digitale können Rauschen verursachen.",
-      "isolated": "Du solltest ein isoliertes Netzteil verwenden.",
-      "full": "Dein Netzteil ist ausgelastet.",
-      "fullHint": "Füge ein weiteres Gerät hinzu oder nutze ein Modell mit mehr Ausgängen.",
-      "upgrade": "Verwende ein geeignetes Netzteil oder schließe das inkompatible Pedal an ein separates Netzteil an.",
-      "tuner": "Dein Tuner kann mehrere Pedale über eine Daisy-Chain versorgen 🤘",
-      "singleAdapter": "Du kannst ein {voltage}V-Netzteil mit einer Stromstärke über {draw}mA verwenden.",
-      "battery9v": "Du kannst auch eine 9V-Batterie verwenden, wenn das Pedal den Batteriebetrieb unterstützt."
+      "perfect": "Dein Pedalboard ist perfekt mit Strom versorgt. Let's rock 🤘",
+      "splitterGroup": "Du kannst die Pedale {pedals} mit einem Daisy Chain-Kabel über denselben Ausgang versorgen ({draw} mA insgesamt bei {capacity} mA verfügbar).",
+      "tunerOutputGroup": "Nutze den DC OUT des {tuner}, um die Pedale {pedals} mit Strom zu versorgen ({draw} mA insgesamt bei {capacity} mA verfügbar).",
+      "cannotSolve": "Verwende ein zusätzliches Netzteil oder ein Netzteil mit mehr Ausgängen.",
+      "isolated": "Du solltest für dein Pedalboard ein isoliertes Netzteil verwenden.",
+      "upgrade": "Verwende ein leistungsstärkeres Netzteil oder ein separates Netzteil für das inkompatible Pedal.",
+      "singleAdapter": "Du kannst ein {voltage}V-Netzteil mit einer Stromstärke von mehr als {draw}mA verwenden.",
+      "battery9v": "Du kannst auch eine 9V-Batterie verwenden, wenn das Pedal den Batteriebetrieb unterstützt.",
+      "stepTunerTitle": "Den DC OUT des Tuners verwenden",
+      "stepTuner": "Nutze den DC OUT des {tuner}, um die Pedale {pedals} mit Strom zu versorgen.",
+      "stepSplitterTitle": "{count} analoge Pedale an einem Ausgang zusammenfassen",
+      "stepSplitter": "Versorge die Pedale {pedals} über denselben Ausgang mit einem Daisy-Chain-Kabel. Analoge Pedale erzeugen in der Regel nur wenig Störgeräusche, wenn sie sich eine Stromversorgung teilen.",
+      "stepOthersTitle": "Die anderen Pedale an separate Ausgänge anschließen",
+      "individualOthers": "Versorge die Pedale {pedals} über separate Ausgänge. Ein eigener Ausgang für jedes Pedal reduziert das Risiko von Störgeräuschen, insbesondere bei digitalen Pedalen."
     }
   },
   "search": {

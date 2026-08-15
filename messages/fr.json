@@ -306,7 +306,8 @@
     "status": {
       "compatible": "Toutes les pédales sont compatibles avec cette alimentation.",
       "notCompatible": "Cette alimentation n'est pas compatible avec toutes les pédales.",
-      "requiresSplitters": "Toutes les pédales sont compatibles avec cette alimentation mais des câbles splitter seront nécessaires pour toutes les alimenter.",
+      "requiresSplitter": "Toutes les pédales sont compatibles avec cette alimentation. Un câble daisy chain sera nécessaire pour alimenter plusieurs pédales sur une même sortie.",
+      "requiresSplitters": "Toutes les pédales sont compatibles avec cette alimentation. Des câbles daisy chain seront nécessaires pour alimenter plusieurs pédales sur une même sortie.",
       "notEnoughOutputs": "Cette alimentation ne dispose pas de suffisamment de sorties pour alimenter toutes les pédales."
     },
     "empty": {
@@ -316,7 +317,7 @@
     },
     "recommendation": {
       "perfect": "Votre pedalboard est parfaitement alimenté. Let's rock 🤘",
-      "splitterGroup": "Vous pouvez alimenter les pédales {pedals} avec un câble splitter sur une même sortie ({draw} mA au total pour {capacity} mA disponibles).",
+      "splitterGroup": "Vous pouvez alimenter les pédales {pedals} avec un câble daisy chain sur une même sortie ({draw} mA au total pour {capacity} mA disponibles).",
       "tunerOutputGroup": "Utilisez la sortie DC OUT de la {tuner} pour alimenter les {pedals} ({draw} mA au total pour {capacity} mA disponibles).",
       "cannotSolve": "Utilisez une alimentation supplémentaire ou une alimentation avec davantage de sorties.",
       "isolated": "Vous devriez utiliser une alimentation isolée pour votre pedalboard.",
