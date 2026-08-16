@@ -710,6 +710,10 @@ export default function BoardCanvas({
   const dragStartPos = useRef<{ x: number; y: number } | null>(null);
   const lastDist = useRef<number | null>(null);
   const lastCenter = useRef<{ x: number; y: number } | null>(null);
+  const [isPinching, setIsPinching] = useState(false);
+
+  const pinchAnchor = useRef<{ x: number; y: number } | null>(null);
+  const pinchStartScale = useRef<number>(1);
   const [stageSize, setStageSize] = useState({ width: 0, height: 0 });
 
 
@@ -1347,6 +1351,7 @@ export default function BoardCanvas({
 
       {!viewer &&
         overlayPosition &&
+        !(isMobile && mobileSidebarOpen) &&
         (selectedInstanceId !== null || selectedBoardInstanceId !== null) && (
           <div
             key={`actions-${selectedInstanceId ?? `board-${selectedBoardInstanceId}`}`}
@@ -1490,179 +1495,253 @@ export default function BoardCanvas({
               />
             </div>
 
-            {/* FRONT */}
-            <div
-              className="relative w-10 h-10"
-              onMouseEnter={(e) => {
-                const button = e.currentTarget.querySelector("button");
 
-                if (button) {
-                  button.style.width = "40px";
-                  button.style.height = "40px";
-                }
-              }}
-              onMouseLeave={(e) => {
-                const button = e.currentTarget.querySelector("button");
+            {/* FRONT / BACK → DESKTOP UNIQUEMENT */}
+            {!isMobile && (
+              <>
+                {/* FRONT */}
+                <div
+                  className="relative w-10 h-10"
+                  onMouseEnter={(e) => {
+                    const button = e.currentTarget.querySelector("button");
 
-                if (button) {
-                  button.style.width = "36px";
-                  button.style.height = "36px";
-                }
-              }}
-            >
-              <button
-                type="button"
-                aria-label="Bring to front"
-                onClick={() => {
-                  const maxZ = Math.max(
-                    0,
-                    ...activeProject.boardPedals.map(
-                      (p) => Number(p.zIndex) || 0
-                    ),
-                    ...(activeProject.selectedBoards || []).map(
-                      (b) => Number(b.zIndex) || 0
-                    )
-                  );
+                    if (button) {
+                      button.style.width = "40px";
+                      button.style.height = "40px";
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    const button = e.currentTarget.querySelector("button");
 
-                  if (selectedInstanceId !== null) {
-                    updateActiveProject({
-                      boardPedals: activeProject.boardPedals.map((p) =>
-                        p.instanceId === selectedInstanceId
-                          ? { ...p, zIndex: maxZ + 1 }
-                          : p
-                      ),
-                    });
-                  } else if (selectedBoardInstanceId !== null) {
-                    updateActiveProject({
-                      selectedBoards: (activeProject.selectedBoards || []).map(
-                        (b) =>
-                          b.instanceId === selectedBoardInstanceId
-                            ? { ...b, zIndex: maxZ + 1 }
-                            : b
-                      ),
-                    });
+                    if (button) {
+                      button.style.width = "36px";
+                      button.style.height = "36px";
+                    }
+                  }}
+                >
+                  <button
+                    type="button"
+                    aria-label="Bring to front"
+                    onClick={() => {
+                      const maxZ = Math.max(
+                        0,
+                        ...activeProject.boardPedals.map(
+                          (p) => Number(p.zIndex) || 0
+                        ),
+                        ...(activeProject.selectedBoards || []).map(
+                          (b) => Number(b.zIndex) || 0
+                        )
+                      );
+
+                      if (selectedInstanceId !== null) {
+                        updateActiveProject({
+                          boardPedals: activeProject.boardPedals.map((p) =>
+                            p.instanceId === selectedInstanceId
+                              ? { ...p, zIndex: maxZ + 1 }
+                              : p
+                          ),
+                        });
+                      } else if (selectedBoardInstanceId !== null) {
+                        updateActiveProject({
+                          selectedBoards: (
+                            activeProject.selectedBoards || []
+                          ).map((b) =>
+                            b.instanceId === selectedBoardInstanceId
+                              ? { ...b, zIndex: maxZ + 1 }
+                              : b
+                          ),
+                        });
+                      }
+                    }}
+                    style={{
+                      position: "absolute",
+                      left: "50%",
+                      top: "50%",
+                      width: "36px",
+                      height: "36px",
+                      transform: "translate(-50%, -50%)",
+                      transition:
+                        "width 140ms ease-out, height 140ms ease-out",
+                    }}
+                    className="
+                      rounded-xl
+                      border border-zinc-700
+                      bg-zinc-950
+                      shadow-lg
+                      p-0
+                    "
+                  />
+
+                  <ArrowUp
+                    strokeWidth={2}
+                    style={{
+                      position: "absolute",
+                      left: "50%",
+                      top: "50%",
+                      width: "15px",
+                      height: "15px",
+                      transform: "translate(-50%, -50%)",
+                      pointerEvents: "none",
+                      display: "block",
+                    }}
+                  />
+                </div>
+
+                {/* BACK */}
+                <div
+                  className="relative w-10 h-10"
+                  onMouseEnter={(e) => {
+                    const button = e.currentTarget.querySelector("button");
+
+                    if (button) {
+                      button.style.width = "40px";
+                      button.style.height = "40px";
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    const button = e.currentTarget.querySelector("button");
+
+                    if (button) {
+                      button.style.width = "36px";
+                      button.style.height = "36px";
+                    }
+                  }}
+                >
+                  <button
+                    type="button"
+                    aria-label="Send to back"
+                    onClick={() => {
+                      const minZ = Math.min(
+                        0,
+                        ...activeProject.boardPedals.map(
+                          (p) => Number(p.zIndex) || 0
+                        ),
+                        ...(activeProject.selectedBoards || []).map(
+                          (b) => Number(b.zIndex) || 0
+                        )
+                      );
+
+                      if (selectedInstanceId !== null) {
+                        updateActiveProject({
+                          boardPedals: activeProject.boardPedals.map((p) =>
+                            p.instanceId === selectedInstanceId
+                              ? { ...p, zIndex: minZ - 1 }
+                              : p
+                          ),
+                        });
+                      } else if (selectedBoardInstanceId !== null) {
+                        updateActiveProject({
+                          selectedBoards: (
+                            activeProject.selectedBoards || []
+                          ).map((b) =>
+                            b.instanceId === selectedBoardInstanceId
+                              ? { ...b, zIndex: minZ - 1 }
+                              : b
+                          ),
+                        });
+                      }
+                    }}
+                    style={{
+                      position: "absolute",
+                      left: "50%",
+                      top: "50%",
+                      width: "36px",
+                      height: "36px",
+                      transform: "translate(-50%, -50%)",
+                      transition:
+                        "width 140ms ease-out, height 140ms ease-out",
+                    }}
+                    className="
+                      rounded-xl
+                      border border-zinc-700
+                      bg-zinc-950
+                      shadow-lg
+                      p-0
+                    "
+                  />
+
+                  <ArrowDown
+                    strokeWidth={2}
+                    style={{
+                      position: "absolute",
+                      left: "50%",
+                      top: "50%",
+                      width: "15px",
+                      height: "15px",
+                      transform: "translate(-50%, -50%)",
+                      pointerEvents: "none",
+                      display: "block",
+                    }}
+                  />
+                </div>
+              </>
+            )}
+
+            {/* INFO → MOBILE + PÉDALE UNIQUEMENT */}
+            {isMobile && selectedInstanceId !== null && (
+              <div
+                className="relative w-10 h-10"
+                onMouseEnter={(e) => {
+                  const button = e.currentTarget.querySelector("button");
+
+                  if (button) {
+                    button.style.width = "40px";
+                    button.style.height = "40px";
                   }
                 }}
-                style={{
-                  position: "absolute",
-                  left: "50%",
-                  top: "50%",
-                  width: "36px",
-                  height: "36px",
-                  transform: "translate(-50%, -50%)",
-                  transition: "width 140ms ease-out, height 140ms ease-out",
-                }}
-                className="
-            rounded-xl
-            border border-zinc-700
-            bg-zinc-950
-            shadow-lg
-            p-0
-          "
-              />
+                onMouseLeave={(e) => {
+                  const button = e.currentTarget.querySelector("button");
 
-              <ArrowUp
-                strokeWidth={2}
-                style={{
-                  position: "absolute",
-                  left: "50%",
-                  top: "50%",
-                  width: "15px",
-                  height: "15px",
-                  transform: "translate(-50%, -50%)",
-                  pointerEvents: "none",
-                  display: "block",
-                }}
-              />
-            </div>
-
-            {/* BACK */}
-            <div
-              className="relative w-10 h-10"
-              onMouseEnter={(e) => {
-                const button = e.currentTarget.querySelector("button");
-
-                if (button) {
-                  button.style.width = "40px";
-                  button.style.height = "40px";
-                }
-              }}
-              onMouseLeave={(e) => {
-                const button = e.currentTarget.querySelector("button");
-
-                if (button) {
-                  button.style.width = "36px";
-                  button.style.height = "36px";
-                }
-              }}
-            >
-              <button
-                type="button"
-                aria-label="Send to back"
-                onClick={() => {
-                  const minZ = Math.min(
-                    0,
-                    ...activeProject.boardPedals.map(
-                      (p) => Number(p.zIndex) || 0
-                    ),
-                    ...(activeProject.selectedBoards || []).map(
-                      (b) => Number(b.zIndex) || 0
-                    )
-                  );
-
-                  if (selectedInstanceId !== null) {
-                    updateActiveProject({
-                      boardPedals: activeProject.boardPedals.map((p) =>
-                        p.instanceId === selectedInstanceId
-                          ? { ...p, zIndex: minZ - 1 }
-                          : p
-                      ),
-                    });
-                  } else if (selectedBoardInstanceId !== null) {
-                    updateActiveProject({
-                      selectedBoards: (activeProject.selectedBoards || []).map(
-                        (b) =>
-                          b.instanceId === selectedBoardInstanceId
-                            ? { ...b, zIndex: minZ - 1 }
-                            : b
-                      ),
-                    });
+                  if (button) {
+                    button.style.width = "36px";
+                    button.style.height = "36px";
                   }
                 }}
-                style={{
-                  position: "absolute",
-                  left: "50%",
-                  top: "50%",
-                  width: "36px",
-                  height: "36px",
-                  transform: "translate(-50%, -50%)",
-                  transition: "width 140ms ease-out, height 140ms ease-out",
-                }}
-                className="
-            rounded-xl
-            border border-zinc-700
-            bg-zinc-950
-            shadow-lg
-            p-0
-          "
-              />
+              >
+                <button
+                  type="button"
+                  aria-label="Informations"
+                  onClick={() => {
+                    setMobileCanvasPanelOpen?.(false);
+                    setMobileSidebarOpen(true);
+                  }}
+                  style={{
+                    position: "absolute",
+                    left: "50%",
+                    top: "50%",
+                    width: "36px",
+                    height: "36px",
+                    transform: "translate(-50%, -50%)",
+                    transition: "width 140ms ease-out, height 140ms ease-out",
+                  }}
+                  className="
+        rounded-xl
+        border border-zinc-700
+        bg-zinc-950
+        shadow-lg
+        p-0
+      "
+                />
 
-              <ArrowDown
-                strokeWidth={2}
-                style={{
-                  position: "absolute",
-                  left: "50%",
-                  top: "50%",
-                  width: "15px",
-                  height: "15px",
-                  transform: "translate(-50%, -50%)",
-                  pointerEvents: "none",
-                  display: "block",
-                }}
-              />
-            </div>
+                <Info
+                  strokeWidth={2}
+                  style={{
+                    position: "absolute",
+                    left: "50%",
+                    top: "50%",
+                    width: "16px",
+                    height: "16px",
+                    transform: "translate(-50%, -50%)",
+                    pointerEvents: "none",
+                    display: "block",
+                  }}
+                />
+              </div>
+            )}
+
           </div>
         )}
+
 
 
 
@@ -2901,7 +2980,7 @@ ${active
           ref={stageRef}
           width={stageSize.width}
           height={stageSize.height}
-          draggable={!viewer}
+          draggable={!viewer && !isPinching}
           onWheel={handleWheel}
 
           onDragStart={() => {
@@ -2947,72 +3026,164 @@ ${active
 
           onClick={handleStageClick}
 
+          onTouchStart={(e: any) => {
+            const stage = stageRef.current;
+            if (!stage) return;
 
+            const touches = e.evt.touches;
+
+            // 1 doigt = comportement normal
+            if (touches.length < 2) return;
+
+            // 2 doigts = zoom uniquement
+            e.evt.preventDefault();
+
+            // Stoppe immédiatement le déplacement du canvas
+            if (stage.isDragging()) {
+              stage.stopDrag();
+            }
+
+            setIsStageDragging(false);
+            setIsPinching(true);
+
+            const touch1 = touches[0];
+            const touch2 = touches[1];
+
+            const rect = stage.container().getBoundingClientRect();
+
+            const p1 = {
+              x: touch1.clientX - rect.left,
+              y: touch1.clientY - rect.top,
+            };
+
+            const p2 = {
+              x: touch2.clientX - rect.left,
+              y: touch2.clientY - rect.top,
+            };
+
+            const dist = Math.sqrt(
+              Math.pow(p1.x - p2.x, 2) +
+              Math.pow(p1.y - p2.y, 2)
+            );
+
+            const center = {
+              x: (p1.x + p2.x) / 2,
+              y: (p1.y + p2.y) / 2,
+            };
+
+            const scale = stage.scaleX();
+
+            lastDist.current = dist;
+            lastCenter.current = center;
+            pinchStartScale.current = scale;
+
+            pinchAnchor.current = {
+              x: (center.x - stage.x()) / scale,
+              y: (center.y - stage.y()) / scale,
+            };
+          }}
 
           onTouchMove={(e: any) => {
             const stage = stageRef.current;
             if (!stage) return;
 
-            const touch1 = e.evt.touches[0];
-            const touch2 = e.evt.touches[1];
+            const touches = e.evt.touches;
 
-            // On ne fait rien si pas 2 doigts
-            if (!touch1 || !touch2) {
-              lastDist.current = null;
-              return;
-            }
+            // Le pinch fonctionne uniquement avec 2 doigts
+            if (touches.length !== 2) return;
 
             e.evt.preventDefault();
 
-            // Distance entre les 2 doigts
-            const dist = Math.sqrt(
-              Math.pow(touch1.clientX - touch2.clientX, 2) +
-              Math.pow(touch1.clientY - touch2.clientY, 2)
-            );
+            // Le canvas ne doit jamais être déplacé pendant un pinch
+            if (stage.isDragging()) {
+              stage.stopDrag();
+            }
 
-            // Centre entre les 2 doigts
-            const center = {
-              x: (touch1.clientX + touch2.clientX) / 2,
-              y: (touch1.clientY + touch2.clientY) / 2,
+            const touch1 = touches[0];
+            const touch2 = touches[1];
+
+            const rect = stage.container().getBoundingClientRect();
+
+            const p1 = {
+              x: touch1.clientX - rect.left,
+              y: touch1.clientY - rect.top,
             };
 
-            if (!lastDist.current) {
-              lastDist.current = dist;
-              lastCenter.current = center;
+            const p2 = {
+              x: touch2.clientX - rect.left,
+              y: touch2.clientY - rect.top,
+            };
+
+            const dist = Math.sqrt(
+              Math.pow(p1.x - p2.x, 2) +
+              Math.pow(p1.y - p2.y, 2)
+            );
+
+            if (
+              lastDist.current === null ||
+              lastCenter.current === null ||
+              pinchAnchor.current === null
+            ) {
               return;
             }
 
-            const oldScale = stage.scaleX();
             const scaleBy = dist / lastDist.current;
-            const newScale = oldScale * scaleBy;
 
-            const clampedScale = Math.max(1, Math.min(3, newScale));
+            const newScale =
+              pinchStartScale.current * scaleBy;
 
-            const pointTo = {
-              x: (center.x - stage.x()) / oldScale,
-              y: (center.y - stage.y()) / oldScale,
-            };
+            const clampedScale = Math.max(
+              1,
+              Math.min(3, newScale)
+            );
 
-            stage.scale({ x: clampedScale, y: clampedScale });
+            // On garde le centre initial fixe :
+            // avec 2 doigts, aucun déplacement du canvas.
+            const center = lastCenter.current;
+            const anchor = pinchAnchor.current;
 
             const newPos = {
-              x: center.x - pointTo.x * clampedScale,
-              y: center.y - pointTo.y * clampedScale,
+              x: center.x - anchor.x * clampedScale,
+              y: center.y - anchor.y * clampedScale,
             };
+
+            stage.scale({
+              x: clampedScale,
+              y: clampedScale,
+            });
 
             stage.position(newPos);
             stage.batchDraw();
 
-            if (!viewer) {
+            updateOverlayPosition();
+          }}
+
+          onTouchEnd={(e: any) => {
+            const stage = stageRef.current;
+            if (!stage) return;
+
+            // S'il reste 2 doigts, le pinch continue
+            if (e.evt.touches.length >= 2) return;
+
+            if (stage.isDragging()) {
+              stage.stopDrag();
+            }
+
+            // Sauvegarde la position et le zoom obtenus
+            if (lastDist.current !== null && !viewer) {
               updateActiveProject({
-                zoom: clampedScale * 100,
-                stageX: newPos.x,
-                stageY: newPos.y,
+                zoom: stage.scaleX() * 100,
+                stageX: stage.x(),
+                stageY: stage.y(),
               });
             }
 
-            lastDist.current = dist;
-            lastCenter.current = center;
+            setIsPinching(false);
+            setIsStageDragging(false);
+
+            lastDist.current = null;
+            lastCenter.current = null;
+            pinchAnchor.current = null;
           }}
 
         >
@@ -3036,7 +3207,7 @@ ${active
                     key={b.instanceId}
                     x={b.x}
                     y={b.y}
-                    draggable={!viewer}
+                    draggable={!viewer && !isPinching}
                     rotation={b.rotation || 0}
 
                     onDragStart={() => {
@@ -3174,7 +3345,7 @@ ${active
                   x={p.x}
                   y={p.y}
                   rotation={p.rotation || 0}
-                  draggable={!viewer}
+                  draggable={!viewer && !isPinching}
                   instanceId={p.instanceId}
 
                   onDragStart={(e) => {
@@ -3604,7 +3775,7 @@ ${active
                   offsetY={size.h / 2}
                   rotation={b.rotation || 0}
                   fill="rgba(0,0,0,0.01)"
-                  draggable={!viewer}
+                  draggable={!viewer && !isPinching}
                   onMouseEnter={() => {
                     if (!isMobile) {
                       setHoveredBoardId(b.instanceId);
@@ -3673,7 +3844,7 @@ ${active
                     offsetY={size.h / 2}
                     rotation={p.rotation || 0}
                     fill="rgba(0,0,0,0.01)"
-                    draggable={!viewer}
+                    draggable={!viewer && !isPinching}
                     onMouseEnter={() => {
                       if (!isMobile) {
                         setHoveredPedalId(p.instanceId);
