@@ -338,7 +338,7 @@ export default function SettingsPanel({
     <div className="flex flex-col gap-4">
 
       {/* LANGUAGE */}
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-2">
         <span className="text-[10px] uppercase font-bold tracking-wider">
           {t("settings.language")}
         </span>
@@ -395,10 +395,9 @@ export default function SettingsPanel({
     top-0
     h-full
     w-1/2
-    rounded-md
-    border
-    border-blue-500
-    bg-blue-500/10
+    rounded-lg
+    border-0
+    bg-blue-600
     transition-transform
     duration-200
     ease-out
@@ -433,11 +432,17 @@ export default function SettingsPanel({
               h-full leading-tight
             "
                 >
-                  <span className="text-[10px] font-bold">
+                  <span
+                    className={`text-[10px] font-bold ${isActive ? "!text-white" : ""
+                      }`}
+                  >
                     {u.label}
                   </span>
 
-                  <span className="text-[8px] tracking-wide text-zinc-500">
+                  <span
+                    className={`text-[8px] tracking-wide ${isActive ? "!text-white" : ""
+                      }`}
+                  >
                     {u.sub}
                   </span>
                 </button>
@@ -469,10 +474,9 @@ export default function SettingsPanel({
     top-0
     h-full
     w-1/2
-    rounded-md
-    border
-    border-blue-500
-    bg-blue-500/10
+    rounded-lg
+    border-0
+    bg-blue-600
     transition-transform
     duration-200
     ease-out
@@ -514,10 +518,14 @@ export default function SettingsPanel({
               >
                 <Icon
                   size={15}
-                  className="transition-colors duration-200"
+                  className={`transition-colors duration-200 ${isActive ? "!text-white" : ""
+                    }`}
                 />
 
-                <span className="transition-colors duration-200 font-bold">
+                <span
+                  className={`transition-colors duration-200 font-bold ${isActive ? "!text-white" : ""
+                    }`}
+                >
                   {item.label}
                 </span>
               </button>
@@ -555,7 +563,7 @@ export default function SettingsPanel({
         bg-zinc-950
         border
         border-zinc-800
-        rounded-md
+        rounded-lg
         text-[10px]
         text-left
         flex

@@ -7,6 +7,7 @@ import { Download } from "lucide-react";
 type AnyRow = Record<string, any>;
 
 type Props = {
+  isLightTheme: boolean;
   boardPedals: AnyRow[];
   selectedBoards?: AnyRow[];
   displaySizes: Record<number, { w: number; h: number }>;
@@ -21,6 +22,7 @@ type Props = {
 };
 
 export default function ExportPanel({
+  isLightTheme,
   boardPedals,
   selectedBoards = [],
   displaySizes,
@@ -473,15 +475,27 @@ export default function ExportPanel({
   return (
     <div
       ref={containerRef}
-      className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 w-64 shadow-2xl flex flex-col gap-6"
+      className="bg-zinc-800 border border-zinc-800 rounded-xl p-4 w-64 shadow-2xl flex flex-col gap-6"
     >
       {/* TITLE */}
       <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider">
+        <img
+          src={
+            isLightTheme
+              ? "/images/tab-export-dark.webp"
+              : "/images/tab-export-light.webp"
+          }
+          alt=""
+          aria-hidden="true"
+          draggable={false}
+          className="w-[18px] h-[18px] object-contain shrink-0"
+        />
+
         {t("export.title")}
       </div>
 
       {/* NAME */}
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-2">
         <label className="text-[10px] uppercase tracking-wider font-bold">
           {t("export.name")}
         </label>
@@ -546,7 +560,24 @@ export default function ExportPanel({
       {/* DOWNLOAD */}
       <button
         onClick={() => exportPNG()}
-        className="w-full bg-blue-600 !text-white text-[11px] uppercase font-mono font-bold rounded-lg py-2 flex items-center justify-center transition-all duration-150 hover:bg-blue-600 hover:scale-[1.02] active:scale-95 transform-gpu"
+        className="
+    w-full
+    h-[35px]
+    px-3
+    rounded-lg
+    border-0
+    bg-blue-600
+    !text-white
+    text-[10px]
+    font-black
+    uppercase
+    flex
+    items-center
+    justify-center
+    gap-2
+    transition-colors
+    hover:bg-blue-500
+  "
       >
         <div className="relative flex items-center justify-center w-full">
           <span

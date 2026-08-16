@@ -100,6 +100,12 @@ export default function BoardEditor() {
   const t = getTranslator(language);
   const [units, setUnits] = useState<Units>("metric");
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+
+  const [mobileCanvasPanelOpen, setMobileCanvasPanelOpen] = useState(false);
+
+  const mobileCanvasPanelCloseRef =
+    useRef<(() => void) | null>(null);
+
   const [specsOpen, setSpecsOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [canvasSize, setCanvasSize] = useState({
@@ -436,9 +442,15 @@ export default function BoardEditor() {
 
   const saveName = () => {
     if (editingProjectId === null) return;
+
     setProjects((prev) =>
-      prev.map((p) => (p.id === editingProjectId ? { ...p, name: tempName.toUpperCase() } : p))
+      prev.map((p) =>
+        p.id === editingProjectId
+          ? { ...p, name: tempName.trim() }
+          : p
+      )
     );
+
     setEditingProjectId(null);
   };
 
@@ -873,7 +885,6 @@ export default function BoardEditor() {
             >
               <div className="flex-1 relative overflow-hidden">
                 <BoardCanvas
-                  key={activeProject.id}
                   activeProject={activeProject}
                   units={units}
                   language={language}
@@ -948,6 +959,12 @@ export default function BoardEditor() {
             <button
               type="button"
               onClick={() => {
+                if (mobileCanvasPanelOpen) {
+                  mobileCanvasPanelCloseRef.current?.();
+                  setMobileCanvasPanelOpen(false);
+                  return;
+                }
+
                 if (mobileSidebarOpen) {
                   setMobileSidebarOpen(false);
                   return;
@@ -978,12 +995,12 @@ export default function BoardEditor() {
       [-webkit-tap-highlight-color:transparent]
     "
               aria-label={
-                mobileSidebarOpen
-                  ? "Fermer la bibliothèque"
+                mobileSidebarOpen || mobileCanvasPanelOpen
+                  ? "Fermer le panneau"
                   : "Ouvrir la bibliothèque"
               }
             >
-              {mobileSidebarOpen ? (
+              {mobileSidebarOpen || mobileCanvasPanelOpen ? (
                 <Minus size={22} strokeWidth={2.4} />
               ) : (
                 <Plus size={22} strokeWidth={2.4} />
@@ -1024,6 +1041,8 @@ export default function BoardEditor() {
               deleteBoard={deleteBoard}
               isMobile
               mobileSidebarOpen={mobileSidebarOpen}
+              setMobileCanvasPanelOpen={setMobileCanvasPanelOpen}
+              mobileCanvasPanelCloseRef={mobileCanvasPanelCloseRef}
               getCenterRef={getCenterRef}
               projects={projects}
               activeProjectId={activeProjectId}

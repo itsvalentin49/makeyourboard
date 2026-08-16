@@ -14,7 +14,7 @@ type Output = {
 
 type Props = {
   t: (key: string) => string;
-
+  isLightTheme: boolean;
   powerUnits: AnyRow[];
   pedalAssignments: {
     pedal: AnyRow;
@@ -72,6 +72,7 @@ export default function PowerSetup({
   shouldShowNotEnough,
   shouldShowDaisy,
   daisyPedalNames,
+  isLightTheme,
   extractOutputs,
 }: Props) {
   const normalize = (value: any) =>
@@ -498,7 +499,7 @@ export default function PowerSetup({
       className="
     w-[calc(100vw-32px)]
     max-w-[400px]
-    bg-zinc-900
+    bg-zinc-800
     border
     border-zinc-800
     rounded-xl
@@ -507,6 +508,18 @@ export default function PowerSetup({
     >
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-2 text-xs uppercase tracking-wider font-bold">
+          <img
+            src={
+              isLightTheme
+                ? "/images/tab-power2-dark.webp"
+                : "/images/tab-power2-light.webp"
+            }
+            alt=""
+            aria-hidden="true"
+            draggable={false}
+            className="w-[18px] h-[18px] object-contain shrink-0"
+          />
+
           {t("powerSetup.title")}
         </div>
       </div>

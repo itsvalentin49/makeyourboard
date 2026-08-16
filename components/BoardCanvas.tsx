@@ -58,6 +58,11 @@ type Props = {
   language: Language;
 
   mobileSidebarOpen?: boolean;
+  setMobileCanvasPanelOpen?: (v: boolean) => void;
+
+  mobileCanvasPanelCloseRef?: React.MutableRefObject<
+    (() => void) | null
+  >;
 
   rotatePedal: (id: number) => void;
   deletePedal: (id: number) => void;
@@ -232,6 +237,8 @@ export default function BoardCanvas({
   showIntro,
   isMobile = false,
   mobileSidebarOpen = false,
+  setMobileCanvasPanelOpen,
+  mobileCanvasPanelCloseRef,
   rotatePedal,
   deletePedal,
   movePedalFront,
@@ -659,15 +666,10 @@ export default function BoardCanvas({
 
   const handleStageClick = (e: any) => {
     if (e.target === e.target.getStage()) {
-      // sélection
       setSelectedInstanceId(null);
       setSelectedBoardInstanceId(null);
-
-      // menus sidebar
       closeSearchMenus();
       setContactOpen(false);
-
-      // 🔥 AJOUT ICI (LA CLE)
       setShowPower(false);
       setShowExportPanel(false);
       setShowList(false);
@@ -782,6 +784,53 @@ export default function BoardCanvas({
   const [showList, setShowList] = useState(false);
   const [showOutputs, setShowOutputs] = useState(false);
   const [showPower, setShowPower] = useState(false);
+  const mobileCanvasPanelOpen =
+    isMobile &&
+    (
+      showBoardsMenu ||
+      showCableMenu ||
+      showPower ||
+      showExportPanel ||
+      showSettings
+    );
+
+  useEffect(() => {
+    setMobileCanvasPanelOpen?.(mobileCanvasPanelOpen);
+
+    if (mobileCanvasPanelCloseRef) {
+      mobileCanvasPanelCloseRef.current = mobileCanvasPanelOpen
+        ? () => {
+          closeBottomPanels();
+          setShowMobileMenu(false);
+          setRenderMobileMenu(false);
+        }
+        : null;
+    }
+
+    if (mobileCanvasPanelOpen) {
+      setShowMobileMenu(false);
+      setRenderMobileMenu(false);
+    }
+  }, [
+    mobileCanvasPanelOpen,
+    setMobileCanvasPanelOpen,
+    mobileCanvasPanelCloseRef,
+  ]);
+  const mobileFullPanelClass = `
+  z-[100]
+  fixed
+  left-0
+  right-0
+  bottom-0
+  top-[calc(64px+env(safe-area-inset-top))]
+  overflow-y-auto
+  overflow-x-hidden
+  bg-zinc-800
+  flex
+  justify-center
+  items-start
+  p-4
+`;
   const [hoveredBoardId, setHoveredBoardId] = useState<number | null>(null);
   const [overlayPosition, setOverlayPosition] = useState<{
     x: number;
@@ -1216,10 +1265,10 @@ export default function BoardCanvas({
     <div
       ref={containerRef}
       className={`
-      relative w-full h-full overflow-hidden
-      ${isMobile ? "pb-6" : "pb-20"}
-      ${canvasBg === "neutral" ? "bg-canvas" : ""}
-    `}
+  relative w-full h-full overflow-hidden
+  ${isMobile ? "pb-6 touch-none" : "pb-20"}
+  ${canvasBg === "neutral" ? "bg-canvas" : ""}
+`}
       style={
         canvasBg === "neutral"
           ? undefined
@@ -2168,7 +2217,6 @@ export default function BoardCanvas({
                       }}
                       className="
       bg-zinc-900
-      border border-black
       rounded-2xl
       p-0
       cursor-pointer
@@ -2233,21 +2281,32 @@ export default function BoardCanvas({
 
                   <div
                     ref={boardsMenuRef}
-                    className="
-    z-50
-    fixed
-    right-4
-    top-4
-  "
+                    className={
+                      isMobile
+                        ? mobileFullPanelClass
+                        : "z-50 fixed right-4 top-4"
+                    }
                   >
                     <div
                       className="
-          w-64 bg-zinc-900 border border-zinc-800 rounded-xl
+          w-64 bg-zinc-800 border border-zinc-800 rounded-xl
           p-3 flex flex-col gap-2
         "
                       onClick={(e) => e.stopPropagation()}
                     >
                       <div className="flex items-center gap-2 text-xs uppercase tracking-wider font-bold px-2 pb-3">
+                        <img
+                          src={
+                            isLightTheme
+                              ? "/images/tab-board-dark.webp"
+                              : "/images/tab-board-light.webp"
+                          }
+                          alt=""
+                          aria-hidden="true"
+                          draggable={false}
+                          className="w-[18px] h-[18px] object-contain shrink-0"
+                        />
+
                         {t("canvasControls.pedalboards")}
                       </div>
 
@@ -2258,12 +2317,20 @@ export default function BoardCanvas({
                           <div
                             key={project.id}
                             className={`
-      group flex items-center gap-2 rounded-lg transition-colors
-      ${active
-                                ? "bg-blue-600 !text-white"
-                                : "text-zinc-300 hover:bg-canvas"
+    group
+    flex
+    items-center
+    gap-2
+    h-[35px]
+    rounded-lg
+    border
+    transition-colors
+
+${active
+                                ? "bg-zinc-950 border-blue-500"
+                                : "bg-zinc-950 border-zinc-800 hover:border-blue-500"
                               }
-    `}
+  `}
                           >
                             {editingProjectId === project.id ? (
                               <input
@@ -2276,20 +2343,19 @@ export default function BoardCanvas({
                                   if (e.key === "Enter") saveName?.();
                                   if (e.key === "Escape") saveName?.();
                                 }}
-                                className="flex-1 bg-transparent outline-none px-3 py-2 text-[10px] font-bold uppercase tracking-wide"
+                                className="flex-1 bg-transparent outline-none px-3 py-2 text-[10px] font-bold tracking-wide"
                               />
                             ) : (
                               <button
                                 type="button"
                                 onClick={() => {
                                   setActiveProjectId?.(project.id);
-                                  setShowBoardsMenu(false);
                                 }}
                                 onDoubleClick={(e) => {
                                   e.stopPropagation();
                                   startEditing?.(project, e);
                                 }}
-                                className="flex-1 text-left px-3 py-2 text-[10px] font-bold uppercase tracking-wide"
+                                className="flex-1 text-left px-3 py-2 text-[10px] font-bold tracking-wide"
                               >
                                 {project.name || `Board ${index + 1}`}
                               </button>
@@ -2348,10 +2414,9 @@ export default function BoardCanvas({
                                 <div
                                   ref={confirmDeleteRef}
                                   className="
-      absolute right-0 bottom-full mb-2
+      absolute right-0 top-full mt-2
       w-full rounded-xl
       bg-zinc-900
-      text-zinc-300
       p-3 shadow-xl z-50
     "
                                   onClick={(e) => e.stopPropagation()}
@@ -2368,12 +2433,12 @@ export default function BoardCanvas({
                                         setConfirmDeleteProjectId(null);
                                       }}
                                       className="
-          px-3 py-1.5 rounded-md
-          bg-zinc-700 hover:bg-zinc-500
-          !text-white
-          transition-colors
-          text-[10px] font-black uppercase
-        "
+  px-3 py-1.5 rounded-md
+  bg-blue-600 hover:bg-blue-500
+  !text-white
+  transition-colors
+  text-[10px] font-black uppercase
+"
                                     >
                                       {t("tabs.cancel")}
                                     </button>
@@ -2412,17 +2477,14 @@ export default function BoardCanvas({
                           type="button"
                           onClick={() => {
                             createNewProject?.();
-                            setShowBoardsMenu(false);
                           }}
                           className="
-    mt-1
     w-full
-    h-[36px]
+    h-[35px]
     px-3
     rounded-lg
-    border
-    border-blue-500
-    bg-blue-500/10
+    bg-blue-600
+    !text-white
     text-[10px]
     font-black
     uppercase
@@ -2431,10 +2493,9 @@ export default function BoardCanvas({
     justify-center
     gap-2
     transition-colors
-    hover:bg-blue-500/15
+    hover:bg-blue-500
   "
                         >
-                          <Plus size={14} />
                           {t("canvasControls.newBoard")}
                         </button>
                       )}
@@ -2478,22 +2539,33 @@ export default function BoardCanvas({
 
               {showCableMenu && (
                 <div
-                  className="
-      z-50
-      fixed
-      right-4
-      top-4
-    "
+                  className={
+                    isMobile
+                      ? mobileFullPanelClass
+                      : "z-50 fixed right-4 top-4"
+                  }
                 >
                   <div
                     className="
         relative
-        w-65 bg-zinc-900 border border-zinc-800 rounded-xl
+        w-65 bg-zinc-800 border border-zinc-800 rounded-xl
         p-4 space-y-4
       "
                     onClick={(e) => e.stopPropagation()}
                   >
                     <div className="flex items-center gap-2 text-xs uppercase tracking-wider font-bold">
+                      <img
+                        src={
+                          isLightTheme
+                            ? "/images/tab-cables-dark.webp"
+                            : "/images/tab-cables-light.webp"
+                        }
+                        alt=""
+                        aria-hidden="true"
+                        draggable={false}
+                        className="w-[18px] h-[18px] object-contain shrink-0"
+                      />
+
                       {t("canvasControls.cables")}
                     </div>
 
@@ -2511,7 +2583,7 @@ export default function BoardCanvas({
                           {t("canvasControls.cableClearance")}
                         </div>
 
-                        <div className="text-[10px] text-zinc-500 font-medium mt-0.5 leading-snug">
+                        <div className="text-[10px] font-medium mt-0.5 leading-snug">
                           {t("canvasControls.cableClearanceDescription")}
                         </div>
                       </div>
@@ -2610,29 +2682,40 @@ export default function BoardCanvas({
                   <div className="fixed inset-0 z-40 pointer-events-none" />
 
                   <div
-                    className="
-    z-[100]
-    fixed
-    right-4
-
-    overflow-y-auto
-    overflow-x-hidden
-    overscroll-contain
-
-    [scrollbar-width:none]
-    [-ms-overflow-style:none]
-    [&::-webkit-scrollbar]:hidden
-  "
-                    style={{
-                      top: "16px",
-                      bottom: "296px",
-                    }}
+                    className={
+                      isMobile
+                        ? `${mobileFullPanelClass}
+       overscroll-contain
+       [scrollbar-width:none]
+       [-ms-overflow-style:none]
+       [&::-webkit-scrollbar]:hidden`
+                        : `
+       z-[100]
+       fixed
+       right-4
+       overflow-y-auto
+       overflow-x-hidden
+       overscroll-contain
+       [scrollbar-width:none]
+       [-ms-overflow-style:none]
+       [&::-webkit-scrollbar]:hidden
+      `
+                    }
+                    style={
+                      isMobile
+                        ? undefined
+                        : {
+                          top: "16px",
+                          bottom: "296px",
+                        }
+                    }
                     onWheel={(e) => {
                       e.stopPropagation();
                     }}
                   >
                     <PowerSetup
                       t={t}
+                      isLightTheme={isLightTheme}
                       powerUnits={powerUnits}
                       pedalAssignments={pedalAssignments}
                       hasPower={hasPower}
@@ -2707,15 +2790,14 @@ export default function BoardCanvas({
                 <>
                   <div className="fixed inset-0 z-40 pointer-events-none" />
                   <div
-                    className="
-        z-50
-        fixed
-        right-4
-        top-4
-      "
-
+                    className={
+                      isMobile
+                        ? mobileFullPanelClass
+                        : "z-50 fixed right-4 top-4"
+                    }
                   >
                     <ExportPanel
+                      isLightTheme={isLightTheme}
                       boardPedals={activeProject.boardPedals}
                       selectedBoards={activeProject.selectedBoards}
                       displaySizes={displaySizes}
@@ -2764,16 +2846,26 @@ export default function BoardCanvas({
                   <div className="fixed inset-0 z-40 pointer-events-none" />
 
                   <div
-                    className="
-        z-50
-        fixed
-        right-4
-        top-4
-      "
-
+                    className={
+                      isMobile
+                        ? mobileFullPanelClass
+                        : "z-50 fixed right-4 top-4"
+                    }
                   >
-                    <div className="w-64 bg-zinc-900 border border-zinc-800 rounded-xl p-4">
+                    <div className="w-64 bg-zinc-800 border border-zinc-800 rounded-xl p-4">
                       <div className="flex items-center gap-2 text-xs uppercase tracking-wider font-bold mb-6">
+                        <img
+                          src={
+                            isLightTheme
+                              ? "/images/tab-settings-dark.webp"
+                              : "/images/tab-settings-light.webp"
+                          }
+                          alt=""
+                          aria-hidden="true"
+                          draggable={false}
+                          className="w-[18px] h-[18px] object-contain shrink-0"
+                        />
+
                         {t("settings.title")}
                       </div>
 
@@ -2824,29 +2916,13 @@ export default function BoardCanvas({
           scaleX={viewer ? 1 : (activeProject.zoom || 100) / 100}
           scaleY={viewer ? 1 : (activeProject.zoom || 100) / 100}
 
-          onMouseDown={(e) => {
+          onMouseDown={() => {
             if (viewer) return;
 
-            // ✅ ferme Export dès qu'on clique sur le canvas,
-            // même sur une pédale, board, alim, etc.
+            // ferme Export dès qu'on clique sur le canvas
             if (showExportPanel) {
               setShowExportPanel(false);
             }
-
-            const stage = stageRef.current;
-            if (!stage) return;
-
-            if (e.target === stage) {
-              stage.draggable(true);
-            }
-          }}
-
-          onMouseUp={() => {
-            if (viewer) return;
-
-            const stage = stageRef.current;
-            if (!stage) return;
-            stage.draggable(false);
           }}
 
           onDragEnd={(e) => {

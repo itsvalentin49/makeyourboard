@@ -197,6 +197,10 @@ html:not(.light) .hover\:bg-zinc-800:hover {
   background-color: var(--zinc-200) !important;
 }
 
+.hover\:border-blue-500:hover {
+  border-color: var(--blue) !important;
+}
+
 /* =========================
    INPUT FIX
    ========================= */
