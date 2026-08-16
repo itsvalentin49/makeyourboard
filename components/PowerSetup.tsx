@@ -15,6 +15,7 @@ type Output = {
 type Props = {
   t: (key: string) => string;
   isLightTheme: boolean;
+  isMobile?: boolean;
   powerUnits: AnyRow[];
   pedalAssignments: {
     pedal: AnyRow;
@@ -51,6 +52,7 @@ type Props = {
 
 export default function PowerSetup({
   t,
+  isMobile = false,
   powerUnits,
   pedalAssignments,
   hasPower,
@@ -496,15 +498,11 @@ export default function PowerSetup({
 
   return (
     <div
-      className="
-    w-[calc(100vw-32px)]
-    max-w-[400px]
-    bg-zinc-800
-    border
-    border-zinc-800
-    rounded-xl
-    p-4
-  "
+      className={
+        isMobile
+          ? "w-full min-h-full bg-zinc-800 border-0 rounded-none p-6"
+          : "w-[calc(100vw-32px)] max-w-[400px] bg-zinc-800 border border-zinc-800 rounded-xl p-4"
+      }
     >
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-2 text-xs uppercase tracking-wider font-bold">

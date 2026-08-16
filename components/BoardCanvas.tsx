@@ -826,10 +826,6 @@ export default function BoardCanvas({
   overflow-y-auto
   overflow-x-hidden
   bg-zinc-800
-  flex
-  justify-center
-  items-start
-  p-4
 `;
   const [hoveredBoardId, setHoveredBoardId] = useState<number | null>(null);
   const [overlayPosition, setOverlayPosition] = useState<{
@@ -2288,10 +2284,11 @@ export default function BoardCanvas({
                     }
                   >
                     <div
-                      className="
-          w-64 bg-zinc-800 border border-zinc-800 rounded-xl
-          p-3 flex flex-col gap-2
-        "
+                      className={
+                        isMobile
+                          ? "w-full min-h-full bg-zinc-800 border-0 rounded-none p-6 flex flex-col gap-2"
+                          : "w-64 bg-zinc-800 border border-zinc-800 rounded-xl p-3 flex flex-col gap-2"
+                      }
                       onClick={(e) => e.stopPropagation()}
                     >
                       <div className="flex items-center gap-2 text-xs uppercase tracking-wider font-bold px-2 pb-3">
@@ -2546,11 +2543,11 @@ ${active
                   }
                 >
                   <div
-                    className="
-        relative
-        w-65 bg-zinc-800 border border-zinc-800 rounded-xl
-        p-4 space-y-4
-      "
+                    className={
+                      isMobile
+                        ? "relative w-full min-h-full bg-zinc-800 border-0 rounded-none p-6 space-y-4"
+                        : "relative w-65 bg-zinc-800 border border-zinc-800 rounded-xl p-4 space-y-4"
+                    }
                     onClick={(e) => e.stopPropagation()}
                   >
                     <div className="flex items-center gap-2 text-xs uppercase tracking-wider font-bold">
@@ -2716,6 +2713,7 @@ ${active
                     <PowerSetup
                       t={t}
                       isLightTheme={isLightTheme}
+                      isMobile={isMobile}
                       powerUnits={powerUnits}
                       pedalAssignments={pedalAssignments}
                       hasPower={hasPower}
@@ -2798,6 +2796,7 @@ ${active
                   >
                     <ExportPanel
                       isLightTheme={isLightTheme}
+                      isMobile={isMobile}
                       boardPedals={activeProject.boardPedals}
                       selectedBoards={activeProject.selectedBoards}
                       displaySizes={displaySizes}
@@ -2852,8 +2851,13 @@ ${active
                         : "z-50 fixed right-4 top-4"
                     }
                   >
-                    <div className="w-64 bg-zinc-800 border border-zinc-800 rounded-xl p-4">
-                      <div className="flex items-center gap-2 text-xs uppercase tracking-wider font-bold mb-6">
+                    <div
+                      className={
+                        isMobile
+                          ? "w-full min-h-full bg-zinc-800 border-0 rounded-none p-6"
+                          : "w-64 bg-zinc-800 border border-zinc-800 rounded-xl p-4"
+                      }
+                    >                      <div className="flex items-center gap-2 text-xs uppercase tracking-wider font-bold mb-6">
                         <img
                           src={
                             isLightTheme

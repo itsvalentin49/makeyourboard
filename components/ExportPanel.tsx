@@ -8,6 +8,7 @@ type AnyRow = Record<string, any>;
 
 type Props = {
   isLightTheme: boolean;
+  isMobile?: boolean;
   boardPedals: AnyRow[];
   selectedBoards?: AnyRow[];
   displaySizes: Record<number, { w: number; h: number }>;
@@ -23,6 +24,7 @@ type Props = {
 
 export default function ExportPanel({
   isLightTheme,
+  isMobile = false,
   boardPedals,
   selectedBoards = [],
   displaySizes,
@@ -475,7 +477,11 @@ export default function ExportPanel({
   return (
     <div
       ref={containerRef}
-      className="bg-zinc-800 border border-zinc-800 rounded-xl p-4 w-64 shadow-2xl flex flex-col gap-6"
+      className={
+        isMobile
+          ? "w-full min-h-full bg-zinc-800 border-0 rounded-none shadow-none p-6 flex flex-col gap-6"
+          : "bg-zinc-800 border border-zinc-800 rounded-xl p-4 w-64 shadow-2xl flex flex-col gap-6"
+      }
     >
       {/* TITLE */}
       <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider">
@@ -549,10 +555,14 @@ export default function ExportPanel({
           {t("export.preview")}
         </label>
 
-        <div className="flex items-center justify-center overflow-hidden">
+        <div className="w-full overflow-hidden">
           <canvas
             ref={previewRef}
-            className="max-w-full max-h-40 rounded-md"
+            className={
+              isMobile
+                ? "block w-full h-auto rounded-md"
+                : "max-w-full max-h-40 rounded-md"
+            }
           />
         </div>
       </div>
