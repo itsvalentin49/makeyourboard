@@ -1767,39 +1767,8 @@ export default function BoardCanvas({
 
             {(
               <>
-                {/* ZOOM */}
-                <div
-                  className="
-  fixed
-  bottom-6
-  left-4
-  z-50
-  flex items-center justify-center
-  h-8 w-20
-  bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl
-  lg:hidden
-"
-                >
-                  <button
-                    onClick={zoomOut}
-                    disabled={isMinZoom}
-                    className="absolute left-2"
-                  >
-                    <Minus size={12} />
-                  </button>
 
-                  <span className="text-[10px] font-black">
-                    {displayZoomPercent}%
-                  </span>
 
-                  <button
-                    onClick={zoomIn}
-                    disabled={isMaxZoom}
-                    className="absolute right-2"
-                  >
-                    <Plus size={12} />
-                  </button>
-                </div>
 
                 {/* MENU À DROITE */}
                 <div

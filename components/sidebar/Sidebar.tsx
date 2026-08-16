@@ -699,7 +699,13 @@ export default function Sidebar({
         <div className="px-1 mt-4 flex flex-col gap-4 flex-1 overflow-hidden">
 
           <div className="shrink-0">
-            <div className="grid grid-cols-5 gap-1.5">
+            <div
+              className={
+                isMobile
+                  ? "grid grid-cols-5 gap-2 justify-center"
+                  : "grid grid-cols-5 gap-1.5"
+              }
+            >
               {
                 [
                   {
@@ -777,8 +783,9 @@ export default function Sidebar({
                           setShowPowerResults(false);
                         }}
                         style={{
-                          width: "100%",
-                          aspectRatio: "1 / 1",
+                          width: isMobile ? "64px" : "100%",
+                          height: isMobile ? "64px" : undefined,
+                          aspectRatio: isMobile ? undefined : "1 / 1",
                           borderRadius: "14px",
                           background: style.background,
 

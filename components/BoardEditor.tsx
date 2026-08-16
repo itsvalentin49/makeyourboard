@@ -1148,6 +1148,7 @@ export default function BoardEditor() {
                     contactOpen={contactOpen}
                     setContactOpen={setContactOpen}
                     hideLogo
+                    isMobile
                   />
                 </div>
               </div>
