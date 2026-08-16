@@ -311,7 +311,7 @@ export default function BoardCanvas({
   const currentZoom = activeProject.zoom || 100;
   const zoomPercent = Math.round(currentZoom);
   const displayZoomPercent = Math.round(zoomPercent * 0.75 - 25);
-  const MIN_ZOOM = 100;
+  const MIN_ZOOM = 50;
   const MAX_ZOOM = 300;
 
   const ZOOM_STEP = 5;
@@ -375,7 +375,7 @@ export default function BoardCanvas({
         ? oldScale * scaleBy
         : oldScale / scaleBy;
 
-    const clampedScale = Math.max(1, Math.min(3, newScale));
+    const clampedScale = Math.max(0.5, Math.min(3, newScale));
 
     if (viewer) {
       // 🔥 ZOOM CENTRÉ ÉCRAN
@@ -1678,66 +1678,67 @@ export default function BoardCanvas({
             )}
 
             {/* INFO → MOBILE + PÉDALE UNIQUEMENT */}
-            {isMobile && selectedInstanceId !== null && (
-              <div
-                className="relative w-10 h-10"
-                onMouseEnter={(e) => {
-                  const button = e.currentTarget.querySelector("button");
+            {isMobile &&
+              (selectedInstanceId !== null || selectedBoardInstanceId !== null) && (
+                <div
+                  className="relative w-10 h-10"
+                  onMouseEnter={(e) => {
+                    const button = e.currentTarget.querySelector("button");
 
-                  if (button) {
-                    button.style.width = "40px";
-                    button.style.height = "40px";
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  const button = e.currentTarget.querySelector("button");
+                    if (button) {
+                      button.style.width = "40px";
+                      button.style.height = "40px";
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    const button = e.currentTarget.querySelector("button");
 
-                  if (button) {
-                    button.style.width = "36px";
-                    button.style.height = "36px";
-                  }
-                }}
-              >
-                <button
-                  type="button"
-                  aria-label="Informations"
-                  onClick={() => {
-                    setMobileCanvasPanelOpen?.(false);
-                    setMobileSidebarOpen(true);
+                    if (button) {
+                      button.style.width = "36px";
+                      button.style.height = "36px";
+                    }
                   }}
-                  style={{
-                    position: "absolute",
-                    left: "50%",
-                    top: "50%",
-                    width: "36px",
-                    height: "36px",
-                    transform: "translate(-50%, -50%)",
-                    transition: "width 140ms ease-out, height 140ms ease-out",
-                  }}
-                  className="
+                >
+                  <button
+                    type="button"
+                    aria-label="Informations"
+                    onClick={() => {
+                      setMobileCanvasPanelOpen?.(false);
+                      setMobileSidebarOpen(true);
+                    }}
+                    style={{
+                      position: "absolute",
+                      left: "50%",
+                      top: "50%",
+                      width: "36px",
+                      height: "36px",
+                      transform: "translate(-50%, -50%)",
+                      transition: "width 140ms ease-out, height 140ms ease-out",
+                    }}
+                    className="
         rounded-xl
         border border-zinc-700
         bg-zinc-950
         shadow-lg
         p-0
       "
-                />
+                  />
 
-                <Info
-                  strokeWidth={2}
-                  style={{
-                    position: "absolute",
-                    left: "50%",
-                    top: "50%",
-                    width: "16px",
-                    height: "16px",
-                    transform: "translate(-50%, -50%)",
-                    pointerEvents: "none",
-                    display: "block",
-                  }}
-                />
-              </div>
-            )}
+                  <Info
+                    strokeWidth={2}
+                    style={{
+                      position: "absolute",
+                      left: "50%",
+                      top: "50%",
+                      width: "16px",
+                      height: "16px",
+                      transform: "translate(-50%, -50%)",
+                      pointerEvents: "none",
+                      display: "block",
+                    }}
+                  />
+                </div>
+              )}
 
           </div>
         )}
@@ -3133,7 +3134,7 @@ ${active
               pinchStartScale.current * scaleBy;
 
             const clampedScale = Math.max(
-              1,
+              0.5,
               Math.min(3, newScale)
             );
 
