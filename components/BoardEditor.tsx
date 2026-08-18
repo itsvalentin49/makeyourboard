@@ -8,7 +8,7 @@ import SettingsPanel from "@/components/SettingsPanel";
 import { useLibrary } from "@/hooks/useLibrary";
 import type { AnyRow, BoardItem, Project } from "@/types/project";
 import { getTranslator, type Language } from "@/utils/i18n";
-import { Settings, Plus, Minus, RotateCw, X, Trash2 } from "lucide-react";
+import { Settings, Plus, Minus, RotateCw, X, Trash2, Info } from "lucide-react";
 import { useRef } from "react";
 import SidebarLogo from "@/components/sidebar/SidebarLogo";
 
@@ -102,6 +102,7 @@ export default function BoardEditor() {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   const [mobileCanvasPanelOpen, setMobileCanvasPanelOpen] = useState(false);
+  const mobileHelpOpenRef = useRef<(() => void) | null>(null);
 
   const mobileCanvasPanelCloseRef =
     useRef<(() => void) | null>(null);
@@ -182,7 +183,7 @@ export default function BoardEditor() {
   /* ================= FORCE CLOSE MOBILE DRAWER ON DESKTOP ================= */
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth >= 1024) {
+      if (window.innerWidth >= 768) {
         setMobileSidebarOpen(false);
       }
     };
@@ -328,7 +329,7 @@ export default function BoardEditor() {
 
   useEffect(() => {
     const check = () => {
-      setIsMobileDevice(window.innerWidth < 768);
+      setIsMobileDevice(window.innerWidth < 1024);
     };
 
     check();
@@ -434,8 +435,7 @@ export default function BoardEditor() {
     });
   };
 
-  const startEditing = (project: Project, e: React.MouseEvent<HTMLElement>) => {
-    e.stopPropagation();
+  const startEditing = (project: Project) => {
     setEditingProjectId(project.id);
     setTempName(project.name);
   };
@@ -956,34 +956,61 @@ export default function BoardEditor() {
           >
             <SidebarLogo compact />
 
-            <button
-              type="button"
-              onClick={() => {
-                if (mobileCanvasPanelOpen) {
-                  mobileCanvasPanelCloseRef.current?.();
-                  setMobileCanvasPanelOpen(false);
-                  return;
-                }
+            <div className="ml-auto flex items-center gap-3">
 
-                if (mobileSidebarOpen) {
-                  setMobileSidebarOpen(false);
-                  return;
-                }
+              {/* HELP / INFO */}
+              <button
+                type="button"
+                aria-label={t("help.title")}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  mobileHelpOpenRef.current?.();
+                }}
+                className="
+    w-[30px]
+    h-[30px]
+    shrink-0
+    rounded-full
+    bg-blue-600
+    !text-white
+    flex
+    items-center
+    justify-center
+    shadow-2xl
+    active:scale-95
+    transition-transform
+    touch-manipulation
+    [-webkit-tap-highlight-color:transparent]
+  "
+              >
+                <Info size={16} strokeWidth={2} />
+              </button>
 
-                setSelectedInstanceId(null);
-                setSelectedBoardInstanceId(null);
-                setMobileSidebarOpen(true);
-              }}
-              className="
-      absolute
-      right-4
-      top-1/2
-      -translate-y-1/2
-      z-50
+              {/* PLUS / MOINS */}
+              <button
+                type="button"
+                onClick={() => {
+                  if (mobileCanvasPanelOpen) {
+                    mobileCanvasPanelCloseRef.current?.();
+                    setMobileCanvasPanelOpen(false);
+                    return;
+                  }
+
+                  if (mobileSidebarOpen) {
+                    setMobileSidebarOpen(false);
+                    return;
+                  }
+
+                  setSelectedInstanceId(null);
+                  setSelectedBoardInstanceId(null);
+                  setMobileSidebarOpen(true);
+                }}
+                className="
       w-[30px]
       h-[30px]
+      shrink-0
       rounded-full
-      bg-[#3b82f6]
+      bg-blue-600
       !text-white
       flex
       items-center
@@ -994,18 +1021,20 @@ export default function BoardEditor() {
       touch-manipulation
       [-webkit-tap-highlight-color:transparent]
     "
-              aria-label={
-                mobileSidebarOpen || mobileCanvasPanelOpen
-                  ? "Fermer le panneau"
-                  : "Ouvrir la bibliothèque"
-              }
-            >
-              {mobileSidebarOpen || mobileCanvasPanelOpen ? (
-                <Minus size={22} strokeWidth={2.4} />
-              ) : (
-                <Plus size={22} strokeWidth={2.4} />
-              )}
-            </button>
+                aria-label={
+                  mobileSidebarOpen || mobileCanvasPanelOpen
+                    ? "Fermer le panneau"
+                    : "Ouvrir la bibliothèque"
+                }
+              >
+                {mobileSidebarOpen || mobileCanvasPanelOpen ? (
+                  <Minus size={22} strokeWidth={2.4} />
+                ) : (
+                  <Plus size={22} strokeWidth={2.4} />
+                )}
+              </button>
+
+            </div>
           </div>
 
           {/* CANVAS MOBILE */}
@@ -1051,6 +1080,7 @@ export default function BoardEditor() {
               setSettingsOpen={setSettingsOpen}
               setLanguage={setLanguage}
               setUnits={setUnits}
+              openHelpRef={mobileHelpOpenRef}
             />
           </div>
 

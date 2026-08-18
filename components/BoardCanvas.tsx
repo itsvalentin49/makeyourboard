@@ -64,6 +64,10 @@ type Props = {
     (() => void) | null
   >;
 
+  openHelpRef?: React.MutableRefObject<
+    (() => void) | null
+  >;
+
   rotatePedal: (id: number) => void;
   deletePedal: (id: number) => void;
   movePedalFront: (id: number) => void;
@@ -85,7 +89,7 @@ type Props = {
   setContactOpen: (v: boolean) => void;
 
   deleteProject?: (id: number, e: React.MouseEvent<HTMLElement>) => void;
-  startEditing?: (project: Project, e: React.MouseEvent<HTMLElement>) => void;
+  startEditing?: (project: Project) => void;
   editingProjectId?: number | null;
   tempName?: string;
   setTempName?: (v: string) => void;
@@ -239,6 +243,7 @@ export default function BoardCanvas({
   mobileSidebarOpen = false,
   setMobileCanvasPanelOpen,
   mobileCanvasPanelCloseRef,
+  openHelpRef,
   rotatePedal,
   deletePedal,
   movePedalFront,
@@ -272,6 +277,29 @@ export default function BoardCanvas({
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [renderMobileMenu, setRenderMobileMenu] = useState(false);
   const [isLightTheme, setIsLightTheme] = useState(true);
+  const [helpOpen, setHelpOpen] = useState(false);
+
+  useEffect(() => {
+    if (!openHelpRef) return;
+
+    openHelpRef.current = () => {
+      setHelpOpen(true);
+    };
+
+    return () => {
+      openHelpRef.current = null;
+    };
+  }, [openHelpRef]);
+
+  useEffect(() => {
+    if (!showIntro) return;
+
+    const hidden = localStorage.getItem("myb_help_hidden");
+
+    if (hidden !== "true") {
+      setHelpOpen(true);
+    }
+  }, [showIntro]);
 
   useEffect(() => {
     const html = document.documentElement;
@@ -683,6 +711,10 @@ export default function BoardCanvas({
   const boardsMenuRef = useRef<HTMLDivElement>(null);
   const boardsButtonRef = useRef<HTMLButtonElement>(null);
   const confirmDeleteRef = useRef<HTMLDivElement>(null);
+  const lastProjectTapRef = useRef<{
+    id: number;
+    time: number;
+  } | null>(null);
   const stageRef = useRef<any>(null);
   const rafRef = useRef<number | null>(null);
   const wheelTimeout = useRef<any>(null);
@@ -1281,14 +1313,9 @@ export default function BoardCanvas({
       }
     >
 
-      {/* HELP GUIDE */}
-      {showIntro && !mobileSidebarOpen && (
-        <HelpGuide
-          t={t}
-          mobile={isMobile}
-          forceClose={false}
-        />
-      )}
+
+
+
 
       {/* --- MODE VIEWER (CENTER BOTTOM) --- */}
       {viewer && (
@@ -1351,7 +1378,7 @@ export default function BoardCanvas({
 
       {!viewer &&
         overlayPosition &&
-        !(isMobile && mobileSidebarOpen) &&
+        !(isMobile && (mobileSidebarOpen || mobileCanvasPanelOpen)) &&
         (selectedInstanceId !== null || selectedBoardInstanceId !== null) && (
           <div
             key={`actions-${selectedInstanceId ?? `board-${selectedBoardInstanceId}`}`}
@@ -2367,12 +2394,12 @@ export default function BoardCanvas({
     flex
     items-center
     gap-2
-    h-[35px]
+h-[35px]
     rounded-lg
     border
     transition-colors
 
-${active
+    ${active
                                 ? "bg-zinc-950 border-blue-500"
                                 : "bg-zinc-950 border-zinc-800 hover:border-blue-500"
                               }
@@ -2398,62 +2425,82 @@ ${active
                                   setActiveProjectId?.(project.id);
                                 }}
                                 onDoubleClick={(e) => {
+                                  e.preventDefault();
                                   e.stopPropagation();
-                                  startEditing?.(project, e);
+
+                                  startEditing?.(project);
                                 }}
-                                className="flex-1 text-left px-3 py-2 text-[10px] font-bold tracking-wide"
+                                onTouchEnd={(e) => {
+                                  e.stopPropagation();
+
+                                  const now = Date.now();
+                                  const lastTap = lastProjectTapRef.current;
+
+                                  if (
+                                    lastTap &&
+                                    lastTap.id === project.id &&
+                                    now - lastTap.time <= 350
+                                  ) {
+                                    e.preventDefault();
+
+                                    lastProjectTapRef.current = null;
+                                    startEditing?.(project);
+
+                                    return;
+                                  }
+
+                                  lastProjectTapRef.current = {
+                                    id: project.id,
+                                    time: now,
+                                  };
+                                }}
+                                className="
+    flex-1
+    h-full
+    text-left
+    px-3
+    text-[10px]
+    font-bold
+    tracking-wide
+    touch-manipulation
+  "
                               >
                                 {project.name || `Board ${index + 1}`}
                               </button>
                             )}
 
-                            <div className="flex items-center pr-2">
+                            <div className="flex items-center h-full pr-2">
 
-                              {/* EDIT */}
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  startEditing?.(project, e);
-                                }}
-                                className="px-1.5 py-2 transition-opacity group/edit"
-                              >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  width="13"
-                                  height="13"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  strokeWidth="2"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  className="
-  transition-transform duration-150
-  group-hover/edit:scale-110
-"
-                                >
-                                  <path d="M12 20h9" />
-                                  <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
-                                </svg>
-                              </button>
+
 
                               {/* DELETE */}
                               <button
                                 type="button"
+                                aria-label={t("pedal.actions.delete")}
                                 onClick={(e) => {
+                                  e.preventDefault();
                                   e.stopPropagation();
                                   setConfirmDeleteProjectId(project.id);
                                 }}
-                                className="px-1.5 py-2 transition-opacity group/delete"
+                                onPointerUp={(e) => {
+                                  if (e.pointerType !== "touch") return;
+
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  setConfirmDeleteProjectId(project.id);
+                                }}
+                                className="
+    delete-project-button
+    w-11
+    h-[35px]
+    flex
+    items-center
+    justify-center
+    shrink-0
+    touch-manipulation
+  "
                               >
-                                <X
-                                  size={14}
-                                  className="
-                                    transition-transform duration-150
-                                    group-hover/delete:scale-110
-                                  "
-                                />
+                                <X size={14} />
                               </button>
 
                               {confirmDeleteProjectId === project.id && (
@@ -2462,7 +2509,7 @@ ${active
                                   className="
       absolute right-0 top-full mt-2
       w-full rounded-xl
-      bg-zinc-900
+      bg-zinc-800
       p-3 shadow-xl z-50
     "
                                   onClick={(e) => e.stopPropagation()}
@@ -2525,22 +2572,22 @@ ${active
                             createNewProject?.();
                           }}
                           className="
-    w-full
-    h-[35px]
-    px-3
-    rounded-lg
-    bg-blue-600
-    !text-white
-    text-[10px]
-    font-black
-    uppercase
-    flex
-    items-center
-    justify-center
-    gap-2
-    transition-colors
-    hover:bg-blue-500
-  "
+  w-full
+  h-[35px]
+  px-3
+  rounded-lg
+  bg-blue-600
+  !text-white
+  text-[10px]
+  font-black
+  uppercase
+  flex
+  items-center
+  justify-center
+  gap-2
+  transition-colors
+  hover:bg-blue-500
+"
                         >
                           {t("canvasControls.newBoard")}
                         </button>
@@ -3888,6 +3935,103 @@ ${active
         </Stage>
       )}
 
+      {/* ================= INFO / HELP ================= */}
+
+      {!viewer &&
+        !isMobile &&
+        !helpOpen && (
+          <div
+            className="
+        fixed
+        top-4
+        right-4
+        z-[40]
+        w-10
+        h-10
+        flex
+        items-center
+        justify-center
+        pointer-events-auto
+      "
+            onMouseEnter={(e) => {
+              const button = e.currentTarget.querySelector("button");
+
+              if (button) {
+                button.style.width = "40px";
+                button.style.height = "40px";
+              }
+            }}
+            onMouseLeave={(e) => {
+              const button = e.currentTarget.querySelector("button");
+
+              if (button) {
+                button.style.width = "36px";
+                button.style.height = "36px";
+              }
+            }}
+          >
+            <button
+              type="button"
+              aria-label={t("help.title")}
+              onClick={(e) => {
+                e.stopPropagation();
+
+                closeBottomPanels();
+                setShowMobileMenu(false);
+                setRenderMobileMenu(false);
+                setHelpOpen(true);
+              }}
+              style={{
+                position: "absolute",
+                left: "50%",
+                top: "50%",
+                width: "36px",
+                height: "36px",
+                transform: "translate(-50%, -50%)",
+                transition:
+                  "width 140ms ease-out, height 140ms ease-out",
+              }}
+              className="
+          bg-zinc-900
+          border border-zinc-800
+          rounded-xl
+          p-0
+          cursor-pointer
+        "
+            />
+
+            <div
+              className="
+          relative
+          z-10
+          flex
+          items-center
+          justify-center
+          pointer-events-none
+        "
+            >
+              <Info size={17} strokeWidth={2} />
+            </div>
+          </div>
+        )}
+
+      {/* ================= HELP GUIDE ================= */}
+
+      <HelpGuide
+        t={t}
+        mobile={isMobile}
+        open={helpOpen}
+        onClose={() => setHelpOpen(false)}
+        onContact={() => {
+          setHelpOpen(false);
+          setContactOpen(true);
+
+          if (isMobile) {
+            setMobileSidebarOpen(true);
+          }
+        }}
+        supportUrl="https://buy.stripe.com/14A8wPeGZ8uQ0tQ96I8Zq00"
+      />
 
     </div>
   );

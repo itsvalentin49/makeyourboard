@@ -480,14 +480,15 @@ export default function ImportBuilder({
           mt-2
           rounded-md
           !text-white
-          bg-green-700
+          bg-blue-600
+          hover:bg-blue-500
           text-[10px]
           font-black
           uppercase
           transition-all
           duration-150
           ${isUploadValid
-                        ? "hover:bg-green-600 cursor-pointer"
+                        ? "hover:bg-blue-500 cursor-pointer"
                         : "cursor-not-allowed"
                     }
         `}

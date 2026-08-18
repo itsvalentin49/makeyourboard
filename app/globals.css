@@ -96,6 +96,14 @@ body {
   color: var(--blue) !important;
 }
 
+.text-red-500 {
+  color: var(--red) !important;
+}
+
+.text-orange-500 {
+  color: var(--orange) !important;
+}
+
 
 
 /* =========================
@@ -453,4 +461,9 @@ html.light .hover\:bg-green-600:hover {
 
 .light .border-zinc-700 {
   border-color: var(--zinc-700) !important;
+}
+
+.delete-project-button:hover svg,
+.delete-project-button:active svg {
+  stroke: var(--red) !important;
 }

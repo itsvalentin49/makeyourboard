@@ -604,6 +604,10 @@ export default function CustomBuilder({
   const previewTextSizePx =
     CANVAS_TEXT_SIZE * previewScale;
 
+  const previewHideHardware =
+    previewWidthMm < 70 &&
+    previewDepthMm < 70;
+
   const previewKnobCount =
     previewWidthMm < 70
       ? 1
@@ -1412,43 +1416,43 @@ export default function CustomBuilder({
                     )}
 
                     {/* POTENTIOMÈTRES */}
-                    {Array.from({
-                      length: previewKnobCount,
-                    }).map((_, index) => {
-                      const spacing =
-                        previewWidthPx /
-                        (previewKnobCount + 1);
+                    {!previewHideHardware &&
+                      Array.from({
+                        length: previewKnobCount,
+                      }).map((_, index) => {
+                        const spacing =
+                          previewWidthPx /
+                          (previewKnobCount + 1);
 
-                      const offsetFromCenter =
-                        (index -
-                          (previewKnobCount - 1) /
-                          2) *
-                        spacing *
-                        CANVAS_HARDWARE_SPREAD;
+                        const offsetFromCenter =
+                          (index -
+                            (previewKnobCount - 1) / 2) *
+                          spacing *
+                          CANVAS_HARDWARE_SPREAD;
 
-                      return (
-                        <img
-                          key={index}
-                          src="/images/knob.webp"
-                          alt=""
-                          draggable={false}
-                          className="
-                            absolute
-                            object-contain
-                            pointer-events-none
-                          "
-                          style={{
-                            width: `${previewKnobSizePx}px`,
-                            height: `${previewKnobSizePx}px`,
-                            left: `${previewWidthPx / 2 +
-                              offsetFromCenter -
-                              previewKnobSizePx / 2
-                              }px`,
-                            top: `${previewKnobTopPx}px`,
-                          }}
-                        />
-                      );
-                    })}
+                        return (
+                          <img
+                            key={index}
+                            src="/images/knob.webp"
+                            alt=""
+                            draggable={false}
+                            className="
+          absolute
+          object-contain
+          pointer-events-none
+        "
+                            style={{
+                              width: `${previewKnobSizePx}px`,
+                              height: `${previewKnobSizePx}px`,
+                              left: `${previewWidthPx / 2 +
+                                offsetFromCenter -
+                                previewKnobSizePx / 2
+                                }px`,
+                              top: `${previewKnobTopPx}px`,
+                            }}
+                          />
+                        );
+                      })}
 
                     {/* NOM */}
                     <div
@@ -1476,24 +1480,26 @@ export default function CustomBuilder({
                     </div>
 
                     {/* FOOTSWITCH */}
-                    <img
-                      src="/images/footswitch.webp"
-                      alt=""
-                      draggable={false}
-                      className="
-                        absolute
-                        object-contain
-                        pointer-events-none
-                      "
-                      style={{
-                        width: `${previewFootswitchSizePx}px`,
-                        height: `${previewFootswitchSizePx}px`,
-                        left: `${previewWidthPx / 2 -
-                          previewFootswitchSizePx / 2
-                          }px`,
-                        top: `${previewFootswitchTopPx}px`,
-                      }}
-                    />
+                    {!previewHideHardware && (
+                      <img
+                        src="/images/footswitch.webp"
+                        alt=""
+                        draggable={false}
+                        className="
+      absolute
+      object-contain
+      pointer-events-none
+    "
+                        style={{
+                          width: `${previewFootswitchSizePx}px`,
+                          height: `${previewFootswitchSizePx}px`,
+                          left: `${previewWidthPx / 2 -
+                            previewFootswitchSizePx / 2
+                            }px`,
+                          top: `${previewFootswitchTopPx}px`,
+                        }}
+                      />
+                    )}
                   </div>
                 </div>
               </div>
@@ -1536,8 +1542,8 @@ export default function CustomBuilder({
                 h-[34px]
                 mt-2
                 rounded-md
-                bg-green-700
-                hover:bg-green-600
+bg-blue-600
+hover:bg-blue-500
                 !text-white
                 text-[10px]
                 font-black
@@ -1903,8 +1909,8 @@ export default function CustomBuilder({
                 h-[34px]
                 mt-2
                 rounded-md
-                bg-green-700
-                hover:bg-green-600
+bg-blue-600
+hover:bg-blue-500
                 !text-white
                 text-[10px]
                 font-black
