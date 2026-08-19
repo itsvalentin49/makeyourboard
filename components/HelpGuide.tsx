@@ -1,6 +1,5 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
 import {
   MousePointer2,
   Zap,
@@ -9,6 +8,8 @@ import {
   Mail,
   Heart,
 } from "lucide-react";
+
+import SidebarLogo from "@/components/sidebar/SidebarLogo";
 
 type Props = {
   t: (key: string) => string;
@@ -27,22 +28,7 @@ export function HelpGuide({
   onContact,
   supportUrl,
 }: Props) {
-  const [dontShowAgain, setDontShowAgain] = useState(false);
-
-  useEffect(() => {
-    if (!open) return;
-
-    const hidden = localStorage.getItem("myb_help_hidden");
-    setDontShowAgain(hidden === "true");
-  }, [open]);
-
   const closeGuide = () => {
-    if (dontShowAgain) {
-      localStorage.setItem("myb_help_hidden", "true");
-    } else {
-      localStorage.removeItem("myb_help_hidden");
-    }
-
     onClose();
   };
 
@@ -64,25 +50,40 @@ export function HelpGuide({
       {/* MODAL */}
       <div
         className={`
-        relative z-10
-        ${mobile ? "w-[calc(100vw-32px)]" : "w-[520px]"}
-        max-w-[520px]
-        rounded-2xl
-        bg-zinc-800
-        border border-zinc-700
-        pt-6 px-5 pb-5
-      `}
+          relative z-10
+          ${mobile ? "w-[calc(100vw-32px)]" : "w-[520px]"}
+          max-w-[520px]
+          max-h-[calc(100vh-32px)]
+          overflow-y-auto
+          no-scrollbar
+          rounded-2xl
+          bg-zinc-800
+          border border-zinc-700
+          pt-6
+          px-5
+          pb-5
+        `}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* TITLE */}
-        <div className="mb-6 text-center">
-          <div className="text-[14px] font-black uppercase tracking-wider">
-            {t("help.title")}
+        {/* LOGO */}
+        <div className="flex justify-center mb-6">
+          <SidebarLogo compact={mobile} />
+        </div>
+
+        {/* BIENVENUE */}
+        <div className="mb-6">
+          <div className="text-[12px] font-black mb-1">
+            {t("help.welcomeTitle")}
           </div>
+          <p className="text-[12px] leading-[1.55] text-zinc-400">
+            {t("help.welcomeText")}
+          </p>
+
         </div>
 
         {/* HELP */}
-        <div className="space-y-4 text-sm leading-snug">
+        <div className="space-y-4 leading-snug">
+          {/* MATÉRIEL */}
           <div className="flex gap-3">
             <MousePointer2
               size={18}
@@ -90,16 +91,17 @@ export function HelpGuide({
             />
 
             <div>
-              <div className="font-black">
+              <div className="text-[12px] font-black">
                 {t("help.gearTitle")}
               </div>
 
-              <p className="mt-0.5 text-zinc-400">
+              <p className="mt-0.5 text-[12px] leading-[1.45] text-zinc-400">
                 {t("help.gearText")}
               </p>
             </div>
           </div>
 
+          {/* CÂBLES */}
           <div className="flex gap-3">
             <Cable
               size={18}
@@ -107,16 +109,17 @@ export function HelpGuide({
             />
 
             <div>
-              <div className="font-black">
+              <div className="text-[12px] font-black">
                 {t("help.jacksTitle")}
               </div>
 
-              <p className="mt-0.5 text-zinc-400">
+              <p className="mt-0.5 text-[12px] leading-[1.45] text-zinc-400">
                 {t("help.jacksText")}
               </p>
             </div>
           </div>
 
+          {/* ALIMENTATION */}
           <div className="flex gap-3">
             <Zap
               size={18}
@@ -124,16 +127,17 @@ export function HelpGuide({
             />
 
             <div>
-              <div className="font-black">
+              <div className="text-[12px] font-black">
                 {t("help.powerTitle")}
               </div>
 
-              <p className="mt-0.5 text-zinc-400">
+              <p className="mt-0.5 text-[12px] leading-[1.45] text-zinc-400">
                 {t("help.powerText")}
               </p>
             </div>
           </div>
 
+          {/* EXPORT */}
           <div className="flex gap-3">
             <Download
               size={18}
@@ -141,11 +145,11 @@ export function HelpGuide({
             />
 
             <div>
-              <div className="font-black">
+              <div className="text-[12px] font-black">
                 {t("help.shareTitle")}
               </div>
 
-              <p className="mt-0.5 text-zinc-400">
+              <p className="mt-0.5 text-[12px] leading-[1.45] text-zinc-400">
                 {t("help.shareText")}
               </p>
             </div>
@@ -153,27 +157,49 @@ export function HelpGuide({
         </div>
 
         {/* CONTACT / SUPPORT */}
-        <div className="mt-6 border-t border-zinc-700 pt-4 mb-6">
+        <div
+          className={`
+            mt-6
+            ${mobile ? "" : "border-t border-zinc-700 pt-4"}
+          `}
+        >
+          <div className="mb-4">
+            <div className="text-[12px] font-black mb-1">
+              {t("help.contactTitle")}
+            </div>
+
+            <p className="text-[12px] leading-[1.5] text-zinc-400">
+              {t("help.contactText")}
+            </p>
+          </div>
+
           <div className="grid grid-cols-2 gap-2">
+            {/* CONTACT */}
             <button
               type="button"
               onClick={handleContact}
               className="
-  h-9
-  flex items-center justify-center gap-2
-  rounded-lg
-  bg-zinc-950
-  border border-zinc-700
-  text-[11px] font-bold
-  transition-all
-  hover:border-zinc-500
-  hover:bg-canvas
-"
+                h-9
+                flex
+                items-center
+                justify-center
+                gap-2
+                rounded-lg
+                bg-zinc-950
+                border
+                border-zinc-700
+                text-[12px]
+                font-bold
+                transition-all
+                hover:border-zinc-500
+                hover:bg-canvas
+              "
             >
               <Mail size={15} />
               {t("footer.feedback")}
             </button>
 
+            {/* SUPPORT */}
             {supportUrl && (
               <a
                 href={supportUrl}
@@ -181,16 +207,21 @@ export function HelpGuide({
                 rel="noopener noreferrer"
                 onClick={closeGuide}
                 className="
-  h-9
-  flex items-center justify-center gap-2
-  rounded-lg
-  bg-zinc-950
-  border border-zinc-700
-  text-[11px] font-bold
-  transition-all
-  hover:border-zinc-500
-  hover:bg-canvas
-"
+                  h-9
+                  flex
+                  items-center
+                  justify-center
+                  gap-2
+                  rounded-lg
+                  bg-zinc-950
+                  border
+                  border-zinc-700
+                  text-[12px]
+                  font-bold
+                  transition-all
+                  hover:border-zinc-500
+                  hover:bg-canvas
+                "
               >
                 <Heart size={15} />
                 {t("footer.donate")}
@@ -198,42 +229,6 @@ export function HelpGuide({
             )}
           </div>
         </div>
-
-        {/* DON'T SHOW AGAIN */}
-        <label className="flex items-center gap-2 text-[11px] font-bold text-zinc-300">
-          <input
-            type="checkbox"
-            checked={dontShowAgain}
-            onChange={(e) =>
-              setDontShowAgain(e.target.checked)
-            }
-            className="h-4 w-4 accent-blue-600"
-          />
-
-          {t("help.dontShowAgain")}
-        </label>
-
-        {/* OK */}
-        <button
-          type="button"
-          onClick={closeGuide}
-          className="
-            mt-4
-            h-8
-            w-full
-            rounded-md
-            bg-blue-600
-            !text-white
-            text-[11px]
-            font-black
-            uppercase
-            tracking-wide
-            transition-colors
-            hover:bg-blue-500
-          "
-        >
-          {t("help.ok")}
-        </button>
       </div>
     </div>
   );

@@ -405,7 +405,11 @@
     "shareTitle": "Download your pedalboard",
     "shareText": "Export your pedalboard as a PNG to save or share it.",
     "ok": "OK",
-    "dontShowAgain": "Don't show again"
+    "dontShowAgain": "Don't show again",
+    "welcomeTitle": "Welcome to MakeYourBoard",
+    "welcomeText": "MakeYourBoard is a free tool for designing your ideal pedalboard. Add your board, pedals and power supply, arrange your setup however you like and see the result in just a few clicks. Made for pedal enthusiasts, I hope you find it useful and fun to use.",
+    "contactTitle": "Feedback, an idea, or just want to get in touch?",
+    "contactText": "MakeYourBoard is a solo project developed in my spare time, so feedback, ideas and suggestions are always welcome. If you enjoy the tool and would like to contribute to its development, you can also support the project. Thanks 🤘"
   },
   "colors": {
     "aluminium": "Aluminum",

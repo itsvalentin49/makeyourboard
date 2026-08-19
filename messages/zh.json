@@ -403,7 +403,11 @@
     "shareTitle": "下载你的 pedalboard",
     "shareText": "将你的 pedalboard 导出为 PNG，方便保存或分享。",
     "ok": "OK",
-    "dontShowAgain": "不再显示"
+    "dontShowAgain": "不再显示",
+    "welcomeTitle": "欢迎使用 MakeYourBoard",
+    "welcomeText": "MakeYourBoard 是一款免费的效果器板设计工具。添加你的效果器板、效果器和电源，按照自己的喜好安排整个 setup，只需几次点击即可直观看到最终效果。它专为效果器爱好者而设计，希望这个工具对你有帮助，也能让你用起来觉得有趣。",
+    "contactTitle": "有反馈、想法，或者只是想聊聊？",
+    "contactText": "MakeYourBoard 是我利用业余时间独立开发的项目，因此非常欢迎任何反馈、想法和建议。如果你喜欢这个工具，并希望帮助它继续发展，也可以支持这个项目。谢谢 🤘"
   },
   "colors": {
     "aluminium": "铝色",

@@ -403,7 +403,11 @@
     "shareTitle": "Transferir a sua pedalboard",
     "shareText": "Exporte a sua pedalboard em PNG para a guardar ou partilhar.",
     "ok": "OK",
-    "dontShowAgain": "Não mostrar novamente"
+    "dontShowAgain": "Não mostrar novamente",
+    "welcomeTitle": "Bem-vindo ao MakeYourBoard",
+    "welcomeText": "MakeYourBoard é uma ferramenta gratuita para criar o seu pedalboard ideal. Adicione o seu board, os pedais e a fonte de alimentação, organize o setup como quiser e visualize o resultado em poucos cliques. Pensado para apaixonados por pedais, espero que seja útil e divertido de usar.",
+    "contactTitle": "Tem algum feedback, uma ideia ou simplesmente quer conversar?",
+    "contactText": "MakeYourBoard é um projeto pessoal que desenvolvo no meu tempo livre, por isso feedback, ideias e sugestões são sempre bem-vindos. Se gosta da ferramenta e quer contribuir para o seu desenvolvimento, também pode apoiar o projeto. Obrigado 🤘"
   },
   "colors": {
     "aluminium": "Alumínio",
