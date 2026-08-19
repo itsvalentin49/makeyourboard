@@ -1077,6 +1077,12 @@ export default function BoardEditor() {
               activeProjectId={activeProjectId}
               setActiveProjectId={setActiveProjectId}
               createNewProject={createNewProject}
+              deleteProject={deleteProject}
+              startEditing={startEditing}
+              editingProjectId={editingProjectId}
+              tempName={tempName}
+              setTempName={setTempName}
+              saveName={saveName}
               setSettingsOpen={setSettingsOpen}
               setLanguage={setLanguage}
               setUnits={setUnits}

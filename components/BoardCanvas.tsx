@@ -2389,22 +2389,36 @@ export default function BoardCanvas({
                         return (
                           <div
                             key={project.id}
-                            className={`
+                            className="
+    pedalboard-project-row
     group
+    relative
     flex
     items-center
     gap-2
-h-[35px]
+    h-[35px]
     rounded-lg
     border
+    border-zinc-800
+    bg-zinc-950
     transition-colors
-
-    ${active
-                                ? "bg-zinc-950 border-blue-500"
-                                : "bg-zinc-950 border-zinc-800 hover:border-blue-500"
-                              }
-  `}
+    overflow-hidden
+  "
                           >
+                            {active && (
+                              <div
+                                className="
+        absolute
+        inset-0
+        rounded-md
+        border
+        border-blue-500
+        bg-blue-500/10
+        pointer-events-none
+        z-0
+      "
+                              />
+                            )}
                             {editingProjectId === project.id ? (
                               <input
                                 autoFocus
@@ -2416,8 +2430,7 @@ h-[35px]
                                   if (e.key === "Enter") saveName?.();
                                   if (e.key === "Escape") saveName?.();
                                 }}
-                                className="flex-1 bg-transparent outline-none px-3 py-2 text-[10px] font-bold tracking-wide"
-                              />
+                                className="relative z-10 flex-1 bg-transparent outline-none px-3 py-2 text-[10px] font-bold tracking-wide" />
                             ) : (
                               <button
                                 type="button"
@@ -2489,6 +2502,13 @@ h-[35px]
                                   e.stopPropagation();
                                   setConfirmDeleteProjectId(project.id);
                                 }}
+                                onMouseEnter={(e) => {
+                                  if (isMobile) return;
+                                  e.currentTarget.style.color = "var(--red)";
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.color = "";
+                                }}
                                 className="
     delete-project-button
     w-11
@@ -2503,7 +2523,7 @@ h-[35px]
                                 <X size={14} />
                               </button>
 
-                              {confirmDeleteProjectId === project.id && (
+                              {!isMobile && confirmDeleteProjectId === project.id && (
                                 <div
                                   ref={confirmDeleteRef}
                                   className="
@@ -2591,6 +2611,63 @@ h-[35px]
                         >
                           {t("canvasControls.newBoard")}
                         </button>
+                      )}
+                      {isMobile && confirmDeleteProjectId !== null && (
+                        <div
+                          ref={confirmDeleteRef}
+                          className="
+      mt-2
+      w-full
+      rounded-xl
+      bg-zinc-900
+      border
+      border-zinc-700
+      p-3
+      z-50
+    "
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <div className="text-[11px] font-bold mb-3">
+                            {t("tabs.confirmDelete")}
+                          </div>
+
+                          <div className="flex gap-2 justify-end">
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setConfirmDeleteProjectId(null);
+                              }}
+                              className="
+          px-3 py-1.5 rounded-md
+          bg-blue-600 hover:bg-blue-500
+          !text-white
+          transition-colors
+          text-[10px] font-black uppercase
+        "
+                            >
+                              {t("tabs.cancel")}
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                deleteProject?.(confirmDeleteProjectId, e);
+                                setConfirmDeleteProjectId(null);
+                              }}
+                              className="
+          px-3 py-1.5 rounded-md
+          bg-red-600 hover:bg-red-500
+          !text-white
+          transition-colors
+          text-[10px] font-black uppercase
+        "
+                            >
+                              {t("pedal.actions.delete")}
+                            </button>
+                          </div>
+                        </div>
                       )}
                     </div>
                   </div>

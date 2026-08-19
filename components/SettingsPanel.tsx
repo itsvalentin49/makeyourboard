@@ -204,9 +204,10 @@ export default function SettingsPanel({
     top-0
     h-full
     w-1/2
-    rounded-lg
-    border-0
-    bg-blue-600
+    rounded-md
+    border
+    border-blue-500
+    bg-blue-500/10
     transition-transform
     duration-200
     ease-out
@@ -241,17 +242,11 @@ export default function SettingsPanel({
               h-full leading-tight
             "
                 >
-                  <span
-                    className={`text-[10px] font-bold ${isActive ? "!text-white" : ""
-                      }`}
-                  >
+                  <span className="text-[10px] font-bold">
                     {u.label}
                   </span>
 
-                  <span
-                    className={`text-[8px] tracking-wide ${isActive ? "!text-white" : ""
-                      }`}
-                  >
+                  <span className="text-[8px] tracking-wide">
                     {u.sub}
                   </span>
                 </button>
@@ -283,9 +278,10 @@ export default function SettingsPanel({
     top-0
     h-full
     w-1/2
-    rounded-lg
-    border-0
-    bg-blue-600
+    rounded-md
+    border
+    border-blue-500
+    bg-blue-500/10
     transition-transform
     duration-200
     ease-out
@@ -327,14 +323,10 @@ export default function SettingsPanel({
               >
                 <Icon
                   size={15}
-                  className={`transition-colors duration-200 ${isActive ? "!text-white" : ""
-                    }`}
+                  className="transition-colors duration-200"
                 />
 
-                <span
-                  className={`transition-colors duration-200 font-bold ${isActive ? "!text-white" : ""
-                    }`}
-                >
+                <span className="transition-colors duration-200 font-bold">
                   {item.label}
                 </span>
               </button>

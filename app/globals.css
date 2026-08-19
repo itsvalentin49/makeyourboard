@@ -209,6 +209,10 @@ html:not(.light) .hover\:bg-zinc-800:hover {
   border-color: var(--blue) !important;
 }
 
+.hover\:border-zinc-700:hover {
+  border-color: var(--zinc-700) !important;
+}
+
 /* =========================
    INPUT FIX
    ========================= */
@@ -463,7 +467,8 @@ html.light .hover\:bg-green-600:hover {
   border-color: var(--zinc-700) !important;
 }
 
-.delete-project-button:hover svg,
-.delete-project-button:active svg {
-  stroke: var(--red) !important;
+@media (hover: hover) and (pointer: fine) {
+  .pedalboard-row-hover:hover {
+    border-color: var(--zinc-500) !important;
+  }
 }
