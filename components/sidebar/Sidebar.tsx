@@ -5,6 +5,7 @@ import {
   ArrowLeft,
   ChevronDown,
   ExternalLink,
+  Mail,
   Plus,
   RotateCw,
   ShoppingCart,
@@ -476,21 +477,23 @@ export default function Sidebar({
 
 
       {contactOpen ? (
-        <div className="flex flex-col gap-6 animate-in slide-in-from-left duration-300 px-1">
+        <div className="flex flex-col gap-6 px-1">
 
-          {/* TITLE → DESKTOP ONLY */}
-          <div className="hidden lg:block">
-            <div className="space-y-1 mt-4">
-              <h2 className="text-[16px] font-black leading-tight">
-                {t("contact.title")}
-              </h2>
-            </div>
+          {/* CONTACT TITLE */}
+          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider mt-4">
+            <Mail
+              size={18}
+              strokeWidth={2}
+              className="shrink-0"
+            />
+
+            {t("contact.title")}
           </div>
 
           <>
             {/* EMAIL */}
             <div className="flex flex-col gap-1">
-              <label className="text-[10px] uppercase font-black tracking-widest">
+              <label className="text-[10px] uppercase tracking-wider font-bold">
                 {t("contact.email")}
               </label>
               <input
@@ -504,7 +507,7 @@ export default function Sidebar({
 
             {/* TYPE */}
             <div className="flex flex-col gap-1 relative" ref={contactTypeRef}>
-              <label className="text-[10px] uppercase font-black tracking-widest">
+              <label className="text-[10px] uppercase tracking-wider font-bold">
                 {t("contact.type")}
               </label>
 
@@ -547,7 +550,7 @@ export default function Sidebar({
 
             {/* MESSAGE */}
             <div className="flex flex-col gap-1">
-              <label className="text-[10px] uppercase font-black tracking-widest">
+              <label className="text-[10px] uppercase tracking-wider font-bold">
                 {t("contact.message")}
               </label>
               <textarea
@@ -696,14 +699,14 @@ export default function Sidebar({
       ) : (
 
         // LIBRARY (default view)
-        <div className="px-1 mt-4 flex flex-col gap-4 flex-1 overflow-hidden">
+        <div className="px-1 mt-4 flex flex-col gap-4 flex-1 overflow-visible">
 
           <div className="shrink-0">
             <div
               className={
                 isMobile
-                  ? "grid grid-cols-5 gap-2 justify-center"
-                  : "grid grid-cols-5 gap-1.5"
+                  ? "grid grid-cols-5 gap-2 justify-center p-1.5 overflow-visible"
+                  : "grid grid-cols-5 gap-1.5 p-1.5 overflow-visible"
               }
             >
               {
@@ -729,8 +732,8 @@ export default function Sidebar({
                   {
                     key: "custom",
                     label: t("sidebar.custom"),
-                    lightImage: "/images/tab-custom-light.webp",
-                    darkImage: "/images/tab-custom-dark.webp",
+                    lightImage: "/images/tab-custom-light-v3.webp",
+                    darkImage: "/images/tab-custom-dark-v3.webp",
                   },
                   {
                     key: "import",
@@ -789,9 +792,7 @@ export default function Sidebar({
                           borderRadius: "14px",
                           background: style.background,
 
-                          border: active
-                            ? "2px solid #FFFFFF"
-                            : "1px solid rgba(0,0,0,0.035)",
+                          border: "1px solid rgba(0,0,0,0.035)",
 
                           boxShadow: "none",
 

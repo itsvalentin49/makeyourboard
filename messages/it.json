@@ -230,7 +230,7 @@
     "message": "Messaggio",
     "placeholderEmail": "tu@email.com",
     "placeholderMessage": "Scrivi il tuo messaggio...",
-    "send": "Invia messaggio",
+    "send": "Invia",
     "sending": "Invio in corso...",
     "sent": "Messaggio inviato",
     "errorRequired": "Compila tutti i campi.",
@@ -404,7 +404,7 @@
     "shareText": "Esporta la tua pedalboard in PNG per salvarla o condividerla.",
     "ok": "OK",
     "dontShowAgain": "Non mostrare più",
-    "welcomeTitle": "Benvenuto su MakeYourBoard",
+    "welcomeTitle": "Benvenuto su MakeYourBoard !",
     "welcomeText": "MakeYourBoard è uno strumento gratuito per progettare il tuo pedalboard ideale. Aggiungi la pedalboard, i pedali e l’alimentatore, organizza il setup come preferisci e visualizza il risultato in pochi clic. Pensato per gli appassionati di pedali, spero che ti sia utile e divertente da usare.",
     "contactTitle": "Un feedback, un’idea o semplicemente voglia di fare due chiacchiere?",
     "contactText": "MakeYourBoard è un progetto personale che sviluppo nel mio tempo libero, quindi feedback, idee e suggerimenti sono sempre benvenuti. Se ti piace lo strumento e vuoi contribuire al suo sviluppo, puoi anche sostenere il progetto. Grazie 🤘"

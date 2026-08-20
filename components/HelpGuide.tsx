@@ -40,31 +40,68 @@ export function HelpGuide({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-[300] flex items-center justify-center">
-      {/* OVERLAY */}
-      <div
-        className="absolute inset-0 z-0 bg-black/20"
-        onClick={closeGuide}
-      />
-
-      {/* MODAL */}
-      <div
-        className={`
-          relative z-10
-          ${mobile ? "w-[calc(100vw-32px)]" : "w-[520px]"}
-          max-w-[520px]
-          max-h-[calc(100vh-32px)]
+    <div
+      className={
+        mobile
+          ? `
+          fixed
+          z-[100]
+          left-0
+          right-0
+          bottom-0
+          top-[calc(64px+env(safe-area-inset-top))]
           overflow-y-auto
-          no-scrollbar
-          rounded-2xl
+          overflow-x-hidden
+          overscroll-contain
           bg-zinc-800
-          border border-zinc-700
-          pt-6
-          px-5
-          pb-5
-        `}
+          [scrollbar-width:none]
+          [-ms-overflow-style:none]
+          [&::-webkit-scrollbar]:hidden
+        `
+          : "fixed inset-0 z-[300] flex items-center justify-center"
+      }
+    >
+      {/* OVERLAY DESKTOP UNIQUEMENT */}
+      {!mobile && (
+        <div
+          className="absolute inset-0 z-0 bg-black/20"
+          onClick={closeGuide}
+        />
+      )}
+
+      {/* CONTENU */}
+      <div
+        className={
+          mobile
+            ? `
+            relative
+            w-full
+            min-h-full
+            bg-zinc-800
+            border-0
+            rounded-none
+            p-6
+          `
+            : `
+            relative
+            z-10
+            w-[520px]
+            max-w-[520px]
+            max-h-[calc(100vh-32px)]
+            overflow-y-auto
+            no-scrollbar
+            rounded-2xl
+            bg-zinc-800
+            border
+            border-zinc-700
+            pt-6
+            px-5
+            pb-5
+          `
+        }
         onClick={(e) => e.stopPropagation()}
       >
+
         {/* LOGO */}
         <div className="flex justify-center mb-6">
           <SidebarLogo compact={mobile} />
@@ -157,12 +194,7 @@ export function HelpGuide({
         </div>
 
         {/* CONTACT / SUPPORT */}
-        <div
-          className={`
-            mt-6
-            ${mobile ? "" : "border-t border-zinc-700 pt-4"}
-          `}
-        >
+        <div className="mt-6">
           <div className="mb-4">
             <div className="text-[12px] font-black mb-1">
               {t("help.contactTitle")}

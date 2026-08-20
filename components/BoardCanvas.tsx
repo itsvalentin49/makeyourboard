@@ -283,7 +283,7 @@ export default function BoardCanvas({
     if (!openHelpRef) return;
 
     openHelpRef.current = () => {
-      setHelpOpen(true);
+      setHelpOpen((v) => !v);
     };
 
     return () => {
@@ -328,6 +328,8 @@ export default function BoardCanvas({
     setShowExportPanel(false);
     setShowSettings(false);
     setShowList(false);
+    setHelpOpen(false);
+
   };
   const [knob] = useImage("/images/knob.webp");
   const [footswitch] = useImage("/images/footswitch.webp");
@@ -827,7 +829,8 @@ export default function BoardCanvas({
       showCableMenu ||
       showPower ||
       showExportPanel ||
-      showSettings
+      showSettings ||
+      helpOpen
     );
 
   useEffect(() => {
@@ -4071,7 +4074,7 @@ export default function BoardCanvas({
               className="
           bg-zinc-900
           border border-zinc-800
-          rounded-xl
+          rounded-full
           p-0
           cursor-pointer
         "
@@ -4079,15 +4082,17 @@ export default function BoardCanvas({
 
             <div
               className="
-          relative
-          z-10
-          flex
-          items-center
-          justify-center
-          pointer-events-none
-        "
+    relative
+    z-10
+    flex
+    items-center
+    justify-center
+    pointer-events-none
+  "
             >
-              <Info size={17} strokeWidth={2} />
+              <span className="text-[20px] font-bold leading-none">
+                ?
+              </span>
             </div>
           </div>
         )}

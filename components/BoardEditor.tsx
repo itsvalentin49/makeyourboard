@@ -964,6 +964,10 @@ export default function BoardEditor() {
                 aria-label={t("help.title")}
                 onClick={(e) => {
                   e.stopPropagation();
+
+                  setMobileSidebarOpen(false);
+                  setContactOpen(false);
+
                   mobileHelpOpenRef.current?.();
                 }}
                 className="
@@ -983,7 +987,9 @@ export default function BoardEditor() {
     [-webkit-tap-highlight-color:transparent]
   "
               >
-                <Info size={16} strokeWidth={2} />
+                <span className="text-[19px] font-bold leading-none -mt-[1px]">
+                  ?
+                </span>
               </button>
 
               {/* PLUS / MOINS */}
@@ -1103,7 +1109,10 @@ export default function BoardEditor() {
             <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
 
             <div
-              className={`absolute inset-0 w-full transition-transform duration-300 ${mobileSidebarOpen ? "translate-y-0" : "translate-y-full"
+              className={`absolute inset-0 w-full ${contactOpen
+                ? "translate-y-0"
+                : `transition-transform duration-300 ${mobileSidebarOpen ? "translate-y-0" : "translate-y-full"
+                }`
                 }`}
               onClick={(e) => e.stopPropagation()}
             >
