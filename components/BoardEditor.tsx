@@ -56,8 +56,77 @@ const createEmptyProject = (index: number): Project => ({
   selectedBoards: [],
 });
 
+type BoardEditorProps = {
+  initialCountry?: string;
+};
 
-export default function BoardEditor() {
+const COUNTRY_TO_LANGUAGE: Record<string, Language> = {
+  // Français
+  FR: "fr",
+  MC: "fr",
+
+  // Espagnol
+  ES: "es",
+  AR: "es",
+  MX: "es",
+  CL: "es",
+  CO: "es",
+  PE: "es",
+  VE: "es",
+  UY: "es",
+  PY: "es",
+  BO: "es",
+  EC: "es",
+  CR: "es",
+  PA: "es",
+  GT: "es",
+  HN: "es",
+  SV: "es",
+  NI: "es",
+  DO: "es",
+  CU: "es",
+
+  // Allemand
+  DE: "de",
+  AT: "de",
+  LI: "de",
+
+  // Italien
+  IT: "it",
+  SM: "it",
+  VA: "it",
+
+  // Portugais
+  PT: "pt",
+  BR: "pt",
+  AO: "pt",
+  MZ: "pt",
+
+  // Chinois
+  CN: "zh",
+  TW: "zh",
+  HK: "zh",
+  MO: "zh",
+};
+
+function getLanguageFromCountry(country?: string): Language {
+  if (!country) return "en";
+
+  return COUNTRY_TO_LANGUAGE[country.toUpperCase()] || "en";
+}
+
+function getUnitsFromCountry(country?: string): Units {
+  if (!country) return "metric";
+
+  return country.toUpperCase() === "US"
+    ? "imperial"
+    : "metric";
+}
+
+
+export default function BoardEditor({
+  initialCountry,
+}: BoardEditorProps) {
   const desktopCanvasRef = useRef<HTMLDivElement | null>(null);
   const mobileCanvasRef = useRef<HTMLDivElement | null>(null);
   const canvasContainerRef = useRef<HTMLDivElement | null>(null);
@@ -96,9 +165,16 @@ export default function BoardEditor() {
         ? "/backgrounds/steel-full.webp"
         : undefined;
 
-  const [language, setLanguage] = useState<Language>("en");
+  const [language, setLanguage] = useState<Language>(() =>
+    getLanguageFromCountry(initialCountry)
+  );
+
   const t = getTranslator(language);
-  const [units, setUnits] = useState<Units>("metric");
+
+  const [settingsLoaded, setSettingsLoaded] = useState(false);
+  const [units, setUnits] = useState<Units>(() =>
+    getUnitsFromCountry(initialCountry)
+  );
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   const [mobileCanvasPanelOpen, setMobileCanvasPanelOpen] = useState(false);
@@ -125,10 +201,20 @@ export default function BoardEditor() {
       if (saved) {
         const parsed = JSON.parse(saved);
 
-        if (parsed.canvasBg) setCanvasBg(parsed.canvasBg);
+        if (parsed.canvasBg) {
+          setCanvasBg(parsed.canvasBg);
+        }
 
         if (parsed.language) {
-          const allowed: Language[] = ["en", "fr", "es", "de", "it", "pt", "zh"];
+          const allowed: Language[] = [
+            "en",
+            "fr",
+            "es",
+            "de",
+            "it",
+            "pt",
+            "zh",
+          ];
 
           const normalizedLanguage = String(parsed.language)
             .replace("Chinese", "zh")
@@ -139,10 +225,12 @@ export default function BoardEditor() {
           }
         }
 
-        if (parsed.units) setUnits(parsed.units);
+        if (parsed.units) {
+          setUnits(parsed.units);
+        }
       }
 
-      // ✅ THEME : LIGHT PAR DÉFAUT
+      // THEME : LIGHT PAR DÉFAUT
       const savedTheme = localStorage.getItem("theme");
 
       const initialTheme =
@@ -158,26 +246,32 @@ export default function BoardEditor() {
         initialTheme === "dark"
       );
 
-      // Enregistre "light" pour les nouveaux visiteurs
       if (!savedTheme) {
         localStorage.setItem("theme", "light");
       }
-
     } catch {
       // storage corrompu → on ignore
+    } finally {
+      setSettingsLoaded(true);
     }
   }, []);
 
+
   /* ================= SETTINGS SAVE ================= */
   useEffect(() => {
+    if (!settingsLoaded) return;
+
     const data = {
       canvasBg,
       language,
       units,
     };
 
-    localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(data));
-  }, [canvasBg, language, units]);
+    localStorage.setItem(
+      SETTINGS_STORAGE_KEY,
+      JSON.stringify(data)
+    );
+  }, [settingsLoaded, canvasBg, language, units]);
 
 
   /* ================= FORCE CLOSE MOBILE DRAWER ON DESKTOP ================= */

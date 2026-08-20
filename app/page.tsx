@@ -1,6 +1,12 @@
+import { headers } from "next/headers";
 import BoardEditor from "@/components/BoardEditor";
 
-export default function Page() {
+export default async function Page() {
+  const headersList = await headers();
+
+  const country =
+    headersList.get("x-vercel-ip-country")?.toUpperCase() || "";
+
   return (
     <>
       {/* SEO content invisible */}
@@ -14,7 +20,6 @@ export default function Page() {
           overflow: "hidden",
         }}
       >
-
         <h1>Guitar Pedalboard Builder</h1>
 
         <p>
@@ -34,7 +39,7 @@ export default function Page() {
       </div>
 
       {/* APP */}
-      <BoardEditor />
+      <BoardEditor initialCountry={country} />
     </>
   );
 }
