@@ -102,10 +102,12 @@ export function HelpGuide({
         onClick={(e) => e.stopPropagation()}
       >
 
-        {/* LOGO */}
-        <div className="flex justify-center mb-6">
-          <SidebarLogo compact={mobile} />
-        </div>
+        {/* LOGO — desktop uniquement */}
+        {!mobile && (
+          <div className="flex justify-center mb-6">
+            <SidebarLogo />
+          </div>
+        )}
 
         {/* BIENVENUE */}
         <div className="mb-6">
