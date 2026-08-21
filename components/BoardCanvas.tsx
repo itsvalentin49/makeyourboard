@@ -2359,14 +2359,14 @@ export default function BoardCanvas({
                     className={
                       isMobile
                         ? mobileFullPanelClass
-                        : "z-50 fixed right-4 top-4"
+                        : "z-50 fixed right-4 top-4 w-64 flex flex-col gap-2"
                     }
                   >
                     <div
                       className={
                         isMobile
                           ? "w-full min-h-full bg-zinc-800 border-0 rounded-none p-6 flex flex-col gap-2"
-                          : "w-64 bg-zinc-800 border border-zinc-800 rounded-xl p-3 flex flex-col gap-2"
+                          : "w-full bg-zinc-800 border border-zinc-800 rounded-xl p-3 flex flex-col gap-2"
                       }
                       onClick={(e) => e.stopPropagation()}
                     >
@@ -2405,7 +2405,7 @@ export default function BoardCanvas({
     border-zinc-800
     bg-zinc-950
     transition-colors
-    overflow-hidden
+    overflow-visible
   "
                           >
                             {active && (
@@ -2485,7 +2485,7 @@ export default function BoardCanvas({
                               </button>
                             )}
 
-                            <div className="flex items-center h-full pr-2">
+                            <div className="flex items-center h-full">
 
 
 
@@ -2526,59 +2526,7 @@ export default function BoardCanvas({
                                 <X size={14} />
                               </button>
 
-                              {!isMobile && confirmDeleteProjectId === project.id && (
-                                <div
-                                  ref={confirmDeleteRef}
-                                  className="
-      absolute right-0 top-full mt-2
-      w-full rounded-xl
-      bg-zinc-800
-      p-3 shadow-xl z-50
-    "
-                                  onClick={(e) => e.stopPropagation()}
-                                >
-                                  <div className="text-[11px] font-bold mb-3">
-                                    {t("tabs.confirmDelete")}
-                                  </div>
 
-                                  <div className="flex gap-2 justify-end">
-                                    <button
-                                      type="button"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        setConfirmDeleteProjectId(null);
-                                      }}
-                                      className="
-  px-3 py-1.5 rounded-md
-  bg-blue-600 hover:bg-blue-500
-  !text-white
-  transition-colors
-  text-[10px] font-black uppercase
-"
-                                    >
-                                      {t("tabs.cancel")}
-                                    </button>
-
-                                    <button
-                                      type="button"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        deleteProject?.(project.id, e);
-                                        setConfirmDeleteProjectId(null);
-                                      }}
-                                      className="
-          px-3 py-1.5 rounded-md
-          bg-red-600 hover:bg-red-500
-          !text-white
-          transition-colors
-          text-[10px] font-black uppercase
-        "
-                                    >
-                                      {t("pedal.actions.delete")}
-                                    </button>
-                                  </div>
-                                </div>
-                              )}
 
 
                             </div>
@@ -2619,15 +2567,13 @@ export default function BoardCanvas({
                         <div
                           ref={confirmDeleteRef}
                           className="
-      mt-2
-      w-full
-      rounded-xl
-      bg-zinc-900
-      border
-      border-zinc-700
-      p-3
-      z-50
-    "
+  w-full
+  rounded-xl
+  bg-zinc-950
+  border
+  border-zinc-800
+  p-3
+"
                           onClick={(e) => e.stopPropagation()}
                         >
                           <div className="text-[11px] font-bold mb-3">
@@ -2673,6 +2619,63 @@ export default function BoardCanvas({
                         </div>
                       )}
                     </div>
+
+                    {!isMobile && confirmDeleteProjectId !== null && (
+                      <div
+                        ref={confirmDeleteRef}
+                        className="
+                          w-full
+                          rounded-xl
+                          bg-zinc-800
+                          border
+                          border-zinc-800
+                          p-3
+                          shadow-xl
+                        "
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <div className="text-[11px] font-bold mb-3">
+                          {t("tabs.confirmDelete")}
+                        </div>
+
+                        <div className="flex gap-2 justify-end">
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setConfirmDeleteProjectId(null);
+                            }}
+                            className="
+                              px-3 py-1.5 rounded-md
+                              bg-blue-600 hover:bg-blue-500
+                              !text-white
+                              transition-colors
+                              text-[10px] font-black uppercase
+                            "
+                          >
+                            {t("tabs.cancel")}
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              deleteProject?.(confirmDeleteProjectId, e);
+                              setConfirmDeleteProjectId(null);
+                            }}
+                            className="
+                              px-3 py-1.5 rounded-md
+                              bg-red-600 hover:bg-red-500
+                              !text-white
+                              transition-colors
+                              text-[10px] font-black uppercase
+                            "
+                          >
+                            {t("pedal.actions.delete")}
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </>
               )}
