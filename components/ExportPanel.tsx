@@ -480,7 +480,7 @@ export default function ExportPanel({
       className={
         isMobile
           ? "w-full min-h-full bg-zinc-800 border-0 rounded-none shadow-none p-6 flex flex-col gap-6"
-          : "bg-zinc-800 border border-zinc-800 rounded-xl p-4 w-64 shadow-2xl flex flex-col gap-6"
+          : "w-full bg-transparent border-0 rounded-none shadow-none p-0 flex flex-col gap-6"
       }
     >
       {/* TITLE */}

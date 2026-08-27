@@ -713,6 +713,8 @@ export default function BoardCanvas({
   const boardsMenuRef = useRef<HTMLDivElement>(null);
   const boardsButtonRef = useRef<HTMLButtonElement>(null);
   const confirmDeleteRef = useRef<HTMLDivElement>(null);
+  const rightSidebarRef = useRef<HTMLDivElement>(null);
+
   const lastProjectTapRef = useRef<{
     id: number;
     time: number;
@@ -822,6 +824,58 @@ export default function BoardCanvas({
   const [showList, setShowList] = useState(false);
   const [showOutputs, setShowOutputs] = useState(false);
   const [showPower, setShowPower] = useState(false);
+  const desktopRightPanelOpen =
+    !isMobile &&
+    (
+      showBoardsMenu ||
+      showCableMenu ||
+      showPower ||
+      showExportPanel ||
+      showSettings
+    );
+
+  useLayoutEffect(() => {
+    if (isMobile || !rightSidebarRef.current) return;
+
+    const sidebarOpen =
+      showBoardsMenu ||
+      showCableMenu ||
+      showPower ||
+      showExportPanel ||
+      showSettings;
+
+    if (!sidebarOpen) return;
+
+    const sidebar = rightSidebarRef.current;
+
+    const animation = sidebar.animate(
+      [
+        {
+          transform: "translateX(100%)",
+        },
+        {
+          transform: "translateX(0)",
+        },
+      ],
+      {
+        duration: 550,
+        easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+        fill: "both",
+      }
+    );
+
+    return () => {
+      animation.cancel();
+    };
+  }, [
+    isMobile,
+    showBoardsMenu,
+    showCableMenu,
+    showPower,
+    showExportPanel,
+    showSettings,
+  ]);
+
   const mobileCanvasPanelOpen =
     isMobile &&
     (
@@ -866,6 +920,27 @@ export default function BoardCanvas({
   overflow-x-hidden
   bg-zinc-800
 `;
+  const desktopRightSidebarClass = `
+  z-[100]
+  fixed
+  top-0
+  right-0
+  bottom-0
+  w-[272px]
+  box-border
+  bg-zinc-800
+  overflow-y-auto
+  overflow-x-hidden
+  overscroll-contain
+  p-4
+  [scrollbar-width:none]
+  [-ms-overflow-style:none]
+  [&::-webkit-scrollbar]:hidden
+`;
+  const desktopRightSidebarStyle: React.CSSProperties = {
+    width: "340px",
+    boxSizing: "border-box",
+  };
   const [hoveredBoardId, setHoveredBoardId] = useState<number | null>(null);
   const [overlayPosition, setOverlayPosition] = useState<{
     x: number;
@@ -1800,38 +1875,143 @@ export default function BoardCanvas({
 
 
 
-                {/* MENU À DROITE */}
+                {/* MENU */}
                 <div
-                  className="
-    fixed
-    bottom-6
-    right-4
+                  className={`
     z-50
     flex
-    flex-col
-    items-end
     gap-2
-  "
+${isMobile
+                      ? "fixed bottom-6 right-4 items-end"
+                      : "absolute bottom-0 left-4 flex-row items-center"
+                    }
+  `}
                 >
-                  {/* ONGLETS */}
-                  {renderMobileMenu && (
+
+                  {/* BOUTON MENU */}
+                  <div
+                    className={`
+    relative
+    w-[84px]
+    h-9
+    shrink-0
+    flex
+    items-center
+    justify-center
+  `}
+                    onMouseEnter={(e) => {
+                      const button = e.currentTarget.querySelector("button");
+
+                      if (button) {
+                        button.style.width = "76px";
+                        button.style.height = "36px";
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      const button = e.currentTarget.querySelector("button");
+
+                      if (button) {
+                        button.style.width = "72px";
+                        button.style.height = "32px";
+                      }
+                    }}
+                  >
+                    {/* FOND DU BOUTON : lui seul grossit */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (showMobileMenu) {
+                          // FERMETURE
+                          setShowMobileMenu(false);
+                          closeBottomPanels();
+
+                          window.setTimeout(() => {
+                            setRenderMobileMenu(false);
+                          }, 400);
+                        } else {
+                          // OUVERTURE
+                          setRenderMobileMenu(true);
+
+                          requestAnimationFrame(() => {
+                            requestAnimationFrame(() => {
+                              setShowMobileMenu(true);
+                            });
+                          });
+                        }
+                      }}
+                      style={{
+                        position: "absolute",
+                        left: "50%",
+                        top: "50%",
+                        width: "72px",
+                        height: "32px",
+                        transform: "translate(-50%, -50%)",
+                        transition: "width 140ms ease-out, height 140ms ease-out",
+                      }}
+                      className="
+      bg-zinc-900
+      rounded-2xl
+      p-0
+      cursor-pointer
+    "
+                    />
+
+                    {/* TEXTE : ne grossit jamais */}
                     <div
                       className="
-      flex
-      flex-col
-      w-[150px]
-      gap-2
+      relative
+      z-10
+      pointer-events-none
+      text-[10px]
+      font-bold
+      uppercase
     "
+                    >
+                      Menu
+                    </div>
+                  </div>
+
+                  {renderMobileMenu && (
+                    <div
+                      className={`
+      flex
+      gap-2
+      ${isMobile
+                          ? "absolute right-0 flex-col w-[150px]"
+                          : "flex-row w-auto"
+                        }
+    `}
+                      style={
+                        isMobile
+                          ? {
+                            bottom: "calc(100% + 8px)",
+                          }
+                          : undefined
+                      }
                       onClick={(e) => e.stopPropagation()}
                     >
                       {/* PEDALBOARDS */}
                       <div
-                        className="relative w-full h-9 shrink-0 flex items-center px-4"
+                        className={`
+  relative
+  h-9
+  shrink-0
+  flex
+  items-center
+  px-4
+  ${isMobile ? "w-full" : "w-auto"}
+`}
                         style={{
                           opacity: showMobileMenu ? 1 : 0,
-                          transform: showMobileMenu ? "translateY(0)" : "translateY(16px)",
+                          transform: showMobileMenu
+                            ? "translate(0, 0)"
+                            : isMobile
+                              ? "translateY(16px)"
+                              : "translateX(-24px)",
                           transition: "opacity 180ms ease-out, transform 180ms ease-out",
-                          transitionDelay: showMobileMenu ? "200ms" : "0ms",
+                          transitionDelay: isMobile
+                            ? showMobileMenu ? "200ms" : "0ms"
+                            : showMobileMenu ? "0ms" : "200ms",
                           pointerEvents: showMobileMenu ? "auto" : "none",
                         }}
                         onMouseEnter={(e) => {
@@ -1910,12 +2090,26 @@ export default function BoardCanvas({
 
                       {/* CÂBLES */}
                       <div
-                        className="relative w-full h-9 shrink-0 flex items-center px-4"
+                        className={`
+  relative
+  h-9
+  shrink-0
+  flex
+  items-center
+  px-4
+  ${isMobile ? "w-full" : "w-auto"}
+`}
                         style={{
                           opacity: showMobileMenu ? 1 : 0,
-                          transform: showMobileMenu ? "translateX(0)" : "translateX(16px)",
+                          transform: showMobileMenu
+                            ? "translateX(0)"
+                            : isMobile
+                              ? "translateX(16px)"
+                              : "translateX(-24px)",
                           transition: "opacity 180ms ease-out, transform 180ms ease-out",
-                          transitionDelay: showMobileMenu ? "150ms" : "50ms",
+                          transitionDelay: isMobile
+                            ? showMobileMenu ? "150ms" : "50ms"
+                            : showMobileMenu ? "50ms" : "150ms",
                           pointerEvents: showMobileMenu ? "auto" : "none",
                         }}
                         onMouseEnter={(e) => {
@@ -1991,10 +2185,22 @@ export default function BoardCanvas({
                       </div>
                       {/* ALIMENTATION */}
                       <div
-                        className="relative w-full h-9 shrink-0 flex items-center px-4"
+                        className={`
+  relative
+  h-9
+  shrink-0
+  flex
+  items-center
+  px-4
+  ${isMobile ? "w-full" : "w-auto"}
+`}
                         style={{
                           opacity: showMobileMenu ? 1 : 0,
-                          transform: showMobileMenu ? "translateX(0)" : "translateX(16px)",
+                          transform: showMobileMenu
+                            ? "translateX(0)"
+                            : isMobile
+                              ? "translateX(16px)"
+                              : "translateX(-24px)",
                           transition: "opacity 180ms ease-out, transform 180ms ease-out",
                           transitionDelay: "100ms",
                           pointerEvents: showMobileMenu ? "auto" : "none",
@@ -2073,12 +2279,26 @@ export default function BoardCanvas({
 
                       {/* EXPORT */}
                       <div
-                        className="relative w-full h-9 shrink-0 flex items-center px-4"
+                        className={`
+  relative
+  h-9
+  shrink-0
+  flex
+  items-center
+  px-4
+  ${isMobile ? "w-full" : "w-auto"}
+`}
                         style={{
                           opacity: showMobileMenu ? 1 : 0,
-                          transform: showMobileMenu ? "translateX(0)" : "translateX(16px)",
+                          transform: showMobileMenu
+                            ? "translateX(0)"
+                            : isMobile
+                              ? "translateX(16px)"
+                              : "translateX(-24px)",
                           transition: "opacity 180ms ease-out, transform 180ms ease-out",
-                          transitionDelay: showMobileMenu ? "50ms" : "150ms",
+                          transitionDelay: isMobile
+                            ? showMobileMenu ? "50ms" : "150ms"
+                            : showMobileMenu ? "150ms" : "50ms",
                           pointerEvents: showMobileMenu ? "auto" : "none",
                         }}
                         onMouseEnter={(e) => {
@@ -2155,12 +2375,26 @@ export default function BoardCanvas({
 
                       {/* PARAMÈTRES */}
                       <div
-                        className="relative w-full h-9 shrink-0 flex items-center px-4"
+                        className={`
+  relative
+  h-9
+  shrink-0
+  flex
+  items-center
+  px-4
+  ${isMobile ? "w-full" : "w-auto"}
+`}
                         style={{
                           opacity: showMobileMenu ? 1 : 0,
-                          transform: showMobileMenu ? "translateX(0)" : "translateX(16px)",
+                          transform: showMobileMenu
+                            ? "translateX(0)"
+                            : isMobile
+                              ? "translateX(16px)"
+                              : "translateX(-24px)",
                           transition: "opacity 180ms ease-out, transform 180ms ease-out",
-                          transitionDelay: showMobileMenu ? "0ms" : "200ms",
+                          transitionDelay: isMobile
+                            ? showMobileMenu ? "0ms" : "200ms"
+                            : showMobileMenu ? "200ms" : "0ms",
                           pointerEvents: showMobileMenu ? "auto" : "none",
                         }}
                         onMouseEnter={(e) => {
@@ -2238,80 +2472,7 @@ export default function BoardCanvas({
                   )}
 
 
-                  {/* BOUTON MENU */}
-                  <div
-                    className="relative w-[84px] h-9 shrink-0 flex items-center justify-center"
-                    onMouseEnter={(e) => {
-                      const button = e.currentTarget.querySelector("button");
 
-                      if (button) {
-                        button.style.width = "76px";
-                        button.style.height = "36px";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      const button = e.currentTarget.querySelector("button");
-
-                      if (button) {
-                        button.style.width = "72px";
-                        button.style.height = "32px";
-                      }
-                    }}
-                  >
-                    {/* FOND DU BOUTON : lui seul grossit */}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (showMobileMenu) {
-                          // FERMETURE
-                          setShowMobileMenu(false);
-                          closeBottomPanels();
-
-                          window.setTimeout(() => {
-                            setRenderMobileMenu(false);
-                          }, 400);
-                        } else {
-                          // OUVERTURE
-                          setRenderMobileMenu(true);
-
-                          requestAnimationFrame(() => {
-                            requestAnimationFrame(() => {
-                              setShowMobileMenu(true);
-                            });
-                          });
-                        }
-                      }}
-                      style={{
-                        position: "absolute",
-                        left: "50%",
-                        top: "50%",
-                        width: "72px",
-                        height: "32px",
-                        transform: "translate(-50%, -50%)",
-                        transition: "width 140ms ease-out, height 140ms ease-out",
-                      }}
-                      className="
-      bg-zinc-900
-      rounded-2xl
-      p-0
-      cursor-pointer
-    "
-                    />
-
-                    {/* TEXTE : ne grossit jamais */}
-                    <div
-                      className="
-      relative
-      z-10
-      pointer-events-none
-      text-[10px]
-      font-bold
-      uppercase
-    "
-                    >
-                      Menu
-                    </div>
-                  </div>
 
                 </div>
 
@@ -2355,18 +2516,26 @@ export default function BoardCanvas({
                 <>
 
                   <div
-                    ref={boardsMenuRef}
+                    ref={(node) => {
+                      boardsMenuRef.current = node;
+                      rightSidebarRef.current = node;
+                    }}
                     className={
                       isMobile
                         ? mobileFullPanelClass
-                        : "z-50 fixed right-4 top-4 w-64 flex flex-col gap-2"
+                        : desktopRightSidebarClass
+                    }
+                    style={
+                      isMobile
+                        ? undefined
+                        : desktopRightSidebarStyle
                     }
                   >
                     <div
                       className={
                         isMobile
                           ? "w-full min-h-full bg-zinc-800 border-0 rounded-none p-6 flex flex-col gap-2"
-                          : "w-full bg-zinc-800 border border-zinc-800 rounded-xl p-3 flex flex-col gap-2"
+                          : "w-full bg-transparent border-0 rounded-none p-0 flex flex-col gap-2"
                       }
                       onClick={(e) => e.stopPropagation()}
                     >
@@ -2715,17 +2884,23 @@ export default function BoardCanvas({
 
               {showCableMenu && (
                 <div
+                  ref={rightSidebarRef}
                   className={
                     isMobile
                       ? mobileFullPanelClass
-                      : "z-50 fixed right-4 top-4"
+                      : desktopRightSidebarClass
+                  }
+                  style={
+                    isMobile
+                      ? undefined
+                      : desktopRightSidebarStyle
                   }
                 >
                   <div
                     className={
                       isMobile
                         ? "relative w-full min-h-full bg-zinc-800 border-0 rounded-none p-6 space-y-4"
-                        : "relative w-65 bg-zinc-800 border border-zinc-800 rounded-xl p-4 space-y-4"
+                        : "relative w-full bg-transparent border-0 rounded-none p-0 space-y-4"
                     }
                     onClick={(e) => e.stopPropagation()}
                   >
@@ -2851,39 +3026,25 @@ export default function BoardCanvas({
               </button>
 
 
-
-
               {showPower && (
                 <>
                   <div className="fixed inset-0 z-40 pointer-events-none" />
 
                   <div
+                    ref={rightSidebarRef}
                     className={
                       isMobile
                         ? `${mobileFullPanelClass}
-       overscroll-contain
-       [scrollbar-width:none]
-       [-ms-overflow-style:none]
-       [&::-webkit-scrollbar]:hidden`
-                        : `
-       z-[100]
-       fixed
-       right-4
-       overflow-y-auto
-       overflow-x-hidden
-       overscroll-contain
-       [scrollbar-width:none]
-       [-ms-overflow-style:none]
-       [&::-webkit-scrollbar]:hidden
-      `
+         overscroll-contain
+         [scrollbar-width:none]
+         [-ms-overflow-style:none]
+         [&::-webkit-scrollbar]:hidden`
+                        : desktopRightSidebarClass
                     }
                     style={
                       isMobile
                         ? undefined
-                        : {
-                          top: "16px",
-                          bottom: "296px",
-                        }
+                        : desktopRightSidebarStyle
                     }
                     onWheel={(e) => {
                       e.stopPropagation();
@@ -2967,10 +3128,16 @@ export default function BoardCanvas({
                 <>
                   <div className="fixed inset-0 z-40 pointer-events-none" />
                   <div
+                    ref={rightSidebarRef}
                     className={
                       isMobile
                         ? mobileFullPanelClass
-                        : "z-50 fixed right-4 top-4"
+                        : desktopRightSidebarClass
+                    }
+                    style={
+                      isMobile
+                        ? undefined
+                        : desktopRightSidebarStyle
                     }
                   >
                     <ExportPanel
@@ -3024,17 +3191,23 @@ export default function BoardCanvas({
                   <div className="fixed inset-0 z-40 pointer-events-none" />
 
                   <div
+                    ref={rightSidebarRef}
                     className={
                       isMobile
                         ? mobileFullPanelClass
-                        : "z-50 fixed right-4 top-4"
+                        : desktopRightSidebarClass
+                    }
+                    style={
+                      isMobile
+                        ? undefined
+                        : desktopRightSidebarStyle
                     }
                   >
                     <div
                       className={
                         isMobile
                           ? "w-full min-h-full bg-zinc-800 border-0 rounded-none p-6"
-                          : "w-64 bg-zinc-800 border border-zinc-800 rounded-xl p-4"
+                          : "w-full bg-transparent border-0 rounded-none p-0"
                       }
                     >                      <div className="flex items-center gap-2 text-xs uppercase tracking-wider font-bold mb-6">
                         <img

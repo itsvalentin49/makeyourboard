@@ -501,7 +501,7 @@ export default function PowerSetup({
       className={
         isMobile
           ? "w-full min-h-full bg-zinc-800 border-0 rounded-none p-6"
-          : "w-[calc(100vw-32px)] max-w-[400px] bg-zinc-800 border border-zinc-800 rounded-xl p-4"
+          : "w-full bg-transparent border-0 rounded-none p-0"
       }
     >
       <div className="flex items-center justify-between mb-5">
@@ -645,57 +645,16 @@ export default function PowerSetup({
 
                 <div className="mx-2 border-b border-dotted border-zinc-600 mb-[2px]" />
 
-                <div className="text-[11px] whitespace-nowrap text-right">
-                  {(() => {
-                    const powerType = String(a.pedal.power || "").toLowerCase();
-
-                    if (powerType === "passive") {
-                      return (
-                        <span>
-                          {t("pedal.power.Passive")}
-                        </span>
-                      );
-                    }
-
-                    if (powerType === "battery") {
-                      return (
-                        <span>
-                          {t("pedal.power.Battery")}
-                        </span>
-                      );
-                    }
-
-                    if (powerType === "usb") {
-                      return (
-                        <span>
-                          {t("pedal.power.USB")}
-                        </span>
-                      );
-                    }
-
-                    if (powerType === "ac") {
-                      return (
-                        <span>
-                          {t("pedal.power.AC")}
-                        </span>
-                      );
-                    }
-
-                    return (
-                      <span
-                        className={
-                          !hasPower
-                            ? ""
-                            : a.ok
-                              ? "text-green-600"
-                              : "text-red-500"
-                        }
-                      >
-                        {Number(a.pedal.voltage) || 9}V /{" "}
-                        {Number(a.pedal.draw) || 0}mA
-                      </span>
-                    );
-                  })()}
+                <div
+                  className={`
+    text-[11px]
+    font-bold
+    whitespace-nowrap
+    text-right
+    ${a.ok ? "text-green-600" : "text-red-500"}
+  `}
+                >
+                  {a.ok ? "OK" : "KO"}
                 </div>
               </div>
             ))}
@@ -706,20 +665,24 @@ export default function PowerSetup({
       {hasPedals && powerMessage && (
         <div className="flex items-center justify-between -mt-3">
           <div
-            className={`text-[12px] ${extraPedals > 0
-              ? recommendationCanSolve
-                ? "text-green-600"
-                : "text-red-500"
-              : powerMessageColor
+            className={`text-[12px] ${hasFailingPedal
+                ? "text-red-500"
+                : extraPedals > 0
+                  ? recommendationCanSolve
+                    ? "text-green-600"
+                    : "text-red-500"
+                  : powerMessageColor
               }`}
           >
-            {extraPedals > 0
-              ? recommendationCanSolve
-                ? splitterGroups.length === 1
-                  ? t("powerSetup.status.requiresSplitter")
-                  : t("powerSetup.status.requiresSplitters")
-                : t("powerSetup.status.notEnoughOutputs")
-              : powerMessage}
+            {hasFailingPedal
+              ? t("powerSetup.status.notCompatible")
+              : extraPedals > 0
+                ? recommendationCanSolve
+                  ? splitterGroups.length === 1
+                    ? t("powerSetup.status.requiresSplitter")
+                    : t("powerSetup.status.requiresSplitters")
+                  : t("powerSetup.status.notEnoughOutputs")
+                : powerMessage}
           </div>
         </div>
       )}
