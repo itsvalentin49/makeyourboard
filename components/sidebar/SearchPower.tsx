@@ -241,12 +241,8 @@ export default function SearchPower({
         {/* LISTE */}
         <div className="flex flex-col gap-0 overflow-y-auto no-scrollbar pb-6 min-h-0">
           {visiblePower.length > 0 ? (
-            visiblePower.map((power, index) => {
+            visiblePower.map((power) => {
               const image = power.thumbnail || null;
-              const podium =
-                !isSearching && index < 3
-                  ? ["🥇", "🥈", "🥉"][index]
-                  : null;
 
               return (
                 <button
@@ -320,22 +316,6 @@ export default function SearchPower({
                       </div>
                     </div>
                   </div>
-
-                  {podium && (
-                    <span
-                      className="
-      absolute
-      right-2
-      top-1/2
-      -translate-y-1/2
-      text-[18px]
-      leading-none
-      pointer-events-none
-    "
-                    >
-                      {podium}
-                    </span>
-                  )}
                 </button>
               );
             })

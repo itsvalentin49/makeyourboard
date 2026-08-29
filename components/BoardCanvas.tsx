@@ -1971,6 +1971,30 @@ ${isMobile
                     </div>
                   </div>
 
+                  {/* TRIANGLE DESKTOP */}
+                  {!isMobile && renderMobileMenu && (
+                    <div
+                      className="w-[10px] h-9 shrink-0 flex items-center justify-center"
+                      style={{
+                        opacity: showMobileMenu ? 1 : 0,
+                        transform: showMobileMenu
+                          ? "translateX(0)"
+                          : "translateX(-6px)",
+                        transition:
+                          "opacity 220ms ease-out, transform 220ms ease-out",
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: "10px",
+                          height: "14px",
+                          backgroundColor: "#18181b",
+                          clipPath: "polygon(0 0, 100% 50%, 0 100%)",
+                        }}
+                      />
+                    </div>
+                  )}
+
                   {renderMobileMenu && (
                     <div
                       className={`
