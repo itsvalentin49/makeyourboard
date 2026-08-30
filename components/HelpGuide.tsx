@@ -264,7 +264,7 @@ export function HelpGuide({
   "
             >
               <BookOpen size={15} />
-              Documentation
+              {t("help.documentation")}
             </Link>
 
             {/* SUPPORT */}
