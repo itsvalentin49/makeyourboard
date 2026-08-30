@@ -107,11 +107,11 @@ export default function CustomGearPage() {
 
                 <p>
                     If you prefer to use an actual image of the pedal,
-                    you can instead{" "}
+                    you can instead {" "}
                     <DocLink href="/docs/import-pedal">
-                        import your own pedal image
-                    </DocLink>
-                    .
+                        import
+                    </DocLink>{" "}
+                    your own pedal image.
                 </p>
 
                 <h3>Power requirements</h3>
@@ -119,9 +119,9 @@ export default function CustomGearPage() {
                 <p>
                     Define the pedal voltage and current draw so
                     MakeYourBoard can take its power requirements into
-                    account when{" "}
+                    account when checking{" "}
                     <DocLink href="/docs/power-supplies">
-                        checking power supply compatibility
+                        power supply compatibility
                     </DocLink>
                     .
                 </p>

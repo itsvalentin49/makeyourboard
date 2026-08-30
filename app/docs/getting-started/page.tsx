@@ -67,29 +67,15 @@ export default function GettingStartedPage() {
                     href: "#manage",
                     label: "Manage and export",
                 },
+                {
+                    href: "#responsive",
+                    label: "Mobile and tablet",
+                },
             ]}
         >
             {/* INTRO */}
             <section className="docs-section">
                 <h1>Getting Started</h1>
-
-                <p className="docs-intro">
-                    MakeYourBoard is a free online guitar pedalboard
-                    planner designed to help you build, visualize and
-                    check your setup before assembling it in real life.
-                </p>
-
-                <p>
-                    Choose your pedalboard, add your pedals and power
-                    supply, arrange everything using realistic product
-                    dimensions and make sure your setup has enough space
-                    for cables and power connections.
-                </p>
-
-                <p>
-                    No account is required, so you can start building
-                    your pedalboard immediately.
-                </p>
             </section>
 
             {/* WHAT IS MYB */}
@@ -100,17 +86,19 @@ export default function GettingStartedPage() {
                 <h2>What Is MakeYourBoard?</h2>
 
                 <p>
-                    MakeYourBoard is a visual planning tool for guitar,
-                    bass and effects pedal setups. Its goal is simple:
+                    MakeYourBoard is a free pedalboard planner for guitar and bass setups.
+                    Its goal is simple:
                     help you see how your gear will fit together before
                     you start mounting pedals and connecting cables.
-                </p>
-
-                <p>
                     The library includes thousands of pedals,
                     pedalboards and power supplies with real product
-                    dimensions whenever manufacturer specifications are
-                    available.
+                    dimensions.
+                    Choose your pedalboard, add your pedals and power
+                    supply, arrange everything using realistic product
+                    dimensions and make sure your setup has enough space
+                    for cables and power connections.
+                    No account is required, so you can start
+                    building your pedalboard immediately !
                 </p>
             </section>
 
@@ -131,20 +119,57 @@ export default function GettingStartedPage() {
                         pedal library
                     </DocLink>{" "}
                     by brand, model or effect type such as overdrive,
-                    distortion, fuzz, delay or reverb.
-                </p>
-
-                <p>
-                    Add your pedals to the canvas and move, rotate or
-                    reorder them freely until you find a layout that
-                    works for your setup.
-                </p>
-
-                <p>
+                    distortion, fuzz, delay or reverb. Add your pedals
+                    to the canvas and move, rotate or reorder them freely
+                    until you find a layout that works for your setup.
                     Select a pedal or pedalboard to open its information
                     panel and view available descriptions, technical
                     specifications and retailer links.
                 </p>
+
+                <div
+                    style={{
+                        width: "100%",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "16px",
+                        marginTop: "28px",
+                    }}
+                >
+                    <img
+                        src="/docs/getting-started/build1-v2.webp"
+                        alt="Choose a pedalboard in MakeYourBoard"
+                        style={{
+                            width: "360px",
+                            height: "280px",
+                            objectFit: "contain",
+                            display: "block",
+                        }}
+                    />
+
+                    <img
+                        src="/docs/getting-started/build2-v2.webp"
+                        alt="Search for pedals in MakeYourBoard"
+                        style={{
+                            width: "360px",
+                            height: "280px",
+                            objectFit: "contain",
+                            display: "block",
+                        }}
+                    />
+
+                    <img
+                        src="/docs/getting-started/build3-v2.webp"
+                        alt="Arrange pedals on your pedalboard"
+                        style={{
+                            width: "360px",
+                            height: "280px",
+                            objectFit: "contain",
+                            display: "block",
+                        }}
+                    />
+                </div>
             </section>
 
             {/* PLAN */}
@@ -162,14 +187,43 @@ export default function GettingStartedPage() {
                     </DocLink>{" "}
                     tool can also help you estimate whether enough space
                     is available around audio jacks and power connectors.
-                </p>
-
-                <p>
                     Green clearance areas indicate that no obvious
                     overlap has been detected, while red areas highlight
                     places where another pedal may leave too little room
                     for your cables and connectors.
                 </p>
+
+                <div
+                    style={{
+                        width: "100%",
+                        maxWidth: "680px",
+                        margin: "28px auto 0",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        gap: "16px",
+                    }}
+                >
+                    <img
+                        src="/docs/getting-started/cable-clearance-ko.webp"
+                        style={{
+                            width: "100%",
+                            height: "280px",
+                            objectFit: "contain",
+                            display: "block",
+                        }}
+                    />
+
+                    <img
+                        src="/docs/getting-started/cable-clearance-ok.webp"
+                        style={{
+                            width: "100%",
+                            height: "280px",
+                            objectFit: "contain",
+                            display: "block",
+                        }}
+                    />
+                </div>
             </section>
 
             {/* POWER */}
@@ -186,12 +240,9 @@ export default function GettingStartedPage() {
                     </DocLink>{" "}
                     to your pedalboard and use the Power Supply tool to
                     compare its available outputs with the voltage and
-                    current requirements of your pedals.
-                </p>
-
-                <p>
-                    This can help you identify potential compatibility
-                    issues before wiring your real setup.
+                    current requirements of your pedals. This can help
+                    you identify potential compatibility issues before
+                    wiring your real setup.
                 </p>
             </section>
 
@@ -204,20 +255,18 @@ export default function GettingStartedPage() {
 
                 <p>
                     If the gear you need is not available in the
-                    MakeYourBoard library, you can{" "}
+                    MakeYourBoard library, you can create a{" "}
                     <DocLink href="/docs/custom-gear">
-                        create a custom pedal or pedalboard
+                        custom pedal
                     </DocLink>{" "}
-                    using your own dimensions and specifications.
-                </p>
-
-                <p>
-                    You can also{" "}
+                    or pedalboard using your own dimensions and
+                    specifications. You can also{" "}
                     <DocLink href="/docs/import-pedal">
-                        import your own pedal image
+                        import
                     </DocLink>{" "}
-                    and define its name, dimensions, voltage and current
-                    draw before adding it to the canvas.
+                    your own pedal image and define its name, dimensions,
+                    voltage and current draw before adding it to the
+                    canvas.
                 </p>
             </section>
 
@@ -232,26 +281,36 @@ export default function GettingStartedPage() {
                     You can create and manage up to five separate
                     pedalboards from Menu &gt; Pedalboards, making it
                     easy to work on different rigs or different versions
-                    of the same setup.
-                </p>
-
-                <p>
-                    When your pedalboard is ready, you can{" "}
+                    of the same setup. When your pedalboard is ready,
+                    you can{" "}
                     <DocLink href="/docs/export">
-                        export it as a high-quality image
+                        export
                     </DocLink>{" "}
-                    with a transparent background, white background or
-                    the background currently selected on the canvas.
-                </p>
-
-                <p>
-                    The{" "}
+                    it as a high-quality image with a transparent
+                    background, white background or the background
+                    currently selected on the canvas. The{" "}
                     <DocLink href="/docs/settings">
-                        Settings
+                        settings
                     </DocLink>{" "}
                     also let you choose between metric and imperial
                     units, Light and Dark mode, several interface
                     languages and different canvas backgrounds.
+                </p>
+            </section>
+
+            {/* RESPONSIVE */}
+            <section
+                id="responsive"
+                className="docs-section"
+            >
+                <h2>Use MakeYourBoard on Any Device</h2>
+
+                <p>
+                    MakeYourBoard is fully responsive and adapts to
+                    desktop computers, tablets and smartphones. You can
+                    build, edit and check your pedalboard directly from
+                    your web browser, with an interface adapted to
+                    smaller screens and touch devices.
                 </p>
             </section>
         </DocsShell>

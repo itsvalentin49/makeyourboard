@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
 import type { ReactNode } from "react";
+import SidebarLogo from "@/components/sidebar/SidebarLogo";
 
 type TocItem = {
     href: string;
@@ -38,10 +38,9 @@ export default function DocsShell({
             <header className="docs-header">
                 <div className="docs-header-inner">
 
-                    <Link href="/" className="docs-back">
-                        <ArrowLeft size={16} />
-                        MakeYourBoard
-                    </Link>
+                    <div className="docs-logo">
+                        <SidebarLogo compact />
+                    </div>
 
                     <Link href="/" className="docs-open">
                         Open Pedalboard Planner
@@ -56,9 +55,6 @@ export default function DocsShell({
                 <aside className="docs-sidebar">
                     <div className="docs-sidebar-inner">
 
-                        <div className="docs-brand">
-                            MakeYourBoard
-                        </div>
 
                         <div className="docs-nav-section">
                             <div className="docs-nav-title">
@@ -148,8 +144,8 @@ export default function DocsShell({
                             <Link
                                 href="/docs/settings"
                                 className={`docs-nav-link ${activePage === "settings"
-                                        ? "active"
-                                        : ""
+                                    ? "active"
+                                    : ""
                                     }`}
                             >
                                 Settings
