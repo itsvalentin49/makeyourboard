@@ -666,12 +666,12 @@ export default function PowerSetup({
         <div className="flex items-center justify-between -mt-3">
           <div
             className={`text-[12px] ${hasFailingPedal
-                ? "text-red-500"
-                : extraPedals > 0
-                  ? recommendationCanSolve
-                    ? "text-green-600"
-                    : "text-red-500"
-                  : powerMessageColor
+              ? "text-red-500"
+              : extraPedals > 0
+                ? recommendationCanSolve
+                  ? "text-green-600"
+                  : "text-red-500"
+                : powerMessageColor
               }`}
           >
             {hasFailingPedal
@@ -735,7 +735,7 @@ export default function PowerSetup({
                     )}
 
                     {isMixedWithMultipleDigital && (
-                      <div className="text-yellow-500">
+                      <div className="">
                         {t("powerSetup.recommendation.isolated")}
                       </div>
                     )}
@@ -757,7 +757,7 @@ export default function PowerSetup({
             )}
 
             {hasPower && hasFailingPedal && (
-              <div className="text-yellow-500">
+              <div className="">
                 {t("powerSetup.recommendation.upgrade")}
               </div>
             )}

@@ -309,7 +309,7 @@
       "compatible": "All pedals are compatible with this power supply.",
       "notCompatible": "This power supply is not compatible with all pedals.",
       "requiresSplitter": "All pedals are compatible with this power supply. One daisy-chain cable will be required to power multiple pedals from the same output.",
-      "requiresSplitters": "All pedals are compatible with this power supply. Multiple daisy-chain cables will be required to power multiple pedals from the same output.",
+      "requiresSplitters": "All pedals are compatible with this power supply. Daisy-chain cables will be required to power multiple pedals from the same output.",
       "notEnoughOutputs": "This power supply does not have enough outputs to power all pedals."
     },
     "empty": {

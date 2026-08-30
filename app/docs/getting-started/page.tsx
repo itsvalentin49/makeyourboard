@@ -52,8 +52,8 @@ export default function GettingStartedPage() {
                     label: "Build your pedalboard",
                 },
                 {
-                    href: "#plan",
-                    label: "Plan your layout",
+                    href: "#cable",
+                    label: "Cable Clearance",
                 },
                 {
                     href: "#power",
@@ -64,12 +64,8 @@ export default function GettingStartedPage() {
                     label: "Add your own gear",
                 },
                 {
-                    href: "#manage",
-                    label: "Manage and export",
-                },
-                {
-                    href: "#responsive",
-                    label: "Mobile and tablet",
+                    href: "#export",
+                    label: "Export your Setup",
                 },
             ]}
         >
@@ -86,19 +82,17 @@ export default function GettingStartedPage() {
                 <h2>What Is MakeYourBoard?</h2>
 
                 <p>
-                    MakeYourBoard is a free pedalboard planner for guitar and bass setups.
-                    Its goal is simple:
-                    help you see how your gear will fit together before
-                    you start mounting pedals and connecting cables.
-                    The library includes thousands of pedals,
-                    pedalboards and power supplies with real product
-                    dimensions.
-                    Choose your pedalboard, add your pedals and power
-                    supply, arrange everything using realistic product
-                    dimensions and make sure your setup has enough space
-                    for cables and power connections.
-                    No account is required, so you can start
-                    building your pedalboard immediately !
+                    MakeYourBoard is a free pedalboard planner for guitar
+                    and bass setups. Its goal is simple: help you see how
+                    your gear will fit together before you start mounting
+                    pedals and connecting cables. The library includes
+                    thousands of pedals, pedalboards and power supplies
+                    with real product dimensions. Choose your pedalboard,
+                    add your pedals and power supply, arrange everything
+                    using realistic product dimensions and make sure your
+                    setup has enough space for cables and power
+                    connections. No account is required, so you can start
+                    building your pedalboard immediately!
                 </p>
             </section>
 
@@ -138,46 +132,37 @@ export default function GettingStartedPage() {
                     }}
                 >
                     <img
-                        src="/docs/getting-started/build1-v2.webp"
+                        src="/docs/getting-started/build1-v3.webp"
                         alt="Choose a pedalboard in MakeYourBoard"
                         style={{
-                            width: "360px",
-                            height: "280px",
-                            objectFit: "contain",
+                            width: "250px",
+                            maxWidth: "100%",
+                            height: "auto",
                             display: "block",
+                            borderRadius: "10px",
                         }}
                     />
 
                     <img
-                        src="/docs/getting-started/build2-v2.webp"
+                        src="/docs/getting-started/build2-v3.webp"
                         alt="Search for pedals in MakeYourBoard"
                         style={{
-                            width: "360px",
-                            height: "280px",
-                            objectFit: "contain",
+                            width: "250px",
+                            maxWidth: "100%",
+                            height: "auto",
                             display: "block",
-                        }}
-                    />
-
-                    <img
-                        src="/docs/getting-started/build3-v2.webp"
-                        alt="Arrange pedals on your pedalboard"
-                        style={{
-                            width: "360px",
-                            height: "280px",
-                            objectFit: "contain",
-                            display: "block",
+                            borderRadius: "10px",
                         }}
                     />
                 </div>
             </section>
 
-            {/* PLAN */}
+            {/* CABLE CLEARANCE */}
             <section
-                id="plan"
+                id="cable"
                 className="docs-section"
             >
-                <h2>Plan Your Layout</h2>
+                <h2>Cable Clearance</h2>
 
                 <p>
                     MakeYourBoard does more than show whether your pedals
@@ -196,7 +181,7 @@ export default function GettingStartedPage() {
                 <div
                     style={{
                         width: "100%",
-                        maxWidth: "680px",
+                        maxWidth: "500px",
                         margin: "28px auto 0",
                         display: "flex",
                         flexDirection: "column",
@@ -206,21 +191,23 @@ export default function GettingStartedPage() {
                 >
                     <img
                         src="/docs/getting-started/cable-clearance-ko.webp"
+                        alt="Cable clearance warning in MakeYourBoard"
                         style={{
                             width: "100%",
-                            height: "280px",
-                            objectFit: "contain",
+                            height: "auto",
                             display: "block",
+                            borderRadius: "10px",
                         }}
                     />
 
                     <img
                         src="/docs/getting-started/cable-clearance-ok.webp"
+                        alt="Compatible cable clearance in MakeYourBoard"
                         style={{
                             width: "100%",
-                            height: "280px",
-                            objectFit: "contain",
+                            height: "auto",
                             display: "block",
+                            borderRadius: "10px",
                         }}
                     />
                 </div>
@@ -244,6 +231,62 @@ export default function GettingStartedPage() {
                     you identify potential compatibility issues before
                     wiring your real setup.
                 </p>
+
+                <p>
+                    MakeYourBoard also provides recommendations based on
+                    your setup. It can suggest which power supply outputs
+                    to use for each pedal, provide useful wiring tips,
+                    warn you when a more powerful power supply or
+                    additional outputs may be required, or simply confirm
+                    that your complete power setup is compatible.
+                </p>
+
+                <div
+                    style={{
+                        width: "100%",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "12px",
+                        marginTop: "28px",
+                    }}
+                >
+                    <img
+                        src="/docs/getting-started/power-setup1.webp"
+                        alt="Pedalboard power compatibility check in MakeYourBoard"
+                        style={{
+                            width: "250px",
+                            maxWidth: "100%",
+                            height: "auto",
+                            display: "block",
+                            borderRadius: "10px",
+                        }}
+                    />
+
+                    <img
+                        src="/docs/getting-started/power-setup2-v2.webp"
+                        alt="Power supply output recommendations in MakeYourBoard"
+                        style={{
+                            width: "250px",
+                            maxWidth: "100%",
+                            height: "auto",
+                            display: "block",
+                            borderRadius: "10px",
+                        }}
+                    />
+
+                    <img
+                        src="/docs/getting-started/power-setup4.webp"
+                        alt="Compatible pedalboard power setup in MakeYourBoard"
+                        style={{
+                            width: "250px",
+                            maxWidth: "100%",
+                            height: "auto",
+                            display: "block",
+                            borderRadius: "10px",
+                        }}
+                    />
+                </div>
             </section>
 
             {/* CUSTOM */}
@@ -268,51 +311,83 @@ export default function GettingStartedPage() {
                     voltage and current draw before adding it to the
                     canvas.
                 </p>
+
+                <div
+                    style={{
+                        width: "100%",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "20px",
+                        marginTop: "28px",
+                        flexWrap: "wrap",
+                    }}
+                >
+                    <img
+                        src="/docs/getting-started/custom-pedal2.webp"
+                        alt="Create a custom pedal in MakeYourBoard"
+                        style={{
+                            width: "250px",
+                            maxWidth: "100%",
+                            height: "auto",
+                            display: "block",
+                            borderRadius: "10px",
+                        }}
+                    />
+
+                    <img
+                        src="/docs/getting-started/custom-board.webp"
+                        alt="Create a custom pedalboard in MakeYourBoard"
+                        style={{
+                            width: "250px",
+                            maxWidth: "100%",
+                            height: "auto",
+                            display: "block",
+                            borderRadius: "10px",
+                        }}
+                    />
+                </div>
             </section>
 
-            {/* MANAGE */}
+            {/* EXPORT */}
             <section
-                id="manage"
+                id="export"
                 className="docs-section"
             >
-                <h2>Manage and Export Your Setup</h2>
+                <h2>Export Your Setup</h2>
 
                 <p>
-                    You can create and manage up to five separate
-                    pedalboards from Menu &gt; Pedalboards, making it
-                    easy to work on different rigs or different versions
-                    of the same setup. When your pedalboard is ready,
-                    you can{" "}
+                    When your pedalboard is ready, you can{" "}
                     <DocLink href="/docs/export">
-                        export
+                        export your setup
                     </DocLink>{" "}
-                    it as a high-quality image with a transparent
-                    background, white background or the background
-                    currently selected on the canvas. The{" "}
-                    <DocLink href="/docs/settings">
-                        settings
-                    </DocLink>{" "}
-                    also let you choose between metric and imperial
-                    units, Light and Dark mode, several interface
-                    languages and different canvas backgrounds.
+                    as a high-quality image. Choose between a transparent
+                    background, a white background or the background currently
+                    selected on the MakeYourBoard canvas.
                 </p>
+
+                <div
+                    style={{
+                        width: "100%",
+                        display: "flex",
+                        justifyContent: "center",
+                        marginTop: "28px",
+                    }}
+                >
+                    <img
+                        src="/docs/getting-started/export-board.webp"
+                        alt="Export a pedalboard setup from MakeYourBoard"
+                        style={{
+                            width: "250px",
+                            maxWidth: "100%",
+                            height: "auto",
+                            display: "block",
+                            borderRadius: "10px",
+                        }}
+                    />
+                </div>
             </section>
 
-            {/* RESPONSIVE */}
-            <section
-                id="responsive"
-                className="docs-section"
-            >
-                <h2>Use MakeYourBoard on Any Device</h2>
-
-                <p>
-                    MakeYourBoard is fully responsive and adapts to
-                    desktop computers, tablets and smartphones. You can
-                    build, edit and check your pedalboard directly from
-                    your web browser, with an interface adapted to
-                    smaller screens and touch devices.
-                </p>
-            </section>
         </DocsShell>
     );
 }

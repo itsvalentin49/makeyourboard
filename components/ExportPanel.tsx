@@ -555,13 +555,13 @@ export default function ExportPanel({
           {t("export.preview")}
         </label>
 
-        <div className="w-full overflow-hidden">
+        <div className="w-full overflow-hidden flex justify-center">
           <canvas
             ref={previewRef}
             className={
               isMobile
                 ? "block w-full h-auto rounded-md"
-                : "max-w-full max-h-40 rounded-md"
+                : "block max-w-full max-h-40 rounded-md"
             }
           />
         </div>
