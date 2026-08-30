@@ -161,6 +161,18 @@
     margin: 0 0 18px;
 }
 
+.docs-section a {
+    color: #2563eb !important;
+    text-decoration: underline !important;
+    text-decoration-thickness: 1px !important;
+    text-underline-offset: 3px;
+    font-weight: 650;
+}
+
+.docs-section a:hover {
+    color: #1d4ed8 !important;
+}
+
 .docs-step {
     padding-bottom: 30px;
 }
@@ -184,8 +196,17 @@
 .docs-table {
     width: 100%;
     border-collapse: collapse;
-    min-width: 720px;
+    table-layout: fixed;
+    min-width: 900px;
     font-size: 13px;
+}
+
+.docs-col-feature {
+    width: 30%;
+}
+
+.docs-col-site {
+    width: 14%;
 }
 
 .docs-table th,
@@ -205,6 +226,7 @@
 .docs-table td:first-child {
     text-align: left;
     font-weight: 750;
+    white-space: nowrap;
 }
 
 .docs-table td:not(:first-child) {

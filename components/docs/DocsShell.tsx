@@ -8,7 +8,18 @@ type TocItem = {
 };
 
 type Props = {
-    activePage: "getting-started" | "faq" | "comparison";
+    activePage:
+    | "getting-started"
+    | "pedals"
+    | "pedalboards"
+    | "power-supplies"
+    | "custom-gear"
+    | "cable-clearance"
+    | "import-pedal"
+    | "export"
+    | "settings"
+    | "faq"
+    | "comparison";
     breadcrumb: string;
     toc: TocItem[];
     children: ReactNode;
@@ -63,6 +74,87 @@ export default function DocsShell({
                             >
                                 Getting Started
                             </Link>
+
+                            <Link
+                                href="/docs/pedals"
+                                className={`docs-nav-link ${activePage === "pedals"
+                                    ? "active"
+                                    : ""
+                                    }`}
+                            >
+                                Pedals
+                            </Link>
+
+                            <Link
+                                href="/docs/pedalboards"
+                                className={`docs-nav-link ${activePage === "pedalboards"
+                                    ? "active"
+                                    : ""
+                                    }`}
+                            >
+                                Pedalboards
+                            </Link>
+
+                            <Link
+                                href="/docs/power-supplies"
+                                className={`docs-nav-link ${activePage === "power-supplies"
+                                    ? "active"
+                                    : ""
+                                    }`}
+                            >
+                                Power Supplies
+                            </Link>
+
+                            <Link
+                                href="/docs/custom-gear"
+                                className={`docs-nav-link ${activePage === "custom-gear"
+                                    ? "active"
+                                    : ""
+                                    }`}
+                            >
+                                Custom Gear
+                            </Link>
+
+                            <Link
+                                href="/docs/cable-clearance"
+                                className={`docs-nav-link ${activePage === "cable-clearance"
+                                    ? "active"
+                                    : ""
+                                    }`}
+                            >
+                                Cable Clearance
+                            </Link>
+
+                            <Link
+                                href="/docs/import-pedal"
+                                className={`docs-nav-link ${activePage === "import-pedal"
+                                    ? "active"
+                                    : ""
+                                    }`}
+                            >
+                                Import a Pedal
+                            </Link>
+
+                            <Link
+                                href="/docs/export"
+                                className={`docs-nav-link ${activePage === "export"
+                                    ? "active"
+                                    : ""
+                                    }`}
+                            >
+                                Export
+                            </Link>
+
+                            <Link
+                                href="/docs/settings"
+                                className={`docs-nav-link ${activePage === "settings"
+                                        ? "active"
+                                        : ""
+                                    }`}
+                            >
+                                Settings
+                            </Link>
+
                         </div>
 
                         <div className="docs-nav-section">

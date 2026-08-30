@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import DocsShell from "@/components/docs/DocsShell";
 
 export const metadata: Metadata = {
@@ -6,12 +7,35 @@ export const metadata: Metadata = {
         absolute: "Getting Started | MakeYourBoard Documentation",
     },
     description:
-        "Learn how to use MakeYourBoard, the free online guitar pedalboard planner. Choose a pedalboard, add pedals, arrange your setup and export your layout.",
+        "Discover MakeYourBoard, a free online guitar pedalboard planner for building, arranging and checking your pedalboard setup before assembling it in real life.",
     alternates: {
         canonical:
-            "https://makeyourboard.com/docs/getting-started",
+            "https://www.makeyourboard.com/docs/getting-started",
     },
 };
+
+function DocLink({
+    href,
+    children,
+}: {
+    href: string;
+    children: React.ReactNode;
+}) {
+    return (
+        <Link href={href}>
+            <span
+                style={{
+                    color: "#2563eb",
+                    textDecoration: "underline",
+                    textUnderlineOffset: "3px",
+                    fontWeight: 650,
+                }}
+            >
+                {children}
+            </span>
+        </Link>
+    );
+}
 
 export default function GettingStartedPage() {
     return (
@@ -20,139 +44,216 @@ export default function GettingStartedPage() {
             breadcrumb="Getting Started"
             toc={[
                 {
-                    href: "#choose-board",
-                    label: "Choose your pedalboard",
+                    href: "#what-is-makeyourboard",
+                    label: "What is MakeYourBoard?",
                 },
                 {
-                    href: "#add-pedals",
-                    label: "Add your pedals",
+                    href: "#build",
+                    label: "Build your pedalboard",
                 },
                 {
-                    href: "#arrange",
-                    label: "Arrange your setup",
+                    href: "#plan",
+                    label: "Plan your layout",
                 },
                 {
                     href: "#power",
-                    label: "Add a power supply",
+                    label: "Check your power setup",
                 },
                 {
-                    href: "#export",
-                    label: "Export your pedalboard",
+                    href: "#custom",
+                    label: "Add your own gear",
+                },
+                {
+                    href: "#manage",
+                    label: "Manage and export",
                 },
             ]}
         >
-
+            {/* INTRO */}
             <section className="docs-section">
-
                 <h1>Getting Started</h1>
 
                 <p className="docs-intro">
                     MakeYourBoard is a free online guitar pedalboard
-                    planner that helps you build and visualize your
-                    setup before assembling it in real life.
+                    planner designed to help you build, visualize and
+                    check your setup before assembling it in real life.
                 </p>
 
                 <p>
                     Choose your pedalboard, add your pedals and power
                     supply, arrange everything using realistic product
-                    dimensions and check that your setup works before
-                    putting it together.
+                    dimensions and make sure your setup has enough space
+                    for cables and power connections.
                 </p>
 
+                <p>
+                    No account is required, so you can start building
+                    your pedalboard immediately.
+                </p>
             </section>
 
+            {/* WHAT IS MYB */}
             <section
-                id="choose-board"
+                id="what-is-makeyourboard"
                 className="docs-section"
             >
-                <h2>Choose Your Pedalboard</h2>
+                <h2>What Is MakeYourBoard?</h2>
 
                 <p>
-                    Start by opening the pedalboard library and choosing
-                    the board you want to use.
+                    MakeYourBoard is a visual planning tool for guitar,
+                    bass and effects pedal setups. Its goal is simple:
+                    help you see how your gear will fit together before
+                    you start mounting pedals and connecting cables.
                 </p>
 
                 <p>
-                    MakeYourBoard displays pedalboards using their real
+                    The library includes thousands of pedals,
+                    pedalboards and power supplies with real product
                     dimensions whenever manufacturer specifications are
-                    available, allowing you to accurately visualize the
-                    usable space.
+                    available.
                 </p>
             </section>
 
+            {/* BUILD */}
             <section
-                id="add-pedals"
+                id="build"
                 className="docs-section"
             >
-                <h2>Add Your Pedals</h2>
+                <h2>Build Your Pedalboard</h2>
 
                 <p>
-                    Search the pedal library and add your pedals to the
-                    canvas. You can move and rotate each pedal until you
-                    find the layout that works best for your setup.
+                    Start by choosing a{" "}
+                    <DocLink href="/docs/pedalboards">
+                        pedalboard
+                    </DocLink>
+                    , then search the{" "}
+                    <DocLink href="/docs/pedals">
+                        pedal library
+                    </DocLink>{" "}
+                    by brand, model or effect type such as overdrive,
+                    distortion, fuzz, delay or reverb.
                 </p>
 
                 <p>
-                    If a product is not available in the library, you
-                    can also create a custom pedal using your own
-                    dimensions.
+                    Add your pedals to the canvas and move, rotate or
+                    reorder them freely until you find a layout that
+                    works for your setup.
+                </p>
+
+                <p>
+                    Select a pedal or pedalboard to open its information
+                    panel and view available descriptions, technical
+                    specifications and retailer links.
                 </p>
             </section>
 
+            {/* PLAN */}
             <section
-                id="arrange"
+                id="plan"
                 className="docs-section"
             >
-                <h2>Arrange Your Setup</h2>
+                <h2>Plan Your Layout</h2>
 
                 <p>
-                    Drag your pedals around the board to experiment with
-                    different layouts.
+                    MakeYourBoard does more than show whether your pedals
+                    physically fit on a board. The{" "}
+                    <DocLink href="/docs/cable-clearance">
+                        Cable Clearance
+                    </DocLink>{" "}
+                    tool can also help you estimate whether enough space
+                    is available around audio jacks and power connectors.
                 </p>
 
                 <p>
-                    MakeYourBoard can also display additional clearance
-                    around pedals to help you leave enough room for
-                    patch cables and connectors.
+                    Green clearance areas indicate that no obvious
+                    overlap has been detected, while red areas highlight
+                    places where another pedal may leave too little room
+                    for your cables and connectors.
                 </p>
             </section>
 
+            {/* POWER */}
             <section
                 id="power"
                 className="docs-section"
             >
-                <h2>Add a Power Supply</h2>
+                <h2>Check Your Power Setup</h2>
 
                 <p>
-                    Add your power supply to the pedalboard and
-                    MakeYourBoard can compare its available outputs with
-                    the requirements of your pedals.
+                    Add a{" "}
+                    <DocLink href="/docs/power-supplies">
+                        power supply
+                    </DocLink>{" "}
+                    to your pedalboard and use the Power Supply tool to
+                    compare its available outputs with the voltage and
+                    current requirements of your pedals.
                 </p>
 
                 <p>
-                    This helps identify possible voltage, current or
-                    output compatibility issues before wiring your real
-                    pedalboard.
+                    This can help you identify potential compatibility
+                    issues before wiring your real setup.
                 </p>
             </section>
 
+            {/* CUSTOM */}
             <section
-                id="export"
+                id="custom"
                 className="docs-section"
             >
-                <h2>Export Your Pedalboard</h2>
+                <h2>Add Your Own Gear</h2>
 
                 <p>
-                    Once you are happy with your layout, use the export
-                    tool to create an image of your pedalboard.
+                    If the gear you need is not available in the
+                    MakeYourBoard library, you can{" "}
+                    <DocLink href="/docs/custom-gear">
+                        create a custom pedal or pedalboard
+                    </DocLink>{" "}
+                    using your own dimensions and specifications.
                 </p>
 
                 <p>
-                    You can save the image as a reference or share your
-                    setup with other musicians.
+                    You can also{" "}
+                    <DocLink href="/docs/import-pedal">
+                        import your own pedal image
+                    </DocLink>{" "}
+                    and define its name, dimensions, voltage and current
+                    draw before adding it to the canvas.
                 </p>
             </section>
 
+            {/* MANAGE */}
+            <section
+                id="manage"
+                className="docs-section"
+            >
+                <h2>Manage and Export Your Setup</h2>
+
+                <p>
+                    You can create and manage up to five separate
+                    pedalboards from Menu &gt; Pedalboards, making it
+                    easy to work on different rigs or different versions
+                    of the same setup.
+                </p>
+
+                <p>
+                    When your pedalboard is ready, you can{" "}
+                    <DocLink href="/docs/export">
+                        export it as a high-quality image
+                    </DocLink>{" "}
+                    with a transparent background, white background or
+                    the background currently selected on the canvas.
+                </p>
+
+                <p>
+                    The{" "}
+                    <DocLink href="/docs/settings">
+                        Settings
+                    </DocLink>{" "}
+                    also let you choose between metric and imperial
+                    units, Light and Dark mode, several interface
+                    languages and different canvas backgrounds.
+                </p>
+            </section>
         </DocsShell>
     );
 }

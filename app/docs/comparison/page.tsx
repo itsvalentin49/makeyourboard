@@ -7,7 +7,7 @@ export const metadata: Metadata = {
             "Pedalboard Planner Comparison | MakeYourBoard",
     },
     description:
-        "Compare MakeYourBoard with other online pedalboard planners including Pedal Playground, Pedalboard.App, Pedaltrain, RockBoard and Stompbox Garden.",
+        "Compare MakeYourBoard with other online pedalboard planners including Pedal Playground, Pedalboard.App, Pedaltrain and RockBoard.",
     alternates: {
         canonical:
             "https://makeyourboard.com/docs/comparison",
@@ -56,6 +56,15 @@ export default function ComparisonPage() {
                 <div className="docs-table-wrap">
                     <table className="docs-table">
 
+                        <colgroup>
+                            <col className="docs-col-feature" />
+                            <col className="docs-col-site" />
+                            <col className="docs-col-site" />
+                            <col className="docs-col-site" />
+                            <col className="docs-col-site" />
+                            <col className="docs-col-site" />
+                        </colgroup>
+
                         <thead>
                             <tr>
                                 <th>Feature</th>
@@ -64,25 +73,11 @@ export default function ComparisonPage() {
                                 <th>Pedalboard.App</th>
                                 <th>Pedaltrain</th>
                                 <th>RockBoard</th>
-                                <th>Stompbox Garden</th>
                             </tr>
                         </thead>
 
                         <tbody>
 
-                            {/* FREE TO USE */}
-                            <tr>
-                                <td>
-                                    Free to use
-                                </td>
-
-                                <td>{renderBadge("yes")}</td>
-                                <td>{renderBadge("yes")}</td>
-                                <td>{renderBadge("yes")}</td>
-                                <td>{renderBadge("yes")}</td>
-                                <td>{renderBadge("yes")}</td>
-                                <td>{renderBadge("yes")}</td>
-                            </tr>
 
                             {/* NO ACCOUNT */}
                             <tr>
@@ -93,6 +88,18 @@ export default function ComparisonPage() {
                                 <td>{renderBadge("yes")}</td>
                                 <td>{renderBadge("yes")}</td>
                                 <td>{renderBadge("no")}</td>
+                                <td>{renderBadge("yes")}</td>
+                                <td>{renderBadge("no")}</td>
+                            </tr>
+
+                            {/* EASY TO USE */}
+                            <tr>
+                                <td>
+                                    Easy to use
+                                </td>
+
+                                <td>{renderBadge("yes")}</td>
+                                <td>{renderBadge("yes")}</td>
                                 <td>{renderBadge("yes")}</td>
                                 <td>{renderBadge("no")}</td>
                                 <td>{renderBadge("no")}</td>
@@ -109,7 +116,6 @@ export default function ComparisonPage() {
                                 <td>{renderBadge("yes")}</td>
                                 <td>{renderBadge("no")}</td>
                                 <td>{renderBadge("no")}</td>
-                                <td>{renderBadge("yes")}</td>
                             </tr>
 
                             {/* MULTIPLE BOARDS */}
@@ -123,7 +129,6 @@ export default function ComparisonPage() {
                                 <td>{renderBadge("no")}</td>
                                 <td>{renderBadge("no")}</td>
                                 <td>{renderBadge("no")}</td>
-                                <td>{renderBadge("yes")}</td>
                             </tr>
 
                             {/* POWER */}
@@ -135,7 +140,6 @@ export default function ComparisonPage() {
                                 <td>{renderBadge("yes")}</td>
                                 <td>{renderBadge("no")}</td>
                                 <td>{renderBadge("yes")}</td>
-                                <td>{renderBadge("no")}</td>
                                 <td>{renderBadge("no")}</td>
                                 <td>{renderBadge("no")}</td>
                             </tr>
@@ -151,21 +155,6 @@ export default function ComparisonPage() {
                                 <td>{renderBadge("yes")}</td>
                                 <td>{renderBadge("no")}</td>
                                 <td>{renderBadge("no")}</td>
-                                <td>{renderBadge("no")}</td>
-                            </tr>
-
-                            {/* SIGNAL PATH */}
-                            <tr>
-                                <td>
-                                    Signal path
-                                </td>
-
-                                <td>{renderBadge("yes")}</td>
-                                <td>{renderBadge("no")}</td>
-                                <td>{renderBadge("no")}</td>
-                                <td>{renderBadge("no")}</td>
-                                <td>{renderBadge("yes")}</td>
-                                <td>{renderBadge("yes")}</td>
                             </tr>
 
                             {/* CUSTOM GEAR */}
@@ -178,8 +167,7 @@ export default function ComparisonPage() {
                                 <td>{renderBadge("yes")}</td>
                                 <td>{renderBadge("yes")}</td>
                                 <td>{renderBadge("no")}</td>
-                                <td>{renderBadge("yes")}</td>
-                                <td>{renderBadge("yes")}</td>
+                                <td>{renderBadge("no")}</td>
                             </tr>
 
                             {/* IMPORT IMAGE */}
@@ -192,8 +180,7 @@ export default function ComparisonPage() {
                                 <td>{renderBadge("no")}</td>
                                 <td>{renderBadge("no")}</td>
                                 <td>{renderBadge("no")}</td>
-                                <td>{renderBadge("yes")}</td>
-                                <td>{renderBadge("yes")}</td>
+                                <td>{renderBadge("no")}</td>
                             </tr>
 
                             {/* PRODUCT RESEARCH */}
@@ -206,7 +193,6 @@ export default function ComparisonPage() {
                                 <td>{renderBadge("no")}</td>
                                 <td>{renderBadge("yes")}</td>
                                 <td>{renderBadge("no")}</td>
-                                <td>{renderBadge("no")}</td>
                                 <td>{renderBadge("yes")}</td>
                             </tr>
 
@@ -218,24 +204,22 @@ export default function ComparisonPage() {
 
                                 <td>{renderBadge("yes")}</td>
                                 <td>{renderBadge("no")}</td>
-                                <td>{renderBadge("no")}</td>
-                                <td>{renderBadge("no")}</td>
                                 <td>{renderBadge("yes")}</td>
+                                <td>{renderBadge("no")}</td>
                                 <td>{renderBadge("no")}</td>
                             </tr>
 
                             {/* ZOOM */}
                             <tr>
                                 <td>
-                                    Simple canvas zoom
+                                    Easy zoom & drag
                                 </td>
 
                                 <td>{renderBadge("yes")}</td>
                                 <td>{renderBadge("no")}</td>
+                                <td>{renderBadge("no")}</td>
+                                <td>{renderBadge("no")}</td>
                                 <td>{renderBadge("yes")}</td>
-                                <td>{renderBadge("no")}</td>
-                                <td>{renderBadge("no")}</td>
-                                <td>{renderBadge("no")}</td>
                             </tr>
 
                             {/* BACKGROUND */}
@@ -249,7 +233,6 @@ export default function ComparisonPage() {
                                 <td>{renderBadge("no")}</td>
                                 <td>{renderBadge("no")}</td>
                                 <td>{renderBadge("no")}</td>
-                                <td>{renderBadge("yes")}</td>
                             </tr>
 
                             {/* DARK / LIGHT */}
@@ -259,7 +242,6 @@ export default function ComparisonPage() {
                                 </td>
 
                                 <td>{renderBadge("yes")}</td>
-                                <td>{renderBadge("no")}</td>
                                 <td>{renderBadge("no")}</td>
                                 <td>{renderBadge("no")}</td>
                                 <td>{renderBadge("no")}</td>
@@ -276,7 +258,6 @@ export default function ComparisonPage() {
                                 <td>{renderBadge("no")}</td>
                                 <td>{renderBadge("no")}</td>
                                 <td>{renderBadge("no")}</td>
-                                <td>{renderBadge("yes")}</td>
                                 <td>{renderBadge("no")}</td>
                             </tr>
 
@@ -287,22 +268,20 @@ export default function ComparisonPage() {
                                 </td>
 
                                 <td>{renderBadge("yes")}</td>
-                                <td>{renderBadge("no")}</td>
-                                <td>{renderBadge("no")}</td>
-                                <td>{renderBadge("no")}</td>
                                 <td>{renderBadge("yes")}</td>
-                                <td>{renderBadge("yes")}</td>
+                                <td>{renderBadge("no")}</td>
+                                <td>{renderBadge("no")}</td>
+                                <td>{renderBadge("no")}</td>
                             </tr>
 
                             {/* PNG EXPORT */}
                             <tr>
                                 <td>
-                                    PNG export
+                                    Hight quality PNG export
                                 </td>
 
                                 <td>{renderBadge("yes")}</td>
                                 <td>{renderBadge("no")}</td>
-                                <td>{renderBadge("yes")}</td>
                                 <td>{renderBadge("no")}</td>
                                 <td>{renderBadge("no")}</td>
                                 <td>{renderBadge("no")}</td>
