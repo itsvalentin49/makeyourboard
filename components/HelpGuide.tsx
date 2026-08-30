@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import {
   MousePointer2,
   Zap,
@@ -7,6 +9,7 @@ import {
   Cable,
   Mail,
   Heart,
+  BookOpen,
 } from "lucide-react";
 
 import SidebarLogo from "@/components/sidebar/SidebarLogo";
@@ -207,7 +210,13 @@ export function HelpGuide({
             </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-2">
+          <div
+            className={
+              supportUrl
+                ? "grid grid-cols-3 gap-2"
+                : "grid grid-cols-2 gap-2"
+            }
+          >
             {/* CONTACT */}
             <button
               type="button"
@@ -232,6 +241,31 @@ export function HelpGuide({
               <Mail size={15} />
               {t("footer.feedback")}
             </button>
+
+            {/* DOCUMENTATION */}
+            <Link
+              href="/docs"
+              onClick={closeGuide}
+              className="
+    h-9
+    flex
+    items-center
+    justify-center
+    gap-2
+    rounded-lg
+    bg-zinc-950
+    border
+    border-zinc-700
+    text-[12px]
+    font-bold
+    transition-all
+    hover:border-zinc-500
+    hover:bg-canvas
+  "
+            >
+              <BookOpen size={15} />
+              Documentation
+            </Link>
 
             {/* SUPPORT */}
             {supportUrl && (
