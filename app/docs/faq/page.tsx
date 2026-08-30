@@ -3,7 +3,7 @@ import DocsShell from "@/components/docs/DocsShell";
 
 export const metadata: Metadata = {
     title: {
-        absolute: "MakeYourBoard FAQ | Pedalboard Planner Help",
+        absolute: "FAQ | MakeYourBoard",
     },
     description:
         "Frequently asked questions about MakeYourBoard, the free online guitar pedalboard planner.",
