@@ -218,7 +218,7 @@
     "donate": "Apoyar"
   },
   "tabs": {
-    "confirmDelete": "¿Seguro que quieres eliminar esta pedalera?",
+    "confirmDelete": "¿Seguro que quieres eliminar «{name}»?",
     "yes": "Sí",
     "cancel": "Cancelar"
   },

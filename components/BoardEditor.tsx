@@ -24,7 +24,7 @@ const LANGUAGE_TO_LOCALE: Record<string, "en" | "fr" | "es" | "de" | "it" | "pt"
 };
 
 
-const MAX_PROJECTS = 5;
+const MAX_PROJECTS = 7;
 const STORAGE_KEY = "guitar-sandbox-data";
 const SETTINGS_STORAGE_KEY = "myb_settings";
 

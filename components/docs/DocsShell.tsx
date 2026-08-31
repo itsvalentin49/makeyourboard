@@ -1,6 +1,5 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import SidebarLogo from "@/components/sidebar/SidebarLogo";
 
 type TocItem = {
     href: string;
@@ -39,7 +38,15 @@ export default function DocsShell({
                 <div className="docs-header-inner">
 
                     <div className="docs-logo">
-                        <SidebarLogo compact />
+                        <img
+                            src="/images/sidebar-logo4.webp"
+                            alt="MakeYourBoard - Guitar Pedalboard Planner"
+                            style={{
+                                display: "block",
+                                width: "230px",
+                                height: "auto",
+                            }}
+                        />
                     </div>
 
                     <Link href="/" className="docs-open">

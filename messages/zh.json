@@ -218,7 +218,7 @@
     "donate": "支持"
   },
   "tabs": {
-    "confirmDelete": "确定要删除这个效果器板吗？",
+    "confirmDelete": "确定要删除“{name}”吗？",
     "yes": "是",
     "cancel": "取消"
   },

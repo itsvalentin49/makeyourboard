@@ -218,7 +218,7 @@
     "donate": "Unterstützen"
   },
   "tabs": {
-    "confirmDelete": "Möchtest du dieses Pedalboard wirklich löschen?",
+    "confirmDelete": "Möchten Sie „{name}“ wirklich löschen?",
     "yes": "Ja",
     "cancel": "Abbrechen"
   },

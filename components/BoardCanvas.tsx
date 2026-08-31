@@ -2729,7 +2729,7 @@ ${isMobile
                         );
                       })}
 
-                      {projects.length < 5 && (
+                      {projects.length < 7 && (
                         <button
                           type="button"
                           onClick={() => {
@@ -2756,7 +2756,7 @@ ${isMobile
                           {t("canvasControls.newBoard")}
                         </button>
                       )}
-                      {isMobile && confirmDeleteProjectId !== null && (
+                      {confirmDeleteProjectId !== null && (
                         <div
                           ref={confirmDeleteRef}
                           className="
@@ -2770,7 +2770,13 @@ ${isMobile
                           onClick={(e) => e.stopPropagation()}
                         >
                           <div className="text-[11px] font-bold mb-3">
-                            {t("tabs.confirmDelete")}
+                            {t("tabs.confirmDelete").replace(
+                              "{name}",
+                              projects.find(
+                                (project) =>
+                                  project.id === confirmDeleteProjectId
+                              )?.name || "Pedalboard"
+                            )}
                           </div>
 
                           <div className="flex gap-2 justify-end">
@@ -2813,62 +2819,7 @@ ${isMobile
                       )}
                     </div>
 
-                    {!isMobile && confirmDeleteProjectId !== null && (
-                      <div
-                        ref={confirmDeleteRef}
-                        className="
-                          w-full
-                          rounded-xl
-                          bg-zinc-800
-                          border
-                          border-zinc-800
-                          p-3
-                          shadow-xl
-                        "
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <div className="text-[11px] font-bold mb-3">
-                          {t("tabs.confirmDelete")}
-                        </div>
 
-                        <div className="flex gap-2 justify-end">
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setConfirmDeleteProjectId(null);
-                            }}
-                            className="
-                              px-3 py-1.5 rounded-md
-                              bg-blue-600 hover:bg-blue-500
-                              !text-white
-                              transition-colors
-                              text-[10px] font-black uppercase
-                            "
-                          >
-                            {t("tabs.cancel")}
-                          </button>
-
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              deleteProject?.(confirmDeleteProjectId, e);
-                              setConfirmDeleteProjectId(null);
-                            }}
-                            className="
-                              px-3 py-1.5 rounded-md
-                              bg-red-600 hover:bg-red-500
-                              !text-white
-                              transition-colors
-                              text-[10px] font-black uppercase
-                            "
-                          >
-                            {t("pedal.actions.delete")}
-                          </button>
-                        </div>
-                      </div>
-                    )}
                   </div>
                 </>
               )}
