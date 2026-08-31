@@ -18,7 +18,7 @@ const SITE_URL = "https://www.makeyourboard.com";
 const SITE_NAME = "MakeYourBoard";
 
 const SITE_TITLE =
-  "MakeYourBoard | Guitar Pedalboard Planner  ";
+  "MakeYourBoard | Guitar Pedalboard Planner 🎸";
 
 const SITE_DESCRIPTION =
   "Guitar pedalboard planner with thousands of pedals, real dimensions, power supply compatibility, cable clearance checks and high-quality image export.";
