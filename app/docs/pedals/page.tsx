@@ -2,6 +2,12 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import Link from "next/link";
 import DocsShell from "@/components/docs/DocsShell";
+import {
+    RotateCw,
+    ArrowUp,
+    ArrowDown,
+    Trash2,
+} from "lucide-react";
 
 export const metadata: Metadata = {
     title: {
@@ -186,10 +192,37 @@ export default function PedalsPage() {
 
                 </p>
 
-                <h3>Rotate a pedal</h3>
+                <div
+                    style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "flex-start",
+                        gap: "10px",
+                        margin: "32px 0 10px",
+                    }}
+                >
+                    <h3 style={{ margin: 0 }}>
+                        Rotate a pedal
+                    </h3>
+
+                    <div
+                        style={{
+                            width: "30px",
+                            height: "30px",
+                            borderRadius: "10px",
+                            background: "#ffffff",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            flexShrink: 0,
+                        }}
+                    >
+                        <RotateCw size={18} strokeWidth={2} />
+                    </div>
+                </div>
 
                 <p>
-                    Select a pedal and use the Rotate button to change its orientation on the pedalboard.
+                    Select a pedal and use the rotate button to change its orientation on the pedalboard.
                 </p>
                 <div
                     style={{
@@ -251,7 +284,55 @@ export default function PedalsPage() {
                     />
                 </div>
 
-                <h3>Move to front or back</h3>
+                <div
+                    style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "flex-start",
+                        gap: "10px",
+                        margin: "32px 0 10px",
+                    }}
+                >
+                    <h3 style={{ margin: 0 }}>
+                        Move to front or back
+                    </h3>
+
+                    <div
+                        style={{
+                            display: "flex",
+                            gap: "6px",
+                            flexShrink: 0,
+                        }}
+                    >
+                        <div
+                            style={{
+                                width: "30px",
+                                height: "30px",
+                                borderRadius: "10px",
+                                background: "#ffffff",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                            }}
+                        >
+                            <ArrowUp size={18} strokeWidth={2} />
+                        </div>
+
+                        <div
+                            style={{
+                                width: "30px",
+                                height: "30px",
+                                borderRadius: "10px",
+                                background: "#ffffff",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                            }}
+                        >
+                            <ArrowDown size={18} strokeWidth={2} />
+                        </div>
+                    </div>
+                </div>
 
                 <p>
                     Pedals can be moved to the foreground or background
@@ -294,7 +375,34 @@ export default function PedalsPage() {
                     />
                 </div>
 
-                <h3>Delete a pedal</h3>
+                <div
+                    style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "flex-start",
+                        gap: "10px",
+                        margin: "32px 0 10px",
+                    }}
+                >
+                    <h3 style={{ margin: 0 }}>
+                        Delete a pedal
+                    </h3>
+
+                    <div
+                        style={{
+                            width: "30px",
+                            height: "30px",
+                            borderRadius: "10px",
+                            background: "#ffffff",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            flexShrink: 0,
+                        }}
+                    >
+                        <Trash2 size={18} strokeWidth={2} />
+                    </div>
+                </div>
 
                 <p>
                     Select a pedal and use the delete action button to remove
