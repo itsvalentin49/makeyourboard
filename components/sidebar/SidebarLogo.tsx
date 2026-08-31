@@ -11,15 +11,15 @@ export default function SidebarLogo({
     <div
       className={
         compact
-          ? "select-none flex flex-col items-center"
-          : "pb-0 pt-2 select-none flex flex-col items-center"
+          ? "select-none inline-flex flex-col"
+          : "pb-0 pt-2 select-none inline-flex flex-col"
       }
     >
       <div
         className={
           compact
-            ? "w-fit text-[22px] font-black tracking-tight leading-none"
-            : "w-fit text-[34px] font-black tracking-tight leading-none"
+            ? "text-[22px] font-black tracking-tight leading-none"
+            : "text-[34px] font-black tracking-tight leading-none"
         }
       >
         MakeYourBoard
@@ -28,11 +28,33 @@ export default function SidebarLogo({
       <div
         className={
           compact
-            ? "w-fit mt-1 text-[7px] font-bold tracking-[0.28em] uppercase leading-none whitespace-nowrap"
-            : "w-fit mt-1 text-[10px] font-bold tracking-[0.37em] uppercase leading-none whitespace-nowrap"
+            ? "w-full mt-1 flex items-center justify-between text-[7px] font-bold uppercase leading-none whitespace-nowrap"
+            : "w-full mt-1 flex items-center justify-between text-[10px] font-bold uppercase leading-none whitespace-nowrap"
         }
       >
-        Guitar Pedalboard Builder
+        <span
+          style={{
+            letterSpacing: compact ? "1px" : "3.5px",
+          }}
+        >
+          GUITAR
+        </span>
+
+        <span
+          style={{
+            letterSpacing: compact ? "1px" : "3.5px",
+          }}
+        >
+          PEDALBOARD
+        </span>
+
+        <span
+          style={{
+            letterSpacing: compact ? "1px" : "3.5px",
+          }}
+        >
+          PLANNER
+        </span>
       </div>
     </div>
   );

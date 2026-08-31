@@ -14,11 +14,14 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const SITE_URL = "https://makeyourboard.com";
+const SITE_URL = "https://www.makeyourboard.com";
 const SITE_NAME = "MakeYourBoard";
-const SITE_TITLE = "MakeYourBoard | Guitar Pedalboard Planner";
+
+const SITE_TITLE =
+  "Free Guitar Pedalboard Planner | MakeYourBoard";
+
 const SITE_DESCRIPTION =
-  "Free online guitar pedalboard builder and planner. Design your setup from thousands of pedals, drag-and-drop layout, power supply compatibility, cable clearance checks and high-quality exports.";
+  "Free online guitar pedalboard planner with thousands of pedals, real dimensions, power supply compatibility, cable clearance checks and high-quality image export.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -36,13 +39,17 @@ export const metadata: Metadata = {
 
   description: SITE_DESCRIPTION,
 
-  keywords: [
-    "guitar pedalboard builder",
-    "pedalboard planner",
-    "pedalboard designer",
-    "build pedalboard online",
-    "guitar pedals layout",
-  ],
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
 
   openGraph: {
     title: SITE_TITLE,
@@ -54,7 +61,7 @@ export const metadata: Metadata = {
         url: `${SITE_URL}/og-image.png`,
         width: 1200,
         height: 630,
-        alt: SITE_TITLE,
+        alt: "MakeYourBoard Guitar Pedalboard Planner",
       },
     ],
     locale: "en_US",
@@ -72,7 +79,6 @@ export const metadata: Metadata = {
 export const viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
   viewportFit: "cover",
 };
 
@@ -82,7 +88,9 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const headersList = await headers();
-  const country = headersList.get("x-vercel-ip-country") || "FR";
+
+  const country =
+    headersList.get("x-vercel-ip-country") || "FR";
 
   const structuredDataWebsite = {
     "@context": "https://schema.org",
@@ -91,6 +99,7 @@ export default async function RootLayout({
     url: `${SITE_URL}/`,
     name: SITE_NAME,
     alternateName: "Make Your Board",
+    inLanguage: "en",
   };
 
   const structuredDataApp = {
@@ -99,9 +108,28 @@ export default async function RootLayout({
     "@id": `${SITE_URL}/#webapp`,
     name: SITE_NAME,
     url: `${SITE_URL}/`,
-    applicationCategory: "MusicApplication",
-    operatingSystem: "All",
     description: SITE_DESCRIPTION,
+
+    applicationCategory: "DesignApplication",
+    operatingSystem: "All",
+
+    isAccessibleForFree: true,
+
+    offers: {
+      "@type": "Offer",
+      price: 0,
+    },
+
+    featureList: [
+      "Guitar pedalboard planning",
+      "Thousands of guitar pedals",
+      "Real pedal dimensions",
+      "Drag and drop pedal layout",
+      "Power supply compatibility",
+      "Cable clearance checking",
+      "Custom pedals and pedalboards",
+      "High-quality image export",
+    ],
   };
 
   return (
@@ -115,7 +143,9 @@ export default async function RootLayout({
       >
         <script
           dangerouslySetInnerHTML={{
-            __html: `window.__MYB_COUNTRY__ = ${JSON.stringify(country)};`,
+            __html: `window.__MYB_COUNTRY__ = ${JSON.stringify(
+              country
+            )};`,
           }}
         />
 
@@ -124,14 +154,18 @@ export default async function RootLayout({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify(structuredDataWebsite),
+            __html: JSON.stringify(
+              structuredDataWebsite
+            ),
           }}
         />
 
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify(structuredDataApp),
+            __html: JSON.stringify(
+              structuredDataApp
+            ),
           }}
         />
 
