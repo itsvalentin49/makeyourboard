@@ -149,12 +149,14 @@ export default function BoardEditor({
       label: "Wood",
       type: "image" as const,
       thumbSrc: "/backgrounds/wood-thumb.webp",
+      src: "/backgrounds/wood-full.webp",
     },
     {
       id: "steel",
       label: "Steel",
       type: "image" as const,
       thumbSrc: "/backgrounds/steel-thumb.webp",
+      src: "/backgrounds/steel-full.webp",
     },
   ], []);
 

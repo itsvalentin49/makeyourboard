@@ -325,7 +325,6 @@ export default function GettingStartedPage() {
                 >
                     <img
                         src="/docs/getting-started/custom-pedal2.webp"
-                        alt="Create a custom pedal in MakeYourBoard"
                         style={{
                             width: "250px",
                             maxWidth: "100%",
@@ -337,7 +336,17 @@ export default function GettingStartedPage() {
 
                     <img
                         src="/docs/getting-started/custom-board.webp"
-                        alt="Create a custom pedalboard in MakeYourBoard"
+                        style={{
+                            width: "250px",
+                            maxWidth: "100%",
+                            height: "auto",
+                            display: "block",
+                            borderRadius: "10px",
+                        }}
+                    />
+
+                    <img
+                        src="/docs/getting-started/import-pedal.webp"
                         style={{
                             width: "250px",
                             maxWidth: "100%",
@@ -375,10 +384,19 @@ export default function GettingStartedPage() {
                     }}
                 >
                     <img
-                        src="/docs/getting-started/export-board.webp"
-                        alt="Export a pedalboard setup from MakeYourBoard"
+                        src="/docs/getting-started/export-board2.webp"
                         style={{
                             width: "250px",
+                            maxWidth: "100%",
+                            height: "auto",
+                            display: "block",
+                            borderRadius: "10px",
+                        }}
+                    />
+                    <img
+                        src="/docs/getting-started/image-pedalboard.webp"
+                        style={{
+                            width: "500px",
                             maxWidth: "100%",
                             height: "auto",
                             display: "block",

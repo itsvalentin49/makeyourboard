@@ -56,10 +56,6 @@ export default function PedalsPage() {
                     href: "#pedal-info",
                     label: "Pedal information",
                 },
-                {
-                    href: "#retailers",
-                    label: "Retailer links",
-                },
             ]}
         >
             {/* INTRO */}
@@ -72,9 +68,6 @@ export default function PedalsPage() {
                         pedalboard
                     </DocLink>{" "}
                     and arrange your setup using real product dimensions.
-                </p>
-
-                <p>
                     MakeYourBoard lets you quickly position, rotate and
                     organize pedals on the canvas while keeping useful
                     product information and specifications close at hand.
@@ -90,28 +83,82 @@ export default function PedalsPage() {
 
                 <p>
                     Use the pedal search bar in the left sidebar to find
-                    a pedal by brand, model or effect type such as
-                    overdrive, distortion, fuzz, delay, reverb or chorus.
-                </p>
-
-                <p>
+                    a pedal by brand, model or effect type (such as
+                    overdrive, delay, reverb...).
                     Select a pedal from the results to add it directly
                     to the canvas. Recently added pedals are displayed
                     below the search bar so you can also discover the
                     latest additions to the MakeYourBoard library.
-                </p>
-
-                <p>
-                    If you cannot find a pedal, you can{" "}
+                    If you cannot find a pedal, you can create your own{" "}
                     <DocLink href="/docs/custom-gear">
-                        create your own custom pedal
+                        custom pedal
                     </DocLink>{" "}
                     or{" "}
                     <DocLink href="/docs/import-pedal">
-                        import your own pedal image
-                    </DocLink>
-                    .
+                        import
+                    </DocLink>{" "}
+                    your own pedal image.
                 </p>
+
+                <div
+                    style={{
+                        width: "100%",
+                        display: "flex",
+                        alignItems: "flex-start",
+                        justifyContent: "center",
+                        gap: "12px",
+                        marginTop: "28px",
+                        flexWrap: "wrap",
+                    }}
+                >
+                    <img
+                        src="/docs/pedals/pedals-search-pedal.webp"
+                        alt="Search a pedal by brand or model in MakeYourBoard"
+                        style={{
+                            width: "190px",
+                            maxWidth: "100%",
+                            height: "auto",
+                            display: "block",
+                            borderRadius: "10px",
+                        }}
+                    />
+
+                    <img
+                        src="/docs/pedals/pedals-search-effect.webp"
+                        alt="Search guitar pedals by effect type in MakeYourBoard"
+                        style={{
+                            width: "190px",
+                            maxWidth: "100%",
+                            height: "auto",
+                            display: "block",
+                            borderRadius: "10px",
+                        }}
+                    />
+
+                    <img
+                        src="/docs/pedals/pedals-custom-pedal.webp"
+                        alt="Create a custom pedal in MakeYourBoard"
+                        style={{
+                            width: "190px",
+                            maxWidth: "100%",
+                            height: "auto",
+                            display: "block",
+                            borderRadius: "10px",
+                        }}
+                    />
+
+                    <img
+                        src="/docs/pedals/pedals-import-pedal.webp"
+                        alt="Import your own pedal image in MakeYourBoard"
+                        style={{
+                            width: "190px",
+                            maxWidth: "100%",
+                            height: "auto",
+                            display: "block",
+                            borderRadius: "10px",
+                        }}
+                    />
+                </div>
             </section>
 
             {/* ARRANGE */}
@@ -126,9 +173,6 @@ export default function PedalsPage() {
                     layout. MakeYourBoard uses the real dimensions of
                     each pedal whenever manufacturer specifications are
                     available.
-                </p>
-
-                <p>
                     You can also use{" "}
                     <DocLink href="/docs/cable-clearance">
                         Cable Clearance
@@ -138,12 +182,74 @@ export default function PedalsPage() {
                     connectors.
                 </p>
 
+                <p>
+
+                </p>
+
                 <h3>Rotate a pedal</h3>
 
                 <p>
-                    Select a pedal and use the rotate action to change
-                    its orientation on the pedalboard.
+                    Select a pedal and use the Rotate button to change its orientation on the pedalboard.
                 </p>
+                <div
+                    style={{
+                        width: "100%",
+                        display: "flex",
+                        alignItems: "flex-start",
+                        justifyContent: "center",
+                        gap: "12px",
+                        marginTop: "28px",
+                        flexWrap: "wrap",
+                    }}
+                >
+                    <img
+                        src="/docs/pedals/pedals-rotate-up.webp"
+                        alt="Pedal rotated upward in MakeYourBoard"
+                        style={{
+                            width: "190px",
+                            maxWidth: "100%",
+                            height: "auto",
+                            display: "block",
+                            borderRadius: "10px",
+                        }}
+                    />
+
+                    <img
+                        src="/docs/pedals/pedals-rotate-right.webp"
+                        alt="Pedal rotated right in MakeYourBoard"
+                        style={{
+                            width: "190px",
+                            maxWidth: "100%",
+                            height: "auto",
+                            display: "block",
+                            borderRadius: "10px",
+                        }}
+                    />
+
+                    <img
+                        src="/docs/pedals/pedals-rotate-down.webp"
+                        alt="Pedal rotated downward in MakeYourBoard"
+                        style={{
+                            width: "190px",
+                            maxWidth: "100%",
+                            height: "auto",
+                            display: "block",
+                            borderRadius: "10px",
+                        }}
+                    />
+
+                    <img
+                        src="/docs/pedals/pedals-rotate-left.webp"
+                        alt="Pedal rotated left in MakeYourBoard"
+                        style={{
+                            width: "190px",
+                            maxWidth: "100%",
+                            height: "auto",
+                            display: "block",
+                            borderRadius: "10px",
+                        }}
+                    />
+                </div>
 
                 <h3>Move to front or back</h3>
 
@@ -152,11 +258,46 @@ export default function PedalsPage() {
                     when items overlap, giving you control over their
                     stacking order on the canvas.
                 </p>
+                <div
+                    style={{
+                        width: "100%",
+                        display: "flex",
+                        alignItems: "flex-start",
+                        justifyContent: "center",
+                        gap: "16px",
+                        marginTop: "28px",
+                        flexWrap: "wrap",
+                    }}
+                >
+                    <img
+                        src="/docs/pedals/pedals-move-front.webp"
+                        alt="Move a pedal to the front in MakeYourBoard"
+                        style={{
+                            width: "250px",
+                            maxWidth: "100%",
+                            height: "auto",
+                            display: "block",
+                            borderRadius: "10px",
+                        }}
+                    />
+
+                    <img
+                        src="/docs/pedals/pedals-move-back.webp"
+                        alt="Move a pedal to the back in MakeYourBoard"
+                        style={{
+                            width: "250px",
+                            maxWidth: "100%",
+                            height: "auto",
+                            display: "block",
+                            borderRadius: "10px",
+                        }}
+                    />
+                </div>
 
                 <h3>Delete a pedal</h3>
 
                 <p>
-                    Select a pedal and use the delete action to remove
+                    Select a pedal and use the delete action button to remove
                     it from your current pedalboard.
                 </p>
             </section>
@@ -173,38 +314,41 @@ export default function PedalsPage() {
                     Depending on the available product data, you can
                     view a description and technical specifications
                     for the selected pedal.
-                </p>
-
-                <p>
                     Technical information can include dimensions,
-                    weight, power requirements, current draw, circuit
-                    type and bypass type. Voltage and current information
-                    can also be used to{" "}
+                    weight, voltage, current draw, manual... Voltage and current draw
+                    can also be used to check{" "}
                     <DocLink href="/docs/power-supplies">
-                        check power supply compatibility
+                        power supply compatibility
                     </DocLink>{" "}
                     for your setup.
-                </p>
-            </section>
-
-            {/* RETAILERS */}
-            <section
-                id="retailers"
-                className="docs-section"
-            >
-                <h2>Retailer Links</h2>
-
-                <p>
                     When retailer links are available for a pedal,
                     MakeYourBoard provides direct access to online
                     stores where you can find the product.
-                </p>
-
-                <p>
                     Retailer availability may vary depending on the
                     pedal and your location.
                 </p>
+                <div
+                    style={{
+                        width: "100%",
+                        display: "flex",
+                        justifyContent: "center",
+                        marginTop: "28px",
+                    }}
+                >
+                    <img
+                        src="/docs/pedals/pedals-infos2.webp"
+                        alt="Pedal information panel in MakeYourBoard"
+                        style={{
+                            width: "320px",
+                            maxWidth: "100%",
+                            height: "auto",
+                            display: "block",
+                            borderRadius: "10px",
+                        }}
+                    />
+                </div>
             </section>
+
         </DocsShell>
     );
 }

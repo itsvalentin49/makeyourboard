@@ -794,12 +794,14 @@ export default function Sidebar({
 
                           border: "1px solid rgba(0,0,0,0.035)",
 
-                          boxShadow: "none",
+                          boxShadow: active
+                            ? "0 0 0 1px #2563eb"
+                            : "none",
 
                           transform: "scale(1)",
 
                           transition:
-                            "transform 140ms ease-out, border-color 140ms ease-out",
+                            "transform 140ms ease-out, border-color 140ms ease-out, box-shadow 140ms ease-out",
                         }}
                         onMouseEnter={(e) => {
                           e.currentTarget.style.transform = "scale(1.05)";
