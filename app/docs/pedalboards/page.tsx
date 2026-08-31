@@ -74,9 +74,6 @@ export default function PedalboardsPage() {
                     Choose a pedalboard from the MakeYourBoard library
                     and build your setup using realistic product
                     dimensions.
-                </p>
-
-                <p>
                     Add your{" "}
                     <DocLink href="/docs/pedals">
                         pedals
@@ -98,16 +95,8 @@ export default function PedalboardsPage() {
                 <p>
                     Open the pedalboard library from the left sidebar
                     and search for a board by brand or model.
-                </p>
-
-                <p>
                     Select a pedalboard from the results to add it to
-                    your setup. MakeYourBoard uses the real dimensions
-                    of each board whenever manufacturer specifications
-                    are available.
-                </p>
-
-                <p>
+                    your setup.
                     If the board you need is not available in the
                     library, you can{" "}
                     <DocLink href="/docs/custom-gear">

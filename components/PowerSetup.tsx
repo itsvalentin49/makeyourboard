@@ -627,7 +627,11 @@ export default function PowerSetup({
             {pedalAssignments.map((a, i) => (
               <div
                 key={i}
-                className="grid grid-cols-[auto_1fr_auto] items-end text-[11px] leading-none"
+                className={
+                  hasPower
+                    ? "grid grid-cols-[auto_1fr_auto] items-end text-[11px] leading-none"
+                    : "flex items-center text-[11px] leading-none"
+                }
               >
                 <div className="flex items-center gap-1 whitespace-nowrap">
                   <span className="shrink-0">
@@ -643,19 +647,23 @@ export default function PowerSetup({
                   </span>
                 </div>
 
-                <div className="mx-2 border-b border-dotted border-zinc-600 mb-[2px]" />
+                {hasPower && (
+                  <>
+                    <div className="mx-2 border-b border-dotted border-zinc-600 mb-[2px]" />
 
-                <div
-                  className={`
-    text-[11px]
-    font-bold
-    whitespace-nowrap
-    text-right
-    ${a.ok ? "text-green-600" : "text-red-500"}
-  `}
-                >
-                  {a.ok ? "OK" : "KO"}
-                </div>
+                    <div
+                      className={`
+                  text-[11px]
+                  font-bold
+                  whitespace-nowrap
+                  text-right
+                  ${a.ok ? "text-green-600" : "text-red-500"}
+                `}
+                    >
+                      {a.ok ? "OK" : "KO"}
+                    </div>
+                  </>
+                )}
               </div>
             ))}
           </div>
@@ -746,12 +754,6 @@ export default function PowerSetup({
                       </div>
                     )}
                   </>
-                )}
-
-                {hasDaisyChainTuner && !isSinglePedal && (
-                  <div className="text-zinc-400 -mt-2">
-                    {t("powerSetup.recommendation.tuner")}
-                  </div>
                 )}
               </>
             )}
