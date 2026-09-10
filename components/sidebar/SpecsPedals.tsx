@@ -422,7 +422,7 @@ export default function PedalSpecs({
 
             {/* NOM */}
             {name && (
-              <div className="text-[12px] truncate">
+              <div className="text-[12px] leading-snug whitespace-normal break-words">
                 {name}
               </div>
             )}

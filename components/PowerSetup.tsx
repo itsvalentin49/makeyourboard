@@ -541,13 +541,14 @@ export default function PowerSetup({
                   </div>
 
                   <div className="text-center">
-                    <div className="text-[14px] leading-tight mb-3">
-                      <span className="font-bold">
+                    <div className="mb-3 px-2 text-center">
+                      <div className="text-[15px] font-black leading-tight">
                         {p.brand}
-                      </span>{" "}
-                      <span className="font-normal">
+                      </div>
+
+                      <div className="text-[12px] font-normal leading-snug whitespace-normal break-words mt-0.5">
                         {p.name}
-                      </span>
+                      </div>
                     </div>
 
                     <div
@@ -629,36 +630,40 @@ export default function PowerSetup({
                 key={i}
                 className={
                   hasPower
-                    ? "grid grid-cols-[auto_1fr_auto] items-end text-[11px] leading-none"
-                    : "flex items-center text-[11px] leading-none"
+                    ? "flex items-end min-w-0 text-[11px] leading-none"
+                    : "flex items-center min-w-0 text-[11px] leading-none"
                 }
               >
-                <div className="flex items-center gap-1 whitespace-nowrap">
+                {/* PÉDALE */}
+                <div className="flex items-center gap-1 min-w-0 shrink">
                   <span className="shrink-0">
                     •
                   </span>
 
-                  <span className="font-bold">
+                  <span className="font-bold shrink-0 whitespace-nowrap">
                     {a.pedal.brand || "Custom"}
                   </span>
 
-                  <span>
+                  <span className="truncate min-w-0 whitespace-nowrap">
                     {a.pedal.name}
                   </span>
                 </div>
 
                 {hasPower && (
                   <>
-                    <div className="mx-2 border-b border-dotted border-zinc-600 mb-[2px]" />
+                    {/* POINTILLÉS */}
+                    <div className="mx-2 flex-1 min-w-[12px] border-b border-dotted border-zinc-600 mb-[2px]" />
 
+                    {/* OK / KO TOUJOURS VISIBLE */}
                     <div
                       className={`
-                  text-[11px]
-                  font-bold
-                  whitespace-nowrap
-                  text-right
-                  ${a.ok ? "text-green-600" : "text-red-500"}
-                `}
+            text-[11px]
+            font-bold
+            whitespace-nowrap
+            shrink-0
+            text-right
+            ${a.ok ? "text-green-600" : "text-red-500"}
+          `}
                     >
                       {a.ok ? "OK" : "KO"}
                     </div>
