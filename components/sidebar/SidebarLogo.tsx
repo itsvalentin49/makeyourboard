@@ -35,7 +35,7 @@ export default function SidebarLogo({
       >
         <span
           style={{
-            letterSpacing: compact ? "1.5px" : "3.5px",
+            letterSpacing: compact ? "1.7px" : "3.3px",
           }}
         >
           GUITAR
@@ -43,7 +43,7 @@ export default function SidebarLogo({
 
         <span
           style={{
-            letterSpacing: compact ? "1.5px" : "3.5px",
+            letterSpacing: compact ? "1.7px" : "3.3px",
           }}
         >
           PEDALBOARD
@@ -52,8 +52,8 @@ export default function SidebarLogo({
 
         <span
           style={{
-            letterSpacing: compact ? "1.5px" : "3.5px",
-            marginRight: compact ? "-1.5px" : "-3.5px",
+            letterSpacing: compact ? "1.7px" : "3.3px",
+            marginRight: compact ? "-1.7px" : "-3.3px",
           }}
         >
           PLANNER
