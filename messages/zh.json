@@ -256,11 +256,17 @@
   },
   "share": {
     "button": "分享",
-    "title": "分享你的效果器板",
-    "preview": "预览",
-    "social": "分享到",
+    "title": "分享效果器板",
+    "boardName": "效果器板名称",
+    "createLink": "创建分享链接",
+    "creating": "正在创建...",
+    "ready": "你的效果器板已准备好分享。",
+    "shareLink": "分享链接",
     "copy": "复制链接",
-    "copied": "已复制"
+    "copied": "已复制",
+    "error": "无法创建分享链接。",
+    "sharedBoardUnavailable": "此分享的效果器板当前不可用。",
+    "loadingSharedBoard": "正在加载分享的效果器板..."
   },
   "list": {
     "button": "列表",

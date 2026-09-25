@@ -256,11 +256,17 @@
   },
   "share": {
     "button": "Teilen",
-    "title": "Dein Pedalboard teilen",
-    "preview": "Vorschau",
-    "social": "Teilen über",
+    "title": "Pedalboard teilen",
+    "boardName": "Name des Pedalboards",
+    "createLink": "Freigabelink erstellen",
+    "creating": "Wird erstellt...",
+    "ready": "Dein Pedalboard kann jetzt geteilt werden.",
+    "shareLink": "Freigabelink",
     "copy": "Link kopieren",
-    "copied": "Kopiert"
+    "copied": "Kopiert",
+    "error": "Der Freigabelink konnte nicht erstellt werden.",
+    "sharedBoardUnavailable": "Dieses geteilte Pedalboard ist nicht verfügbar.",
+    "loadingSharedBoard": "Geteiltes Pedalboard wird geladen..."
   },
   "list": {
     "button": "Liste",

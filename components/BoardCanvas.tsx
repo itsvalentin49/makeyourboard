@@ -11,6 +11,7 @@ import ExportPanel from "@/components/ExportPanel";
 import Image from "next/image";
 import type { Project } from "@/types/project";
 import SettingsPanel from "@/components/SettingsPanel";
+import SharePanel from "@/components/SharePanel";
 import PowerSetup from "@/components/PowerSetup";
 import { HelpGuide } from "@/components/HelpGuide";
 import SignalPath, { SignalPoint } from "@/components/SignalPath";
@@ -329,6 +330,7 @@ export default function BoardCanvas({
     setShowSettings(false);
     setShowList(false);
     setHelpOpen(false);
+    setShowSharePanel(false);
 
   };
   const [knob] = useImage("/images/knob.webp");
@@ -706,6 +708,7 @@ export default function BoardCanvas({
       setShowBoardsMenu(false);
       setShowSettings(false);
       setShowCableMenu(false);
+      setShowSharePanel(false);
     }
   };
 
@@ -778,6 +781,7 @@ export default function BoardCanvas({
 
   const [hoveredPedalId, setHoveredPedalId] = useState<number | null>(null);
   const [showExportPanel, setShowExportPanel] = useState(false);
+  const [showSharePanel, setShowSharePanel] = useState(false);
   const [showJacksMargin, setShowJacksMargin] = useState(false);
   const [showSignalPath, setShowSignalPath] = useState(false);
   const [showCableMenu, setShowCableMenu] = useState(false);
@@ -831,6 +835,7 @@ export default function BoardCanvas({
       showCableMenu ||
       showPower ||
       showExportPanel ||
+      showSharePanel ||
       showSettings
     );
 
@@ -842,6 +847,7 @@ export default function BoardCanvas({
       showCableMenu ||
       showPower ||
       showExportPanel ||
+      showSharePanel ||
       showSettings;
 
     if (!sidebarOpen) return;
@@ -873,6 +879,7 @@ export default function BoardCanvas({
     showCableMenu,
     showPower,
     showExportPanel,
+    showSharePanel,
     showSettings,
   ]);
 
@@ -883,6 +890,7 @@ export default function BoardCanvas({
       showCableMenu ||
       showPower ||
       showExportPanel ||
+      showSharePanel ||
       showSettings ||
       helpOpen
     );
@@ -2397,6 +2405,93 @@ ${isMobile
                         </div>
                       </div>
 
+                      {/* SHARE */}
+                      <div
+                        className={`
+    relative
+    h-9
+    shrink-0
+    flex
+    items-center
+    px-4
+    ${isMobile ? "w-full" : "w-auto"}
+  `}
+                        style={{
+                          opacity: showMobileMenu ? 1 : 0,
+                          transform: showMobileMenu
+                            ? "translateX(0)"
+                            : isMobile
+                              ? "translateX(16px)"
+                              : "translateX(-24px)",
+                          transition: "opacity 180ms ease-out, transform 180ms ease-out",
+                          transitionDelay: isMobile
+                            ? showMobileMenu ? "25ms" : "225ms"
+                            : showMobileMenu ? "200ms" : "25ms",
+                          pointerEvents: showMobileMenu ? "auto" : "none",
+                        }}
+                        onMouseEnter={(e) => {
+                          const button = e.currentTarget.querySelector("button");
+
+                          if (button) {
+                            button.style.width = "calc(100% + 4px)";
+                            button.style.height = "36px";
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          const button = e.currentTarget.querySelector("button");
+
+                          if (button) {
+                            button.style.width = "100%";
+                            button.style.height = "32px";
+                          }
+                        }}
+                      >
+                        <button
+                          type="button"
+                          onClick={() => {
+                            closeBottomPanels();
+                            setShowSharePanel(true);
+                          }}
+                          style={{
+                            position: "absolute",
+                            left: "50%",
+                            top: "50%",
+                            width: "100%",
+                            height: "32px",
+                            transform: "translate(-50%, -50%)",
+                            transition: "width 140ms ease-out, height 140ms ease-out",
+                          }}
+                          className="
+      bg-zinc-900
+      border border-zinc-800
+      rounded-2xl
+      p-0
+      cursor-pointer
+    "
+                        />
+
+                        <div
+                          className="
+      relative
+      z-10
+      flex
+      items-center
+      justify-center
+      gap-2
+      whitespace-nowrap
+      pointer-events-none
+      text-[10px]
+      font-bold
+      uppercase
+    "
+                        >
+                          <Share2 size={18} />
+
+                          {t("share.button")}
+                        </div>
+                      </div>
+
+
                       {/* PARAMÈTRES */}
                       <div
                         className={`
@@ -3131,7 +3226,44 @@ ${isMobile
               )}
             </div>
 
+            {/* SHARE PANEL */}
+            {showSharePanel && (
+              <>
+                <div className="fixed inset-0 z-40 pointer-events-none" />
 
+                <div
+                  ref={rightSidebarRef}
+                  className={
+                    isMobile
+                      ? mobileFullPanelClass
+                      : desktopRightSidebarClass
+                  }
+                  style={
+                    isMobile
+                      ? undefined
+                      : desktopRightSidebarStyle
+                  }
+                >
+                  <SharePanel
+                    isLightTheme={isLightTheme}
+                    isMobile={isMobile}
+                    boardName={activeProject.name}
+                    boardPedals={activeProject.boardPedals}
+                    language={language}
+                    selectedBoards={activeProject.selectedBoards}
+                    signalPath={activeProject.signalPath}
+                    zoom={activeProject.zoom ?? 200}
+                    stageX={activeProject.stageX}
+                    stageY={activeProject.stageY}
+                    displaySizes={displaySizes}
+                    canvasBg={canvasBg}
+                    selectedBackgroundSrc={selectedBackgroundSrc}
+
+                    onClose={() => setShowSharePanel(false)}
+                  />
+                </div>
+              </>
+            )}
 
             {/* SETTINGS */}
             <div className="relative">

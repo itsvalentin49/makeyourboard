@@ -1,3 +1,4 @@
+
 "use client";
 
 type Props = {
@@ -12,7 +13,7 @@ export default function SidebarLogo({
       className={
         compact
           ? "select-none inline-flex flex-col"
-          : "pb-0 pt-2 select-none inline-flex flex-col"
+          : "px-1 pb-0 pt-2 select-none inline-flex flex-col"
       }
     >
       <div
@@ -34,7 +35,7 @@ export default function SidebarLogo({
       >
         <span
           style={{
-            letterSpacing: compact ? "1px" : "3.5px",
+            letterSpacing: compact ? "1.5px" : "3.5px",
           }}
         >
           GUITAR
@@ -42,15 +43,17 @@ export default function SidebarLogo({
 
         <span
           style={{
-            letterSpacing: compact ? "1px" : "3.5px",
+            letterSpacing: compact ? "1.5px" : "3.5px",
           }}
         >
           PEDALBOARD
         </span>
 
+
         <span
           style={{
-            letterSpacing: compact ? "1px" : "3.5px",
+            letterSpacing: compact ? "1.5px" : "3.5px",
+            marginRight: compact ? "-1.5px" : "-3.5px",
           }}
         >
           PLANNER

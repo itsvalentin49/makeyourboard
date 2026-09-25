@@ -705,8 +705,8 @@ export default function Sidebar({
             <div
               className={
                 isMobile
-                  ? "grid grid-cols-5 gap-2 justify-center p-1.5 overflow-visible"
-                  : "grid grid-cols-5 gap-1.5 p-1.5 overflow-visible"
+                  ? "flex items-center justify-between w-full overflow-visible"
+                  : "grid grid-cols-5 gap-1.5 p-0 overflow-visible"
               }
             >
               {
@@ -738,8 +738,8 @@ export default function Sidebar({
                   {
                     key: "import",
                     label: t("sidebar.import"),
-                    lightImage: "/images/tab-import-light.webp",
-                    darkImage: "/images/tab-import-dark.webp",
+                    lightImage: "/images/tab-import-v3.webp",
+                    darkImage: "/images/tab-import-dark-v3.webp",
                   },
                 ]
 

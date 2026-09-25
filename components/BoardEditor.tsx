@@ -27,6 +27,7 @@ const LANGUAGE_TO_LOCALE: Record<string, "en" | "fr" | "es" | "de" | "it" | "pt"
 const MAX_PROJECTS = 7;
 const STORAGE_KEY = "guitar-sandbox-data";
 const SETTINGS_STORAGE_KEY = "myb_settings";
+const SHARED_IMPORT_KEY = "myb_shared_board_import";
 
 
 const DEFAULT_WORKING_BOARD: Project = {
@@ -310,6 +311,11 @@ export default function BoardEditor({
   useEffect(() => {
     if (!hydrated) return;
 
+    const sharedImportPending =
+      sessionStorage.getItem(SHARED_IMPORT_KEY);
+
+    if (sharedImportPending) return;
+
     if (projects.length === 0) {
       const firstProject: Project = {
         id: Date.now(),
@@ -422,6 +428,201 @@ export default function BoardEditor({
 
     setHydrated(true);
   }, []);
+
+  /* ================= SHARED BOARD IMPORT ================= */
+  useEffect(() => {
+    if (!hydrated) return;
+
+    const rawSharedImport =
+      sessionStorage.getItem(SHARED_IMPORT_KEY);
+
+    if (!rawSharedImport) return;
+
+    try {
+      const sharedImport = JSON.parse(rawSharedImport);
+
+      const sharedProjectData =
+        sharedImport?.data?.project;
+
+      if (!sharedProjectData) {
+        console.error("Invalid shared board data.");
+        sessionStorage.removeItem(SHARED_IMPORT_KEY);
+        return;
+      }
+
+      const sharedName =
+        typeof sharedProjectData.name === "string" &&
+          sharedProjectData.name.trim()
+          ? sharedProjectData.name.trim()
+          : typeof sharedImport.name === "string" &&
+            sharedImport.name.trim()
+            ? sharedImport.name.trim()
+            : "Shared Pedalboard";
+
+      const currentProject =
+        projects.find((p) => p.id === activeProjectId) ?? null;
+
+      const currentProjectHasContent =
+        !!currentProject &&
+        (
+          currentProject.boardPedals.length > 0 ||
+          currentProject.selectedBoards.length > 0
+        );
+
+      /*
+        Si le projet actuel est vide, on le remplace directement.
+        Sinon, on crée un nouveau projet local.
+      */
+
+      if (currentProject && !currentProjectHasContent) {
+        const importedProject = {
+          ...currentProject,
+
+          name: sharedName,
+
+          zoom:
+            typeof sharedProjectData.zoom === "number"
+              ? sharedProjectData.zoom
+              : 200,
+
+          stageX:
+            typeof sharedProjectData.stageX === "number"
+              ? sharedProjectData.stageX
+              : 0,
+
+          stageY:
+            typeof sharedProjectData.stageY === "number"
+              ? sharedProjectData.stageY
+              : 0,
+
+          boardPedals:
+            Array.isArray(sharedProjectData.boardPedals)
+              ? sharedProjectData.boardPedals
+              : [],
+
+          selectedBoards:
+            Array.isArray(sharedProjectData.selectedBoards)
+              ? sharedProjectData.selectedBoards
+              : [],
+
+          ...(Array.isArray(sharedProjectData.signalPath)
+            ? { signalPath: sharedProjectData.signalPath }
+            : {}),
+        } as Project;
+
+        setProjects((prev) =>
+          prev.map((project) =>
+            project.id === currentProject.id
+              ? importedProject
+              : project
+          )
+        );
+
+        setActiveProjectId(currentProject.id);
+      } else {
+        /*
+          Le projet actuel contient déjà du matériel :
+          on ne touche à rien et on ajoute le board partagé.
+        */
+
+        if (projects.length >= MAX_PROJECTS) {
+          alert(
+            `You already have ${MAX_PROJECTS} pedalboards. Delete one before opening this shared board.`
+          );
+          return;
+        }
+
+        const newId = Date.now();
+
+        const importedProject = {
+          id: newId,
+          name: sharedName,
+
+          zoom:
+            typeof sharedProjectData.zoom === "number"
+              ? sharedProjectData.zoom
+              : 200,
+
+          stageX:
+            typeof sharedProjectData.stageX === "number"
+              ? sharedProjectData.stageX
+              : 0,
+
+          stageY:
+            typeof sharedProjectData.stageY === "number"
+              ? sharedProjectData.stageY
+              : 0,
+
+          boardPedals:
+            Array.isArray(sharedProjectData.boardPedals)
+              ? sharedProjectData.boardPedals
+              : [],
+
+          selectedBoards:
+            Array.isArray(sharedProjectData.selectedBoards)
+              ? sharedProjectData.selectedBoards
+              : [],
+
+          ...(Array.isArray(sharedProjectData.signalPath)
+            ? { signalPath: sharedProjectData.signalPath }
+            : {}),
+        } as Project;
+
+        setProjects((prev) => [
+          ...prev,
+          importedProject,
+        ]);
+
+        setActiveProjectId(newId);
+      }
+
+      /*
+        Restaure les dimensions utilisées par le snapshot.
+      */
+      const sharedDisplaySizes =
+        sharedImport?.data?.displaySizes;
+
+      if (
+        sharedDisplaySizes &&
+        typeof sharedDisplaySizes === "object"
+      ) {
+        setDisplaySizes(sharedDisplaySizes);
+      }
+
+      /*
+        Restaure le fond du board partagé.
+      */
+      const sharedCanvasBg =
+        sharedImport?.data?.appearance?.canvasBg;
+
+      if (
+        typeof sharedCanvasBg === "string" &&
+        BACKGROUNDS.some(
+          (background) =>
+            background.id === sharedCanvasBg
+        )
+      ) {
+        setCanvasBg(sharedCanvasBg);
+      }
+
+      /*
+        Important :
+        le snapshot a maintenant été importé localement.
+        On le retire pour éviter de l'importer une deuxième fois.
+      */
+      sessionStorage.removeItem(SHARED_IMPORT_KEY);
+
+      setSelectedInstanceId(null);
+      setSelectedBoardInstanceId(null);
+    } catch (error) {
+      console.error(
+        "Unable to import shared board:",
+        error
+      );
+
+      sessionStorage.removeItem(SHARED_IMPORT_KEY);
+    }
+  }, [hydrated]);
 
   useEffect(() => {
     const check = () => {

@@ -257,11 +257,17 @@
   },
   "share": {
     "button": "Partager",
-    "title": "Partager votre Board",
-    "preview": "Aperçu",
-    "social": "Partager via",
+    "title": "Partager le pedalboard",
+    "boardName": "Nom du pedalboard",
+    "createLink": "Créer le lien de partage",
+    "creating": "Création...",
+    "ready": "Votre pedalboard est prêt à être partagé.",
+    "shareLink": "Lien de partage",
     "copy": "Copier le lien",
-    "copied": "Copié"
+    "copied": "Copié",
+    "error": "Impossible de créer le lien de partage.",
+    "sharedBoardUnavailable": "Ce pedalboard partagé est indisponible.",
+    "loadingSharedBoard": "Chargement du pedalboard partagé..."
   },
   "list": {
     "button": "Liste",

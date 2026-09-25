@@ -256,11 +256,17 @@
   },
   "share": {
     "button": "Compartir",
-    "title": "Comparte tu pedalboard",
-    "preview": "Vista previa",
-    "social": "Compartir vía",
+    "title": "Compartir pedalboard",
+    "boardName": "Nombre del pedalboard",
+    "createLink": "Crear enlace para compartir",
+    "creating": "Creando...",
+    "ready": "Tu pedalboard está listo para compartir.",
+    "shareLink": "Enlace para compartir",
     "copy": "Copiar enlace",
-    "copied": "Copiado"
+    "copied": "Copiado",
+    "error": "No se ha podido crear el enlace para compartir.",
+    "sharedBoardUnavailable": "Este pedalboard compartido no está disponible.",
+    "loadingSharedBoard": "Cargando pedalboard compartido..."
   },
   "list": {
     "button": "Lista",
