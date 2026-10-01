@@ -443,5 +443,14 @@
     "black": "Black",
     "wood": "Wood",
     "aluminium": "Aluminium"
+  },
+  "boardFinder": {
+    "button": "Pedalboard Finder",
+    "subtitle": "Based on your current pedal layout.",
+    "currentLayout": "Your setup",
+    "fits": "Boards that fit your pedals",
+    "overlap": "Some pedals overlap. Check their spacing before assembly.",
+    "multipleBoards": "This tool can replace only one pedalboard. Remove extra boards before selecting a result.",
+    "pedalsLabel": "Pedals"
   }
 }

@@ -442,5 +442,19 @@
     "black": "Noir",
     "wood": "Bois",
     "aluminium": "Aluminium"
+  },
+  "boardFinder": {
+    "button": "Pedalboard Finder",
+    "subtitle": "Trouvez le pedalboard idéal.",
+    "back": "Retour",
+    "pedalLabel": "Pédale",
+    "pedalsLabel": "Pédales",
+    "resultsFound": "{count} pedalboards compatibles",
+    "overlap": "L’espace entre certaines pédales semble insuffisant pour le câblage. Consultez l’onglet Câbles pour identifier les zones à corriger.",
+    "multipleBoards": "Cet outil ne peut remplacer qu'un seul pedalboard. Supprimez les boards supplémentaires avant de sélectionner un résultat.",
+    "noMatchTitle": "Aucun pedalboard compatible",
+    "rearrange": "Réorganisation nécessaire",
+    "compatible": "Compatible",
+    "noMatch": "Aucun pedalboard ne convient à votre configuration. Envisagez un modèle sur mesure ou plusieurs pedalboards."
   }
 }

@@ -12,6 +12,12 @@ import { Settings, Plus, Minus, RotateCw, X, Trash2, Info } from "lucide-react";
 import { useRef } from "react";
 import SidebarLogo from "@/components/sidebar/SidebarLogo";
 
+import {
+  getFinderLayout,
+  getBoardFitMode,
+} from "@/utils/boardFinder";
+
+
 type Units = "metric" | "imperial";
 const LANGUAGE_TO_LOCALE: Record<string, "en" | "fr" | "es" | "de" | "it" | "pt" | "zh"> = {
   English: "en",
@@ -859,6 +865,83 @@ export default function BoardEditor({
     closeSearchMenus();
   };
 
+  // BOARD FINDER V1 — separate from the existing manual board selection.
+
+
+
+  const selectSuggestedBoard = (board: AnyRow): boolean => {
+    const existingBoards =
+      activeProject.selectedBoards || [];
+
+    if (existingBoards.length > 1) return false;
+
+    const originalItems =
+      activeProject.boardPedals;
+
+    const layout = getFinderLayout(
+      originalItems,
+      existingBoards
+    );
+
+    // Use the same compatibility rules as the Finder.
+    const mode = getBoardFitMode(
+      layout,
+      board,
+      true
+    );
+
+    if (!mode) return false;
+
+    const now = Date.now();
+
+    // Preserve the existing board layer.
+    // Under-board power supplies stay underneath.
+    const boardZIndex =
+      existingBoards.length === 1
+        ? Number(
+          existingBoards[0].zIndex ?? -9999
+        )
+        : Math.min(
+          -9999,
+          ...originalItems.map(
+            (item) => Number(item.zIndex) || 0
+          )
+        ) - 1;
+
+    const newBoard: BoardItem = {
+      ...board,
+
+      instanceId: now,
+
+      x: layout.centerX,
+      y: layout.centerY,
+
+      rotation: 0,
+
+      zIndex: boardZIndex,
+    };
+
+    // Never move or rotate the pedals automatically.
+    // The user remains free to arrange them manually.
+    updateActiveProject({
+      selectedBoards: [newBoard],
+      boardPedals: originalItems,
+    });
+
+    setLastSelectedBoard(board);
+
+    setSelectedInstanceId(null);
+    setSelectedBoardInstanceId(null);
+
+    closeSearchMenus();
+    setMobileSidebarOpen(false);
+
+    return true;
+  };
+
+
+
+
   const addCustomItem = (item: AnyRow = {}) => {
     const isUploadedImage = item?.slug === "custom-upload";
     const itemType = isUploadedImage ? "pedal" : customType;
@@ -1153,6 +1236,9 @@ export default function BoardEditor({
               setCustomColor={setCustomColor}
               addPedal={addPedal}
               selectBoard={selectBoard}
+              selectSuggestedBoard={selectSuggestedBoard}
+              finderPedals={activeProject.boardPedals}
+              existingBoards={activeProject.selectedBoards || []}
               addCustomItem={addCustomItem}
               rotatePedal={rotatePedal}
               movePedalFront={movePedalFront}
@@ -1465,6 +1551,9 @@ export default function BoardEditor({
                       selectBoard(b);
                       setMobileSidebarOpen(false);
                     }}
+                    selectSuggestedBoard={selectSuggestedBoard}
+                    finderPedals={activeProject.boardPedals}
+                    existingBoards={activeProject.selectedBoards || []}
                     addCustomItem={(item) => {
                       addCustomItem(item);
                       setMobileSidebarOpen(false);

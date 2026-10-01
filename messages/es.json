@@ -441,5 +441,20 @@
     "black": "Negro",
     "wood": "Madera",
     "aluminium": "Aluminio"
+  },
+  "boardFinder": {
+    "button": "Encontrar mi pedalboard",
+    "subtitle": "Encuentra una pedalera para tus {count} pedales.",
+    "title": "Encontrar mi pedalboard",
+    "back": "Volver a las pedaleras",
+    "pedals": "{count} pedales en el lienzo",
+    "required": "Espacio necesario: {width} × {depth}",
+    "clearance": "Incluye espacio para conectores y cables.",
+    "results": "{count} pedaleras compatibles por dimensiones",
+    "fits": "Dimensiones compatibles",
+    "noResults": "Ninguna pedalera admite esta disposición. Acerca los pedales.",
+    "missingDimensions": "Faltan las dimensiones de algunos pedales. Comprueba sus especificaciones.",
+    "overlap": "Algunos pedales o espacios para cables se solapan. Sepáralos antes de buscar.",
+    "multipleBoards": "La V1 solo puede sustituir una pedalera. Retira las adicionales antes de elegir."
   }
 }

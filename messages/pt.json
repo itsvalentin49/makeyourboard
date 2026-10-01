@@ -441,5 +441,20 @@
     "black": "Preto",
     "wood": "Madeira",
     "aluminum": "Alumínio"
+  },
+  "boardFinder": {
+    "button": "Encontrar a minha pedalboard",
+    "subtitle": "Encontra uma pedalboard para os teus {count} pedais.",
+    "title": "Encontrar a minha pedalboard",
+    "back": "Voltar às pedalboards",
+    "pedals": "{count} pedais na área de trabalho",
+    "required": "Espaço necessário: {width} × {depth}",
+    "clearance": "Inclui espaço para jacks e cabos.",
+    "results": "{count} pedalboards compatíveis em dimensões",
+    "fits": "Dimensões compatíveis",
+    "noResults": "Nenhuma pedalboard comporta esta disposição. Aproxima os pedais.",
+    "missingDimensions": "Alguns pedais não têm dimensões definidas. Verifica as especificações.",
+    "overlap": "Os pedais ou os espaços para cabos sobrepõem-se. Afasta-os antes da pesquisa.",
+    "multipleBoards": "A V1 só substitui uma pedalboard. Remove as adicionais antes de escolher."
   }
 }

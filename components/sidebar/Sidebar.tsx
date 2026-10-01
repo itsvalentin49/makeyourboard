@@ -1,940 +1,1649 @@
 "use client";
 
 import React from "react";
+
 import {
+
   ArrowLeft,
+
   ChevronDown,
+
   ExternalLink,
+
   Mail,
+
   Plus,
+
   RotateCw,
+
   ShoppingCart,
+
   Trash2,
+
 } from "lucide-react";
+
 import type { Language } from "@/utils/i18n";
 
 import SidebarLogo from "@/components/sidebar/SidebarLogo";
+
 import BuyOnline from "@/components/sidebar/BuyOnline";
+
 import { mmToIn, formatWeight } from "@/utils/units";
+
 import { getTranslator } from "@/utils/i18n";
+
 import SpecsPedal from "@/components/sidebar/SpecsPedals";
+
 import SpecsBoards from "@/components/sidebar/SpecsBoards";
+
 import SpecsPower from "@/components/sidebar/SpecsPower";
+
 import SearchPedals from "@/components/sidebar/SearchPedals";
+
 import SearchBoards from "@/components/sidebar/SearchBoards";
+
 import CustomBuilder from "@/components/sidebar/CustomBuilder";
+
 import SearchPower from "@/components/sidebar/SearchPower";
+
 import ImportBuilder from "@/components/sidebar/ImportBuilder";
+
 
 
 type AnyRow = Record<string, any>;
 
 type Props = {
+
   // Data
+
   pedalsLibrary: AnyRow[];
+
   boardsLibrary: AnyRow[];
+
   powerLibrary: AnyRow[];
+
   lastSelectedPedal: AnyRow | null;
+
   lastSelectedBoard: AnyRow | null;
+
   lastSelectedPower: AnyRow | null;
+
   setLastSelectedPower: (p: AnyRow) => void;
+
   setLastSelectedPedal: (p: AnyRow) => void;
 
   // UI state
+
   showPedalResults: boolean;
+
   setShowPedalResults: (v: boolean) => void;
+
   showBoardResults: boolean;
+
   setShowBoardResults: (v: boolean) => void;
 
   pedalSearch: string;
+
   setPedalSearch: (v: string) => void;
+
   boardSearch: string;
+
   setBoardSearch: (v: string) => void;
 
   // Selection
+
   selectedPedal: AnyRow | undefined;
+
   selectedBoardDetails: AnyRow | undefined;
+
   selectedInstanceId: number | null;
+
   selectedBoardInstanceId: number | null;
+
   setSelectedInstanceId: (v: number | null) => void;
+
   setSelectedBoardInstanceId: (v: number | null) => void;
 
   // Custom item
+
   customName: string;
+
   setCustomName: (v: string) => void;
+
   customWidth: string;
+
   setCustomWidth: (v: string) => void;
+
   customDepth: string;
+
   setCustomDepth: (v: string) => void;
+
   customColor: string;
+
   setCustomColor: (v: string) => void;
+
   customType: "pedal" | "board" | null;
+
   setCustomType: (v: "pedal" | "board" | null) => void;
+
   makeOpen: boolean;
+
   setMakeOpen: (v: boolean) => void;
+
   contactOpen: boolean;
+
   setContactOpen: (v: boolean) => void;
 
   // Actions
+
   addPedal: (p: AnyRow) => void;
+
   selectBoard: (b: AnyRow) => void;
+  selectSuggestedBoard?: (b: AnyRow) => boolean;
+  finderPedals?: AnyRow[];
+  existingBoards?: AnyRow[];
+
   addCustomItem: (item: AnyRow) => void;
+
   rotatePedal: (id: number) => void;
+
   movePedalFront: (id: number) => void;
+
   movePedalBack: (id: number) => void;
+
   deletePedal: (id: number) => void;
+
   rotateBoard: (id: number) => void;
+
   deleteBoard: (id: number) => void;
+
   moveBoardFront: (id: number) => void;
+
   moveBoardBack: (id: number) => void;
 
   // Settings
+
   canvasBg: string;
+
   setCanvasBg: (v: string) => void;
 
   language: Language;
+
   setLanguage: (v: Language) => void;
 
   units: "metric" | "imperial";
+
   setUnits: (v: "metric" | "imperial") => void;
 
   // NEW
+
   isMobile?: boolean;
+
   hideLogo?: boolean;
+
 };
 
 export default function Sidebar({
+
   pedalsLibrary,
+
   boardsLibrary,
+
   powerLibrary,
+
   showPedalResults,
+
   setShowPedalResults,
+
   showBoardResults,
+
   setShowBoardResults,
+
   pedalSearch,
+
   setPedalSearch,
+
   boardSearch,
+
   setBoardSearch,
+
   selectedPedal,
+
   selectedBoardDetails,
+
   selectedInstanceId,
+
   selectedBoardInstanceId,
+
   setSelectedInstanceId,
+
   setSelectedBoardInstanceId,
+
   customName,
+
   setCustomName,
+
   customWidth,
+
   setCustomWidth,
+
   customDepth,
+
   setCustomDepth,
+
   customColor,
+
   setCustomColor,
+
   customType,
+
   setCustomType,
+
   addPedal,
+
   selectBoard,
+  selectSuggestedBoard,
+  finderPedals = [],
+  existingBoards = [],
+
   addCustomItem,
+
   rotatePedal,
+
   deletePedal,
+
   rotateBoard,
+
   movePedalFront,
+
   movePedalBack,
+
   deleteBoard,
+
   moveBoardFront,
+
   moveBoardBack,
+
   canvasBg,
+
   setCanvasBg,
+
   language,
+
   setLanguage,
+
   units,
+
   setUnits,
+
   makeOpen,
+
   setMakeOpen,
+
   contactOpen,
+
   setContactOpen,
+
   isMobile = false,
+
   hideLogo = false,
+
   lastSelectedPedal,
+
   lastSelectedBoard,
+
   setLastSelectedPedal,
+
   lastSelectedPower,
+
   setLastSelectedPower,
 
 }: Props) {
 
   const t = getTranslator(language);
+
   const LANGUAGE_LABELS: Record<Language, string> = {
+
     en: "English",
+
     fr: "Français",
+
     es: "Español",
+
     de: "Deutsch",
+
     it: "Italiano",
+
     pt: "Português",
+
     zh: "中文",
+
   };
 
   const minMm = customType === "pedal" ? 30 : 100;
+
   const maxMm = customType === "pedal" ? 300 : 1000;
 
   // Convert for display (rounded to 1 decimal in inches)
+
   const displayMin =
+
     units === "metric"
+
       ? minMm
+
       : Math.round(mmToIn(minMm) * 10) / 10;
 
   const displayMax =
+
     units === "metric"
+
       ? maxMm
+
       : Math.round(mmToIn(maxMm) * 10) / 10;
 
   const minValue =
+
     units === "metric" ? minMm : mmToIn(minMm);
+
   const maxValue =
+
     units === "metric" ? maxMm : mmToIn(maxMm);
 
   const [activeSidebarTab, setActiveSidebarTab] =
+
     React.useState<"pedals" | "boards" | "power" | "custom" | "import">("pedals");
 
   const [isLightTheme, setIsLightTheme] = React.useState(true);
 
   React.useEffect(() => {
+
     const html = document.documentElement;
 
     const updateTheme = () => {
+
       setIsLightTheme(html.classList.contains("light"));
+
     };
 
     // Vérification initiale
+
     updateTheme();
 
     // Surveillance des changements de classe sur <html>
+
     const observer = new MutationObserver(updateTheme);
 
     observer.observe(html, {
+
       attributes: true,
+
       attributeFilter: ["class"],
+
     });
 
     return () => {
+
       observer.disconnect();
+
     };
+
   }, []);
 
   // Convert UI values to mm for validation
+
   const widthMm =
+
     units === "metric"
+
       ? Number(customWidth)
+
       : Number(customWidth) * 25.4;
 
   const depthMm =
+
     units === "metric"
+
       ? Number(customDepth)
+
       : Number(customDepth) * 25.4;
 
   const isPedalValid =
+
     widthMm >= 30 &&
+
     widthMm <= 300 &&
+
     depthMm >= 30 &&
+
     depthMm <= 300;
 
   const isBoardValid =
+
     widthMm >= 100 &&
+
     widthMm <= 1000 &&
+
     depthMm >= 100 &&
+
     depthMm <= 1000;
 
   const unitLabel = units === "metric" ? "mm" : "in";
+
   const withUnit = (label: string) =>
+
     `${label} (${unitLabel})`;
+
   const isImportedPedal =
+
     selectedPedal?.slug === "custom-upload";
 
   const isCustomPedal =
+
     selectedPedal?.brand === "Custom" &&
+
     !isImportedPedal;
 
   const isCustomBoard = selectedBoardDetails?.brand === "Custom";
+
   const [country] = React.useState<string>(() => {
+
     if (typeof window === "undefined") return "FR";
 
     return (window as any).__MYB_COUNTRY__ || "FR";
+
   });
+
   const USA_COUNTRIES = ["US"];
 
   const EUROPE_COUNTRIES = [
+
     "FR", "DE", "NL", "ES", "IT", "PT", "BE", "AT", "DK", "SE", "NO", "FI", "PL", "CZ", "SK",
+
     "HU", "RO", "BG", "HR", "SI", "EE", "LV", "LT", "LU", "IE", "GR"
+
   ];
 
   const isUSA = USA_COUNTRIES.includes(country.toUpperCase());
+
   const isEurope = EUROPE_COUNTRIES.includes(country.toUpperCase());
+
   const [bgOpen, setBgOpen] = React.useState(false);
+
   const bgRef = React.useRef<HTMLDivElement>(null);
+
   const [langOpen, setLangOpen] = React.useState(false);
+
   const langRef = React.useRef<HTMLDivElement>(null);
+
   const [settingsOpen, setSettingsOpen] = React.useState(false);
+
   const pedalDropdownRef = React.useRef<HTMLDivElement>(null);
+
   const boardDropdownRef = React.useRef<HTMLDivElement>(null);
+
   const powerDropdownRef = React.useRef<HTMLDivElement>(null);
+
   const pedalInputRef = React.useRef<HTMLInputElement>(null);
+
   const boardInputRef = React.useRef<HTMLInputElement>(null);
+
   const [mobileOpen, setMobileOpen] = React.useState(false);
+
   const [powerSearch, setPowerSearch] = React.useState("");
+
   const [showPowerResults, setShowPowerResults] = React.useState(false);
+
   const powerInputRef = React.useRef<HTMLInputElement>(null);
+
   const [formatOpen, setFormatOpen] = React.useState(false);
+
   const [contactEmail, setContactEmail] = React.useState("");
+
   const [contactType, setContactType] = React.useState("question");
+
   const [contactTypeOpen, setContactTypeOpen] = React.useState(false);
+
   const contactTypeRef = React.useRef<HTMLDivElement>(null);
 
 
+
   const CONTACT_TYPES = [
+
     { value: "question", label: t("contact.types.question") },
+
     { value: "request", label: t("contact.types.request") },
+
     { value: "bug", label: t("contact.types.bug") },
+
     { value: "other", label: t("contact.types.other") },
+
   ];
+
   const [contactMessage, setContactMessage] = React.useState("");
+
   const isValidEmail = (email: string) => {
+
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
   };
+
   const [contactLoading, setContactLoading] = React.useState(false);
+
   const [contactSuccess, setContactSuccess] = React.useState(false);
 
   React.useEffect(() => {
+
     if (contactSuccess) {
+
       const timer = setTimeout(() => {
+
         setContactSuccess(false);
+
         setContactOpen(false);
+
       }, 2000);
 
       return () => clearTimeout(timer);
+
     }
+
   }, [contactSuccess]);
+
   const [contactError, setContactError] = React.useState("");
+
   const [honeypot, setHoneypot] = React.useState("");
 
 
+
   const getStoresForCountry = () => {
+
     const c = country.toUpperCase();
 
     const americas = ["US", "CA", "MX", "BR", "AR", "CL", "CO", "PE"];
+
     if (americas.includes(c)) {
+
       return ["sweetwater"];
+
     }
 
     if (c === "FR") {
+
       return ["woodbrass", "thomann"];
+
     }
 
     if (c === "NL") return ["thomann_nl"];
+
     if (c === "DE") return ["thomann_de"];
+
     if (c === "ES") return ["thomann_es"];
+
     if (c === "IT") return ["thomann_it"];
+
     if (c === "PT") return ["thomann_pt"];
 
     return ["thomann_de"];
+
   };
 
   const isDiscontinued =
+
     (selectedPedal?.status || "")
+
       .toLowerCase()
+
       .includes("discontinued");
 
   const hasPedalCommercialLinks = Boolean(
+
     selectedPedal?.sweetwater ||
+
     selectedPedal?.woodbrass ||
+
     selectedPedal?.thomann
+
   );
 
   const hasBoardCommercialLinks = Boolean(
+
     selectedBoardDetails?.sweetwater ||
+
     selectedBoardDetails?.woodbrass ||
+
     selectedBoardDetails?.thomann
+
   );
 
   const buildThomannUrl = (slug: string) => {
+
     const map: Record<string, string> = {
+
       FR: "thomann.fr",
+
       NL: "thomann.nl",
+
       DE: "thomann.de",
+
       ES: "thomann.es",
+
       IT: "thomann.it",
+
       PT: "thomann.pt",
+
     };
+
 
 
     const domain = map[country.toUpperCase()] || "thomann.de";
 
     return `https://www.${domain}/${slug}`;
+
   };
 
   React.useEffect(() => {
+
     if (showPedalResults) {
+
       pedalInputRef.current?.focus();
+
     }
+
   }, [showPedalResults]);
 
   React.useEffect(() => {
+
     if (showBoardResults) {
+
       boardInputRef.current?.focus();
+
     }
+
   }, [showBoardResults]);
 
   React.useEffect(() => {
+
     const handleClickOutside = (e: MouseEvent) => {
+
       const target = e.target as Node;
 
       if (bgRef.current && !bgRef.current.contains(target)) {
+
         setBgOpen(false);
+
       }
 
       if (langRef.current && !langRef.current.contains(target)) {
+
         setLangOpen(false);
+
       }
 
       if (contactTypeRef.current && !contactTypeRef.current.contains(target)) {
+
         setContactTypeOpen(false);
+
       }
 
       if (powerDropdownRef.current && !powerDropdownRef.current.contains(target)) {
+
         setShowPowerResults(false);
+
       }
+
     };
 
     document.addEventListener("mousedown", handleClickOutside);
+
     return () => {
+
       document.removeEventListener("mousedown", handleClickOutside);
+
     };
+
   }, []);
 
 
+
   const addPower = (p: any) => {
+
     const currentLastPedal = lastSelectedPedal; // On sauvegarde la pédale actuelle
+
     const powerItem = { ...p, type: "power" };
 
     setLastSelectedPower(powerItem);
+
     addPedal(powerItem);
 
     // On restaure immédiatement la pédale pour que le bouton bleu Pedal ne change pas
+
     if (currentLastPedal) {
+
       setTimeout(() => setLastSelectedPedal(currentLastPedal), 0);
+
     }
+
   };
 
   const groupItems = (items: AnyRow[], filter: string) => {
 
     return items.reduce((acc: Record<string, AnyRow[]>, item) => {
+
       if (filter) {
+
         const terms = filter
+
           .toLowerCase()
+
           .split(" ")
+
           .filter(Boolean);
 
         const haystack = `${item.brand ?? ""} ${item.name ?? ""} ${item.type ?? ""}`.toLowerCase();
 
 
+
         const matchesAll = terms.every((t) => haystack.includes(t));
 
         if (!matchesAll) {
+
           return acc;
+
         }
+
       }
+
+
 
 
 
       const key = item.brand || "Other";
 
       if (!acc[key]) acc[key] = [];
+
       acc[key].push(item);
 
       return acc;
+
     }, {});
+
   };
 
   return (
+
     <div
+
       className={`
+
   relative z-40 w-full lg:w-76 shrink-0
+
   bg-zinc-800
+
   px-6 pt-3 pb-6 flex flex-col gap-4
+
   overflow-hidden touch-pan-y
+
   h-full
+
 `}
+
       style={{ WebkitOverflowScrolling: "touch" }}
+
       onClick={(e) => {
+
         e.stopPropagation();
+
         setShowPedalResults(false);
+
         setShowBoardResults(false);
+
       }}
+
     >
 
       {/* Desktop logo only */}
+
       <div className="hidden lg:block">
+
         <SidebarLogo />
+
       </div>
 
 
+
       {contactOpen ? (
+
         <div className="flex flex-col gap-6 px-1">
 
           {/* CONTACT TITLE */}
+
           <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider mt-4">
+
             <Mail
+
               size={18}
+
               strokeWidth={2}
+
               className="shrink-0"
+
             />
 
             {t("contact.title")}
+
           </div>
 
           <>
+
             {/* EMAIL */}
+
             <div className="flex flex-col gap-1">
+
               <label className="text-[10px] uppercase tracking-wider font-bold">
+
                 {t("contact.email")}
+
               </label>
+
               <input
+
                 type="email"
+
                 value={contactEmail}
+
                 onChange={(e) => setContactEmail(e.target.value)}
+
                 className="bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-[11px] focus:border-blue-500 outline-none"
+
                 placeholder={t("contact.placeholderEmail")}
+
               />
+
             </div>
 
             {/* TYPE */}
+
             <div className="flex flex-col gap-1 relative" ref={contactTypeRef}>
+
               <label className="text-[10px] uppercase tracking-wider font-bold">
+
                 {t("contact.type")}
+
               </label>
 
               <button
+
                 type="button"
+
                 onClick={() => setContactTypeOpen((v) => !v)}
+
                 className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2
+
                text-[11px] text-left text-zinc-400
+
                flex items-center justify-between
+
                hover:border-zinc-600 transition-colors"
+
               >
+
                 <span>
+
                   {CONTACT_TYPES.find(t => t.value === contactType)?.label}
+
                 </span>
 
                 <ChevronDown
+
                   size={14}
+
                   className={`text-zinc-500 transition-transform ${contactTypeOpen ? "rotate-180" : ""
+
                     }`}
+
                 />
+
               </button>
 
               {contactTypeOpen && (
+
                 <div className="absolute top-full mt-1 w-full bg-zinc-950 border border-zinc-800 rounded-lg overflow-hidden z-50">
+
                   {CONTACT_TYPES.map((type) => (
+
                     <button
+
                       key={type.value}
+
                       onClick={() => {
+
                         setContactType(type.value);
+
                         setContactTypeOpen(false);
+
                       }}
+
                       className="w-full px-3 py-2 text-left text-[11px] hover:bg-canvas"
+
                     >
+
                       {type.label}
+
                     </button>
+
                   ))}
+
                 </div>
+
               )}
+
             </div>
 
             {/* MESSAGE */}
+
             <div className="flex flex-col gap-1">
+
               <label className="text-[10px] uppercase tracking-wider font-bold">
+
                 {t("contact.message")}
+
               </label>
+
               <textarea
+
                 value={contactMessage}
+
                 onChange={(e) => setContactMessage(e.target.value)}
+
                 rows={5}
+
                 className="bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-[11px] focus:border-blue-500 outline-none resize-none"
+
                 placeholder={t("contact.placeholderMessage")}
+
               />
+
             </div>
 
             {/* HONEYPOT (anti-spam) */}
+
             <input
+
               type="text"
+
               value={honeypot}
+
               onChange={(e) => setHoneypot(e.target.value)}
+
               style={{ display: "none" }}
+
               tabIndex={-1}
+
               autoComplete="off"
+
             />
 
             {contactError && (
+
               <div className="text-red-500 text-[11px] font-bold">
+
                 {contactError}
+
               </div>
+
             )}
 
             {/* SEND BUTTON */}
+
             <button
+
               disabled={contactLoading || contactSuccess}
+
               onClick={async () => {
+
                 setContactError("");
+
                 // Anti-spam check
+
                 if (honeypot) {
+
                   return;
+
                 }
 
                 if (!contactEmail || !contactMessage) {
+
                   setContactError(t("contact.errorRequired"));
+
                   return;
+
                 }
 
                 if (!isValidEmail(contactEmail)) {
+
                   setContactError(t("contact.errorInvalidEmail"));
+
                   return;
+
                 }
 
                 try {
+
                   setContactLoading(true);
 
                   const res = await fetch("/api/contact", {
+
                     method: "POST",
+
                     headers: { "Content-Type": "application/json" },
+
                     body: JSON.stringify({
+
                       email: contactEmail,
+
                       subject: "MakeYourBoard Contact",
+
                       message: contactMessage,
+
                       type: contactType,
+
                       honeypot,
+
                     }),
+
                   });
 
                   if (!res.ok) {
+
                     throw new Error("Failed to send message");
+
                   }
 
                   setContactSuccess(true);
+
                   setContactEmail("");
+
                   setContactMessage("");
+
                 } catch (err) {
+
                   setContactError(t("contact.errorGeneric"));
+
                 } finally {
+
                   setContactLoading(false);
+
                 }
+
               }}
+
               className={`w-full mt-2 text-[10px] font-black uppercase py-2 rounded-lg transition-all duration-300 ${contactSuccess
+
                 ? "bg-emerald-500 text-white animate-in zoom-in duration-300"
+
                 : contactLoading
+
                   ? "bg-zinc-700 text-zinc-400 cursor-not-allowed"
+
                   : "bg-blue-600 hover:bg-blue-500 !text-white"
+
                 }`}
+
             >
+
               {contactSuccess
+
                 ? `✓ ${t("contact.sent")}`
+
                 : contactLoading
+
                   ? t("contact.sending")
+
                   : t("contact.send")}
+
             </button>
+
           </>
+
         </div>
 
       ) : selectedPedal && (
+
         selectedPedal.type === "power" || selectedPedal.capacity
+
       ) ? (
 
         <SpecsPower
+
           selectedPower={selectedPedal}
+
           units={units}
+
           language={language}
+
           t={t}
+
           isUSA={isUSA}
+
           isEurope={isEurope}
+
           buildThomannUrl={buildThomannUrl}
+
           selectedInstanceId={selectedInstanceId}
+
           rotatePedal={rotatePedal}
+
           movePedalFront={movePedalFront}
+
           movePedalBack={movePedalBack}
+
           deletePedal={deletePedal}
+
         />
 
       ) : selectedPedal ? (
 
         <SpecsPedal
+
           selectedPedal={selectedPedal}
+
           selectedInstanceId={selectedInstanceId}
+
           units={units}
+
           language={language}
+
           t={t}
+
           isCustomPedal={isCustomPedal}
+
           isImportedPedal={isImportedPedal}
+
           isUSA={isUSA}
+
           isEurope={isEurope}
+
           buildThomannUrl={buildThomannUrl}
+
         />
 
       ) : selectedBoardDetails ? (
 
         <SpecsBoards
+
           selectedBoardDetails={selectedBoardDetails}
+
           units={units}
+
           language={language}
+
           t={t}
+
           isCustomBoard={isCustomBoard}
+
           buildThomannUrl={buildThomannUrl}
+
           getStoresForCountry={getStoresForCountry}
+
           hasBoardCommercialLinks={hasBoardCommercialLinks}
+
           selectedBoardInstanceId={selectedBoardInstanceId}
+
           rotateBoard={rotateBoard}
+
           moveBoardFront={moveBoardFront}
+
           moveBoardBack={moveBoardBack}
+
           deleteBoard={deleteBoard}
+
           isUSA={isUSA}
+
           isEurope={isEurope}
+
         />
 
       ) : (
 
         // LIBRARY (default view)
+
         <div className="px-1 mt-4 flex flex-col gap-4 flex-1 min-h-0 overflow-visible">
 
           <div className="shrink-0">
+
             <div
+
               className={
+
                 isMobile
+
                   ? "flex items-center justify-between w-full overflow-visible"
+
                   : "grid grid-cols-5 gap-1.5 p-0 overflow-visible"
+
               }
+
             >
+
               {
+
                 [
+
                   {
+
                     key: "pedals",
+
                     label: t("sidebar.pedals"),
+
                     lightImage: "/images/tab-pedal2-light.webp",
+
                     darkImage: "/images/tab-pedal2-dark.webp",
+
                   },
+
                   {
+
                     key: "boards",
+
                     label: t("sidebar.boards"),
+
                     lightImage: "/images/tab-board-light.webp",
+
                     darkImage: "/images/tab-board-dark.webp",
+
                   },
+
                   {
+
                     key: "power",
+
                     label: t("sidebar.power"),
+
                     lightImage: "/images/tab-power2-light.webp",
+
                     darkImage: "/images/tab-power2-dark.webp",
+
                   },
+
                   {
+
                     key: "custom",
+
                     label: t("sidebar.custom"),
+
                     lightImage: "/images/tab-custom-light-v3.webp",
+
                     darkImage: "/images/tab-custom-dark-v3.webp",
+
                   },
+
                   {
+
                     key: "import",
+
                     label: t("sidebar.import"),
+
                     lightImage: "/images/tab-import-v3.webp",
+
                     darkImage: "/images/tab-import-dark-v3.webp",
+
                   },
+
                 ]
 
                   .map((tab) => {
+
                     const active = activeSidebarTab === tab.key;
 
                     const tabStyle: Record<
+
                       string,
+
                       {
+
                         background: string;
+
                       }
+
                     > = {
+
                       pedals: {
+
                         background: "#F4F2FF",
+
                       },
 
                       boards: {
+
                         background: "#F2F7FC",
+
                       },
 
                       power: {
+
                         background: "#FFF7DC",
+
                       },
 
                       custom: {
+
                         background: "#FFF0E7",
+
                       },
 
                       import: {
+
                         background: "#ECF9EF",
+
                       },
+
                     };
 
                     const style = tabStyle[tab.key];
 
                     return (
+
                       <button
+
                         key={tab.key}
+
                         type="button"
+
                         onClick={() => {
+
                           setActiveSidebarTab(tab.key as any);
+
                           setShowPedalResults(false);
+
                           setShowBoardResults(false);
+
                           setShowPowerResults(false);
+
                         }}
+
                         style={{
+
                           width: isMobile ? "64px" : "100%",
+
                           height: isMobile ? "64px" : undefined,
+
                           aspectRatio: isMobile ? undefined : "1 / 1",
+
                           borderRadius: "14px",
+
                           background: style.background,
 
                           border: "1px solid rgba(0,0,0,0.035)",
 
                           boxShadow: active
+
                             ? "0 0 0 1px #2563eb"
+
                             : "none",
 
                           transform: "scale(1)",
 
                           transition:
+
                             "transform 140ms ease-out, border-color 140ms ease-out, box-shadow 140ms ease-out",
+
                         }}
+
                         onMouseEnter={(e) => {
+
                           e.currentTarget.style.transform = "scale(1.05)";
+
                         }}
+
                         onMouseLeave={(e) => {
+
                           e.currentTarget.style.transform = "scale(1)";
+
                         }}
+
                         className="
+
         min-w-0
+
         flex
+
         items-center
+
         justify-center
+
         select-none
+
         touch-manipulation
+
         [-webkit-tap-highlight-color:transparent]
+
       "
+
                       >
+
                         <img
+
                           src={tab.darkImage}
+
                           alt=""
+
                           aria-hidden="true"
+
                           draggable={false}
+
                           className="
+
           w-[28px]
+
           h-[28px]
+
           object-contain
+
           pointer-events-none
+
           select-none
+
         "
+
                         />
+
                       </button>
+
                     );
+
                   })
+
               }
+
             </div>
+
           </div>
 
           {activeSidebarTab === "pedals" && (
+
             <SearchPedals
+
               pedalsLibrary={pedalsLibrary}
+
               pedalSearch={pedalSearch}
+
               setPedalSearch={setPedalSearch}
+
               showPedalResults={showPedalResults}
+
               setShowPedalResults={setShowPedalResults}
+
               setShowBoardResults={setShowBoardResults}
+
               addPedal={(p) => {
+
                 setLastSelectedPedal(p);
+
                 addPedal(p);
+
               }}
+
               pedalInputRef={pedalInputRef}
+
               t={t}
+
               groupItems={groupItems}
+
             />
+
           )}
 
           {activeSidebarTab === "boards" && (
+
             <SearchBoards
+
               boardsLibrary={boardsLibrary}
+
               boardSearch={boardSearch}
+
               setBoardSearch={setBoardSearch}
+
               showBoardResults={showBoardResults}
+
               setShowBoardResults={setShowBoardResults}
+
               setShowPedalResults={setShowPedalResults}
+
               selectBoard={selectBoard}
+              selectSuggestedBoard={selectSuggestedBoard}
+              finderPedals={finderPedals}
+              existingBoards={existingBoards}
+              units={units}
+
               boardInputRef={boardInputRef}
+
               t={t}
+
               groupItems={groupItems}
+
             />
+
           )}
 
           {activeSidebarTab === "power" && (
+
             <SearchPower
+
               powerLibrary={powerLibrary}
+
               powerSearch={powerSearch}
+
               setPowerSearch={setPowerSearch}
+
               showPowerResults={showPowerResults}
+
               setShowPowerResults={setShowPowerResults}
+
               setShowPedalResults={setShowPedalResults}
+
               setShowBoardResults={setShowBoardResults}
+
               addPower={(p) => {
+
                 addPower(p);
+
               }}
+
               powerInputRef={powerInputRef}
+
               powerDropdownRef={powerDropdownRef}
+
               t={t}
+
               groupItems={groupItems}
+
             />
+
           )}
 
           {activeSidebarTab === "custom" && (
+
             <CustomBuilder
+
               customType={customType}
+
               setCustomType={setCustomType}
+
               customName={customName}
+
               setCustomName={setCustomName}
+
               customColor={customColor}
+
               setCustomColor={setCustomColor}
+
               customWidth={customWidth}
+
               setCustomWidth={setCustomWidth}
+
               customDepth={customDepth}
+
               setCustomDepth={setCustomDepth}
+
               addCustomItem={addCustomItem}
+
               isPedalValid={isPedalValid}
+
               isBoardValid={isBoardValid}
+
               minValue={minValue}
+
               maxValue={maxValue}
+
               displayMin={displayMin}
+
               displayMax={displayMax}
+
               units={units}
+
               unitLabel={unitLabel}
+
               withUnit={withUnit}
+
               t={t}
+
             />
+
           )}
 
           {activeSidebarTab === "import" && (
+
             <ImportBuilder
+
               addCustomItem={addCustomItem}
+
               units={units}
+
               withUnit={withUnit}
+
               t={t}
+
             />
+
           )}
+
+
+
 
 
 
 
         </div>
+
       )}
+
       {/* PUSH TO BOTTOM (desktop only) */}
+
       <div className="mt-auto" />
 
     </div>
-  );
-}
 
+  );
+
+}

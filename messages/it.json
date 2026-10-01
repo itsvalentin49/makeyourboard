@@ -441,5 +441,20 @@
     "black": "Nero",
     "wood": "Legno",
     "aluminium": "Alluminio"
+  },
+  "boardFinder": {
+    "button": "Trova la mia pedalboard",
+    "subtitle": "Trova una pedalboard adatta ai tuoi {count} pedali.",
+    "title": "Trova la mia pedalboard",
+    "back": "Torna alle pedalboard",
+    "pedals": "{count} pedali sul canvas",
+    "required": "Spazio necessario: {width} × {depth}",
+    "clearance": "Spazio per jack e cavi incluso.",
+    "results": "{count} pedalboard compatibili per dimensioni",
+    "fits": "Dimensioni compatibili",
+    "noResults": "Nessuna pedalboard si adatta a questa disposizione. Avvicina i pedali.",
+    "missingDimensions": "Mancano le dimensioni di alcuni pedali. Controlla le specifiche.",
+    "overlap": "Alcuni pedali o spazi per i cavi si sovrappongono. Distanziali prima della ricerca.",
+    "multipleBoards": "La V1 può sostituire una sola pedalboard. Rimuovi quelle aggiuntive prima di scegliere."
   }
 }

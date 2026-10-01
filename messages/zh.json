@@ -441,5 +441,20 @@
     "black": "黑色",
     "wood": "木质",
     "aluminum": "铝制"
+  },
+  "boardFinder": {
+    "button": "查找合适的效果器板",
+    "subtitle": "为你的 {count} 块效果器寻找合适的效果器板。",
+    "title": "查找效果器板",
+    "back": "返回效果器板列表",
+    "pedals": "画布上有 {count} 块效果器",
+    "required": "所需空间：{width} × {depth}",
+    "clearance": "已包含接口和线缆所需空间。",
+    "results": "{count} 款尺寸兼容的效果器板",
+    "fits": "尺寸兼容",
+    "noResults": "没有适合当前布局的效果器板。请将效果器摆放得更紧凑。",
+    "missingDimensions": "部分效果器缺少尺寸数据，请检查其规格。",
+    "overlap": "效果器或线缆预留区域重叠，请调整间距后重试。",
+    "multipleBoards": "V1 只能替换一块效果器板，请先移除多余的效果器板。"
   }
 }

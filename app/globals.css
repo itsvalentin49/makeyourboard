@@ -178,40 +178,44 @@ body {
   border-color: var(--zinc-800) !important;
 }
 
+
+
 /* =========================
-   HOVER
+   ZINC HOVER — ALL SHADES
    ========================= */
 
-/* DARK (default) */
-html:not(.light) .hover\:bg-zinc-900:hover {
-  background-color: var(--zinc-600) !important;
-}
-
-/* LIGHT */
-.light .hover\:bg-zinc-900:hover {
+html [class~="hover:bg-zinc-200"]:hover {
   background-color: var(--zinc-200) !important;
 }
 
-/* autres hover */
-html:not(.light) .hover\:bg-zinc-800:hover {
-  background-color: var(--zinc-700) !important;
-}
-
-.light .hover\:bg-zinc-800:hover {
+html [class~="hover:bg-zinc-300"]:hover {
   background-color: var(--zinc-300) !important;
 }
 
-.light .hover\:bg-zinc-700:hover {
-  background-color: var(--zinc-200) !important;
+html [class~="hover:bg-zinc-400"]:hover {
+  background-color: var(--zinc-400) !important;
 }
 
-.hover\:border-blue-500:hover {
-  border-color: var(--blue) !important;
+html [class~="hover:bg-zinc-500"]:hover {
+  background-color: var(--zinc-500) !important;
 }
 
-.hover\:border-zinc-700:hover {
-  border-color: var(--zinc-700) !important;
+html [class~="hover:bg-zinc-600"]:hover {
+  background-color: var(--zinc-600) !important;
 }
+
+html [class~="hover:bg-zinc-700"]:hover {
+  background-color: var(--zinc-700) !important;
+}
+
+html [class~="hover:bg-zinc-800"]:hover {
+  background-color: var(--zinc-800) !important;
+}
+
+html [class~="hover:bg-zinc-900"]:hover {
+  background-color: var(--zinc-900) !important;
+}
+
 
 /* =========================
    INPUT FIX
@@ -471,4 +475,14 @@ html.light .hover\:bg-green-600:hover {
   .pedalboard-row-hover:hover {
     border-color: var(--zinc-500) !important;
   }
+}
+
+/* HOVER ZINC — DARK */
+html:not(.light) .hover\:bg-zinc-300:hover {
+  background-color: var(--zinc-300) !important;
+}
+
+/* HOVER ZINC — LIGHT */
+.light .hover\:bg-zinc-300:hover {
+  background-color: var(--zinc-300) !important;
 }

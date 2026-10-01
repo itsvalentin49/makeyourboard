@@ -170,18 +170,10 @@ export default function SearchPedals({
 
   return (
     <div className="flex flex-col mt-4 h-full min-h-0">
-      {/* COMPTEUR AU-DESSUS DE LA BARRE DE RECHERCHE */}
+      {/* TITRE AU-DESSUS DE LA BARRE DE RECHERCHE */}
       <div className="px-1 mb-2 shrink-0">
         <div className="text-[11px] font-black uppercase tracking-wide">
-          {isSearching
-            ? t("pedalsMenu.results").replace(
-              "{count}",
-              String(visiblePedals.length)
-            )
-            : t("pedalsMenu.count").replace(
-              "{count}",
-              String(pedalsLibrary.length)
-            )}
+          {t("pedalsMenu.title")}
         </div>
       </div>
 
@@ -257,7 +249,7 @@ export default function SearchPedals({
       <div className="flex flex-col gap-1 min-h-0 flex-1 overflow-hidden">
         {/* TEXTE NOUVEAUTÉS */}
         {!isSearching && (
-          <div className="px-1 shrink-0 text-[10px] font-bold text-zinc-500">
+          <div className="px-1 shrink-0 text-[10px] font-bold">
             {t("pedalsMenu.latest")}
           </div>
         )}

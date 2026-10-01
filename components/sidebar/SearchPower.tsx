@@ -25,17 +25,13 @@ type Props = {
 
 const POPULAR_POWER_SUPPLIES = [
   "Cioks DC7 V2",
-  "Strymon Zuma",
   "Voodoo Lab Pedal Power 3",
-  "Cioks Sol",
   "Strymon Ojai",
   "Truetone 1 SPOT Pro CS6",
   "Harley Benton PowerPlant ISO-2 Pro",
   "Voodoo Lab Pedal Power X8",
   "MXR DC Brick | M237",
   "Truetone 1 SPOT Pro CS12",
-  "Walrus Audio Canvas Power HP",
-  "Fender Engine Room LVL8",
 ];
 
 function normalize(value: any) {
@@ -143,18 +139,10 @@ export default function SearchPower({
 
   return (
     <div className="flex flex-col mt-4 h-full min-h-0">
-      {/* COMPTEUR AU-DESSUS DE LA BARRE DE RECHERCHE */}
+      {/* TITLE */}
       <div className="px-1 mb-2 shrink-0">
         <div className="text-[11px] font-black uppercase tracking-wide">
-          {isSearching
-            ? t("powerMenu.results").replace(
-              "{count}",
-              String(visiblePower.length)
-            )
-            : t("powerMenu.count").replace(
-              "{count}",
-              String(powerLibrary.length)
-            )}
+          {t("powerMenu.title")}
         </div>
       </div>
 
@@ -233,7 +221,7 @@ export default function SearchPower({
       <div className="flex flex-col gap-1 min-h-0 flex-1 overflow-hidden">
         {/* TEXTE ALIMENTATIONS POPULAIRES */}
         {!isSearching && (
-          <div className="px-1 shrink-0 text-[10px] font-bold text-zinc-500">
+          <div className="px-1 shrink-0 text-[10px] font-bold">
             {t("powerMenu.popular")}
           </div>
         )}

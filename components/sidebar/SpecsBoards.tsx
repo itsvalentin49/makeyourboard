@@ -235,12 +235,32 @@ export default function BoardSpecs({
   isCustomBoard,
   buildThomannUrl,
 }: Props) {
-  /*
-    Les boards Custom sont uniquement manipulés
-    depuis les boutons d’action du canvas.
+  const [isLightTheme, setIsLightTheme] =
+    React.useState(true);
 
-    Aucun contenu n’est affiché dans la sidebar.
-  */
+  React.useEffect(() => {
+    const html = document.documentElement;
+
+    const updateTheme = () => {
+      setIsLightTheme(
+        html.classList.contains("light")
+      );
+    };
+
+    updateTheme();
+
+    const observer =
+      new MutationObserver(updateTheme);
+
+    observer.observe(html, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
   if (
     !selectedBoardDetails ||
     isCustomBoard
@@ -365,23 +385,38 @@ export default function BoardSpecs({
       "
     >
       {/* HERO BOARD */}
+
       <div className="shrink-0 flex flex-col items-center pt-2">
         {image && (
           <div className="w-full min-h-[150px] flex items-center justify-center mb-4">
-            <img
-              src={image}
-              alt={`${brand} ${name}`}
-              className="object-contain"
+
+            <div
+              className="flex items-center justify-center rounded-lg"
               style={{
-                width: "200px",
-                height: "auto",
-                maxHeight: "145px",
-                maxWidth: "100%",
+                width: "250px",
+                paddingTop: "20px",
+                paddingBottom: "20px",
+                backgroundColor: isLightTheme
+                  ? "transparent"
+                  : "#e5e7eb",
               }}
-              loading="lazy"
-              decoding="async"
-              draggable={false}
-            />
+            >
+              <img
+                src={image}
+                alt={`${brand} ${name}`}
+                className="object-contain"
+                style={{
+                  width: "200px",
+                  height: "auto",
+                  maxHeight: "145px",
+                  maxWidth: "100%",
+                }}
+                loading="lazy"
+                decoding="async"
+                draggable={false}
+              />
+            </div>
+
           </div>
         )}
 
