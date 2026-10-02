@@ -273,27 +273,10 @@ export default function SearchBoards({
       ? `${(width / 25.4).toFixed(1)} × ${(depth / 25.4).toFixed(1)} in`
       : `${Math.ceil(width)} × ${Math.ceil(depth)} mm`;
 
-  const translateOrFallback = (
-    key: string,
-    fallback: string
-  ) => {
-    const value = t(key);
-
-    return value === key || !value
-      ? fallback
-      : value;
-  };
-
   const pedalLabel =
     pedalCount === 1
-      ? translateOrFallback(
-        "boardFinder.pedalLabel",
-        "pédale"
-      )
-      : translateOrFallback(
-        "boardFinder.pedalsLabel",
-        "pédales"
-      );
+      ? t("boardFinder.pedalLabel")
+      : t("boardFinder.pedalsLabel");
 
   /* =========================
      NAVIGATION
@@ -414,8 +397,6 @@ export default function SearchBoards({
                 }}
 
                 className="absolute right-4 flex items-center justify-center text-[#6f6a5d] hover:opacity-70 transition-opacity"
-
-                aria-label="Effacer la recherche"
               >
                 <X
                   size={15}
@@ -543,10 +524,7 @@ export default function SearchBoards({
 
             className="mb-2 flex items-center gap-2 py-1 text-[11px] font-bold cursor-pointer"
 
-            aria-label={translateOrFallback(
-              "boardFinder.back",
-              "Retour"
-            )}
+            aria-label={t("boardFinder.back")}
           >
 
             <ArrowLeft
@@ -555,10 +533,7 @@ export default function SearchBoards({
             />
 
             <span>
-              {translateOrFallback(
-                "boardFinder.back",
-                "Retour"
-              )}
+              {t("boardFinder.back")}
             </span>
 
           </button>
@@ -598,11 +573,7 @@ export default function SearchBoards({
               <div className="min-w-0">
 
                 <div className="text-[10px] font-black leading-snug uppercase text-[#14532d]">
-
-                  {translateOrFallback(
-                    "boardFinder.resultsFound",
-                    "{count} pedalboards adaptés à votre configuration"
-                  ).replace(
+                  {t("boardFinder.resultsFound").replace(
                     "{count}",
                     String(matchCount)
                   )}
@@ -639,10 +610,7 @@ export default function SearchBoards({
               />
 
               <span>
-                {translateOrFallback(
-                  "boardFinder.noMatch",
-                  "Aucun pedalboard ne convient à votre configuration. Envisagez un modèle sur mesure ou plusieurs pedalboards."
-                )}
+                {t("boardFinder.noMatch")}
               </span>
 
             </div>
@@ -827,16 +795,8 @@ export default function SearchBoards({
                 {showCompatibilityCheck && (
                   <div
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-green-500"
-
-                    aria-label={translateOrFallback(
-                      "boardFinder.compatible",
-                      "Compatible"
-                    )}
-
-                    title={translateOrFallback(
-                      "boardFinder.compatible",
-                      "Compatible"
-                    )}
+                    aria-label={t("boardFinder.compatible")}
+                    title={t("boardFinder.compatible")}
                   >
 
                     <CheckCircle2

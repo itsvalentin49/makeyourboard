@@ -338,30 +338,30 @@
       "individualOthers": "Versorge die Pedale {pedals} über separate Ausgänge. Ein eigener Ausgang für jedes Pedal reduziert das Risiko von Störgeräuschen, insbesondere bei digitalen Pedalen."
     }
   },
-  "search": {
-    "noResults": "Keine Ergebnisse"
-  },
   "pedalsMenu": {
     "title": "Pedale",
     "searchPlaceholder": "Suchen...",
     "count": "{count} Pedale",
+    "result": "{count} Ergebnis",
     "results": "{count} Ergebnisse",
-    "latest": "Hier sind die neuesten veröffentlichten Pedale.",
-    "new": "NEW",
+    "latest": "Hier sind die neuesten Ergänzungen.",
+    "new": "NEU",
     "newReleases": "Neuheiten"
   },
   "boardsMenu": {
     "title": "Pedalboards",
     "searchPlaceholder": "Suchen...",
     "count": "{count} Pedalboards",
-    "popular": "Die beliebtesten Pedalboards.",
+    "popular": "Meistgenutzte Pedalboards.",
+    "result": "{count} Ergebnis",
     "results": "{count} Ergebnisse"
   },
   "powerMenu": {
-    "title": "Netzteile",
+    "title": "Stromversorgungen",
     "searchPlaceholder": "Suchen...",
-    "count": "{count} Netzteile",
-    "popular": "Die beliebtesten Netzteile.",
+    "count": "{count} Stromversorgungen",
+    "popular": "Meistgenutzte Stromversorgungen.",
+    "result": "{count} Ergebnis",
     "results": "{count} Ergebnisse"
   },
   "customMenu": {
@@ -443,18 +443,17 @@
     "aluminium": "Aluminium"
   },
   "boardFinder": {
-    "button": "Pedalboard finden",
-    "subtitle": "Finde ein Board für deine {count} Pedale.",
-    "title": "Pedalboard finden",
-    "back": "Zurück zu den Pedalboards",
-    "pedals": "{count} Pedale auf der Arbeitsfläche",
-    "required": "Benötigter Platz: {width} × {depth}",
-    "clearance": "Platz für Buchsen und Kabel ist berücksichtigt.",
-    "results": "{count} Pedalboards mit passenden Abmessungen",
-    "fits": "Abmessungen passen",
-    "noResults": "Kein Board passt zu dieser Anordnung. Schiebe die Pedale näher zusammen.",
-    "missingDimensions": "Bei einigen Pedalen fehlen die Abmessungen. Prüfe ihre technischen Daten.",
-    "overlap": "Pedale oder Kabel-Freiräume überlappen sich. Vergrößere die Abstände.",
-    "multipleBoards": "V1 kann nur ein Board ersetzen. Entferne weitere Boards, bevor du auswählst."
+    "button": "Pedalboard Finder",
+    "subtitle": "Finde das passende Pedalboard.",
+    "back": "Zurück",
+    "pedalLabel": "Pedal",
+    "pedalsLabel": "Pedale",
+    "resultsFound": "{count} kompatible Pedalboards",
+    "overlap": "Der Abstand zwischen einigen Pedalen scheint für die Verkabelung nicht auszureichen. Prüfe im Tab Kabel, welche Bereiche angepasst werden müssen.",
+    "multipleBoards": "Dieses Werkzeug kann nur ein Pedalboard ersetzen. Entferne zusätzliche Pedalboards, bevor du ein Ergebnis auswählst.",
+    "noMatchTitle": "Kein kompatibles Pedalboard",
+    "rearrange": "Neue Anordnung erforderlich",
+    "compatible": "Kompatibel",
+    "noMatch": "Kein Pedalboard passt zu deiner Konfiguration. Ziehe ein maßgefertigtes Modell oder mehrere Pedalboards in Betracht."
   }
 }

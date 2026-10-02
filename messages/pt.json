@@ -338,23 +338,22 @@
       "individualOthers": "Alimente os pedais {pedals} por saídas individuais. Usar uma saída dedicada para cada pedal reduz o risco de ruídos indesejados, especialmente com pedais digitais."
     }
   },
-  "search": {
-    "noResults": "Sem resultados"
-  },
   "pedalsMenu": {
     "title": "Pedais",
     "searchPlaceholder": "Pesquisar...",
     "count": "{count} pedais",
+    "result": "{count} resultado",
     "results": "{count} resultados",
-    "latest": "Aqui estão os pedais lançados mais recentemente.",
-    "new": "NEW",
+    "latest": "Aqui estão as novidades mais recentes.",
+    "new": "NOVO",
     "newReleases": "Novidades"
   },
   "boardsMenu": {
     "title": "Pedalboards",
     "searchPlaceholder": "Pesquisar...",
     "count": "{count} pedalboards",
-    "popular": "Pedalboards mais utilizadas.",
+    "popular": "Pedalboards mais utilizados.",
+    "result": "{count} resultado",
     "results": "{count} resultados"
   },
   "powerMenu": {
@@ -362,6 +361,7 @@
     "searchPlaceholder": "Pesquisar...",
     "count": "{count} fontes de alimentação",
     "popular": "Fontes de alimentação mais utilizadas.",
+    "result": "{count} resultado",
     "results": "{count} resultados"
   },
   "customMenu": {
@@ -443,18 +443,17 @@
     "aluminum": "Alumínio"
   },
   "boardFinder": {
-    "button": "Encontrar a minha pedalboard",
-    "subtitle": "Encontra uma pedalboard para os teus {count} pedais.",
-    "title": "Encontrar a minha pedalboard",
-    "back": "Voltar às pedalboards",
-    "pedals": "{count} pedais na área de trabalho",
-    "required": "Espaço necessário: {width} × {depth}",
-    "clearance": "Inclui espaço para jacks e cabos.",
-    "results": "{count} pedalboards compatíveis em dimensões",
-    "fits": "Dimensões compatíveis",
-    "noResults": "Nenhuma pedalboard comporta esta disposição. Aproxima os pedais.",
-    "missingDimensions": "Alguns pedais não têm dimensões definidas. Verifica as especificações.",
-    "overlap": "Os pedais ou os espaços para cabos sobrepõem-se. Afasta-os antes da pesquisa.",
-    "multipleBoards": "A V1 só substitui uma pedalboard. Remove as adicionais antes de escolher."
+    "button": "Pedalboard Finder",
+    "subtitle": "Encontre a pedalboard ideal.",
+    "back": "Voltar",
+    "pedalLabel": "Pedal",
+    "pedalsLabel": "Pedais",
+    "resultsFound": "{count} pedalboards compatíveis",
+    "overlap": "O espaço entre alguns pedais parece insuficiente para a cablagem. Consulte o separador Cabos para identificar as áreas a corrigir.",
+    "multipleBoards": "Esta ferramenta só pode substituir uma pedalboard. Remova as pedalboards adicionais antes de selecionar um resultado.",
+    "noMatchTitle": "Nenhuma pedalboard compatível",
+    "rearrange": "Reorganização necessária",
+    "compatible": "Compatível",
+    "noMatch": "Nenhuma pedalboard é adequada para a sua configuração. Considere um modelo personalizado ou várias pedalboards."
   }
 }

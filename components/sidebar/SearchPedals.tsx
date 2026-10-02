@@ -44,7 +44,7 @@ function isNewPedal(value: any): boolean {
   today.setHours(0, 0, 0, 0);
 
   const limitDate = new Date(today);
-  limitDate.setDate(today.getDate() - 60);
+  limitDate.setDate(today.getDate() - 30);
 
   releaseDate.setHours(0, 0, 0, 0);
 
@@ -80,13 +80,24 @@ export default function SearchPedals({
 
     return pedalsLibrary
       .filter((pedal) => {
-        const haystack = `
-          ${pedal.brand ?? ""}
-          ${pedal.name ?? ""}
-          ${pedal.type ?? ""}
-        `.toLowerCase();
+        const rawType = String(
+          pedal.type ?? ""
+        );
 
-        return terms.every((term) => haystack.includes(term));
+        const translatedType = t(
+          `pedal.type.${rawType}`
+        );
+
+        const haystack = `
+      ${pedal.brand ?? ""}
+      ${pedal.name ?? ""}
+      ${rawType}
+      ${translatedType}
+    `.toLowerCase();
+
+        return terms.every((term) =>
+          haystack.includes(term)
+        );
       })
       .sort((a, b) => {
         const brandA = String(a.brand || "").toLowerCase();
@@ -166,7 +177,7 @@ export default function SearchPedals({
           }
         );
       });
-  }, [pedalsLibrary, search, isSearching]);
+  }, [pedalsLibrary, search, isSearching, t]);
 
   return (
     <div className="flex flex-col mt-4 h-full min-h-0">

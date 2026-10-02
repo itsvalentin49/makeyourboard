@@ -341,15 +341,13 @@
       "individualOthers": "Power the {pedals} from individual outputs. Using a dedicated output for each pedal reduces the risk of unwanted noise, especially with digital pedals."
     }
   },
-  "search": {
-    "noResults": "No results"
-  },
   "pedalsMenu": {
     "title": "Pedals",
     "searchPlaceholder": "Search...",
     "count": "{count} pedals",
+    "result": "{count} result",
     "results": "{count} results",
-    "latest": "Here are the latest pedal releases.",
+    "latest": "Here are the latest additions.",
     "new": "NEW",
     "newReleases": "New Releases"
   },
@@ -358,6 +356,7 @@
     "searchPlaceholder": "Search...",
     "count": "{count} pedalboards",
     "popular": "Most used pedalboards.",
+    "result": "{count} result",
     "results": "{count} results"
   },
   "powerMenu": {
@@ -365,6 +364,7 @@
     "searchPlaceholder": "Search...",
     "count": "{count} power supplies",
     "popular": "Most used power supplies.",
+    "result": "{count} result",
     "results": "{count} results"
   },
   "customMenu": {
@@ -446,11 +446,16 @@
   },
   "boardFinder": {
     "button": "Pedalboard Finder",
-    "subtitle": "Based on your current pedal layout.",
-    "currentLayout": "Your setup",
-    "fits": "Boards that fit your pedals",
-    "overlap": "Some pedals overlap. Check their spacing before assembly.",
-    "multipleBoards": "This tool can replace only one pedalboard. Remove extra boards before selecting a result.",
-    "pedalsLabel": "Pedals"
+    "subtitle": "Find the ideal pedalboard.",
+    "back": "Back",
+    "pedalLabel": "Pedal",
+    "pedalsLabel": "Pedals",
+    "resultsFound": "{count} compatible pedalboards",
+    "overlap": "The space between some pedals seems insufficient for cabling. Check the Cables tab to identify the areas to adjust.",
+    "multipleBoards": "This tool can replace only one pedalboard. Remove the additional boards before selecting a result.",
+    "noMatchTitle": "No compatible pedalboard",
+    "rearrange": "Rearrangement required",
+    "compatible": "Compatible",
+    "noMatch": "No pedalboard fits your configuration. Consider a custom model or multiple pedalboards."
   }
 }

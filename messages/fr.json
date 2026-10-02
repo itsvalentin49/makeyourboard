@@ -339,9 +339,6 @@
       "individualOthers": "Alimentez les {pedals} sur des sorties individuelles. Utiliser une sortie dédiée pour chaque pédale limite les risques de bruits parasites, notamment avec les pédales numériques."
     }
   },
-  "search": {
-    "noResults": "Aucun résultat"
-  },
   "pedalsMenu": {
     "title": "Pédales",
     "searchPlaceholder": "Rechercher...",

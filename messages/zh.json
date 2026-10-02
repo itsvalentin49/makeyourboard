@@ -338,23 +338,22 @@
       "individualOthers": "使用独立输出为 {pedals} 供电。每块效果器使用独立输出可以降低产生杂音的风险，尤其是数字效果器。"
     }
   },
-  "search": {
-    "noResults": "无结果"
-  },
   "pedalsMenu": {
     "title": "效果器",
     "searchPlaceholder": "搜索...",
     "count": "{count} 个效果器",
+    "result": "{count} 个结果",
     "results": "{count} 个结果",
-    "latest": "以下是最新发布的效果器。",
-    "new": "新品",
-    "newReleases": "新品发布"
+    "latest": "以下是最新上架的产品。",
+    "new": "新",
+    "newReleases": "新品"
   },
   "boardsMenu": {
     "title": "效果器板",
     "searchPlaceholder": "搜索...",
     "count": "{count} 个效果器板",
     "popular": "最常用的效果器板。",
+    "result": "{count} 个结果",
     "results": "{count} 个结果"
   },
   "powerMenu": {
@@ -362,6 +361,7 @@
     "searchPlaceholder": "搜索...",
     "count": "{count} 个电源",
     "popular": "最常用的电源。",
+    "result": "{count} 个结果",
     "results": "{count} 个结果"
   },
   "customMenu": {
@@ -443,18 +443,17 @@
     "aluminum": "铝制"
   },
   "boardFinder": {
-    "button": "查找合适的效果器板",
-    "subtitle": "为你的 {count} 块效果器寻找合适的效果器板。",
-    "title": "查找效果器板",
-    "back": "返回效果器板列表",
-    "pedals": "画布上有 {count} 块效果器",
-    "required": "所需空间：{width} × {depth}",
-    "clearance": "已包含接口和线缆所需空间。",
-    "results": "{count} 款尺寸兼容的效果器板",
-    "fits": "尺寸兼容",
-    "noResults": "没有适合当前布局的效果器板。请将效果器摆放得更紧凑。",
-    "missingDimensions": "部分效果器缺少尺寸数据，请检查其规格。",
-    "overlap": "效果器或线缆预留区域重叠，请调整间距后重试。",
-    "multipleBoards": "V1 只能替换一块效果器板，请先移除多余的效果器板。"
+    "button": "效果器板查找器",
+    "subtitle": "找到最合适的效果器板。",
+    "back": "返回",
+    "pedalLabel": "效果器",
+    "pedalsLabel": "效果器",
+    "resultsFound": "{count} 个兼容的效果器板",
+    "overlap": "部分效果器之间的空间可能不足以进行布线。请查看“线缆”选项卡以确定需要调整的位置。",
+    "multipleBoards": "此工具一次只能替换一个效果器板。请选择结果前先移除多余的效果器板。",
+    "noMatchTitle": "没有兼容的效果器板",
+    "rearrange": "需要重新排列",
+    "compatible": "兼容",
+    "noMatch": "没有适合当前配置的效果器板。请考虑定制型号或使用多个效果器板。"
   }
 }

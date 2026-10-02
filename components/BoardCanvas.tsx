@@ -4254,10 +4254,25 @@ ${isMobile
                       };
                     }}
                     onDragMove={(e) => {
+                      const x = e.target.x();
+                      const y = e.target.y();
+
+                      const last = lastRenderedPos.current;
+
+                      if (
+                        last &&
+                        Math.abs(last.x - x) < 0.5 &&
+                        Math.abs(last.y - y) < 0.5
+                      ) {
+                        return;
+                      }
+
+                      lastRenderedPos.current = { x, y };
+
                       updateActiveProject({
                         boardPedals: activeProject.boardPedals.map((item: AnyRow) =>
                           item.instanceId === p.instanceId
-                            ? { ...item, x: e.target.x(), y: e.target.y() }
+                            ? { ...item, x, y }
                             : item
                         ),
                       });
