@@ -357,7 +357,7 @@ export default function SearchBoards({
 
           {/* TITLE */}
 
-          <div className="px-1 mb-2 shrink-0">
+          <div className="mb-2 shrink-0">
 
             <div className="min-w-0 text-[11px] font-black uppercase tracking-wide">
               {t("boardsMenu.title")}
@@ -426,7 +426,19 @@ export default function SearchBoards({
 
           </div>
 
-          {/* PEDALBOARD FINDER BUTTON */}
+          {/* NOMBRE DE RÉSULTATS */}
+          {isSearching && (
+            <div className="mt-4 mb-2 shrink-0 text-[11px] font-bold">
+              {t(
+                visibleBoards.length <= 1
+                  ? "boardsMenu.result"
+                  : "boardsMenu.results"
+              ).replace(
+                "{count}",
+                String(visibleBoards.length)
+              )}
+            </div>
+          )}
 
           {/* PEDALBOARD FINDER BUTTON */}
 
@@ -466,7 +478,7 @@ export default function SearchBoards({
     "
 
               style={{
-                borderRadius: "18px",
+                borderRadius: "8px",
 
                 height: 54,
                 minHeight: 54,
@@ -529,7 +541,7 @@ export default function SearchBoards({
               closeFinder();
             }}
 
-            className="mb-2 flex items-center gap-2 px-1 py-1 text-[11px] font-bold cursor-pointer"
+            className="mb-2 flex items-center gap-2 py-1 text-[11px] font-bold cursor-pointer"
 
             aria-label={translateOrFallback(
               "boardFinder.back",
@@ -681,7 +693,7 @@ export default function SearchBoards({
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
 
         {!isFinder && !isSearching && (
-          <div className="mb-1 px-1 shrink-0 text-[10px] font-bold">
+          <div className="mb-1 mt-4 shrink-0 text-[11px] font-bold">
 
             {t("boardsMenu.popular")}
 

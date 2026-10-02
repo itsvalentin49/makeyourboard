@@ -346,6 +346,7 @@
     "title": "Pédales",
     "searchPlaceholder": "Rechercher...",
     "count": "{count} pédales",
+    "result": "{count} résultat",
     "results": "{count} résultats",
     "latest": "Voici les dernières nouveautés.",
     "new": "NEW",
@@ -356,6 +357,7 @@
     "searchPlaceholder": "Rechercher...",
     "count": "{count} pedalboards",
     "popular": "Pedalboards les plus utilisés.",
+    "result": "{count} résultat",
     "results": "{count} résultats"
   },
   "powerMenu": {
@@ -363,6 +365,7 @@
     "searchPlaceholder": "Rechercher...",
     "count": "{count} alimentations",
     "popular": "Alimentations les plus utilisées.",
+    "result": "{count} résultat",
     "results": "{count} résultats"
   },
   "customMenu": {

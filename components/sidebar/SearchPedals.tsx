@@ -171,7 +171,7 @@ export default function SearchPedals({
   return (
     <div className="flex flex-col mt-4 h-full min-h-0">
       {/* TITRE AU-DESSUS DE LA BARRE DE RECHERCHE */}
-      <div className="px-1 mb-2 shrink-0">
+      <div className="mb-2 shrink-0">
         <div className="text-[11px] font-black uppercase tracking-wide">
           {t("pedalsMenu.title")}
         </div>
@@ -245,31 +245,45 @@ export default function SearchPedals({
         )}
       </div>
 
+      {/* NOMBRE DE RÉSULTATS */}
+      {isSearching && (
+        <div className="mt-4 mb-2 shrink-0 text-[11px] font-bold">
+          {t(
+            visiblePedals.length <= 1
+              ? "pedalsMenu.result"
+              : "pedalsMenu.results"
+          ).replace(
+            "{count}",
+            String(visiblePedals.length)
+          )}
+        </div>
+      )}
+
       {/* RÉSULTATS */}
       <div className="flex flex-col gap-1 min-h-0 flex-1 overflow-hidden">
+
         {/* TEXTE NOUVEAUTÉS */}
         {!isSearching && (
-          <div className="px-1 shrink-0 text-[10px] font-bold">
+          <div className="mt-4 shrink-0 text-[11px] font-bold">
             {t("pedalsMenu.latest")}
           </div>
         )}
 
         {/* LISTE */}
         <div className="flex flex-col gap-0 overflow-y-auto no-scrollbar pb-6 min-h-0">
-          {visiblePedals.length > 0 ? (
-            visiblePedals.map((pedal) => {
-              const image = pedal.thumbnail || null;
-              const isNew = isNewPedal(pedal.year);
+          {visiblePedals.map((pedal) => {
+            const image = pedal.thumbnail || null;
+            const isNew = isNewPedal(pedal.year);
 
-              return (
-                <button
-                  key={pedal.id}
-                  type="button"
-                  onClick={() => {
-                    addPedal(pedal);
-                    setShowPedalResults(false);
-                  }}
-                  className="
+            return (
+              <button
+                key={pedal.id}
+                type="button"
+                onClick={() => {
+                  addPedal(pedal);
+                  setShowPedalResults(false);
+                }}
+                className="
                     relative
                     w-full
                     min-h-[48px]
@@ -286,10 +300,10 @@ export default function SearchPedals({
                     shrink-0
                     overflow-hidden
                   "
-                >
-                  {/* IMAGE COMPLÈTEMENT À GAUCHE */}
-                  <div
-                    className="
+              >
+                {/* IMAGE COMPLÈTEMENT À GAUCHE */}
+                <div
+                  className="
                       absolute
                       left-0
                       top-1/2
@@ -302,42 +316,42 @@ export default function SearchPedals({
                       pointer-events-none
                       overflow-hidden
                     "
-                  >
-                    {image ? (
-                      <img
-                        src={image}
-                        alt={`${pedal.brand || ""} ${pedal.name || ""}`}
-                        loading="lazy"
-                        decoding="async"
-                        className="
+                >
+                  {image ? (
+                    <img
+                      src={image}
+                      alt={`${pedal.brand || ""} ${pedal.name || ""}`}
+                      loading="lazy"
+                      decoding="async"
+                      className="
                           block
                           max-w-[52px]
                           max-h-[38px]
                           object-contain
                         "
-                      />
-                    ) : (
-                      <div className="w-9 h-9 rounded-md bg-zinc-700" />
-                    )}
-                  </div>
+                    />
+                  ) : (
+                    <div className="w-9 h-9 rounded-md bg-zinc-700" />
+                  )}
+                </div>
 
-                  {/* TEXTE */}
-                  <div className="min-w-0 flex items-center flex-1">
-                    <div className="min-w-0 flex-1">
-                      {/* MARQUE */}
-                      <div className="text-[12px] font-black leading-tight truncate">
-                        {pedal.brand}
-                      </div>
+                {/* TEXTE */}
+                <div className="min-w-0 flex items-center flex-1">
+                  <div className="min-w-0 flex-1">
+                    {/* MARQUE */}
+                    <div className="text-[12px] font-black leading-tight truncate">
+                      {pedal.brand}
+                    </div>
 
-                      {/* NOM + BADGE NEW */}
-                      <div className="flex items-center gap-1.5 min-w-0 text-[10px] font-bold text-zinc-300 leading-tight mt-0.5">
-                        <span className="truncate min-w-0">
-                          {pedal.name}
-                        </span>
+                    {/* NOM + BADGE NEW */}
+                    <div className="flex items-center gap-1.5 min-w-0 text-[10px] font-bold text-zinc-300 leading-tight mt-0.5">
+                      <span className="truncate min-w-0">
+                        {pedal.name}
+                      </span>
 
-                        {isNew && (
-                          <span
-                            className="
+                      {isNew && (
+                        <span
+                          className="
                               text-[8px]
                               font-black
                               uppercase
@@ -345,21 +359,16 @@ export default function SearchPedals({
                               text-green-500
                               shrink-0
                             "
-                          >
-                            {t("pedalsMenu.new")}
-                          </span>
-                        )}
-                      </div>
+                        >
+                          {t("pedalsMenu.new")}
+                        </span>
+                      )}
                     </div>
                   </div>
-                </button>
-              );
-            })
-          ) : (
-            <div className="rounded-xl border border-zinc-800 px-4 py-6 text-center text-[10px] font-bold uppercase tracking-widest text-zinc-500">
-              {t("search.noResults")}
-            </div>
-          )}
+                </div>
+              </button>
+            );
+          })}
         </div>
       </div>
     </div>

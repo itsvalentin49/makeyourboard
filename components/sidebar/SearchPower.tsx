@@ -140,7 +140,7 @@ export default function SearchPower({
   return (
     <div className="flex flex-col mt-4 h-full min-h-0">
       {/* TITLE */}
-      <div className="px-1 mb-2 shrink-0">
+      <div className="mb-2 shrink-0">
         <div className="text-[11px] font-black uppercase tracking-wide">
           {t("powerMenu.title")}
         </div>
@@ -217,30 +217,43 @@ export default function SearchPower({
         )}
       </div>
 
+      {/* NOMBRE DE RÉSULTATS */}
+      {isSearching && (
+        <div className="mt-4 mb-2 shrink-0 text-[11px] font-bold">
+          {t(
+            visiblePower.length <= 1
+              ? "powerMenu.result"
+              : "powerMenu.results"
+          ).replace(
+            "{count}",
+            String(visiblePower.length)
+          )}
+        </div>
+      )}
+
       {/* RÉSULTATS */}
       <div className="flex flex-col gap-1 min-h-0 flex-1 overflow-hidden">
         {/* TEXTE ALIMENTATIONS POPULAIRES */}
         {!isSearching && (
-          <div className="px-1 shrink-0 text-[10px] font-bold">
+          <div className="mt-4 shrink-0 text-[11px] font-bold">
             {t("powerMenu.popular")}
           </div>
         )}
 
         {/* LISTE */}
         <div className="flex flex-col gap-0 overflow-y-auto no-scrollbar pb-6 min-h-0">
-          {visiblePower.length > 0 ? (
-            visiblePower.map((power) => {
-              const image = power.thumbnail || null;
+          {visiblePower.map((power) => {
+            const image = power.thumbnail || null;
 
-              return (
-                <button
-                  key={power.id}
-                  type="button"
-                  onClick={() => {
-                    addPower(power);
-                    setShowPowerResults(false);
-                  }}
-                  className="
+            return (
+              <button
+                key={power.id}
+                type="button"
+                onClick={() => {
+                  addPower(power);
+                  setShowPowerResults(false);
+                }}
+                className="
                     relative
                     w-full
                     min-h-[48px]
@@ -257,10 +270,10 @@ export default function SearchPower({
                     shrink-0
                     overflow-hidden
                   "
-                >
-                  {/* IMAGE COMPLÈTEMENT À GAUCHE */}
-                  <div
-                    className="
+              >
+                {/* IMAGE COMPLÈTEMENT À GAUCHE */}
+                <div
+                  className="
                       absolute
                       left-0
                       top-1/2
@@ -273,45 +286,40 @@ export default function SearchPower({
                       pointer-events-none
                       overflow-hidden
                     "
-                  >
-                    {image ? (
-                      <img
-                        src={image}
-                        alt={`${power.brand || ""} ${power.name || ""}`}
-                        loading="lazy"
-                        decoding="async"
-                        className="
+                >
+                  {image ? (
+                    <img
+                      src={image}
+                      alt={`${power.brand || ""} ${power.name || ""}`}
+                      loading="lazy"
+                      decoding="async"
+                      className="
                           block
                           max-w-[60px]
                           max-h-[25px]
                           object-contain
                         "
-                      />
-                    ) : (
-                      <div className="w-9 h-9 rounded-md bg-zinc-700" />
-                    )}
-                  </div>
+                    />
+                  ) : (
+                    <div className="w-9 h-9 rounded-md bg-zinc-700" />
+                  )}
+                </div>
 
-                  {/* TEXTE */}
-                  <div className="min-w-0 flex items-center flex-1">
-                    <div className="min-w-0 flex-1">
-                      <div className="text-[12px] font-black leading-tight truncate">
-                        {power.brand}
-                      </div>
+                {/* TEXTE */}
+                <div className="min-w-0 flex items-center flex-1">
+                  <div className="min-w-0 flex-1">
+                    <div className="text-[12px] font-black leading-tight truncate">
+                      {power.brand}
+                    </div>
 
-                      <div className="text-[10px] font-bold text-zinc-300 leading-tight mt-0.5 line-clamp-2">
-                        {power.name}
-                      </div>
+                    <div className="text-[10px] font-bold text-zinc-300 leading-tight mt-0.5 line-clamp-2">
+                      {power.name}
                     </div>
                   </div>
-                </button>
-              );
-            })
-          ) : (
-            <div className="rounded-xl border border-zinc-800 px-4 py-6 text-center text-[10px] font-bold uppercase tracking-widest text-zinc-500">
-              {t("search.noResults")}
-            </div>
-          )}
+                </div>
+              </button>
+            );
+          })}
         </div>
       </div>
     </div>
