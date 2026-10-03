@@ -20,6 +20,10 @@ import type { Language } from "@/utils/i18n";
 
 type AnyRow = Record<string, any>;
 
+const ENCLOSURE_SIZING_BRANDS = new Set([
+  "JHS Pedals",
+]);
+
 type Background = {
   id: string;
   label: string;
@@ -3676,6 +3680,7 @@ ${isMobile
                       jacksLocation=""
                     />
 
+
                     {!isDragging &&
                       hoveredBoardId === b.instanceId &&
                       selectedBoardInstanceId !== b.instanceId &&
@@ -3961,6 +3966,9 @@ ${isMobile
                     jacksLocation={
                       p.jacksLocation || p.jacks || ""
                     }
+                    useEnclosureSizing={ENCLOSURE_SIZING_BRANDS.has(
+                      String(p.brand || "").trim()
+                    )}
                     onSizeReady={(nw, nh) => handleSizeUpdate?.(p.instanceId, nw, nh)}
                     marginRef={(node) => {
                       if (node) {
