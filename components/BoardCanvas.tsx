@@ -22,6 +22,13 @@ type AnyRow = Record<string, any>;
 
 const ENCLOSURE_SIZING_BRANDS = new Set([
   "JHS Pedals",
+  "1981 Inventions",
+  "29 Pedals",
+  "3 Leaf Audio",
+  "Dunlop",
+  "Keeley",
+  "MXR",
+  "Third Man Hardware",
 ]);
 
 type Background = {
@@ -3624,9 +3631,7 @@ ${isMobile
 
                     onDragMove={(e) => {
                       const node = e.target;
-
                       const bounds = getVisibleBounds();
-
                       const box = node.getClientRect({ skipTransform: false });
                       const scale = stageRef.current?.scaleX() || 1;
 
@@ -3642,6 +3647,8 @@ ${isMobile
                       if (y + height / 2 > bounds.maxY) y = bounds.maxY - height / 2;
 
                       node.position({ x, y });
+
+                      lastRenderedPos.current = { x, y };
                     }}
 
                     onDragEnd={(e) => {
@@ -4265,25 +4272,20 @@ ${isMobile
                       const x = e.target.x();
                       const y = e.target.y();
 
-                      const last = lastRenderedPos.current;
-
-                      if (
-                        last &&
-                        Math.abs(last.x - x) < 0.5 &&
-                        Math.abs(last.y - y) < 0.5
-                      ) {
-                        return;
-                      }
-
                       lastRenderedPos.current = { x, y };
 
-                      updateActiveProject({
-                        boardPedals: activeProject.boardPedals.map((item: AnyRow) =>
-                          item.instanceId === p.instanceId
-                            ? { ...item, x, y }
-                            : item
-                        ),
-                      });
+                      const stage = stageRef.current;
+                      if (!stage) return;
+
+                      const visualGroup = stage.findOne(
+                        (node: any) =>
+                          node.getAttr("instanceId") === p.instanceId
+                      );
+
+                      if (visualGroup) {
+                        visualGroup.position({ x, y });
+                        visualGroup.getLayer()?.batchDraw();
+                      }
                     }}
                     onDragEnd={(e) => {
                       setTimeout(() => setIsDragging(false), 0);
