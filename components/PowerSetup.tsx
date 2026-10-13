@@ -623,7 +623,7 @@ export default function PowerSetup({
       )}
 
       {hasPedals && (
-        <div className="mb-5">
+        <div>
           <div className="space-y-2">
             {pedalAssignments.map((a, i) => (
               <div
@@ -676,7 +676,7 @@ export default function PowerSetup({
       )}
 
       {hasPedals && powerMessage && (
-        <div className="flex items-center justify-between -mt-3">
+        <div className="flex items-center justify-between">
           <div
             className={`text-[12px] ${hasFailingPedal
               ? "text-red-500"

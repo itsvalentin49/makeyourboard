@@ -7,14 +7,21 @@ type AnyRow = Record<string, any>;
 
 type Props = {
   pedalsLibrary: AnyRow[];
+
   pedalSearch: string;
   setPedalSearch: (v: string) => void;
+
   showPedalResults: boolean;
   setShowPedalResults: (v: boolean) => void;
+
   setShowBoardResults: (v: boolean) => void;
+
   addPedal: (p: AnyRow) => void;
+
   pedalInputRef: React.RefObject<HTMLInputElement | null>;
+
   t: (key: string) => string;
+
   groupItems: (
     items: AnyRow[],
     filter: string
@@ -69,8 +76,11 @@ export default function SearchPedals({
       return pedalsLibrary
         .filter((pedal) => isNewPedal(pedal.year))
         .sort((a, b) => {
-          const dateA = parseReleaseDate(a.year)?.getTime() || 0;
-          const dateB = parseReleaseDate(b.year)?.getTime() || 0;
+          const dateA =
+            parseReleaseDate(a.year)?.getTime() || 0;
+
+          const dateB =
+            parseReleaseDate(b.year)?.getTime() || 0;
 
           return dateB - dateA;
         });
@@ -89,25 +99,40 @@ export default function SearchPedals({
         );
 
         const haystack = `
-      ${pedal.brand ?? ""}
-      ${pedal.name ?? ""}
-      ${rawType}
-      ${translatedType}
-    `.toLowerCase();
+          ${pedal.brand ?? ""}
+          ${pedal.name ?? ""}
+          ${rawType}
+          ${translatedType}
+        `.toLowerCase();
 
         return terms.every((term) =>
           haystack.includes(term)
         );
       })
       .sort((a, b) => {
-        const brandA = String(a.brand || "").toLowerCase();
-        const brandB = String(b.brand || "").toLowerCase();
+        const brandA = String(
+          a.brand || ""
+        ).toLowerCase();
 
-        const nameA = String(a.name || "").toLowerCase();
-        const nameB = String(b.name || "").toLowerCase();
+        const brandB = String(
+          b.brand || ""
+        ).toLowerCase();
 
-        const typeA = String(a.type || "").toLowerCase();
-        const typeB = String(b.type || "").toLowerCase();
+        const nameA = String(
+          a.name || ""
+        ).toLowerCase();
+
+        const nameB = String(
+          b.name || ""
+        ).toLowerCase();
+
+        const typeA = String(
+          a.type || ""
+        ).toLowerCase();
+
+        const typeB = String(
+          b.type || ""
+        ).toLowerCase();
 
         function getSearchScore(
           brand: string,
@@ -157,13 +182,14 @@ export default function SearchPedals({
           return scoreA - scoreB;
         }
 
-        const brandComparison = brandA.localeCompare(
-          brandB,
-          undefined,
-          {
-            sensitivity: "base",
-          }
-        );
+        const brandComparison =
+          brandA.localeCompare(
+            brandB,
+            undefined,
+            {
+              sensitivity: "base",
+            }
+          );
 
         if (brandComparison !== 0) {
           return brandComparison;
@@ -177,11 +203,43 @@ export default function SearchPedals({
           }
         );
       });
-  }, [pedalsLibrary, search, isSearching, t]);
+  }, [
+    pedalsLibrary,
+    search,
+    isSearching,
+    t,
+  ]);
+
+  const handlePedalHover = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    const button = event.currentTarget;
+
+    const shade = button.className.match(
+      /(?:^|\s)hover:bg-zinc-(\d+)(?:\s|$)/
+    )?.[1];
+
+    if (!shade) return;
+
+    button.style.setProperty(
+      "background-color",
+      `var(--zinc-${shade})`,
+      "important"
+    );
+  };
+
+  const handlePedalLeave = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    event.currentTarget.style.removeProperty(
+      "background-color"
+    );
+  };
 
   return (
     <div className="flex flex-col mt-4 h-full min-h-0">
       {/* TITRE AU-DESSUS DE LA BARRE DE RECHERCHE */}
+
       <div className="mb-2 shrink-0">
         <div className="text-[11px] font-black uppercase tracking-wide">
           {t("pedalsMenu.title")}
@@ -189,6 +247,7 @@ export default function SearchPedals({
       </div>
 
       {/* BARRE DE RECHERCHE */}
+
       <div className="relative flex items-center mb-4 shrink-0">
         <Search
           size={15}
@@ -203,7 +262,9 @@ export default function SearchPedals({
           autoCorrect="off"
           autoCapitalize="off"
           spellCheck={false}
-          placeholder={t("pedalsMenu.searchPlaceholder")}
+          placeholder={t(
+            "pedalsMenu.searchPlaceholder"
+          )}
           className="
             w-full
             h-[30px]
@@ -225,7 +286,10 @@ export default function SearchPedals({
             setShowPedalResults(true);
           }}
           onChange={(event) => {
-            setPedalSearch(event.target.value);
+            setPedalSearch(
+              event.target.value
+            );
+
             setShowPedalResults(true);
           }}
         />
@@ -237,6 +301,7 @@ export default function SearchPedals({
               event.stopPropagation();
 
               setPedalSearch("");
+
               pedalInputRef.current?.focus();
             }}
             className="
@@ -251,12 +316,16 @@ export default function SearchPedals({
             "
             aria-label="Effacer la recherche"
           >
-            <X size={15} strokeWidth={3} />
+            <X
+              size={15}
+              strokeWidth={3}
+            />
           </button>
         )}
       </div>
 
       {/* NOMBRE DE RÉSULTATS */}
+
       {isSearching && (
         <div className="mt-4 mb-2 shrink-0 text-[11px] font-bold">
           {t(
@@ -265,15 +334,18 @@ export default function SearchPedals({
               : "pedalsMenu.results"
           ).replace(
             "{count}",
-            String(visiblePedals.length)
+            String(
+              visiblePedals.length
+            )
           )}
         </div>
       )}
 
       {/* RÉSULTATS */}
-      <div className="flex flex-col gap-1 min-h-0 flex-1 overflow-hidden">
 
+      <div className="flex flex-col gap-1 min-h-0 flex-1 overflow-hidden">
         {/* TEXTE NOUVEAUTÉS */}
+
         {!isSearching && (
           <div className="mt-4 shrink-0 text-[11px] font-bold">
             {t("pedalsMenu.latest")}
@@ -281,26 +353,43 @@ export default function SearchPedals({
         )}
 
         {/* LISTE */}
-        <div className="flex flex-col gap-0 overflow-y-auto no-scrollbar pb-6 min-h-0">
-          {visiblePedals.map((pedal) => {
-            const image = pedal.thumbnail || null;
-            const isNew = isNewPedal(pedal.year);
 
-            return (
-              <button
-                key={pedal.id}
-                type="button"
-                onClick={() => {
-                  addPedal(pedal);
-                  setShowPedalResults(false);
-                }}
-                className="
+        <div className="flex flex-col gap-0 overflow-y-auto no-scrollbar pb-6 min-h-0">
+          {visiblePedals.map(
+            (pedal) => {
+              const image =
+                pedal.thumbnail ||
+                null;
+
+              const isNew =
+                isNewPedal(
+                  pedal.year
+                );
+
+              return (
+                <button
+                  key={pedal.id}
+                  type="button"
+                  onClick={() => {
+                    addPedal(pedal);
+
+                    setShowPedalResults(
+                      false
+                    );
+                  }}
+                  onMouseEnter={
+                    handlePedalHover
+                  }
+                  onMouseLeave={
+                    handlePedalLeave
+                  }
+                  className="
                     relative
                     w-full
                     min-h-[48px]
                     rounded-lg
                     bg-zinc-800
-                    hover:bg-canvas
+                    hover:bg-zinc-700
                     pl-[64px]
                     pr-2
                     py-1
@@ -311,10 +400,11 @@ export default function SearchPedals({
                     shrink-0
                     overflow-hidden
                   "
-              >
-                {/* IMAGE COMPLÈTEMENT À GAUCHE */}
-                <div
-                  className="
+                >
+                  {/* IMAGE COMPLÈTEMENT À GAUCHE */}
+
+                  <div
+                    className="
                       absolute
                       left-0
                       top-1/2
@@ -327,42 +417,45 @@ export default function SearchPedals({
                       pointer-events-none
                       overflow-hidden
                     "
-                >
-                  {image ? (
-                    <img
-                      src={image}
-                      alt={`${pedal.brand || ""} ${pedal.name || ""}`}
-                      loading="lazy"
-                      decoding="async"
-                      className="
+                  >
+                    {image ? (
+                      <img
+                        src={image}
+                        alt={`${pedal.brand || ""} ${pedal.name || ""}`}
+                        loading="lazy"
+                        decoding="async"
+                        className="
                           block
                           max-w-[52px]
                           max-h-[38px]
                           object-contain
                         "
-                    />
-                  ) : (
-                    <div className="w-9 h-9 rounded-md bg-zinc-700" />
-                  )}
-                </div>
+                      />
+                    ) : (
+                      <div className="w-9 h-9 rounded-md bg-zinc-700" />
+                    )}
+                  </div>
 
-                {/* TEXTE */}
-                <div className="min-w-0 flex items-center flex-1">
-                  <div className="min-w-0 flex-1">
-                    {/* MARQUE */}
-                    <div className="text-[12px] font-black leading-tight truncate">
-                      {pedal.brand}
-                    </div>
+                  {/* TEXTE */}
 
-                    {/* NOM + BADGE NEW */}
-                    <div className="flex items-center gap-1.5 min-w-0 text-[10px] font-bold text-zinc-300 leading-tight mt-0.5">
-                      <span className="truncate min-w-0">
-                        {pedal.name}
-                      </span>
+                  <div className="min-w-0 flex items-center flex-1">
+                    <div className="min-w-0 flex-1">
+                      {/* MARQUE */}
 
-                      {isNew && (
-                        <span
-                          className="
+                      <div className="text-[12px] font-black leading-tight truncate">
+                        {pedal.brand}
+                      </div>
+
+                      {/* NOM + BADGE NEW */}
+
+                      <div className="flex items-center gap-1.5 min-w-0 text-[10px] font-bold text-zinc-300 leading-tight mt-0.5">
+                        <span className="truncate min-w-0">
+                          {pedal.name}
+                        </span>
+
+                        {isNew && (
+                          <span
+                            className="
                               text-[8px]
                               font-black
                               uppercase
@@ -370,16 +463,19 @@ export default function SearchPedals({
                               text-green-500
                               shrink-0
                             "
-                        >
-                          {t("pedalsMenu.new")}
-                        </span>
-                      )}
+                          >
+                            {t(
+                              "pedalsMenu.new"
+                            )}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </button>
-            );
-          })}
+                </button>
+              );
+            }
+          )}
         </div>
       </div>
     </div>

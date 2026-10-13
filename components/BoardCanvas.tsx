@@ -25,10 +25,15 @@ const ENCLOSURE_SIZING_BRANDS = new Set([
   "1981 Inventions",
   "29 Pedals",
   "3 Leaf Audio",
+  "Boss",
+  "Behringer",
   "Dunlop",
   "Keeley",
   "MXR",
+  "TC Electronic",
   "Third Man Hardware",
+  "Wren and Cuff",
+  "Zoom",
 ]);
 
 type Background = {
@@ -1172,10 +1177,20 @@ export default function BoardCanvas({
       const size = displaySizes[selectedInstanceId];
       if (!size) return;
 
+      const currentX =
+        isDragging && lastRenderedPos.current
+          ? lastRenderedPos.current.x
+          : pedal.x;
+
+      const currentY =
+        isDragging && lastRenderedPos.current
+          ? lastRenderedPos.current.y
+          : pedal.y;
+
       setOverlayPosition({
-        x: pedal.x * scale + stageX,
+        x: currentX * scale + stageX,
         y:
-          pedal.y * scale +
+          currentY * scale +
           stageY -
           (size.h * scale) / 2 -
           8,
@@ -1184,12 +1199,12 @@ export default function BoardCanvas({
       if (isMobile) {
         setInfoPosition({
           x:
-            pedal.x * scale +
+            currentX * scale +
             stageX +
             (size.w * scale) / 2 +
             10,
           y:
-            pedal.y * scale +
+            currentY * scale +
             stageY -
             (size.h * scale) / 2 -
             10,
@@ -4286,6 +4301,8 @@ ${isMobile
                         visualGroup.position({ x, y });
                         visualGroup.getLayer()?.batchDraw();
                       }
+
+                      updateOverlayPosition();
                     }}
                     onDragEnd={(e) => {
                       setTimeout(() => setIsDragging(false), 0);
