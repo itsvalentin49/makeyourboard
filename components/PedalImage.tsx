@@ -72,11 +72,15 @@ function longestColumnRun(
   let current = 0;
 
   for (let y = minY; y <= maxY; y++) {
-    const alpha = pixels[(y * canvasWidth + x) * 4 + 3];
+    const alpha =
+      pixels[(y * canvasWidth + x) * 4 + 3];
 
     if (alpha > ALPHA_THRESHOLD) {
       current++;
-      if (current > longest) longest = current;
+
+      if (current > longest) {
+        longest = current;
+      }
     } else {
       current = 0;
     }
@@ -85,14 +89,28 @@ function longestColumnRun(
   return longest;
 }
 
-function getBandIndices(start: number, end: number) {
-  const length = end - start + 1;
+function getBandIndices(
+  start: number,
+  end: number
+) {
+  const length =
+    end - start + 1;
 
-  const firstStart = start + Math.round(length * 0.14);
-  const firstEnd = start + Math.round(length * 0.38);
+  const firstStart =
+    start +
+    Math.round(length * 0.14);
 
-  const secondStart = start + Math.round(length * 0.62);
-  const secondEnd = start + Math.round(length * 0.86);
+  const firstEnd =
+    start +
+    Math.round(length * 0.38);
+
+  const secondStart =
+    start +
+    Math.round(length * 0.62);
+
+  const secondEnd =
+    start +
+    Math.round(length * 0.86);
 
   return [
     {
@@ -116,15 +134,36 @@ function detectStandardRectBounds(
   ignoreTopProtrusions = false,
   ignoreBottomProtrusions = false
 ): EnclosureBounds | null {
-  const visibleWidth = maxX - minX + 1;
-  const visibleHeight = maxY - minY + 1;
+  const visibleWidth =
+    maxX - minX + 1;
 
-  if (visibleWidth < 20 || visibleHeight < 20) return null;
+  const visibleHeight =
+    maxY - minY + 1;
 
-  const verticalRuns = new Array(visibleWidth).fill(0);
+  if (
+    visibleWidth < 20 ||
+    visibleHeight < 20
+  ) {
+    return null;
+  }
 
-  for (let x = minX; x <= maxX; x++) {
-    verticalRuns[x - minX] = longestColumnRun(
+  /*
+   * Largeur principale du boîtier.
+   *
+   * Les colonnes appartenant aux jacks latéraux ont
+   * une hauteur beaucoup plus faible que celles du corps.
+   */
+  const verticalRuns =
+    new Array(visibleWidth).fill(0);
+
+  for (
+    let x = minX;
+    x <= maxX;
+    x++
+  ) {
+    verticalRuns[
+      x - minX
+    ] = longestColumnRun(
       pixels,
       canvasWidth,
       x,
@@ -133,47 +172,104 @@ function detectStandardRectBounds(
     );
   }
 
-  const maxVerticalRun = Math.max(...verticalRuns);
+  const maxVerticalRun =
+    Math.max(...verticalRuns);
 
-  const bodyRun = findLargestRun(
-    verticalRuns,
-    maxVerticalRun * 0.65
-  );
+  const bodyRun =
+    findLargestRun(
+      verticalRuns,
+      maxVerticalRun * 0.65
+    );
 
-  if (!bodyRun) return null;
+  if (!bodyRun) {
+    return null;
+  }
 
-  const bodyLeft = minX + bodyRun.start;
-  const bodyRight = minX + bodyRun.end;
-  const bodyWidth = bodyRight - bodyLeft + 1;
+  const bodyLeft =
+    minX + bodyRun.start;
 
-  if (bodyWidth < visibleWidth * 0.45) return null;
+  const bodyRight =
+    minX + bodyRun.end;
 
-  const colBands = getBandIndices(bodyLeft, bodyRight);
+  const bodyWidth =
+    bodyRight -
+    bodyLeft +
+    1;
+
+  if (
+    bodyWidth <
+    visibleWidth * 0.45
+  ) {
+    return null;
+  }
+
+  /*
+   * Échantillonnage vertical du boîtier.
+   */
+  const colBands =
+    getBandIndices(
+      bodyLeft,
+      bodyRight
+    );
 
   const colSamples: Array<{
     top: number;
     bottom: number;
   }> = [];
 
-  for (const band of colBands) {
-    for (let x = band.start; x <= band.end; x++) {
+  for (
+    const band of colBands
+  ) {
+    for (
+      let x = band.start;
+      x <= band.end;
+      x++
+    ) {
       let top = -1;
       let bottom = -1;
 
-      for (let y = minY; y <= maxY; y++) {
+      for (
+        let y = minY;
+        y <= maxY;
+        y++
+      ) {
         const alpha =
-          pixels[(y * canvasWidth + x) * 4 + 3];
+          pixels[
+          (y *
+            canvasWidth +
+            x) *
+          4 +
+          3
+          ];
 
-        if (alpha > ALPHA_THRESHOLD) {
-          if (top === -1) top = y;
+        if (
+          alpha >
+          ALPHA_THRESHOLD
+        ) {
+          if (
+            top === -1
+          ) {
+            top = y;
+          }
+
           bottom = y;
         }
       }
 
-      if (top !== -1 && bottom !== -1) {
-        const height = bottom - top + 1;
+      if (
+        top !== -1 &&
+        bottom !== -1
+      ) {
+        const height =
+          bottom -
+          top +
+          1;
 
-        if (height >= visibleHeight * 0.55) {
+        if (
+          height >=
+          visibleHeight *
+          0.55
+        ) {
           colSamples.push({
             top,
             bottom,
@@ -183,54 +279,213 @@ function detectStandardRectBounds(
     }
   }
 
-  if (colSamples.length < 8) return null;
+  if (
+    colSamples.length < 8
+  ) {
+    return null;
+  }
 
-  const topValues = colSamples.map((sample) => sample.top);
-  const bottomValues = colSamples.map(
-    (sample) => sample.bottom
-  );
-
-  let bodyTop = Math.floor(quantile(topValues, 0.15));
-
-  let bodyBottom = Math.ceil(
-    quantile(bottomValues, 0.85)
-  );
-
-  if (ignoreTopProtrusions || ignoreBottomProtrusions) {
-    const bodyRowOccupancy: number[] = [];
-
-    for (let y = minY; y <= maxY; y++) {
-      let count = 0;
-
-      for (let x = bodyLeft; x <= bodyRight; x++) {
-        const alpha =
-          pixels[(y * canvasWidth + x) * 4 + 3];
-
-        if (alpha > ALPHA_THRESHOLD) count++;
-      }
-
-      bodyRowOccupancy.push(count);
-    }
-
-    const bodyRun = findLargestRun(
-      bodyRowOccupancy,
-      bodyWidth * 0.62
+  const topValues =
+    colSamples.map(
+      (sample) =>
+        sample.top
     );
 
-    if (bodyRun) {
-      if (ignoreTopProtrusions) {
-        bodyTop = minY + bodyRun.start;
+  const bottomValues =
+    colSamples.map(
+      (sample) =>
+        sample.bottom
+    );
+
+  let bodyTop =
+    Math.floor(
+      quantile(
+        topValues,
+        0.15
+      )
+    );
+
+  let bodyBottom =
+    Math.ceil(
+      quantile(
+        bottomValues,
+        0.85
+      )
+    );
+
+  /*
+   * =====================================================
+   * TOP LIP FILTER
+   * =====================================================
+   *
+   * Certaines images montrent légèrement la tranche
+   * supérieure du boîtier alors que les dimensions
+   * doivent correspondre uniquement à la façade.
+   *
+   * Exemple :
+   *
+   *     ███   █████   ███    <- tranche supérieure
+   *   ┌───────────────────┐
+   *   │      FAÇADE       │
+   *
+   * Cette tranche est opaque et peut donc être détectée
+   * par erreur comme le sommet du boîtier.
+   *
+   * On cherche ici la première longue zone horizontale
+   * occupant réellement la largeur du corps principal.
+   */
+
+  const bodyRowOccupancy =
+    new Array(
+      visibleHeight
+    ).fill(0);
+
+  for (
+    let y = minY;
+    y <= maxY;
+    y++
+  ) {
+    let count = 0;
+
+    for (
+      let x = bodyLeft;
+      x <= bodyRight;
+      x++
+    ) {
+      const alpha =
+        pixels[
+        (y *
+          canvasWidth +
+          x) *
+        4 +
+        3
+        ];
+
+      if (
+        alpha >
+        ALPHA_THRESHOLD
+      ) {
+        count++;
+      }
+    }
+
+    bodyRowOccupancy[
+      y - minY
+    ] = count;
+  }
+
+  /*
+   * 75 % est volontairement assez élevé :
+   *
+   * - une fine tranche supérieure est généralement
+   *   beaucoup moins large ;
+   * - la vraie façade occupe presque toute la largeur ;
+   * - les petits jacks / switches sont ignorés.
+   */
+  const solidBodyRun =
+    findLargestRun(
+      bodyRowOccupancy,
+      bodyWidth * 0.75
+    );
+
+  if (solidBodyRun) {
+    const solidTop =
+      minY +
+      solidBodyRun.start;
+
+    const topDifference =
+      solidTop -
+      bodyTop;
+
+    /*
+     * On ne corrige que lorsqu'une vraie petite tranche
+     * existe avant le corps.
+     *
+     * Cela évite de déplacer le contour simplement à cause
+     * d'un arrondi normal de 1 ou 2 pixels.
+     */
+    const minLipHeight =
+      Math.max(
+        3,
+        Math.round(
+          visibleHeight *
+          0.008
+        )
+      );
+
+    const maxLipHeight =
+      Math.max(
+        8,
+        Math.round(
+          visibleHeight *
+          0.12
+        )
+      );
+
+    if (
+      topDifference >=
+      minLipHeight &&
+      topDifference <=
+      maxLipHeight
+    ) {
+      bodyTop =
+        solidTop;
+    }
+  }
+
+  /*
+   * Gestion historique des protrusions explicitement
+   * déclarées en haut / en bas.
+   */
+  if (
+    ignoreTopProtrusions ||
+    ignoreBottomProtrusions
+  ) {
+    const protrusionRun =
+      findLargestRun(
+        bodyRowOccupancy,
+        bodyWidth * 0.62
+      );
+
+    if (
+      protrusionRun
+    ) {
+      if (
+        ignoreTopProtrusions
+      ) {
+        bodyTop =
+          Math.max(
+            bodyTop,
+            minY +
+            protrusionRun.start
+          );
       }
 
-      if (ignoreBottomProtrusions) {
-        bodyBottom = minY + bodyRun.end;
+      if (
+        ignoreBottomProtrusions
+      ) {
+        bodyBottom =
+          Math.min(
+            bodyBottom,
+            minY +
+            protrusionRun.end
+          );
       }
     }
   }
 
-  const bodyHeight = bodyBottom - bodyTop + 1;
+  const bodyHeight =
+    bodyBottom -
+    bodyTop +
+    1;
 
-  if (bodyHeight < visibleHeight * 0.55) return null;
+  if (
+    bodyHeight <
+    visibleHeight *
+    0.55
+  ) {
+    return null;
+  }
 
   return {
     bodyLeft,
@@ -240,39 +495,78 @@ function detectStandardRectBounds(
   };
 }
 
-function median(values: number[]) {
-  if (values.length === 0) return 0;
+function median(
+  values: number[]
+) {
+  if (
+    values.length === 0
+  ) {
+    return 0;
+  }
 
-  const sorted = [...values].sort((a, b) => a - b);
+  const sorted =
+    [...values].sort(
+      (a, b) => a - b
+    );
 
-  const middle = Math.floor(sorted.length / 2);
+  const middle =
+    Math.floor(
+      sorted.length / 2
+    );
 
-  if (sorted.length % 2 === 1) {
+  if (
+    sorted.length %
+    2 ===
+    1
+  ) {
     return sorted[middle];
   }
 
-  return (sorted[middle - 1] + sorted[middle]) / 2;
+  return (
+    sorted[middle - 1] +
+    sorted[middle]
+  ) / 2;
 }
 
-function quantile(values: number[], q: number) {
-  if (values.length === 0) return 0;
+function quantile(
+  values: number[],
+  q: number
+) {
+  if (
+    values.length === 0
+  ) {
+    return 0;
+  }
 
-  const sorted = [...values].sort((a, b) => a - b);
+  const sorted =
+    [...values].sort(
+      (a, b) => a - b
+    );
 
-  const index = (sorted.length - 1) * q;
+  const index =
+    (sorted.length - 1) *
+    q;
 
-  const lower = Math.floor(index);
-  const upper = Math.ceil(index);
+  const lower =
+    Math.floor(index);
 
-  if (lower === upper) {
+  const upper =
+    Math.ceil(index);
+
+  if (
+    lower === upper
+  ) {
     return sorted[lower];
   }
 
-  const weight = index - lower;
+  const weight =
+    index - lower;
 
   return (
-    sorted[lower] * (1 - weight) +
-    sorted[upper] * weight
+    sorted[lower] *
+    (1 - weight) +
+    sorted[upper] *
+    weight
   );
 }
 
@@ -284,41 +578,69 @@ function findLargestRun(
   let bestEnd = -1;
   let currentStart = -1;
 
-  for (let i = 0; i < values.length; i++) {
-    if (values[i] >= threshold) {
-      if (currentStart === -1) {
+  for (
+    let i = 0;
+    i < values.length;
+    i++
+  ) {
+    if (
+      values[i] >=
+      threshold
+    ) {
+      if (
+        currentStart ===
+        -1
+      ) {
         currentStart = i;
       }
-    } else if (currentStart !== -1) {
-      const currentEnd = i - 1;
+    } else if (
+      currentStart !== -1
+    ) {
+      const currentEnd =
+        i - 1;
 
       if (
         bestStart === -1 ||
-        currentEnd - currentStart >
-        bestEnd - bestStart
+        currentEnd -
+        currentStart >
+        bestEnd -
+        bestStart
       ) {
-        bestStart = currentStart;
-        bestEnd = currentEnd;
+        bestStart =
+          currentStart;
+
+        bestEnd =
+          currentEnd;
       }
 
       currentStart = -1;
     }
   }
 
-  if (currentStart !== -1) {
-    const currentEnd = values.length - 1;
+  if (
+    currentStart !== -1
+  ) {
+    const currentEnd =
+      values.length - 1;
 
     if (
       bestStart === -1 ||
-      currentEnd - currentStart >
-      bestEnd - bestStart
+      currentEnd -
+      currentStart >
+      bestEnd -
+      bestStart
     ) {
-      bestStart = currentStart;
-      bestEnd = currentEnd;
+      bestStart =
+        currentStart;
+
+      bestEnd =
+        currentEnd;
     }
   }
 
-  if (bestStart === -1) {
+  if (
+    bestStart === -1
+  ) {
     return null;
   }
 
@@ -331,18 +653,33 @@ function findLargestRun(
 function isMostlyRectangular(
   occupancies: number[]
 ) {
-  const valid = occupancies.filter(
-    (value) => value > 0
-  );
+  const valid =
+    occupancies.filter(
+      (value) =>
+        value > 0
+    );
 
-  if (valid.length < 8) {
+  if (
+    valid.length < 8
+  ) {
     return true;
   }
 
-  const p20 = quantile(valid, 0.20);
-  const p80 = quantile(valid, 0.80);
+  const p20 =
+    quantile(
+      valid,
+      0.20
+    );
 
-  if (p20 <= 0) {
+  const p80 =
+    quantile(
+      valid,
+      0.80
+    );
+
+  if (
+    p20 <= 0
+  ) {
     return true;
   }
 
@@ -356,29 +693,61 @@ function smoothEdge(
   values: Array<number | null>,
   radius: number
 ) {
-  return values.map((value, index) => {
-    if (value === null) return null;
-
-    const window: number[] = [];
-
-    for (
-      let i = Math.max(0, index - radius);
-      i <= Math.min(values.length - 1, index + radius);
-      i++
-    ) {
-      const candidate = values[i];
-
-      if (candidate !== null) {
-        window.push(candidate);
+  return values.map(
+    (
+      value,
+      index
+    ) => {
+      if (
+        value === null
+      ) {
+        return null;
       }
-    }
 
-    if (window.length === 0) {
-      return value;
-    }
+      const window: number[] =
+        [];
 
-    return median(window);
-  });
+      for (
+        let i =
+          Math.max(
+            0,
+            index -
+            radius
+          );
+        i <=
+        Math.min(
+          values.length -
+          1,
+          index +
+          radius
+        );
+        i++
+      ) {
+        const candidate =
+          values[i];
+
+        if (
+          candidate !==
+          null
+        ) {
+          window.push(
+            candidate
+          );
+        }
+      }
+
+      if (
+        window.length ===
+        0
+      ) {
+        return value;
+      }
+
+      return median(
+        window
+      );
+    }
+  );
 }
 
 function removeLocalProtrusions(
@@ -387,40 +756,78 @@ function removeLocalProtrusions(
   threshold: number,
   edge: "min" | "max"
 ) {
-  return values.map((value, index) => {
-    if (value === null) return null;
-
-    const window: number[] = [];
-
-    for (
-      let i = Math.max(0, index - radius);
-      i <= Math.min(values.length - 1, index + radius);
-      i++
-    ) {
-      if (i === index) continue;
-
-      const candidate = values[i];
-
-      if (candidate !== null) {
-        window.push(candidate);
+  return values.map(
+    (
+      value,
+      index
+    ) => {
+      if (
+        value === null
+      ) {
+        return null;
       }
+
+      const window: number[] =
+        [];
+
+      for (
+        let i =
+          Math.max(
+            0,
+            index -
+            radius
+          );
+        i <=
+        Math.min(
+          values.length -
+          1,
+          index +
+          radius
+        );
+        i++
+      ) {
+        if (
+          i === index
+        ) {
+          continue;
+        }
+
+        const candidate =
+          values[i];
+
+        if (
+          candidate !==
+          null
+        ) {
+          window.push(
+            candidate
+          );
+        }
+      }
+
+      if (
+        window.length < 3
+      ) {
+        return value;
+      }
+
+      const localMedian =
+        median(window);
+
+      const isOutwardProtrusion =
+        edge === "min"
+          ? value <
+          localMedian -
+          threshold
+          : value >
+          localMedian +
+          threshold;
+
+      return isOutwardProtrusion
+        ? localMedian
+        : value;
     }
-
-    if (window.length < 3) {
-      return value;
-    }
-
-    const localMedian = median(window);
-
-    const isOutwardProtrusion =
-      edge === "min"
-        ? value < localMedian - threshold
-        : value > localMedian + threshold;
-
-    return isOutwardProtrusion
-      ? localMedian
-      : value;
-  });
+  );
 }
 
 function detectTreadleBounds(
@@ -431,7 +838,8 @@ function detectTreadleBounds(
   maxX: number,
   maxY: number
 ): EnclosureBounds | null {
-  const visibleWidth = maxX - minX + 1;
+  const visibleWidth =
+    maxX - minX + 1;
 
   const rows: Array<{
     left: number;
@@ -440,123 +848,232 @@ function detectTreadleBounds(
     width: number;
   }> = [];
 
-  for (let y = minY; y <= maxY; y++) {
+  for (
+    let y = minY;
+    y <= maxY;
+    y++
+  ) {
     let left = -1;
     let right = -1;
 
-    for (let x = minX; x <= maxX; x++) {
+    for (
+      let x = minX;
+      x <= maxX;
+      x++
+    ) {
       const alpha =
-        pixels[(y * canvasWidth + x) * 4 + 3];
+        pixels[
+        (y *
+          canvasWidth +
+          x) *
+        4 +
+        3
+        ];
 
-      if (alpha > ALPHA_THRESHOLD) {
-        if (left === -1) left = x;
+      if (
+        alpha >
+        ALPHA_THRESHOLD
+      ) {
+        if (
+          left === -1
+        ) {
+          left = x;
+        }
+
         right = x;
       }
     }
 
-    if (left !== -1 && right !== -1) {
-      const width = right - left + 1;
+    if (
+      left !== -1 &&
+      right !== -1
+    ) {
+      const width =
+        right -
+        left +
+        1;
 
       rows.push({
         left,
         right,
-        center: (left + right) / 2,
+        center:
+          (left +
+            right) /
+          2,
         width,
       });
     }
   }
 
-  if (rows.length < 8) return null;
-
-  const centerMedian = median(
-    rows.map((row) => row.center)
-  );
-
-  const centerTolerance = Math.max(
-    2,
-    visibleWidth * 0.035
-  );
-
-  const centeredRows = rows.filter(
-    (row) =>
-      Math.abs(row.center - centerMedian) <=
-      centerTolerance
-  );
-
-  if (centeredRows.length < 8) return null;
-
-  const targetWidth = quantile(
-    centeredRows.map((row) => row.width),
-    0.985
-  );
-
-  const widestRows = centeredRows.filter(
-    (row) => row.width >= targetWidth - 1
-  );
-
-  const bodyLeft = Math.round(
-    median(widestRows.map((row) => row.left))
-  );
-
-  const bodyRight = Math.round(
-    median(widestRows.map((row) => row.right))
-  );
-
   if (
-    bodyRight - bodyLeft + 1 <
-    visibleWidth * 0.35
+    rows.length < 8
   ) {
     return null;
   }
 
-  let bodyTop = maxY;
-  let bodyBottom = minY;
+  const centerMedian =
+    median(
+      rows.map(
+        (row) =>
+          row.center
+      )
+    );
 
-  for (let x = bodyLeft; x <= bodyRight; x++) {
+  const centerTolerance =
+    Math.max(
+      2,
+      visibleWidth *
+      0.035
+    );
+
+  const centeredRows =
+    rows.filter(
+      (row) =>
+        Math.abs(
+          row.center -
+          centerMedian
+        ) <=
+        centerTolerance
+    );
+
+  if (
+    centeredRows.length <
+    8
+  ) {
+    return null;
+  }
+
+  const targetWidth =
+    quantile(
+      centeredRows.map(
+        (row) =>
+          row.width
+      ),
+      0.985
+    );
+
+  const widestRows =
+    centeredRows.filter(
+      (row) =>
+        row.width >=
+        targetWidth -
+        1
+    );
+
+  const bodyLeft =
+    Math.round(
+      median(
+        widestRows.map(
+          (row) =>
+            row.left
+        )
+      )
+    );
+
+  const bodyRight =
+    Math.round(
+      median(
+        widestRows.map(
+          (row) =>
+            row.right
+        )
+      )
+    );
+
+  if (
+    bodyRight -
+    bodyLeft +
+    1 <
+    visibleWidth *
+    0.35
+  ) {
+    return null;
+  }
+
+  let bodyTop =
+    maxY;
+
+  let bodyBottom =
+    minY;
+
+  for (
+    let x = bodyLeft;
+    x <= bodyRight;
+    x++
+  ) {
     let top = -1;
     let bottom = -1;
 
-    for (let y = minY; y <= maxY; y++) {
+    for (
+      let y = minY;
+      y <= maxY;
+      y++
+    ) {
       const alpha =
-        pixels[(y * canvasWidth + x) * 4 + 3];
+        pixels[
+        (y *
+          canvasWidth +
+          x) *
+        4 +
+        3
+        ];
 
-      if (alpha > ALPHA_THRESHOLD) {
-        if (top === -1) top = y;
+      if (
+        alpha >
+        ALPHA_THRESHOLD
+      ) {
+        if (
+          top === -1
+        ) {
+          top = y;
+        }
+
         bottom = y;
       }
     }
 
-    if (top !== -1) {
-      bodyTop = Math.min(bodyTop, top);
+    if (
+      top !== -1
+    ) {
+      bodyTop =
+        Math.min(
+          bodyTop,
+          top
+        );
     }
 
-    if (bottom !== -1) {
-      bodyBottom = Math.max(bodyBottom, bottom);
+    if (
+      bottom !== -1
+    ) {
+      bodyBottom =
+        Math.max(
+          bodyBottom,
+          bottom
+        );
     }
   }
 
-  if (bodyBottom < bodyTop) return null;
+  if (
+    bodyBottom <
+    bodyTop
+  ) {
+    return null;
+  }
 
   return {
     bodyLeft,
     bodyTop,
-    bodyWidth: bodyRight - bodyLeft + 1,
-    bodyHeight: bodyBottom - bodyTop + 1,
+    bodyWidth:
+      bodyRight -
+      bodyLeft +
+      1,
+    bodyHeight:
+      bodyBottom -
+      bodyTop +
+      1,
   };
 }
 
-/*
- * PETITES PÉDALES RECTANGULAIRES
- *
- * Différence par rapport à la version précédente :
- *
- * bodyTop / bodyBottom sont calculés uniquement à partir
- * des lignes qui ont réellement la largeur du boîtier.
- *
- * Un jack DC centré en haut est beaucoup plus étroit que
- * le boîtier : il n'est donc plus considéré comme faisant
- * partie de la profondeur physique de la pédale.
- */
 function detectMiniRectBounds(
   pixels: Uint8ClampedArray,
   canvasWidth: number,
@@ -565,7 +1082,8 @@ function detectMiniRectBounds(
   maxX: number,
   maxY: number
 ): EnclosureBounds | null {
-  const visibleWidth = maxX - minX + 1;
+  const visibleWidth =
+    maxX - minX + 1;
 
   const rows: Array<{
     y: number;
@@ -575,16 +1093,35 @@ function detectMiniRectBounds(
     width: number;
   }> = [];
 
-  for (let y = minY; y <= maxY; y++) {
+  for (
+    let y = minY;
+    y <= maxY;
+    y++
+  ) {
     let left = -1;
     let right = -1;
 
-    for (let x = minX; x <= maxX; x++) {
+    for (
+      let x = minX;
+      x <= maxX;
+      x++
+    ) {
       const alpha =
-        pixels[(y * canvasWidth + x) * 4 + 3];
+        pixels[
+        (y *
+          canvasWidth +
+          x) *
+        4 +
+        3
+        ];
 
-      if (alpha > ALPHA_THRESHOLD) {
-        if (left === -1) {
+      if (
+        alpha >
+        ALPHA_THRESHOLD
+      ) {
+        if (
+          left === -1
+        ) {
           left = x;
         }
 
@@ -592,127 +1129,144 @@ function detectMiniRectBounds(
       }
     }
 
-    if (left !== -1 && right !== -1) {
+    if (
+      left !== -1 &&
+      right !== -1
+    ) {
       rows.push({
         y,
         left,
         right,
-        center: (left + right) / 2,
-        width: right - left + 1,
+        center:
+          (left +
+            right) /
+          2,
+        width:
+          right -
+          left +
+          1,
       });
     }
   }
 
-  if (rows.length < 8) return null;
-
-  /*
-   * Axe central du boîtier.
-   */
-  const centerMedian = median(
-    rows.map((row) => row.center)
-  );
-
-  const centeredRows = rows.filter(
-    (row) =>
-      Math.abs(row.center - centerMedian) <=
-      Math.max(
-        2,
-        visibleWidth * 0.03
-      )
-  );
-
-  if (centeredRows.length < 8) {
-    return null;
-  }
-
-  /*
-   * On estime la largeur réelle du boîtier à partir
-   * des lignes suffisamment larges.
-   *
-   * Le jack DC supérieur ne représente qu'une petite
-   * largeur et ne peut donc pas devenir la référence.
-   */
-  const bodyWidthEstimate = quantile(
-    centeredRows.map(
-      (row) => row.width
-    ),
-    0.75
-  );
-
-  /*
-   * On conserve uniquement les lignes dont la largeur
-   * correspond au corps principal.
-   */
-  const bodyRows = centeredRows.filter(
-    (row) =>
-      row.width >=
-      bodyWidthEstimate * 0.88 &&
-      row.width <=
-      bodyWidthEstimate * 1.08
-  );
-
-  if (bodyRows.length < 6) {
-    return null;
-  }
-
-  /*
-   * Limites gauche / droite du boîtier.
-   */
-  const bodyLeft = Math.round(
-    median(
-      bodyRows.map(
-        (row) => row.left
-      )
-    )
-  );
-
-  const bodyRight = Math.round(
-    median(
-      bodyRows.map(
-        (row) => row.right
-      )
-    )
-  );
-
-  const bodyWidth =
-    bodyRight - bodyLeft + 1;
-
   if (
-    bodyWidth <
-    visibleWidth * 0.45
+    rows.length < 8
   ) {
     return null;
   }
 
-  /*
-   * Limites haut / bas du boîtier.
-   *
-   * IMPORTANT :
-   * uniquement bodyRows.
-   *
-   * Les protrusions étroites comme :
-   * - jack DC supérieur
-   * - jack inférieur
-   * - petit switch dépassant
-   *
-   * ne modifient donc plus bodyTop/bodyBottom.
-   */
-  const bodyTop = Math.min(
-    ...bodyRows.map(
-      (row) => row.y
-    )
-  );
+  const centerMedian =
+    median(
+      rows.map(
+        (row) =>
+          row.center
+      )
+    );
 
-  const bodyBottom = Math.max(
-    ...bodyRows.map(
-      (row) => row.y
-    )
-  );
+  const centeredRows =
+    rows.filter(
+      (row) =>
+        Math.abs(
+          row.center -
+          centerMedian
+        ) <=
+        Math.max(
+          2,
+          visibleWidth *
+          0.03
+        )
+    );
+
+  if (
+    centeredRows.length <
+    8
+  ) {
+    return null;
+  }
+
+  const bodyWidthEstimate =
+    quantile(
+      centeredRows.map(
+        (row) =>
+          row.width
+      ),
+      0.75
+    );
+
+  const bodyRows =
+    centeredRows.filter(
+      (row) =>
+        row.width >=
+        bodyWidthEstimate *
+        0.88 &&
+        row.width <=
+        bodyWidthEstimate *
+        1.08
+    );
+
+  if (
+    bodyRows.length < 6
+  ) {
+    return null;
+  }
+
+  const bodyLeft =
+    Math.round(
+      median(
+        bodyRows.map(
+          (row) =>
+            row.left
+        )
+      )
+    );
+
+  const bodyRight =
+    Math.round(
+      median(
+        bodyRows.map(
+          (row) =>
+            row.right
+        )
+      )
+    );
+
+  const bodyWidth =
+    bodyRight -
+    bodyLeft +
+    1;
+
+  if (
+    bodyWidth <
+    visibleWidth *
+    0.45
+  ) {
+    return null;
+  }
+
+  const bodyTop =
+    Math.min(
+      ...bodyRows.map(
+        (row) =>
+          row.y
+      )
+    );
+
+  const bodyBottom =
+    Math.max(
+      ...bodyRows.map(
+        (row) =>
+          row.y
+      )
+    );
 
   const bodyHeight =
-    bodyBottom - bodyTop + 1;
+    bodyBottom -
+    bodyTop +
+    1;
 
-  if (bodyHeight <= 0) {
+  if (
+    bodyHeight <= 0
+  ) {
     return null;
   }
 
@@ -734,16 +1288,52 @@ function getVisiblePixelBounds(
   let maxX = -1;
   let maxY = -1;
 
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
+  for (
+    let y = 0;
+    y < height;
+    y++
+  ) {
+    for (
+      let x = 0;
+      x < width;
+      x++
+    ) {
       const alpha =
-        pixels[(y * width + x) * 4 + 3];
+        pixels[
+        (y *
+          width +
+          x) *
+        4 +
+        3
+        ];
 
-      if (alpha > ALPHA_THRESHOLD) {
-        minX = Math.min(minX, x);
-        minY = Math.min(minY, y);
-        maxX = Math.max(maxX, x);
-        maxY = Math.max(maxY, y);
+      if (
+        alpha >
+        ALPHA_THRESHOLD
+      ) {
+        minX =
+          Math.min(
+            minX,
+            x
+          );
+
+        minY =
+          Math.min(
+            minY,
+            y
+          );
+
+        maxX =
+          Math.max(
+            maxX,
+            x
+          );
+
+        maxY =
+          Math.max(
+            maxY,
+            y
+          );
       }
     }
   }
@@ -775,7 +1365,9 @@ function detectEnclosure(
 ): EnclosureBounds | null {
   try {
     const canvas =
-      document.createElement("canvas");
+      document.createElement(
+        "canvas"
+      );
 
     const naturalWidth =
       image.naturalWidth;
@@ -783,37 +1375,46 @@ function detectEnclosure(
     const naturalHeight =
       image.naturalHeight;
 
-    const analysisScale = Math.min(
-      1,
-      MAX_ANALYSIS_SIZE /
+    const analysisScale =
+      Math.min(
+        1,
+        MAX_ANALYSIS_SIZE /
+        Math.max(
+          naturalWidth,
+          naturalHeight
+        )
+      );
+
+    canvas.width =
       Math.max(
-        naturalWidth,
-        naturalHeight
-      )
-    );
+        1,
+        Math.round(
+          naturalWidth *
+          analysisScale
+        )
+      );
 
-    canvas.width = Math.max(
-      1,
-      Math.round(
-        naturalWidth *
-        analysisScale
-      )
-    );
-
-    canvas.height = Math.max(
-      1,
-      Math.round(
-        naturalHeight *
-        analysisScale
-      )
-    );
+    canvas.height =
+      Math.max(
+        1,
+        Math.round(
+          naturalHeight *
+          analysisScale
+        )
+      );
 
     const ctx =
-      canvas.getContext("2d", {
-        willReadFrequently: true,
-      });
+      canvas.getContext(
+        "2d",
+        {
+          willReadFrequently:
+            true,
+        }
+      );
 
-    if (!ctx) return null;
+    if (!ctx) {
+      return null;
+    }
 
     ctx.drawImage(
       image,
@@ -841,7 +1442,9 @@ function detectEnclosure(
         canvas.height
       );
 
-    if (!visibleBounds) {
+    if (
+      !visibleBounds
+    ) {
       return null;
     }
 
@@ -850,15 +1453,22 @@ function detectEnclosure(
       minY,
       maxX,
       maxY,
-    } = visibleBounds;
+    } =
+      visibleBounds;
 
     const visibleWidth =
-      maxX - minX + 1;
+      maxX -
+      minX +
+      1;
 
     const visibleHeight =
-      maxY - minY + 1;
+      maxY -
+      minY +
+      1;
 
-    if (miniRectMode) {
+    if (
+      miniRectMode
+    ) {
       const miniRect =
         detectMiniRectBounds(
           pixels,
@@ -869,9 +1479,12 @@ function detectEnclosure(
           maxY
         );
 
-      if (miniRect) {
+      if (
+        miniRect
+      ) {
         const inverseScale =
-          1 / analysisScale;
+          1 /
+          analysisScale;
 
         return {
           bodyLeft:
@@ -893,7 +1506,9 @@ function detectEnclosure(
       }
     }
 
-    if (standardRectMode) {
+    if (
+      standardRectMode
+    ) {
       const standardRect =
         detectStandardRectBounds(
           pixels,
@@ -906,9 +1521,12 @@ function detectEnclosure(
           hasBottomJacks
         );
 
-      if (standardRect) {
+      if (
+        standardRect
+      ) {
         const inverseScale =
-          1 / analysisScale;
+          1 /
+          analysisScale;
 
         return {
           bodyLeft:
@@ -930,7 +1548,9 @@ function detectEnclosure(
       }
     }
 
-    if (treadleMode) {
+    if (
+      treadleMode
+    ) {
       const treadle =
         detectTreadleBounds(
           pixels,
@@ -941,9 +1561,12 @@ function detectEnclosure(
           maxY
         );
 
-      if (treadle) {
+      if (
+        treadle
+      ) {
         const inverseScale =
-          1 / analysisScale;
+          1 /
+          analysisScale;
 
         return {
           bodyLeft:
@@ -965,23 +1588,40 @@ function detectEnclosure(
       }
     }
 
-    let bodyLeft = minX;
-    let bodyRight = maxX;
-    let bodyTop = minY;
-    let bodyBottom = maxY;
+    let bodyLeft =
+      minX;
 
-    if (detectHorizontal) {
+    let bodyRight =
+      maxX;
+
+    let bodyTop =
+      minY;
+
+    let bodyBottom =
+      maxY;
+
+    if (
+      detectHorizontal
+    ) {
       const leftEdges:
-        Array<number | null> =
+        Array<
+          number | null
+        > =
         new Array(
           visibleHeight
-        ).fill(null);
+        ).fill(
+          null
+        );
 
       const rightEdges:
-        Array<number | null> =
+        Array<
+          number | null
+        > =
         new Array(
           visibleHeight
-        ).fill(null);
+        ).fill(
+          null
+        );
 
       const rowOccupancy =
         new Array(
@@ -1004,7 +1644,9 @@ function detectEnclosure(
         ) {
           const alpha =
             pixels[
-            (y * canvas.width + x) *
+            (y *
+              canvas.width +
+              x) *
             4 +
             3
             ];
@@ -1013,7 +1655,9 @@ function detectEnclosure(
             alpha >
             ALPHA_THRESHOLD
           ) {
-            if (first === -1) {
+            if (
+              first === -1
+            ) {
               first = x;
             }
 
@@ -1029,7 +1673,9 @@ function detectEnclosure(
           rowIndex
         ] = count;
 
-        if (first !== -1) {
+        if (
+          first !== -1
+        ) {
           leftEdges[
             rowIndex
           ] = first;
@@ -1051,15 +1697,23 @@ function detectEnclosure(
 
       for (
         let i = 0;
-        i < rowOccupancy.length;
+        i <
+        rowOccupancy.length;
         i++
       ) {
         if (
-          rowOccupancy[i] <
+          rowOccupancy[
+          i
+          ] <
           minRowOccupancy
         ) {
-          leftEdges[i] = null;
-          rightEdges[i] = null;
+          leftEdges[
+            i
+          ] = null;
+
+          rightEdges[
+            i
+          ] = null;
         }
       }
 
@@ -1110,7 +1764,8 @@ function detectEnclosure(
           }
 
           columnOccupancy[
-            x - minX
+            x -
+            minX
           ] = count;
         }
 
@@ -1126,7 +1781,9 @@ function detectEnclosure(
             BODY_OCCUPANCY_THRESHOLD
           );
 
-        if (run) {
+        if (
+          run
+        ) {
           const detectedWidth =
             run.end -
             run.start +
@@ -1134,7 +1791,8 @@ function detectEnclosure(
 
           if (
             detectedWidth >
-            visibleWidth * 0.45
+            visibleWidth *
+            0.45
           ) {
             bodyLeft =
               minX +
@@ -1204,7 +1862,8 @@ function detectEnclosure(
             (
               value
             ): value is number =>
-              value !== null
+              value !==
+              null
           );
 
         const validRight =
@@ -1212,7 +1871,8 @@ function detectEnclosure(
             (
               value
             ): value is number =>
-              value !== null
+              value !==
+              null
           );
 
         if (
@@ -1238,18 +1898,28 @@ function detectEnclosure(
       }
     }
 
-    if (detectVertical) {
+    if (
+      detectVertical
+    ) {
       const topEdges:
-        Array<number | null> =
+        Array<
+          number | null
+        > =
         new Array(
           visibleWidth
-        ).fill(null);
+        ).fill(
+          null
+        );
 
       const bottomEdges:
-        Array<number | null> =
+        Array<
+          number | null
+        > =
         new Array(
           visibleWidth
-        ).fill(null);
+        ).fill(
+          null
+        );
 
       const columnOccupancy =
         new Array(
@@ -1272,7 +1942,9 @@ function detectEnclosure(
         ) {
           const alpha =
             pixels[
-            (y * canvas.width + x) *
+            (y *
+              canvas.width +
+              x) *
             4 +
             3
             ];
@@ -1293,13 +1965,16 @@ function detectEnclosure(
         }
 
         const columnIndex =
-          x - minX;
+          x -
+          minX;
 
         columnOccupancy[
           columnIndex
         ] = count;
 
-        if (first !== -1) {
+        if (
+          first !== -1
+        ) {
           topEdges[
             columnIndex
           ] = first;
@@ -1326,11 +2001,18 @@ function detectEnclosure(
         i++
       ) {
         if (
-          columnOccupancy[i] <
+          columnOccupancy[
+          i
+          ] <
           minColumnOccupancy
         ) {
-          topEdges[i] = null;
-          bottomEdges[i] = null;
+          topEdges[
+            i
+          ] = null;
+
+          bottomEdges[
+            i
+          ] = null;
         }
       }
 
@@ -1381,7 +2063,8 @@ function detectEnclosure(
           }
 
           rowOccupancy[
-            y - minY
+            y -
+            minY
           ] = count;
         }
 
@@ -1397,7 +2080,9 @@ function detectEnclosure(
             BODY_OCCUPANCY_THRESHOLD
           );
 
-        if (run) {
+        if (
+          run
+        ) {
           const detectedHeight =
             run.end -
             run.start +
@@ -1405,7 +2090,8 @@ function detectEnclosure(
 
           if (
             detectedHeight >
-            visibleHeight * 0.45
+            visibleHeight *
+            0.45
           ) {
             bodyTop =
               minY +
@@ -1475,7 +2161,8 @@ function detectEnclosure(
             (
               value
             ): value is number =>
-              value !== null
+              value !==
+              null
           );
 
         const validBottom =
@@ -1483,7 +2170,8 @@ function detectEnclosure(
             (
               value
             ): value is number =>
-              value !== null
+              value !==
+              null
           );
 
         if (
@@ -1528,12 +2216,15 @@ function detectEnclosure(
 
     if (
       bodyWidth <
-      visibleWidth * 0.45 ||
+      visibleWidth *
+      0.45 ||
       bodyHeight <
-      visibleHeight * 0.45
+      visibleHeight *
+      0.45
     ) {
       const inverseScale =
-        1 / analysisScale;
+        1 /
+        analysisScale;
 
       return {
         bodyLeft:
@@ -1555,7 +2246,8 @@ function detectEnclosure(
     }
 
     const inverseScale =
-      1 / analysisScale;
+      1 /
+      analysisScale;
 
     return {
       bodyLeft:
@@ -1597,13 +2289,21 @@ export default function PedalImage({
   useEnclosureSizing = false,
 }: PedalImageProps) {
   const [img, setImg] =
-    useState<HTMLImageElement | null>(null);
+    useState<HTMLImageElement | null>(
+      null
+    );
 
-  const [renderSize, setRenderSize] =
-    useState({
-      w: Number(width) || 80,
-      h: Number(depth) || 120,
-    });
+  const [
+    renderSize,
+    setRenderSize,
+  ] = useState({
+    w:
+      Number(width) ||
+      80,
+    h:
+      Number(depth) ||
+      120,
+  });
 
   const [
     imagePlacement,
@@ -1613,36 +2313,54 @@ export default function PedalImage({
       null
     );
 
-  const lastSize = useRef({
-    w: 0,
-    h: 0,
-  });
+  const lastSize =
+    useRef({
+      w: 0,
+      h: 0,
+    });
 
   const rawData =
     String(
-      jacksLocation || ""
+      jacksLocation ||
+      ""
     ).toLowerCase();
 
   const hasLeft =
-    rawData.includes("left") ||
-    rawData.includes("side");
+    rawData.includes(
+      "left"
+    ) ||
+    rawData.includes(
+      "side"
+    );
 
   const hasRight =
-    rawData.includes("right") ||
-    rawData.includes("side");
+    rawData.includes(
+      "right"
+    ) ||
+    rawData.includes(
+      "side"
+    );
 
   const hasTop =
-    rawData.includes("top");
+    rawData.includes(
+      "top"
+    );
 
   const hasBottom =
-    rawData.includes("down") ||
-    rawData.includes("bottom");
+    rawData.includes(
+      "down"
+    ) ||
+    rawData.includes(
+      "bottom"
+    );
 
   const hasHorizontalJacks =
-    hasLeft || hasRight;
+    hasLeft ||
+    hasRight;
 
   const hasVerticalJacks =
-    hasTop || hasBottom;
+    hasTop ||
+    hasBottom;
 
   const scaledWidth =
     renderSize.w;
@@ -1683,22 +2401,29 @@ export default function PedalImage({
   useEffect(() => {
     let objectUrl:
       | string
-      | null = null;
+      | null =
+      null;
 
-    let cancelled = false;
+    let cancelled =
+      false;
 
     const loadImage =
       async () => {
         let finalUrl =
-          url || null;
+          url ||
+          null;
 
-        if (imageId) {
+        if (
+          imageId
+        ) {
           const indexedDbUrl =
             await getCustomImageUrl(
               imageId
             );
 
-          if (indexedDbUrl) {
+          if (
+            indexedDbUrl
+          ) {
             finalUrl =
               indexedDbUrl;
 
@@ -1708,10 +2433,16 @@ export default function PedalImage({
         }
 
         const bodyW =
-          Number(width) || 80;
+          Number(
+            width
+          ) ||
+          80;
 
         const bodyH =
-          Number(depth) || 120;
+          Number(
+            depth
+          ) ||
+          120;
 
         setRenderSize({
           w: bodyW,
@@ -1719,9 +2450,11 @@ export default function PedalImage({
         });
 
         if (
-          lastSize.current.w !==
+          lastSize.current
+            .w !==
           bodyW ||
-          lastSize.current.h !==
+          lastSize.current
+            .h !==
           bodyH
         ) {
           lastSize.current = {
@@ -1735,7 +2468,9 @@ export default function PedalImage({
           );
         }
 
-        if (!finalUrl) {
+        if (
+          !finalUrl
+        ) {
           setImg(null);
 
           setImagePlacement(
@@ -1754,177 +2489,232 @@ export default function PedalImage({
         image.src =
           finalUrl;
 
-        image.onload = () => {
-          if (cancelled) return;
+        image.onload =
+          () => {
+            if (
+              cancelled
+            ) {
+              return;
+            }
 
-          setImg(image);
+            setImg(
+              image
+            );
 
-          if (isBoard) {
-            setImagePlacement({
-              width: bodyW,
-              height: bodyH,
-              x: -bodyW / 2,
-              y: -bodyH / 2,
-            });
+            if (
+              isBoard
+            ) {
+              setImagePlacement({
+                width:
+                  bodyW,
+                height:
+                  bodyH,
+                x:
+                  -bodyW /
+                  2,
+                y:
+                  -bodyH /
+                  2,
+              });
 
-            return;
-          }
+              return;
+            }
 
-          if (
-            !useEnclosureSizing
-          ) {
-            setImagePlacement({
-              width: bodyW,
-              height: bodyH,
-              x: -bodyW / 2,
-              y: -bodyH / 2,
-            });
+            if (
+              !useEnclosureSizing
+            ) {
+              setImagePlacement({
+                width:
+                  bodyW,
+                height:
+                  bodyH,
+                x:
+                  -bodyW /
+                  2,
+                y:
+                  -bodyH /
+                  2,
+              });
 
-            return;
-          }
+              return;
+            }
 
-          const ratio =
-            bodyH / bodyW;
+            const ratio =
+              bodyH /
+              bodyW;
 
-          const miniRectMode =
-            bodyW <=
-            MINI_RECT_MAX_WIDTH &&
-            bodyH <=
-            MINI_RECT_MAX_DEPTH &&
-            ratio >=
-            MINI_RECT_MIN_RATIO;
+            const miniRectMode =
+              bodyW <=
+              MINI_RECT_MAX_WIDTH &&
+              bodyH <=
+              MINI_RECT_MAX_DEPTH &&
+              ratio >=
+              MINI_RECT_MIN_RATIO;
 
-          const treadleMode =
-            ratio >=
-            TREADLE_DIMENSION_RATIO &&
-            bodyW >=
-            TREADLE_MIN_WIDTH &&
-            bodyH >=
-            TREADLE_MIN_DEPTH;
+            const treadleMode =
+              ratio >=
+              TREADLE_DIMENSION_RATIO &&
+              bodyW >=
+              TREADLE_MIN_WIDTH &&
+              bodyH >=
+              TREADLE_MIN_DEPTH;
 
-          const standardRectMode =
-            !miniRectMode &&
-            !treadleMode;
+            const standardRectMode =
+              !miniRectMode &&
+              !treadleMode;
 
-          const cacheKey = [
-            "enclosure-v15",
-            miniRectMode
-              ? "mini-rect"
-              : treadleMode
-                ? "treadle"
-                : standardRectMode
-                  ? "rect-precise"
-                  : "standard",
-            hasTop
-              ? "top"
-              : "",
-            hasBottom
-              ? "bottom"
-              : "",
-            finalUrl,
-          ].join("|");
+            /*
+             * v16 :
+             * nouvelle détection standard des fines
+             * tranches supérieures.
+             */
+            const cacheKey =
+              [
+                "enclosure-v16",
 
-          let enclosure:
-            EnclosureBounds | null;
+                miniRectMode
+                  ? "mini-rect"
+                  : treadleMode
+                    ? "treadle"
+                    : standardRectMode
+                      ? "rect-precise"
+                      : "standard",
 
-          if (
-            enclosureCache.has(
-              cacheKey
-            )
-          ) {
-            enclosure =
-              enclosureCache.get(
-                cacheKey
-              ) ?? null;
-          } else {
-            enclosure =
-              detectEnclosure(
-                image,
-                true,
-                true,
-                treadleMode,
-                miniRectMode,
-                standardRectMode,
-                hasTop,
+                hasTop
+                  ? "top"
+                  : "",
+
                 hasBottom
+                  ? "bottom"
+                  : "",
+
+                finalUrl,
+              ].join(
+                "|"
               );
 
-            enclosureCache.set(
-              cacheKey,
-              enclosure
-            );
-          }
+            let enclosure:
+              EnclosureBounds | null;
 
-          if (!enclosure) {
+            if (
+              enclosureCache.has(
+                cacheKey
+              )
+            ) {
+              enclosure =
+                enclosureCache.get(
+                  cacheKey
+                ) ??
+                null;
+            } else {
+              enclosure =
+                detectEnclosure(
+                  image,
+                  true,
+                  true,
+                  treadleMode,
+                  miniRectMode,
+                  standardRectMode,
+                  hasTop,
+                  hasBottom
+                );
+
+              enclosureCache.set(
+                cacheKey,
+                enclosure
+              );
+            }
+
+            if (
+              !enclosure
+            ) {
+              setImagePlacement({
+                width:
+                  bodyW,
+                height:
+                  bodyH,
+                x:
+                  -bodyW /
+                  2,
+                y:
+                  -bodyH /
+                  2,
+              });
+
+              return;
+            }
+
+            const scaleX =
+              bodyW /
+              enclosure.bodyWidth;
+
+            const scaleY =
+              bodyH /
+              enclosure.bodyHeight;
+
+            const fullWidth =
+              image.naturalWidth *
+              scaleX;
+
+            const fullHeight =
+              image.naturalHeight *
+              scaleY;
+
+            const bodyCenterX =
+              enclosure.bodyLeft +
+              enclosure.bodyWidth /
+              2;
+
+            const bodyCenterY =
+              enclosure.bodyTop +
+              enclosure.bodyHeight /
+              2;
+
+            const x =
+              -bodyCenterX *
+              scaleX;
+
+            const y =
+              -bodyCenterY *
+              scaleY;
+
             setImagePlacement({
-              width: bodyW,
-              height: bodyH,
-              x: -bodyW / 2,
-              y: -bodyH / 2,
+              width:
+                fullWidth,
+              height:
+                fullHeight,
+              x,
+              y,
             });
+          };
 
-            return;
-          }
+        image.onerror =
+          () => {
+            if (
+              cancelled
+            ) {
+              return;
+            }
 
-          const scaleX =
-            bodyW /
-            enclosure.bodyWidth;
+            setImg(
+              null
+            );
 
-          const scaleY =
-            bodyH /
-            enclosure.bodyHeight;
-
-          const fullWidth =
-            image.naturalWidth *
-            scaleX;
-
-          const fullHeight =
-            image.naturalHeight *
-            scaleY;
-
-          const bodyCenterX =
-            enclosure.bodyLeft +
-            enclosure.bodyWidth /
-            2;
-
-          const bodyCenterY =
-            enclosure.bodyTop +
-            enclosure.bodyHeight /
-            2;
-
-          const x =
-            -bodyCenterX *
-            scaleX;
-
-          const y =
-            -bodyCenterY *
-            scaleY;
-
-          setImagePlacement({
-            width: fullWidth,
-            height: fullHeight,
-            x,
-            y,
-          });
-        };
-
-        image.onerror = () => {
-          if (cancelled) return;
-
-          setImg(null);
-
-          setImagePlacement(
-            null
-          );
-        };
+            setImagePlacement(
+              null
+            );
+          };
       };
 
     loadImage();
 
     return () => {
-      cancelled = true;
+      cancelled =
+        true;
 
-      if (objectUrl) {
+      if (
+        objectUrl
+      ) {
         URL.revokeObjectURL(
           objectUrl
         );
@@ -1944,17 +2734,22 @@ export default function PedalImage({
   return (
     <Group>
       {/* MARGE JACKS */}
+
       {showJacksMargin &&
         !isBoard && (
           <Rect
-            ref={marginRef}
+            ref={
+              marginRef
+            }
             x={
               marginRect.x -
-              scaledWidth / 2
+              scaledWidth /
+              2
             }
             y={
               marginRect.y -
-              scaledHeight / 2
+              scaledHeight /
+              2
             }
             width={
               marginRect.w
@@ -1967,22 +2762,34 @@ export default function PedalImage({
                 ? "#ef4444"
                 : "#22c55e"
             }
-            strokeWidth={1.5}
-            dash={[4, 2]}
-            cornerRadius={4}
-            listening={false}
+            strokeWidth={
+              1.5
+            }
+            dash={[
+              4,
+              2,
+            ]}
+            cornerRadius={
+              4
+            }
+            listening={
+              false
+            }
           />
         )}
 
       {/* IMAGE OU RECTANGLE */}
+
       {!img ||
         !imagePlacement ? (
         <Rect
           x={
-            -scaledWidth / 2
+            -scaledWidth /
+            2
           }
           y={
-            -scaledHeight / 2
+            -scaledHeight /
+            2
           }
           height={
             scaledHeight
@@ -2001,7 +2808,9 @@ export default function PedalImage({
               ? "rgba(255,255,255,0.3)"
               : "#3f3f46"
           }
-          strokeWidth={1}
+          strokeWidth={
+            1
+          }
           cornerRadius={
             isBoard
               ? 0
@@ -2010,7 +2819,9 @@ export default function PedalImage({
         />
       ) : (
         <KonvaImage
-          image={img}
+          image={
+            img
+          }
           x={
             imagePlacement.x
           }
@@ -2035,6 +2846,7 @@ export default function PedalImage({
       )}
 
       {/* TEXTE */}
+
       {!img &&
         name && (
           <Text
@@ -2049,16 +2861,22 @@ export default function PedalImage({
             height={
               scaledHeight
             }
-            text={name}
+            text={
+              name
+            }
             width={
               scaledWidth
             }
             align="center"
             verticalAlign="middle"
             fill="white"
-            fontSize={10}
+            fontSize={
+              10
+            }
             fontStyle="bold"
-            padding={5}
+            padding={
+              5
+            }
             wrap="char"
           />
         )}

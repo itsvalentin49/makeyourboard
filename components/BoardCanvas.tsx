@@ -27,11 +27,15 @@ const ENCLOSURE_SIZING_BRANDS = new Set([
   "3 Leaf Audio",
   "Boss",
   "Behringer",
+  "Chase Bliss",
   "Dunlop",
+  "EarthQuaker Devices",
+  "J. Rockett",
   "Keeley",
   "MXR",
   "TC Electronic",
   "Third Man Hardware",
+  "Walrus Audio",
   "Wren and Cuff",
   "Zoom",
 ]);
@@ -761,6 +765,7 @@ export default function BoardCanvas({
     );
   };
   const lastRenderedPos = useRef<{ x: number; y: number } | null>(null);
+  const draggingPedalId = useRef<number | null>(null);
   const lastStablePos = useRef<{ x: number; y: number } | null>(null);
   const dragStartPos = useRef<{ x: number; y: number } | null>(null);
   const lastDist = useRef<number | null>(null);
@@ -841,6 +846,7 @@ export default function BoardCanvas({
   }, [confirmDeleteProjectId]);
 
   const [collisionReady, setCollisionReady] = useState(false);
+  const [, forceCollisionRender] = useState<number>(0);
   const [showList, setShowList] = useState(false);
   const [showOutputs, setShowOutputs] = useState(false);
   const [showPower, setShowPower] = useState(false);
@@ -1177,14 +1183,19 @@ export default function BoardCanvas({
       const size = displaySizes[selectedInstanceId];
       if (!size) return;
 
+      const selectedPedalIsDragging =
+        isDragging &&
+        draggingPedalId.current === selectedInstanceId &&
+        lastRenderedPos.current !== null;
+
       const currentX =
-        isDragging && lastRenderedPos.current
-          ? lastRenderedPos.current.x
+        selectedPedalIsDragging
+          ? lastRenderedPos.current!.x
           : pedal.x;
 
       const currentY =
-        isDragging && lastRenderedPos.current
-          ? lastRenderedPos.current.y
+        selectedPedalIsDragging
+          ? lastRenderedPos.current!.y
           : pedal.y;
 
       setOverlayPosition({
@@ -3757,6 +3768,7 @@ ${isMobile
 
                   onDragStart={(e) => {
                     setIsDragging(true);
+                    draggingPedalId.current = p.instanceId;
                     lastRenderedPos.current = {
                       x: e.target.x(),
                       y: e.target.y(),
@@ -4132,8 +4144,7 @@ ${isMobile
                       />
                     )}
 
-                  {!isDragging &&
-                    selectedInstanceId === p.instanceId &&
+                  {selectedInstanceId === p.instanceId &&
                     displaySizes[p.instanceId] && (
                       <Rect
                         x={-displaySizes[p.instanceId].w / 2}
@@ -4278,6 +4289,7 @@ ${isMobile
                     }}
                     onDragStart={(e) => {
                       setIsDragging(true);
+                      draggingPedalId.current = p.instanceId;
                       lastRenderedPos.current = {
                         x: e.target.x(),
                         y: e.target.y(),
@@ -4302,11 +4314,16 @@ ${isMobile
                         visualGroup.getLayer()?.batchDraw();
                       }
 
+                      forceCollisionRender(
+                        (value) => value + 1
+                      );
+
                       updateOverlayPosition();
                     }}
                     onDragEnd={(e) => {
                       setTimeout(() => setIsDragging(false), 0);
                       lastRenderedPos.current = null;
+                      draggingPedalId.current = null;
 
                       updateActiveProject({
                         boardPedals: activeProject.boardPedals.map((item: AnyRow) =>
