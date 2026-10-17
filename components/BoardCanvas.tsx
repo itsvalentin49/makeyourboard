@@ -12,6 +12,7 @@ import Image from "next/image";
 import type { Project } from "@/types/project";
 import SettingsPanel from "@/components/SettingsPanel";
 import SharePanel from "@/components/SharePanel";
+import PedalboardsPanel from "@/components/PedalboardsPanel";
 import PowerSetup from "@/components/PowerSetup";
 import { HelpGuide } from "@/components/HelpGuide";
 import SignalPath, { SignalPoint } from "@/components/SignalPath";
@@ -25,17 +26,28 @@ const ENCLOSURE_SIZING_BRANDS = new Set([
   "1981 Inventions",
   "29 Pedals",
   "3 Leaf Audio",
+  "BBE",
   "Boss",
   "Behringer",
   "Chase Bliss",
+  "Catalinbread",
   "Dunlop",
+  "Dolmen Effects",
+  "EBS",
   "EarthQuaker Devices",
+  "Electro-Harmonix",
+  "Fulltone",
   "J. Rockett",
   "Keeley",
+  "Line 6",
   "MXR",
+  "One Control",
   "TC Electronic",
   "Third Man Hardware",
+  "Triungulo Lab",
   "Walrus Audio",
+  "Wampler",
+  "Warm Audio",
   "Wren and Cuff",
   "Zoom",
 ]);
@@ -735,13 +747,7 @@ export default function BoardCanvas({
   const containerRef = useRef<HTMLDivElement>(null);
   const boardsMenuRef = useRef<HTMLDivElement>(null);
   const boardsButtonRef = useRef<HTMLButtonElement>(null);
-  const confirmDeleteRef = useRef<HTMLDivElement>(null);
   const rightSidebarRef = useRef<HTMLDivElement>(null);
-
-  const lastProjectTapRef = useRef<{
-    id: number;
-    time: number;
-  } | null>(null);
   const stageRef = useRef<any>(null);
   const rafRef = useRef<number | null>(null);
   const wheelTimeout = useRef<any>(null);
@@ -807,7 +813,6 @@ export default function BoardCanvas({
   const [showSignalPath, setShowSignalPath] = useState(false);
   const [showCableMenu, setShowCableMenu] = useState(false);
   const [showBoardsMenu, setShowBoardsMenu] = useState(false);
-  const [confirmDeleteProjectId, setConfirmDeleteProjectId] = useState<number | null>(null);
   useEffect(() => {
     if (!showBoardsMenu) return;
 
@@ -827,23 +832,8 @@ export default function BoardCanvas({
     };
   }, [showBoardsMenu]);
 
-  useEffect(() => {
-    if (confirmDeleteProjectId === null) return;
 
-    const handleClickOutsideConfirm = (e: MouseEvent) => {
-      const target = e.target as Node;
 
-      if (confirmDeleteRef.current?.contains(target)) return;
-
-      setConfirmDeleteProjectId(null);
-    };
-
-    document.addEventListener("mousedown", handleClickOutsideConfirm);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutsideConfirm);
-    };
-  }, [confirmDeleteProjectId]);
 
   const [collisionReady, setCollisionReady] = useState(false);
   const [, forceCollisionRender] = useState<number>(0);
@@ -2670,7 +2660,6 @@ ${isMobile
 
               {showBoardsMenu && (
                 <>
-
                   <div
                     ref={(node) => {
                       boardsMenuRef.current = node;
@@ -2687,271 +2676,21 @@ ${isMobile
                         : desktopRightSidebarStyle
                     }
                   >
-                    <div
-                      className={
-                        isMobile
-                          ? "w-full min-h-full bg-zinc-800 border-0 rounded-none p-6 flex flex-col gap-2"
-                          : "w-full bg-transparent border-0 rounded-none p-0 flex flex-col gap-2"
-                      }
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <div className="flex items-center gap-2 text-xs uppercase tracking-wider font-bold px-2 pb-3">
-                        <img
-                          src={
-                            isLightTheme
-                              ? "/images/tab-board-dark.webp"
-                              : "/images/tab-board-light.webp"
-                          }
-                          alt=""
-                          aria-hidden="true"
-                          draggable={false}
-                          className="w-[18px] h-[18px] object-contain shrink-0"
-                        />
-
-                        {t("canvasControls.pedalboards")}
-                      </div>
-
-                      {projects.map((project, index) => {
-                        const active = project.id === activeProjectId;
-
-                        return (
-                          <div
-                            key={project.id}
-                            className="
-    pedalboard-project-row
-    group
-    relative
-    flex
-    items-center
-    gap-2
-    h-[35px]
-    rounded-lg
-    border
-    border-zinc-800
-    bg-zinc-950
-    transition-colors
-    overflow-visible
-  "
-                          >
-                            {active && (
-                              <div
-                                className="
-        absolute
-        inset-0
-        rounded-md
-        border
-        border-blue-500
-        bg-blue-500/10
-        pointer-events-none
-        z-0
-      "
-                              />
-                            )}
-                            {editingProjectId === project.id ? (
-                              <input
-                                autoFocus
-                                value={tempName}
-                                onChange={(e) => setTempName?.(e.target.value)}
-                                onClick={(e) => e.stopPropagation()}
-                                onBlur={() => saveName?.()}
-                                onKeyDown={(e) => {
-                                  if (e.key === "Enter") saveName?.();
-                                  if (e.key === "Escape") saveName?.();
-                                }}
-                                className="relative z-10 flex-1 bg-transparent outline-none px-3 py-2 text-[10px] font-bold tracking-wide" />
-                            ) : (
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setActiveProjectId?.(project.id);
-                                }}
-                                onDoubleClick={(e) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-
-                                  startEditing?.(project);
-                                }}
-                                onTouchEnd={(e) => {
-                                  e.stopPropagation();
-
-                                  const now = Date.now();
-                                  const lastTap = lastProjectTapRef.current;
-
-                                  if (
-                                    lastTap &&
-                                    lastTap.id === project.id &&
-                                    now - lastTap.time <= 350
-                                  ) {
-                                    e.preventDefault();
-
-                                    lastProjectTapRef.current = null;
-                                    startEditing?.(project);
-
-                                    return;
-                                  }
-
-                                  lastProjectTapRef.current = {
-                                    id: project.id,
-                                    time: now,
-                                  };
-                                }}
-                                className="
-    flex-1
-    h-full
-    text-left
-    px-3
-    text-[10px]
-    font-bold
-    tracking-wide
-    touch-manipulation
-  "
-                              >
-                                {project.name || `Board ${index + 1}`}
-                              </button>
-                            )}
-
-                            <div className="flex items-center h-full">
-
-
-
-                              {/* DELETE */}
-                              <button
-                                type="button"
-                                aria-label={t("pedal.actions.delete")}
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                  setConfirmDeleteProjectId(project.id);
-                                }}
-                                onPointerUp={(e) => {
-                                  if (e.pointerType !== "touch") return;
-
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                  setConfirmDeleteProjectId(project.id);
-                                }}
-                                onMouseEnter={(e) => {
-                                  if (isMobile) return;
-                                  e.currentTarget.style.color = "var(--red)";
-                                }}
-                                onMouseLeave={(e) => {
-                                  e.currentTarget.style.color = "";
-                                }}
-                                className="
-    delete-project-button
-    w-11
-    h-[35px]
-    flex
-    items-center
-    justify-center
-    shrink-0
-    touch-manipulation
-  "
-                              >
-                                <X size={14} />
-                              </button>
-
-
-
-
-                            </div>
-
-
-                          </div>
-                        );
-                      })}
-
-                      {projects.length < 7 && (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            createNewProject?.();
-                          }}
-                          className="
-  w-full
-  h-[35px]
-  px-3
-  rounded-lg
-  bg-blue-600
-  !text-white
-  text-[10px]
-  font-black
-  uppercase
-  flex
-  items-center
-  justify-center
-  gap-2
-  transition-colors
-  hover:bg-blue-500
-"
-                        >
-                          {t("canvasControls.newBoard")}
-                        </button>
-                      )}
-                      {confirmDeleteProjectId !== null && (
-                        <div
-                          ref={confirmDeleteRef}
-                          className="
-  w-full
-  rounded-xl
-  bg-zinc-950
-  border
-  border-zinc-800
-  p-3
-"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <div className="text-[11px] font-bold mb-3">
-                            {t("tabs.confirmDelete").replace(
-                              "{name}",
-                              projects.find(
-                                (project) =>
-                                  project.id === confirmDeleteProjectId
-                              )?.name || "Pedalboard"
-                            )}
-                          </div>
-
-                          <div className="flex gap-2 justify-end">
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setConfirmDeleteProjectId(null);
-                              }}
-                              className="
-          px-3 py-1.5 rounded-md
-          bg-blue-600 hover:bg-blue-500
-          !text-white
-          transition-colors
-          text-[10px] font-black uppercase
-        "
-                            >
-                              {t("tabs.cancel")}
-                            </button>
-
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                deleteProject?.(confirmDeleteProjectId, e);
-                                setConfirmDeleteProjectId(null);
-                              }}
-                              className="
-          px-3 py-1.5 rounded-md
-          bg-red-600 hover:bg-red-500
-          !text-white
-          transition-colors
-          text-[10px] font-black uppercase
-        "
-                            >
-                              {t("pedal.actions.delete")}
-                            </button>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-
+                    <PedalboardsPanel
+                      projects={projects}
+                      activeProjectId={activeProjectId}
+                      setActiveProjectId={setActiveProjectId}
+                      createNewProject={createNewProject}
+                      deleteProject={deleteProject}
+                      startEditing={startEditing}
+                      editingProjectId={editingProjectId}
+                      tempName={tempName}
+                      setTempName={setTempName}
+                      saveName={saveName}
+                      language={language}
+                      isLightTheme={isLightTheme}
+                      isMobile={isMobile}
+                    />
                   </div>
                 </>
               )}
@@ -3756,6 +3495,15 @@ ${isMobile
 
               const p = item;
 
+              const pedalSize = displaySizes[p.instanceId];
+
+
+
+              const selectionWidth =
+                pedalSize
+                  ? pedalSize.w
+                  : 0;
+
               return (
                 <Group
                   name="exportable"
@@ -4132,9 +3880,9 @@ ${isMobile
                     selectedInstanceId !== p.instanceId &&
                     displaySizes[p.instanceId] && (
                       <Rect
-                        x={-displaySizes[p.instanceId].w / 2}
+                        x={-selectionWidth / 2}
                         y={-displaySizes[p.instanceId].h / 2}
-                        width={displaySizes[p.instanceId].w}
+                        width={selectionWidth}
                         height={displaySizes[p.instanceId].h}
                         stroke="white"
                         strokeWidth={0.5}
@@ -4147,9 +3895,9 @@ ${isMobile
                   {selectedInstanceId === p.instanceId &&
                     displaySizes[p.instanceId] && (
                       <Rect
-                        x={-displaySizes[p.instanceId].w / 2}
+                        x={-selectionWidth / 2}
                         y={-displaySizes[p.instanceId].h / 2}
-                        width={displaySizes[p.instanceId].w}
+                        width={selectionWidth}
                         height={displaySizes[p.instanceId].h}
                         stroke="white"
                         strokeWidth={0.5}

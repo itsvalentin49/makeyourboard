@@ -63,6 +63,7 @@
       "Distortion": "Distorção",
       "Doubler": "Duplicador",
       "Drum Machine": "Caixa de ritmos",
+      "Enhancer": "Realçador",
       "Envelope Filter": "Envelope Filter",
       "Equalizer": "Equalizador",
       "EQ": "Equalizador",
@@ -307,7 +308,7 @@
     },
     "sections": {
       "pedals": "Pedais",
-      "recommendation": "Recomendação"
+      "recommendation": "Recomendações"
     },
     "status": {
       "compatible": "Todos os pedais são compatíveis com esta fonte de alimentação.",

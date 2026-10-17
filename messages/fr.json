@@ -64,6 +64,7 @@
       "Distortion": "Distorsion",
       "Doubler": "Doubleur",
       "Drum Machine": "Boîte à rythmes",
+      "Enhancer": "Enhancer",
       "Envelope Filter": "Enveloppe Filter",
       "Equalizer": "EQ",
       "EQ": "EQ",
@@ -308,7 +309,7 @@
     },
     "sections": {
       "pedals": "Pédales",
-      "recommendation": "Recommandation"
+      "recommendation": "Recommandations"
     },
     "status": {
       "compatible": "Toutes les pédales sont compatibles avec cette alimentation.",

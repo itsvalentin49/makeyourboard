@@ -612,7 +612,7 @@ export default function PowerSetup({
         </div>
       )}
 
-      <div className="mb-1 mt-6 text-[11px] uppercase tracking-wide font-bold">
+      <div className="mb-3 mt-6 text-[11px] uppercase tracking-wide font-bold">
         {t("powerSetup.sections.pedals")}
       </div>
 
@@ -676,7 +676,7 @@ export default function PowerSetup({
       )}
 
       {hasPedals && powerMessage && (
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mt-3">
           <div
             className={`text-[12px] ${hasFailingPedal
               ? "text-red-500"
@@ -700,7 +700,7 @@ export default function PowerSetup({
         </div>
       )}
 
-      <div className="mb-1 mt-6 text-[11px] uppercase tracking-wide font-bold">
+      <div className="mb-3 mt-6 text-[11px] uppercase tracking-wide font-bold">
         {t("powerSetup.sections.recommendation")}
       </div>
 

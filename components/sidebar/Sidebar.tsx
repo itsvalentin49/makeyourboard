@@ -1378,7 +1378,7 @@ export default function Sidebar({
 
                           boxShadow: active
 
-                            ? "0 0 0 1px #2563eb"
+                            ? "0 0 0 1px var(--foreground)"
 
                             : "none",
 

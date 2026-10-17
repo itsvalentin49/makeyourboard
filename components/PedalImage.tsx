@@ -21,7 +21,7 @@ const MIN_VALID_LINE_RATIO = 0.08;
 const RECTANGULAR_VARIATION_LIMIT = 1.10;
 const BODY_OCCUPANCY_THRESHOLD = 0.65;
 
-const TREADLE_DIMENSION_RATIO = 2.15;
+const TREADLE_DIMENSION_RATIO = 1.8;
 const TREADLE_MIN_WIDTH = 65;
 const TREADLE_MIN_DEPTH = 150;
 
@@ -841,12 +841,39 @@ function detectTreadleBounds(
   const visibleWidth =
     maxX - minX + 1;
 
+  const visibleHeight =
+    maxY - minY + 1;
+
+  if (
+    visibleWidth < 20 ||
+    visibleHeight < 20
+  ) {
+    return null;
+  }
+
+  /*
+   * 1. Détection d'origine : c'est celle qui fonctionne
+   *    correctement sur les Cry Baby classiques.
+   */
   const rows: Array<{
+    y: number;
     left: number;
     right: number;
     center: number;
     width: number;
   }> = [];
+
+  const leftEdges:
+    Array<number | null> =
+    new Array(
+      visibleHeight
+    ).fill(null);
+
+  const rightEdges:
+    Array<number | null> =
+    new Array(
+      visibleHeight
+    ).fill(null);
 
   for (
     let y = minY;
@@ -893,7 +920,17 @@ function detectTreadleBounds(
         left +
         1;
 
+      const index =
+        y - minY;
+
+      leftEdges[index] =
+        left;
+
+      rightEdges[index] =
+        right;
+
       rows.push({
+        y,
         left,
         right,
         center:
@@ -937,77 +974,245 @@ function detectTreadleBounds(
     );
 
   if (
-    centeredRows.length <
-    8
+    centeredRows.length < 8
   ) {
     return null;
   }
 
-  const targetWidth =
+  const centeredWidths =
+    centeredRows.map(
+      (row) =>
+        row.width
+    );
+
+  const normalWidth =
     quantile(
-      centeredRows.map(
-        (row) =>
-          row.width
-      ),
+      centeredWidths,
+      0.70
+    );
+
+  const extremeWidth =
+    quantile(
+      centeredWidths,
       0.985
     );
 
-  const widestRows =
-    centeredRows.filter(
-      (row) =>
-        row.width >=
-        targetWidth -
-        1
-    );
+  /*
+   * Si les lignes les plus larges ne sont pas des
+   * valeurs aberrantes, on conserve EXACTEMENT le
+   * principe d'origine. C'est le cas des Cry Baby
+   * qui fonctionnaient déjà correctement.
+   */
+  const hasSideProtrusions =
+    normalWidth > 0 &&
+    extremeWidth >
+    normalWidth *
+    1.10;
 
-  const bodyLeft =
-    Math.round(
-      median(
-        widestRows.map(
-          (row) =>
-            row.left
-        )
-      )
-    );
-
-  const bodyRight =
-    Math.round(
-      median(
-        widestRows.map(
-          (row) =>
-            row.right
-        )
-      )
-    );
+  let bodyLeft: number;
+  let bodyRight: number;
 
   if (
+    !hasSideProtrusions
+  ) {
+    const targetWidth =
+      extremeWidth;
+
+    const widestRows =
+      centeredRows.filter(
+        (row) =>
+          row.width >=
+          targetWidth -
+          1
+      );
+
+    if (
+      widestRows.length === 0
+    ) {
+      return null;
+    }
+
+    bodyLeft =
+      Math.round(
+        median(
+          widestRows.map(
+            (row) =>
+              row.left
+          )
+        )
+      );
+
+    bodyRight =
+      Math.round(
+        median(
+          widestRows.map(
+            (row) =>
+              row.right
+          )
+        )
+      );
+  } else {
+    /*
+     * 2. Cas avec gros boutons / jacks latéraux.
+     *
+     * On applique un filtre médian sur une fenêtre
+     * verticale assez grande. Une protrusion locale
+     * disparaît, tandis que la forme progressive du
+     * châssis (droite ou légèrement trapézoïdale)
+     * reste intacte.
+     */
+    const robustRadius =
+      Math.max(
+        8,
+        Math.round(
+          visibleHeight *
+          0.14
+        )
+      );
+
+    const filteredLeft =
+      smoothEdge(
+        leftEdges,
+        robustRadius
+      );
+
+    const filteredRight =
+      smoothEdge(
+        rightEdges,
+        robustRadius
+      );
+
+    const filteredRows: Array<{
+      left: number;
+      right: number;
+      center: number;
+      width: number;
+    }> = [];
+
+    for (
+      let i = 0;
+      i < visibleHeight;
+      i++
+    ) {
+      const left =
+        filteredLeft[i];
+
+      const right =
+        filteredRight[i];
+
+      if (
+        left === null ||
+        right === null
+      ) {
+        continue;
+      }
+
+      const width =
+        right -
+        left +
+        1;
+
+      if (
+        width <= 0
+      ) {
+        continue;
+      }
+
+      const center =
+        (left +
+          right) /
+        2;
+
+      if (
+        Math.abs(
+          center -
+          centerMedian
+        ) >
+        visibleWidth *
+        0.06
+      ) {
+        continue;
+      }
+
+      filteredRows.push({
+        left,
+        right,
+        center,
+        width,
+      });
+    }
+
+    if (
+      filteredRows.length < 8
+    ) {
+      return null;
+    }
+
+    /*
+     * On prend les limites extérieures robustes du
+     * châssis filtré. Les 3 % extrêmes restants sont
+     * ignorés pour ne jamais récupérer un bouton.
+     */
+    bodyLeft =
+      Math.round(
+        quantile(
+          filteredRows.map(
+            (row) =>
+              row.left
+          ),
+          0.03
+        )
+      );
+
+    bodyRight =
+      Math.round(
+        quantile(
+          filteredRows.map(
+            (row) =>
+              row.right
+          ),
+          0.97
+        )
+      );
+  }
+
+  const bodyWidth =
     bodyRight -
     bodyLeft +
-    1 <
+    1;
+
+  if (
+    bodyWidth <
     visibleWidth *
     0.35
   ) {
     return null;
   }
 
-  let bodyTop =
-    maxY;
-
-  let bodyBottom =
-    minY;
+  /*
+   * 3. Hauteur du vrai boîtier.
+   *
+   * On regarde seulement l'occupation à l'intérieur
+   * de la largeur détectée. Les boutons, jacks et
+   * switches isolés n'occupent pas assez de largeur
+   * pour être considérés comme le châssis.
+   */
+  const rowOccupancy =
+    new Array(
+      visibleHeight
+    ).fill(0);
 
   for (
-    let x = bodyLeft;
-    x <= bodyRight;
-    x++
+    let y = minY;
+    y <= maxY;
+    y++
   ) {
-    let top = -1;
-    let bottom = -1;
+    let count = 0;
 
     for (
-      let y = minY;
-      y <= maxY;
-      y++
+      let x = bodyLeft;
+      x <= bodyRight;
+      x++
     ) {
       const alpha =
         pixels[
@@ -1022,40 +1227,77 @@ function detectTreadleBounds(
         alpha >
         ALPHA_THRESHOLD
       ) {
-        if (
-          top === -1
-        ) {
-          top = y;
-        }
-
-        bottom = y;
+        count++;
       }
     }
 
-    if (
-      top !== -1
-    ) {
-      bodyTop =
-        Math.min(
-          bodyTop,
-          top
-        );
-    }
-
-    if (
-      bottom !== -1
-    ) {
-      bodyBottom =
-        Math.max(
-          bodyBottom,
-          bottom
-        );
-    }
+    rowOccupancy[
+      y - minY
+    ] = count;
   }
 
+  const solidRun =
+    findLargestRun(
+      rowOccupancy,
+      bodyWidth *
+      0.42
+    );
+
   if (
-    bodyBottom <
-    bodyTop
+    !solidRun
+  ) {
+    return null;
+  }
+
+  let bodyTop =
+    minY +
+    solidRun.start;
+
+  let bodyBottom =
+    minY +
+    solidRun.end;
+
+  /*
+   * Récupération des coins arrondis immédiatement
+   * adjacents, sans remonter jusqu'aux contrôles.
+   */
+  const cornerThreshold =
+    bodyWidth *
+    0.22;
+
+  while (
+    bodyTop > minY &&
+    rowOccupancy[
+    bodyTop -
+    minY -
+    1
+    ] >=
+    cornerThreshold
+  ) {
+    bodyTop--;
+  }
+
+  while (
+    bodyBottom < maxY &&
+    rowOccupancy[
+    bodyBottom -
+    minY +
+    1
+    ] >=
+    cornerThreshold
+  ) {
+    bodyBottom++;
+  }
+
+  const bodyHeight =
+    bodyBottom -
+    bodyTop +
+    1;
+
+  if (
+    bodyHeight <
+    visibleHeight *
+    0.45
   ) {
     return null;
   }
@@ -1063,14 +1305,8 @@ function detectTreadleBounds(
   return {
     bodyLeft,
     bodyTop,
-    bodyWidth:
-      bodyRight -
-      bodyLeft +
-      1,
-    bodyHeight:
-      bodyBottom -
-      bodyTop +
-      1,
+    bodyWidth,
+    bodyHeight,
   };
 }
 
@@ -1243,9 +1479,36 @@ function detectMiniRectBounds(
     return null;
   }
 
+  /*
+   * Hauteur du vrai boîtier.
+   *
+   * On garde les lignes suffisamment larges pour appartenir
+   * au châssis, mais on autorise les coins arrondis.
+   *
+   * Les protrusions étroites (jack en haut, footswitch qui
+   * dépasse, etc.) sont automatiquement exclues car elles
+   * n'occupent pas assez de largeur.
+   */
+  const heightRows =
+    centeredRows.filter(
+      (row) =>
+        row.width >=
+        bodyWidth *
+        0.55 &&
+        row.width <=
+        bodyWidth *
+        1.12
+    );
+
+  if (
+    heightRows.length < 6
+  ) {
+    return null;
+  }
+
   const bodyTop =
     Math.min(
-      ...bodyRows.map(
+      ...heightRows.map(
         (row) =>
           row.y
       )
@@ -1253,7 +1516,7 @@ function detectMiniRectBounds(
 
   const bodyBottom =
     Math.max(
-      ...bodyRows.map(
+      ...heightRows.map(
         (row) =>
           row.y
       )
@@ -2570,7 +2833,7 @@ export default function PedalImage({
              */
             const cacheKey =
               [
-                "enclosure-v16",
+                "enclosure-v20",
 
                 miniRectMode
                   ? "mini-rect"
@@ -2738,43 +3001,21 @@ export default function PedalImage({
       {showJacksMargin &&
         !isBoard && (
           <Rect
-            ref={
-              marginRef
-            }
-            x={
-              marginRect.x -
-              scaledWidth /
-              2
-            }
-            y={
-              marginRect.y -
-              scaledHeight /
-              2
-            }
-            width={
-              marginRect.w
-            }
-            height={
-              marginRect.h
-            }
+            ref={marginRef}
+            x={marginRect.x - scaledWidth / 2}
+            y={marginRect.y - scaledHeight / 2}
+            width={marginRect.w}
+            height={marginRect.h}
             stroke={
               isColliding
                 ? "#ef4444"
                 : "#22c55e"
             }
-            strokeWidth={
-              1.5
-            }
-            dash={[
-              4,
-              2,
-            ]}
-            cornerRadius={
-              4
-            }
-            listening={
-              false
-            }
+            strokeWidth={1}
+            strokeScaleEnabled={false}
+            dash={[4, 2]}
+            cornerRadius={3}
+            listening={false}
           />
         )}
 

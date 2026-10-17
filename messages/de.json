@@ -64,6 +64,7 @@
       "Doubler": "Doppler",
       "Drum Machine": "Drumcomputer",
       "Envelope Filter": "Envelope Filter",
+      "Enhancer": "Klangverbesserer",
       "Equalizer": "Equalizer",
       "EQ": "EQ",
       "Expression": "Expression-Pedal",
@@ -307,7 +308,7 @@
     },
     "sections": {
       "pedals": "Pedale",
-      "recommendation": "Empfehlung"
+      "recommendation": "Empfehlungen"
     },
     "status": {
       "compatible": "Alle Pedale sind mit diesem Netzteil kompatibel.",

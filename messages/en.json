@@ -64,6 +64,7 @@
       "Distortion": "Distortion",
       "Doubler": "Doubler",
       "Drum Machine": "Drum Machine",
+      "Enhancer": "Enhancer",
       "Envelope Filter": "Envelope Filter",
       "Equalizer": "EQ",
       "EQ": "EQ",
@@ -310,7 +311,7 @@
     },
     "sections": {
       "pedals": "Pedals",
-      "recommendation": "Recommendation"
+      "recommendation": "Recommendations"
     },
     "status": {
       "compatible": "All pedals are compatible with this power supply.",

@@ -63,6 +63,7 @@
       "Distortion": "Distorsione",
       "Doubler": "Doppiatore",
       "Drum Machine": "Drum machine",
+      "Enhancer": "Esaltatore",
       "Envelope Filter": "Envelope Filter",
       "Equalizer": "Equalizzatore",
       "EQ": "EQ",
@@ -307,7 +308,7 @@
     },
     "sections": {
       "pedals": "Pedali",
-      "recommendation": "Consiglio"
+      "recommendation": "Raccomandazioni"
     },
     "status": {
       "compatible": "Tutti i pedali sono compatibili con questo alimentatore.",

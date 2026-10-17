@@ -707,17 +707,31 @@ export default function BoardEditor({
     if (projects.length >= MAX_PROJECTS) return;
 
     const newId = Date.now();
-    const newProject: Project = {
-      id: newId,
-      name: `Pedalboard ${projects.length + 1}`,
-      zoom: 200,
-      stageX: 0,
-      stageY: 0,
-      boardPedals: [],
-      selectedBoards: [],
-    };
 
-    setProjects((prev) => [...prev, newProject]);
+    setProjects((prev) => {
+      const savedProjects =
+        editingProjectId !== null
+          ? prev.map((p) =>
+            p.id === editingProjectId
+              ? { ...p, name: tempName.trim() || p.name }
+              : p
+          )
+          : prev;
+
+      const newProject: Project = {
+        id: newId,
+        name: `Pedalboard ${savedProjects.length + 1}`,
+        zoom: 200,
+        stageX: 0,
+        stageY: 0,
+        boardPedals: [],
+        selectedBoards: [],
+      };
+
+      return [...savedProjects, newProject];
+    });
+
+    setEditingProjectId(null);
     setActiveProjectId(newId);
   };
 
@@ -743,17 +757,21 @@ export default function BoardEditor({
     setTempName(project.name);
   };
 
-  const saveName = () => {
+  const updateProjectName = (name: string) => {
+    setTempName(name);
+
     if (editingProjectId === null) return;
 
     setProjects((prev) =>
       prev.map((p) =>
         p.id === editingProjectId
-          ? { ...p, name: tempName.trim() }
+          ? { ...p, name }
           : p
       )
     );
+  };
 
+  const saveName = () => {
     setEditingProjectId(null);
   };
 
@@ -1304,7 +1322,7 @@ export default function BoardEditor({
                   startEditing={startEditing}
                   editingProjectId={editingProjectId}
                   tempName={tempName}
-                  setTempName={setTempName}
+                  setTempName={updateProjectName}
                   saveName={saveName}
                   setSettingsOpen={setSettingsOpen}
                   setLanguage={setLanguage}
@@ -1470,7 +1488,7 @@ export default function BoardEditor({
               startEditing={startEditing}
               editingProjectId={editingProjectId}
               tempName={tempName}
-              setTempName={setTempName}
+              setTempName={updateProjectName}
               saveName={saveName}
               setSettingsOpen={setSettingsOpen}
               setLanguage={setLanguage}
