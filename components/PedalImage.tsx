@@ -9,7 +9,7 @@ import {
   Image as KonvaImage,
 } from "react-konva";
 
-const MARGIN_SIZE = 10;
+const MARGIN_SIZE = 13;
 const ALPHA_THRESHOLD = 10;
 const MAX_ANALYSIS_SIZE = 420;
 const enclosureCache = new Map<string, EnclosureBounds | null>();
