@@ -246,28 +246,21 @@
     }
   },
   "export": {
-    "button": "Export",
-    "title": "Bild exportieren",
-    "name": "Dateiname",
-    "background": "Hintergrund",
+    "button": "Exportieren",
+    "title": "Pedalboard exportieren",
+    "name": "Name des Pedalboards",
     "preview": "Vorschau",
+    "downloadTitle": "Bild herunterladen",
+    "canvas": "Canvas (PNG)",
     "transparent": "Transparent (PNG)",
     "white": "Weiß (JPG)",
-    "download": "Herunterladen"
-  },
-  "share": {
-    "button": "Teilen",
-    "title": "Pedalboard teilen",
-    "boardName": "Name des Pedalboards",
-    "createLink": "Freigabelink erstellen",
-    "creating": "Wird erstellt...",
+    "download": "Herunterladen",
+    "shareTitle": "Projekt teilen",
+    "shareDescription": "Der Link öffnet eine bearbeitbare Kopie dieses Pedalboards in MakeYourBoard.",
+    "createLink": "URL generieren",
     "ready": "Dein Pedalboard kann jetzt geteilt werden.",
-    "shareLink": "Freigabelink",
-    "copy": "Link kopieren",
-    "copied": "Kopiert",
-    "error": "Der Freigabelink konnte nicht erstellt werden.",
-    "sharedBoardUnavailable": "Dieses geteilte Pedalboard ist nicht verfügbar.",
-    "loadingSharedBoard": "Geteiltes Pedalboard wird geladen..."
+    "copy": "URL kopieren",
+    "copied": "Kopiert"
   },
   "list": {
     "button": "Liste",
@@ -394,9 +387,17 @@
     "newBoard": "Neues",
     "jacks": "Jacks",
     "cables": "Kabel",
-    "power": "Power",
-    "cableClearance": "Kabelabstand",
-    "cableClearanceDescription": "Prüfe, ob genügend Platz für die Kabel vorhanden ist."
+    "power": "Power"
+  },
+  "cables": {
+    "title": "Kabel",
+    "clearance": "Platz für Kabel",
+    "clearanceDescription": "Prüfe, ob genügend Platz für die Kabel vorhanden ist.",
+    "signalChain": "Signalkette",
+    "signalChainDescription": "Eine empfohlene Reihenfolge als gute Ausgangsbasis. Passe sie nach Belieben an und experimentiere, um deinen Sound zu finden.",
+    "recommendedOrder": "Empfohlene Reihenfolge",
+    "reset": "Zurücksetzen",
+    "empty": "Füge Pedale zum Pedalboard hinzu, um die Signalkette anzuzeigen."
   },
   "help": {
     "title": "Kurzanleitung",

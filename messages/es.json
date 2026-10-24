@@ -247,27 +247,20 @@
   },
   "export": {
     "button": "Exportar",
-    "title": "Exportar imagen",
-    "name": "Nombre del archivo",
-    "background": "Fondo",
+    "title": "Exportar pedalboard",
+    "name": "Nombre del pedalboard",
     "preview": "Vista previa",
+    "downloadTitle": "Descargar imagen",
+    "canvas": "Canvas (PNG)",
     "transparent": "Transparente (PNG)",
     "white": "Blanco (JPG)",
-    "download": "Descargar"
-  },
-  "share": {
-    "button": "Compartir",
-    "title": "Compartir pedalboard",
-    "boardName": "Nombre del pedalboard",
-    "createLink": "Crear enlace para compartir",
-    "creating": "Creando...",
+    "download": "Descargar",
+    "shareTitle": "Compartir proyecto",
+    "shareDescription": "El enlace abre una copia editable de este pedalboard en MakeYourBoard.",
+    "createLink": "Generar URL",
     "ready": "Tu pedalboard está listo para compartir.",
-    "shareLink": "Enlace para compartir",
-    "copy": "Copiar enlace",
-    "copied": "Copiado",
-    "error": "No se ha podido crear el enlace para compartir.",
-    "sharedBoardUnavailable": "Este pedalboard compartido no está disponible.",
-    "loadingSharedBoard": "Cargando pedalboard compartido..."
+    "copy": "Copiar URL",
+    "copied": "Copiado"
   },
   "list": {
     "button": "Lista",
@@ -394,9 +387,17 @@
     "newBoard": "Nuevo",
     "jacks": "Jacks",
     "cables": "Cables",
-    "power": "Alimentación",
-    "cableClearance": "Espacio para cables",
-    "cableClearanceDescription": "Comprueba que los pedales tengan suficiente espacio para los cables."
+    "power": "Alimentación"
+  },
+  "cables": {
+    "title": "Cables",
+    "clearance": "Espacio para cables",
+    "clearanceDescription": "Comprueba que haya suficiente espacio para los cables.",
+    "signalChain": "Cadena de señal",
+    "signalChainDescription": "Un orden recomendado para empezar con una buena base. Puedes adaptarlo y experimentar libremente hasta encontrar tu sonido.",
+    "recommendedOrder": "Orden recomendado",
+    "reset": "Restablecer",
+    "empty": "Añade pedales al pedalboard para mostrar la cadena de señal."
   },
   "help": {
     "title": "Guía rápida",

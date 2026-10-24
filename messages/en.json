@@ -250,27 +250,20 @@
   },
   "export": {
     "button": "Export",
-    "title": "Export image",
-    "name": "File name",
-    "background": "Background",
+    "title": "Export pedalboard",
+    "name": "Pedalboard name",
     "preview": "Preview",
+    "downloadTitle": "Download image",
+    "canvas": "Canvas (PNG)",
     "transparent": "Transparent (PNG)",
     "white": "White (JPG)",
-    "download": "Download"
-  },
-  "share": {
-    "button": "Share",
-    "title": "Share Board",
-    "boardName": "Board Name",
-    "createLink": "Create Share Link",
-    "creating": "Creating...",
-    "ready": "Your pedalboard is ready to share.",
-    "shareLink": "Share link",
-    "copy": "Copy link",
-    "copied": "Copied",
-    "error": "Unable to create the share link.",
-    "sharedBoardUnavailable": "This shared pedalboard is unavailable.",
-    "loadingSharedBoard": "Loading shared pedalboard..."
+    "download": "Download",
+    "shareTitle": "Share project",
+    "shareDescription": "The link opens an editable copy of this pedalboard in MakeYourBoard.",
+    "createLink": "Generate URL",
+    "ready": "Your pedalboard is ready to be shared.",
+    "copy": "Copy URL",
+    "copied": "Copied"
   },
   "list": {
     "button": "List",
@@ -396,9 +389,17 @@
     "pedalboards": "Boards",
     "newBoard": "New",
     "cables": "Cables",
-    "power": "Power",
-    "cableClearance": "Cable Clearance",
-    "cableClearanceDescription": "Check if pedals have enough room for cables."
+    "power": "Power"
+  },
+  "cables": {
+    "title": "Cables",
+    "clearance": "Cable clearance",
+    "clearanceDescription": "Check that there is enough space for the cables.",
+    "signalChain": "Signal chain",
+    "signalChainDescription": "A recommended order to get you started on the right track. Feel free to adjust it and experiment to find your sound.",
+    "recommendedOrder": "Recommended order",
+    "reset": "Reset",
+    "empty": "Add pedals to the pedalboard to display the signal chain."
   },
   "help": {
     "title": "Quick Guide",

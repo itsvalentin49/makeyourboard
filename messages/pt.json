@@ -247,27 +247,20 @@
   },
   "export": {
     "button": "Exportar",
-    "title": "Exportar imagem",
-    "name": "Nome do ficheiro",
-    "background": "Fundo",
+    "title": "Exportar pedalboard",
+    "name": "Nome do pedalboard",
     "preview": "Pré-visualização",
+    "downloadTitle": "Baixar imagem",
+    "canvas": "Canvas (PNG)",
     "transparent": "Transparente (PNG)",
     "white": "Branco (JPG)",
-    "download": "Transferir"
-  },
-  "share": {
-    "button": "Partilhar",
-    "title": "Partilhar pedalboard",
-    "boardName": "Nome do pedalboard",
-    "createLink": "Criar link de partilha",
-    "creating": "A criar...",
-    "ready": "O teu pedalboard está pronto para ser partilhado.",
-    "shareLink": "Link de partilha",
-    "copy": "Copiar link",
-    "copied": "Copiado",
-    "error": "Não foi possível criar o link de partilha.",
-    "sharedBoardUnavailable": "Este pedalboard partilhado não está disponível.",
-    "loadingSharedBoard": "A carregar pedalboard partilhado..."
+    "download": "Baixar",
+    "shareTitle": "Compartilhar projeto",
+    "shareDescription": "O link abre uma cópia editável deste pedalboard no MakeYourBoard.",
+    "createLink": "Gerar URL",
+    "ready": "Seu pedalboard está pronto para ser compartilhado.",
+    "copy": "Copiar URL",
+    "copied": "Copiado"
   },
   "list": {
     "button": "Lista",
@@ -394,9 +387,17 @@
     "newBoard": "Novo",
     "jacks": "Jacks",
     "cables": "Cabos",
-    "power": "Power",
-    "cableClearance": "Espaço para cabos",
-    "cableClearanceDescription": "Verifique se os pedais têm espaço suficiente para os cabos."
+    "power": "Power"
+  },
+  "cables": {
+    "title": "Cabos",
+    "clearance": "Espaço para cabos",
+    "clearanceDescription": "Verifique se há espaço suficiente para os cabos.",
+    "signalChain": "Cadeia de sinal",
+    "signalChainDescription": "Uma ordem recomendada para começar com uma boa base. Sinta-se à vontade para adaptá-la e experimentar até encontrar o seu som.",
+    "recommendedOrder": "Ordem recomendada",
+    "reset": "Repor",
+    "empty": "Adicione pedais ao pedalboard para visualizar a cadeia de sinal."
   },
   "help": {
     "title": "Guia rápido",

@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useRef, useLayoutEffect, useEffect, useState } from "react";
-import { Stage, Layer, Group, Rect, Text, Image as KonvaImage } from "react-konva";
-import { Zap, Weight, Minus, Cable, Plus, Check, Upload, AlertTriangle, RotateCw, Trash2, X, Share2, Info, List, Settings, PanelsTopLeft, Download, ArrowUp, ArrowDown } from "lucide-react";
+import { Stage, Layer, Group, Rect, Text, Circle as KonvaCircle, Image as KonvaImage, } from "react-konva";
+import { Zap, Weight, Minus, Cable, Plus, Check, Upload, AlertTriangle, RotateCw, Circle, Trash2, X, Share2, Info, List, Settings, PanelsTopLeft, Download, ArrowUp, ArrowDown } from "lucide-react";
 import PedalImage from "@/components/PedalImage";
 import { formatWeight } from "@/utils/units";
 import { getTranslator } from "@/utils/i18n";
@@ -11,9 +11,9 @@ import ExportPanel from "@/components/ExportPanel";
 import Image from "next/image";
 import type { Project } from "@/types/project";
 import SettingsPanel from "@/components/SettingsPanel";
-import SharePanel from "@/components/SharePanel";
 import PedalboardsPanel from "@/components/PedalboardsPanel";
 import PowerSetup from "@/components/PowerSetup";
+import CablesPanel from "@/components/CablesPanel";
 import { HelpGuide } from "@/components/HelpGuide";
 import SignalPath, { SignalPoint } from "@/components/SignalPath";
 import type { Language } from "@/utils/i18n";
@@ -37,6 +37,7 @@ const ENCLOSURE_SIZING_BRANDS = new Set([
   "Chase Bliss",
   "Catalinbread",
   "Crazy Tube Circuits",
+  "Danelectro",
   "DOD",
   "Dunlop",
   "Dolmen Effects",
@@ -51,14 +52,17 @@ const ENCLOSURE_SIZING_BRANDS = new Set([
   "J. Rockett",
   "Keeley",
   "Line 6",
+  "Lovepedal",
   "Maestro",
   "Mr. Black",
   "MXR",
   "One Control",
+  "PastFx",
   "ProCo",
   "Singular Sound",
   "Spaceman",
   "Strymon",
+  "T-Rex",
   "Tech 21",
   "TC Electronic",
   "Third Man Hardware",
@@ -380,8 +384,6 @@ export default function BoardCanvas({
     setShowSettings(false);
     setShowList(false);
     setHelpOpen(false);
-    setShowSharePanel(false);
-
   };
   const [knob] = useImage("/images/knob.webp");
   const [footswitch] = useImage("/images/footswitch.webp");
@@ -758,7 +760,6 @@ export default function BoardCanvas({
       setShowBoardsMenu(false);
       setShowSettings(false);
       setShowCableMenu(false);
-      setShowSharePanel(false);
     }
   };
 
@@ -770,8 +771,6 @@ export default function BoardCanvas({
   const rafRef = useRef<number | null>(null);
   const wheelTimeout = useRef<any>(null);
   const marginRefs = useRef<Record<number, any>>({});
-
-
   const checkCollision = (id1: number, id2: number) => {
     const n1 = marginRefs.current[id1];
     const n2 = marginRefs.current[id2];
@@ -826,8 +825,9 @@ export default function BoardCanvas({
 
   const [hoveredPedalId, setHoveredPedalId] = useState<number | null>(null);
   const [showExportPanel, setShowExportPanel] = useState(false);
-  const [showSharePanel, setShowSharePanel] = useState(false);
   const [showJacksMargin, setShowJacksMargin] = useState(false);
+  const [showSignalChain, setShowSignalChain] = useState(false);
+  const [signalOrder, setSignalOrder] = useState<number[]>([]);
   const [showSignalPath, setShowSignalPath] = useState(false);
   const [showCableMenu, setShowCableMenu] = useState(false);
   const [showBoardsMenu, setShowBoardsMenu] = useState(false);
@@ -865,7 +865,6 @@ export default function BoardCanvas({
       showCableMenu ||
       showPower ||
       showExportPanel ||
-      showSharePanel ||
       showSettings
     );
 
@@ -877,7 +876,6 @@ export default function BoardCanvas({
       showCableMenu ||
       showPower ||
       showExportPanel ||
-      showSharePanel ||
       showSettings;
 
     if (!sidebarOpen) return;
@@ -909,7 +907,6 @@ export default function BoardCanvas({
     showCableMenu,
     showPower,
     showExportPanel,
-    showSharePanel,
     showSettings,
   ]);
 
@@ -920,7 +917,6 @@ export default function BoardCanvas({
       showCableMenu ||
       showPower ||
       showExportPanel ||
-      showSharePanel ||
       showSettings ||
       helpOpen
     );
@@ -2450,91 +2446,6 @@ ${isMobile
                         </div>
                       </div>
 
-                      {/* SHARE */}
-                      <div
-                        className={`
-    relative
-    h-9
-    shrink-0
-    flex
-    items-center
-    px-4
-    ${isMobile ? "w-full" : "w-auto"}
-  `}
-                        style={{
-                          opacity: showMobileMenu ? 1 : 0,
-                          transform: showMobileMenu
-                            ? "translateX(0)"
-                            : isMobile
-                              ? "translateX(16px)"
-                              : "translateX(-24px)",
-                          transition: "opacity 180ms ease-out, transform 180ms ease-out",
-                          transitionDelay: isMobile
-                            ? showMobileMenu ? "25ms" : "225ms"
-                            : showMobileMenu ? "200ms" : "25ms",
-                          pointerEvents: showMobileMenu ? "auto" : "none",
-                        }}
-                        onMouseEnter={(e) => {
-                          const button = e.currentTarget.querySelector("button");
-
-                          if (button) {
-                            button.style.width = "calc(100% + 4px)";
-                            button.style.height = "36px";
-                          }
-                        }}
-                        onMouseLeave={(e) => {
-                          const button = e.currentTarget.querySelector("button");
-
-                          if (button) {
-                            button.style.width = "100%";
-                            button.style.height = "32px";
-                          }
-                        }}
-                      >
-                        <button
-                          type="button"
-                          onClick={() => {
-                            closeBottomPanels();
-                            setShowSharePanel(true);
-                          }}
-                          style={{
-                            position: "absolute",
-                            left: "50%",
-                            top: "50%",
-                            width: "100%",
-                            height: "32px",
-                            transform: "translate(-50%, -50%)",
-                            transition: "width 140ms ease-out, height 140ms ease-out",
-                          }}
-                          className="
-      bg-zinc-900
-      border border-zinc-800
-      rounded-2xl
-      p-0
-      cursor-pointer
-    "
-                        />
-
-                        <div
-                          className="
-      relative
-      z-10
-      flex
-      items-center
-      justify-center
-      gap-2
-      whitespace-nowrap
-      pointer-events-none
-      text-[10px]
-      font-bold
-      uppercase
-    "
-                        >
-                          <Share2 size={18} />
-
-                          {t("share.button")}
-                        </div>
-                      </div>
 
 
                       {/* PARAMÈTRES */}
@@ -2716,147 +2627,36 @@ ${isMobile
 
 
             {/* CABLES */}
-            <div className="relative">
-              <button
-                type="button"
-                onClick={() => {
-                  setShowCableMenu((v) => !v);
-                  setShowBoardsMenu(false);
-                  setShowPower(false);
-                  setShowExportPanel(false);
-                  setShowList(false);
-                  setShowSettings(false);
-                }}
-                className={`
-  hidden
-  items-center justify-center gap-2
-  ${isMobile ? "h-8 w-20 text-[9px]" : "h-10 w-28 text-[11px]"}
-  bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl
-  font-mono font-bold uppercase
-  transition-all duration-200
-  hover:scale-105 hover:border-blue-500 active:scale-95
-  cursor-pointer
-`}
-              >
-                <Cable
-                  size={16}
-                  className={showCableMenu ? "text-red-500" : undefined}
-                />
-
-                {t("canvasControls.cables")}
-              </button>
-
-              {showCableMenu && (
-                <div
-                  ref={rightSidebarRef}
-                  className={
-                    isMobile
-                      ? mobileFullPanelClass
-                      : desktopRightSidebarClass
-                  }
-                  style={
-                    isMobile
-                      ? undefined
-                      : desktopRightSidebarStyle
-                  }
-                >
-                  <div
-                    className={
-                      isMobile
-                        ? "relative w-full min-h-full bg-zinc-800 border-0 rounded-none p-6 space-y-4"
-                        : "relative w-full bg-transparent border-0 rounded-none p-0 space-y-4"
-                    }
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <div className="flex items-center gap-2 text-xs uppercase tracking-wider font-bold">
-                      <img
-                        src={
-                          isLightTheme
-                            ? "/images/tab-cables-dark.webp"
-                            : "/images/tab-cables-light.webp"
-                        }
-                        alt=""
-                        aria-hidden="true"
-                        draggable={false}
-                        className="w-[18px] h-[18px] object-contain shrink-0"
-                      />
-
-                      {t("canvasControls.cables")}
-                    </div>
-
-                    {/* SWITCH JACK CLEARANCE */}
-                    <button
-                      type="button"
-                      onClick={() => setShowJacksMargin((v) => !v)}
-                      className="
-          w-full
-          text-left
-        "
-                    >
-                      <div className="pr-2">
-                        <div className="text-[10px] font-bold uppercase tracking-wide">
-                          {t("canvasControls.cableClearance")}
-                        </div>
-
-                        <div className="text-[10px] font-medium mt-0.5 leading-snug">
-                          {t("canvasControls.cableClearanceDescription")}
-                        </div>
-                      </div>
-
-                      <div
-                        className={`
-    absolute top-4 right-4
-    w-10 h-5 rounded-full transition-colors duration-200
-    ${showJacksMargin ? "bg-blue-600" : "bg-zinc-700"}
-  `}
-                      >
-                        <div
-                          className={`
-      absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white
-      transition-transform duration-200
-      ${showJacksMargin ? "translate-x-5" : "translate-x-0"}
-    `}
-                        />
-                      </div>
-                    </button>
-
-                    {/* SWITCH SIGNAL PATH */}
-                    {/*<button
-        type="button"
-        onClick={() => setShowSignalPath((v) => !v)}
-        className="
-          w-full flex items-center justify-between gap-3
-          text-left
-        "
-        >
-        <div>
-          <div className="text-[11px] font-black uppercase tracking-wide">
-            Cable mode
-          </div>
-          <div className="text-[10px] text-zinc-500 font-medium mt-0.5">
-            Signal path
-          </div>
-        </div>
-
-        <div
-          className={`
-            relative w-12 h-7 rounded-full transition-colors duration-200
-            ${showSignalPath ? "bg-blue-600" : "bg-zinc-700"}
-          `}
-        >
-          <div
-            className={`
-              absolute top-1 left-1 w-5 h-5 rounded-full bg-white
-              transition-transform duration-200
-              ${showSignalPath ? "translate-x-5" : "translate-x-0"}
-            `}
-          />
-        </div>
-      </button>*/}
-                  </div>
-                </div>
+            <CablesPanel
+              t={t}
+              isMobile={isMobile}
+              isLightTheme={isLightTheme}
+              showCableMenu={showCableMenu}
+              onToggleCableMenu={() => {
+                setShowCableMenu((v) => !v);
+                setShowBoardsMenu(false);
+                setShowPower(false);
+                setShowExportPanel(false);
+                setShowList(false);
+                setShowSettings(false);
+              }}
+              showJacksMargin={showJacksMargin}
+              setShowJacksMargin={setShowJacksMargin}
+              showSignalChain={showSignalChain}
+              setShowSignalChain={setShowSignalChain}
+              boardPedals={activeProject.boardPedals.filter(
+                (p: AnyRow) =>
+                  String(p.type || "").trim().toLowerCase() !== "power"
               )}
-            </div>
+              signalOrder={signalOrder}
+              setSignalOrder={setSignalOrder}
+              rightSidebarRef={rightSidebarRef}
+              mobileFullPanelClass={mobileFullPanelClass}
+              desktopRightSidebarClass={desktopRightSidebarClass}
+              desktopRightSidebarStyle={desktopRightSidebarStyle}
+            />
+
+            {/* POWER*/}
 
 
             {/* POWER*/}
@@ -2983,7 +2783,7 @@ ${isMobile
   cursor-pointer
 `}
               >
-                <Download size={16} className={showExportPanel ? "text-blue-500" : undefined}
+                <Share2 size={16} className={showExportPanel ? "text-blue-500" : undefined}
                 />
                 {t("export.button")}
               </button>
@@ -3013,6 +2813,11 @@ ${isMobile
                       boardName={activeProject.name}
                       canvasBg={canvasBg}
                       currentBackground={currentBackground}
+                      signalPath={activeProject.signalPath}
+                      zoom={activeProject.zoom ?? 200}
+                      stageX={activeProject.stageX}
+                      stageY={activeProject.stageY}
+
                       onClose={() => setShowExportPanel(false)}
                     />
                   </div>
@@ -3020,44 +2825,7 @@ ${isMobile
               )}
             </div>
 
-            {/* SHARE PANEL */}
-            {showSharePanel && (
-              <>
-                <div className="fixed inset-0 z-40 pointer-events-none" />
 
-                <div
-                  ref={rightSidebarRef}
-                  className={
-                    isMobile
-                      ? mobileFullPanelClass
-                      : desktopRightSidebarClass
-                  }
-                  style={
-                    isMobile
-                      ? undefined
-                      : desktopRightSidebarStyle
-                  }
-                >
-                  <SharePanel
-                    isLightTheme={isLightTheme}
-                    isMobile={isMobile}
-                    boardName={activeProject.name}
-                    boardPedals={activeProject.boardPedals}
-                    language={language}
-                    selectedBoards={activeProject.selectedBoards}
-                    signalPath={activeProject.signalPath}
-                    zoom={activeProject.zoom ?? 200}
-                    stageX={activeProject.stageX}
-                    stageY={activeProject.stageY}
-                    displaySizes={displaySizes}
-                    canvasBg={canvasBg}
-                    selectedBackgroundSrc={selectedBackgroundSrc}
-
-                    onClose={() => setShowSharePanel(false)}
-                  />
-                </div>
-              </>
-            )}
 
             {/* SETTINGS */}
             <div className="relative">
@@ -3379,6 +3147,7 @@ ${isMobile
                   <Group
                     name="exportable"
                     key={b.instanceId}
+                    boardInstanceId={b.instanceId}
                     x={b.x}
                     y={b.y}
                     draggable={!viewer && !isPinching}
@@ -3586,7 +3355,10 @@ ${isMobile
 
                     node.position({ x, y });
 
+
+
                     if (!hasMovedVisually) return;
+
                     lastRenderedPos.current = { x, y };
 
                     updateActiveProject({
@@ -3923,11 +3695,49 @@ ${isMobile
                         listening={false}
                       />
                     )}
+
+                  {/* ================= SIGNAL CHAIN NUMBER ================= */}
+                  {showSignalChain &&
+                    pedalSize &&
+                    String(p.type || "").trim().toLowerCase() !== "power" &&
+                    signalOrder.includes(p.instanceId) && (
+                      <Group
+                        x={-pedalSize.w / 2 + 14}
+                        y={-pedalSize.h / 2 + 14}
+                        rotation={-(Number(p.rotation) || 0)}
+                        listening={false}
+                      >
+                        <KonvaCircle
+                          radius={10}
+                          fill="#2563eb"
+                          stroke="#ffffff"
+                          strokeWidth={1}
+                          listening={false}
+                        />
+
+                        <Text
+                          text={String(signalOrder.indexOf(p.instanceId) + 1)}
+                          x={-10}
+                          y={-10}
+                          width={20}
+                          height={20}
+                          align="center"
+                          verticalAlign="middle"
+                          fill="#ffffff"
+                          fontSize={10}
+                          fontStyle="bold"
+                          listening={false}
+                        />
+                      </Group>
+                    )}
                 </Group>
               );
             })}
 
           </Layer>
+
+
+
 
           {showSignalPath && (
             <Layer listening={true}>
@@ -3988,13 +3798,23 @@ ${isMobile
                     setIsDragging(true);
                   }}
                   onDragMove={(e) => {
-                    updateActiveProject({
-                      selectedBoards: (activeProject.selectedBoards || []).map((item: AnyRow) =>
-                        item.instanceId === b.instanceId
-                          ? { ...item, x: e.target.x(), y: e.target.y() }
-                          : item
-                      ),
-                    });
+                    const x = e.target.x();
+                    const y = e.target.y();
+
+                    const stage = stageRef.current;
+                    if (!stage) return;
+
+                    const visualGroup = stage.findOne(
+                      (node: any) =>
+                        node.getAttr("boardInstanceId") === b.instanceId
+                    );
+
+                    if (visualGroup) {
+                      visualGroup.position({ x, y });
+                      visualGroup.getLayer()?.batchDraw();
+                    }
+
+                    updateOverlayPosition();
                   }}
                   onDragEnd={(e) => {
                     setTimeout(() => setIsDragging(false), 0);

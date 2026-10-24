@@ -1,19 +1,48 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+
+import {
+  Check,
+  Copy,
+  Download,
+  Share2,
+} from "lucide-react";
+
+import { supabase } from "@/lib/supabase";
 import { getTranslator } from "@/utils/i18n";
-import { Download } from "lucide-react";
 
 type AnyRow = Record<string, any>;
 
 type Props = {
   isLightTheme: boolean;
   isMobile?: boolean;
+
   boardPedals: AnyRow[];
   selectedBoards?: AnyRow[];
-  displaySizes: Record<number, { w: number; h: number }>;
+
+  displaySizes: Record<
+    number,
+    {
+      w: number;
+      h: number;
+    }
+  >;
+
   boardName?: string;
+
   canvasBg: string;
+
+  signalPath?: AnyRow[];
+
+  zoom?: number;
+  stageX?: number;
+  stageY?: number;
+
   onClose: () => void;
 
   currentBackground?: {
@@ -25,109 +54,300 @@ type Props = {
 export default function ExportPanel({
   isLightTheme,
   isMobile = false,
+
   boardPedals,
   selectedBoards = [],
+
   displaySizes,
+
   boardName,
-  currentBackground,
+
   canvasBg,
-  onClose,
+
+  signalPath = [],
+
+  zoom = 200,
+  stageX,
+  stageY,
+
+  currentBackground,
 }: Props) {
   const language =
     typeof window !== "undefined"
-      ? JSON.parse(localStorage.getItem("myb_settings") || "{}")?.language || "en"
+      ? JSON.parse(
+        localStorage.getItem("myb_settings") || "{}"
+      )?.language || "en"
       : "en";
 
   const t = getTranslator(language);
 
-  const [loading, setLoading] = useState(false);
-  const [name, setName] = useState(boardName || "pedalboard");
-  const [background, setBackground] = useState<
-    "transparent" | "white" | "current"
+  /* =========================================================
+     STATE
+     ========================================================= */
+
+  const [
+    downloadLoading,
+    setDownloadLoading,
+  ] = useState(false);
+
+  const [
+    shareLoading,
+    setShareLoading,
+  ] = useState(false);
+
+  const [
+    shareUrl,
+    setShareUrl,
+  ] = useState<string | null>(
+    null
+  );
+
+  const [
+    copied,
+    setCopied,
+  ] = useState(false);
+
+  const [
+    name,
+    setName,
+  ] = useState(
+    boardName ||
+    "pedalboard"
+  );
+
+  const [
+    background,
+    setBackground,
+  ] = useState<
+    | "transparent"
+    | "white"
+    | "current"
   >("current");
-  const containerRef = useRef<HTMLDivElement>(null);
-  const previewRef = useRef<HTMLCanvasElement | null>(null);
-  const previewRenderIdRef = useRef(0);
 
-
-
-  const getRenderItems = (): AnyRow[] =>
-    [
-      ...(selectedBoards || []).map((item: AnyRow) => ({
-        ...item,
-        kind: "board",
-      })),
-
-      ...(boardPedals || []).map((item: AnyRow) => ({
-        ...item,
-        kind: "pedal",
-      })),
-    ].sort(
-      (a: AnyRow, b: AnyRow) =>
-        (Number(a.zIndex) || 0) -
-        (Number(b.zIndex) || 0)
+  const containerRef =
+    useRef<HTMLDivElement>(
+      null
     );
 
+  const previewRef =
+    useRef<HTMLCanvasElement | null>(
+      null
+    );
+
+  const previewRenderIdRef =
+    useRef(0);
+
+  /* =========================================================
+     RENDER ITEMS
+     ========================================================= */
+
+  const getRenderItems =
+    (): AnyRow[] =>
+      [
+        ...(
+          selectedBoards ||
+          []
+        ).map(
+          (
+            item: AnyRow
+          ) => ({
+            ...item,
+            kind: "board",
+          })
+        ),
+
+        ...(
+          boardPedals ||
+          []
+        ).map(
+          (
+            item: AnyRow
+          ) => ({
+            ...item,
+            kind: "pedal",
+          })
+        ),
+      ].sort(
+        (
+          a: AnyRow,
+          b: AnyRow
+        ) =>
+          (Number(
+            a.zIndex
+          ) || 0) -
+          (Number(
+            b.zIndex
+          ) || 0)
+      );
+
+  /* =========================================================
+     CUSTOM PEDAL
+     ========================================================= */
+
   const drawCustomPedal = (
-    ctx: CanvasRenderingContext2D,
+    ctx:
+      CanvasRenderingContext2D,
     item: AnyRow,
     w: number,
     h: number,
-    knobImg: HTMLImageElement,
-    footswitchImg: HTMLImageElement,
-    img?: HTMLImageElement | null
+    knobImg:
+      HTMLImageElement,
+    footswitchImg:
+      HTMLImageElement,
+    img?:
+      | HTMLImageElement
+      | null
   ) => {
     const radius = 5;
-    const hasColor = !!item.color;
+
+    const hasColor =
+      !!item.color;
 
     ctx.save();
 
     ctx.beginPath();
-    ctx.moveTo(-w / 2 + radius, -h / 2);
-    ctx.lineTo(w / 2 - radius, -h / 2);
-    ctx.quadraticCurveTo(w / 2, -h / 2, w / 2, -h / 2 + radius);
-    ctx.lineTo(w / 2, h / 2 - radius);
-    ctx.quadraticCurveTo(w / 2, h / 2, w / 2 - radius, h / 2);
-    ctx.lineTo(-w / 2 + radius, h / 2);
-    ctx.quadraticCurveTo(-w / 2, h / 2, -w / 2, h / 2 - radius);
-    ctx.lineTo(-w / 2, -h / 2 + radius);
-    ctx.quadraticCurveTo(-w / 2, -h / 2, -w / 2 + radius, -h / 2);
+
+    ctx.moveTo(
+      -w / 2 + radius,
+      -h / 2
+    );
+
+    ctx.lineTo(
+      w / 2 - radius,
+      -h / 2
+    );
+
+    ctx.quadraticCurveTo(
+      w / 2,
+      -h / 2,
+      w / 2,
+      -h / 2 + radius
+    );
+
+    ctx.lineTo(
+      w / 2,
+      h / 2 - radius
+    );
+
+    ctx.quadraticCurveTo(
+      w / 2,
+      h / 2,
+      w / 2 - radius,
+      h / 2
+    );
+
+    ctx.lineTo(
+      -w / 2 + radius,
+      h / 2
+    );
+
+    ctx.quadraticCurveTo(
+      -w / 2,
+      h / 2,
+      -w / 2,
+      h / 2 - radius
+    );
+
+    ctx.lineTo(
+      -w / 2,
+      -h / 2 + radius
+    );
+
+    ctx.quadraticCurveTo(
+      -w / 2,
+      -h / 2,
+      -w / 2 + radius,
+      -h / 2
+    );
+
     ctx.closePath();
     ctx.clip();
 
     if (img) {
-      ctx.drawImage(img, -w / 2, -h / 2, w, h);
+      ctx.drawImage(
+        img,
+        -w / 2,
+        -h / 2,
+        w,
+        h
+      );
     } else {
-      ctx.fillStyle = item.color || "#888";
-      ctx.fillRect(-w / 2, -h / 2, w, h);
+      ctx.fillStyle =
+        item.color ||
+        "#888";
+
+      ctx.fillRect(
+        -w / 2,
+        -h / 2,
+        w,
+        h
+      );
     }
 
     if (hasColor) {
-      ctx.globalAlpha = 0.7;
-      ctx.fillStyle = item.color;
-      ctx.fillRect(-w / 2, -h / 2, w, h);
-      ctx.globalAlpha = 1;
+      ctx.globalAlpha =
+        0.7;
+
+      ctx.fillStyle =
+        item.color;
+
+      ctx.fillRect(
+        -w / 2,
+        -h / 2,
+        w,
+        h
+      );
+
+      ctx.globalAlpha =
+        1;
     }
 
     ctx.restore();
 
-    const knobSize = 25;
-    const footswitchSize = 18;
+    const knobSize =
+      25;
+
+    const footswitchSize =
+      18;
 
     const knobCount =
-      Number(item.width) < 70 ? 1 : Number(item.width) <= 100 ? 2 : 3;
+      Number(
+        item.width
+      ) < 70
+        ? 1
+        : Number(
+          item.width
+        ) <= 100
+          ? 2
+          : 3;
 
-    const knobY = -h / 2 + 14;
-    const spacing = w / (knobCount + 1);
-    const spread = 1.25;
+    const knobY =
+      -h / 2 + 14;
 
-    for (let i = 0; i < knobCount; i++) {
+    const spacing =
+      w /
+      (knobCount + 1);
+
+    const spread =
+      1.25;
+
+    for (
+      let i = 0;
+      i < knobCount;
+      i++
+    ) {
       const offsetFromCenter =
-        (i - (knobCount - 1) / 2) * spacing * spread;
+        (i -
+          (knobCount -
+            1) /
+          2) *
+        spacing *
+        spread;
 
       ctx.drawImage(
         knobImg,
-        offsetFromCenter - knobSize / 2,
+        offsetFromCenter -
+        knobSize / 2,
         knobY,
         knobSize,
         knobSize
@@ -136,343 +356,1083 @@ export default function ExportPanel({
 
     ctx.drawImage(
       footswitchImg,
-      -footswitchSize / 2,
+      -footswitchSize /
+      2,
       h / 2 - 30,
       footswitchSize,
       footswitchSize
     );
 
     if (item.name) {
-      ctx.fillStyle = "#000000";
-      ctx.strokeStyle = "#000000";
-      ctx.lineWidth = 0.5;
-      ctx.font = "bold 8px Arial";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
+      ctx.fillStyle =
+        "#000000";
 
-      ctx.strokeText(item.name.toUpperCase(), 0, 0);
-      ctx.fillText(item.name.toUpperCase(), 0, 0);
+      ctx.strokeStyle =
+        "#000000";
+
+      ctx.lineWidth =
+        0.5;
+
+      ctx.font =
+        "bold 8px Arial";
+
+      ctx.textAlign =
+        "center";
+
+      ctx.textBaseline =
+        "middle";
+
+      ctx.strokeText(
+        item.name.toUpperCase(),
+        0,
+        0
+      );
+
+      ctx.fillText(
+        item.name.toUpperCase(),
+        0,
+        0
+      );
     }
   };
 
-  const drawItems = async (
-    ctx: CanvasRenderingContext2D,
-    width: number,
-    height: number,
-    minX: number,
-    minY: number,
-    loadImage: (src: string) => Promise<HTMLImageElement>
-  ) => {
-    const knobImg = await loadImage("/images/knob.webp");
-    const footswitchImg = await loadImage("/images/footswitch.webp");
+  /* =========================================================
+     DRAW ITEMS
+     ========================================================= */
 
-    for (const item of getRenderItems()) {
-      const size = displaySizes[Number(item.instanceId)];
-      if (!size) continue;
+  const drawItems =
+    async (
+      ctx:
+        CanvasRenderingContext2D,
+      minX: number,
+      minY: number,
+      loadImage: (
+        src: string
+      ) => Promise<HTMLImageElement>
+    ) => {
+      const knobImg =
+        await loadImage(
+          "/images/knob.webp"
+        );
 
-      const imgSrc = item.image || item.image_url || item.photo || null;
+      const footswitchImg =
+        await loadImage(
+          "/images/footswitch.webp"
+        );
 
-      const w = size.w;
-      const h = size.h;
+      for (
+        const item of
+        getRenderItems()
+      ) {
+        const size =
+          displaySizes[
+          Number(
+            item.instanceId
+          )
+          ];
 
-      const drawX = item.x - minX;
-      const drawY = item.y - minY;
+        if (!size) {
+          continue;
+        }
 
-      const rotation = ((item.rotation || 0) * Math.PI) / 180;
+        const imgSrc =
+          item.image ||
+          item.image_url ||
+          item.photo ||
+          null;
 
-      ctx.save();
-      ctx.translate(drawX, drawY);
-      ctx.rotate(rotation);
+        const w =
+          size.w;
 
-      if (item.kind === "board") {
-        if (imgSrc) {
-          const img = await loadImage(imgSrc);
-          ctx.drawImage(img, -w / 2, -h / 2, w, h);
+        const h =
+          size.h;
+
+        const drawX =
+          item.x - minX;
+
+        const drawY =
+          item.y - minY;
+
+        const rotation =
+          ((item.rotation ||
+            0) *
+            Math.PI) /
+          180;
+
+        ctx.save();
+
+        ctx.translate(
+          drawX,
+          drawY
+        );
+
+        ctx.rotate(
+          rotation
+        );
+
+        if (
+          item.kind ===
+          "board"
+        ) {
+          if (imgSrc) {
+            const img =
+              await loadImage(
+                imgSrc
+              );
+
+            ctx.drawImage(
+              img,
+              -w / 2,
+              -h / 2,
+              w,
+              h
+            );
+          }
+
+          ctx.restore();
+
+          continue;
+        }
+
+        const img =
+          imgSrc
+            ? await loadImage(
+              imgSrc
+            )
+            : null;
+
+        if (
+          item.slug ===
+          "custom"
+        ) {
+          drawCustomPedal(
+            ctx,
+            item,
+            w,
+            h,
+            knobImg,
+            footswitchImg,
+            img
+          );
+        } else if (img) {
+          ctx.drawImage(
+            img,
+            -w / 2,
+            -h / 2,
+            w,
+            h
+          );
         }
 
         ctx.restore();
-        continue;
       }
-
-      const img = imgSrc ? await loadImage(imgSrc) : null;
-
-      if (item.slug === "custom") {
-        drawCustomPedal(ctx, item, w, h, knobImg, footswitchImg, img);
-      } else if (img) {
-        ctx.drawImage(img, -w / 2, -h / 2, w, h);
-      }
-
-      ctx.restore();
-    }
-  };
-
-  const getExportBounds = () => {
-    let minX = Infinity;
-    let minY = Infinity;
-    let maxX = -Infinity;
-    let maxY = -Infinity;
-
-    getRenderItems().forEach((item) => {
-      const size = displaySizes[Number(item.instanceId)];
-      if (!size) return;
-
-      const w = size.w;
-      const h = size.h;
-
-      const rotation = ((Number(item.rotation) || 0) * Math.PI) / 180;
-
-      const corners = [
-        { x: -w / 2, y: -h / 2 },
-        { x: w / 2, y: -h / 2 },
-        { x: w / 2, y: h / 2 },
-        { x: -w / 2, y: h / 2 },
-      ];
-
-      corners.forEach((corner) => {
-        const rotatedX =
-          corner.x * Math.cos(rotation) - corner.y * Math.sin(rotation);
-
-        const rotatedY =
-          corner.x * Math.sin(rotation) + corner.y * Math.cos(rotation);
-
-        const worldX = item.x + rotatedX;
-        const worldY = item.y + rotatedY;
-
-        minX = Math.min(minX, worldX);
-        minY = Math.min(minY, worldY);
-        maxX = Math.max(maxX, worldX);
-        maxY = Math.max(maxY, worldY);
-      });
-    });
-
-    const PADDING = 20;
-
-    minX -= PADDING;
-    minY -= PADDING;
-    maxX += PADDING;
-    maxY += PADDING;
-
-    return {
-      minX,
-      minY,
-      width: maxX - minX,
-      height: maxY - minY,
     };
-  };
 
-  const drawBackground = async (
-    ctx: CanvasRenderingContext2D,
-    width: number,
-    height: number,
-    loadImage: (src: string) => Promise<HTMLImageElement>,
-    preview = false
-  ) => {
-    if (background === "transparent" && preview) {
-      const CHECKER = 10;
+  /* =========================================================
+     BOUNDS
+     ========================================================= */
 
-      for (let y = 0; y < height; y += CHECKER) {
-        for (let x = 0; x < width; x += CHECKER) {
-          ctx.fillStyle =
-            (Math.floor(x / CHECKER) + Math.floor(y / CHECKER)) % 2 === 0
-              ? "#5f6068"
-              : "#777982";
+  const getExportBounds =
+    () => {
+      let minX =
+        Infinity;
 
-          ctx.fillRect(x, y, CHECKER, CHECKER);
-        }
-      }
-    }
+      let minY =
+        Infinity;
 
-    if (background === "white") {
-      ctx.fillStyle = "#ffffff";
-      ctx.fillRect(0, 0, width, height);
-    }
+      let maxX =
+        -Infinity;
 
-    if (background === "current" && currentBackground) {
-      if (currentBackground.type === "css") {
-        const color = getComputedStyle(document.documentElement)
-          .getPropertyValue(
-            document.documentElement.classList.contains("light")
-              ? "--zinc-200"
-              : "--zinc-600"
-          )
-          .trim();
+      let maxY =
+        -Infinity;
 
-        ctx.fillStyle = color;
-        ctx.fillRect(0, 0, width, height);
-      }
+      getRenderItems().forEach(
+        (item) => {
+          const size =
+            displaySizes[
+            Number(
+              item.instanceId
+            )
+            ];
 
-      if (currentBackground.type === "image" && currentBackground.src) {
-        const bgImg = await loadImage(currentBackground.src);
-        ctx.drawImage(bgImg, 0, 0, width, height);
-      }
-    }
-  };
-
-
-
-  // ===============================
-  // 🖼️ PREVIEW RENDER
-  // ===============================
-  const renderPreview = async () => {
-    const hasItems = !!boardPedals?.length || !!selectedBoards?.length;
-
-    if (hasItems && (!displaySizes || Object.keys(displaySizes).length === 0)) {
-      return;
-    }
-
-    const renderId = ++previewRenderIdRef.current;
-
-    try {
-      const loadImage = (src: string): Promise<HTMLImageElement> =>
-        new Promise((resolve, reject) => {
-          const img = new Image();
-          img.crossOrigin = "anonymous";
-          img.src = src;
-          img.onload = () => resolve(img);
-          img.onerror = reject;
-        });
-
-      if (!hasItems) {
-        const visibleCanvas = previewRef.current;
-        if (!visibleCanvas) return;
-
-        const visibleCtx = visibleCanvas.getContext("2d");
-        if (!visibleCtx) return;
-
-        const width = 240;
-        const height = 135;
-        const SCALE = 3;
-
-        visibleCanvas.width = width * SCALE;
-        visibleCanvas.height = height * SCALE;
-
-        visibleCtx.setTransform(SCALE, 0, 0, SCALE, 0, 0);
-        visibleCtx.clearRect(0, 0, width, height);
-        visibleCtx.imageSmoothingEnabled = true;
-
-        await drawBackground(visibleCtx, width, height, loadImage, true);
-
-        return;
-      }
-
-      const { minX, minY, width, height } = getExportBounds();
-
-      if (!isFinite(width) || !isFinite(height)) return;
-
-      const visibleCanvas = previewRef.current;
-      if (!visibleCanvas) return;
-
-      const visibleCtx = visibleCanvas.getContext("2d");
-      if (!visibleCtx) return;
-
-      const SCALE = 6;
-
-      // ✅ on dessine d'abord sur un canvas temporaire
-      // comme ça un ancien rendu ne peut pas polluer le preview visible
-      const tempCanvas = document.createElement("canvas");
-      const tempCtx = tempCanvas.getContext("2d");
-      if (!tempCtx) return;
-
-      tempCanvas.width = width * SCALE;
-      tempCanvas.height = height * SCALE;
-
-      tempCtx.setTransform(SCALE, 0, 0, SCALE, 0, 0);
-      tempCtx.clearRect(0, 0, width, height);
-      tempCtx.imageSmoothingEnabled = true;
-
-      await drawBackground(tempCtx, width, height, loadImage, true);
-      if (renderId !== previewRenderIdRef.current) return;
-
-      await drawItems(tempCtx, width, height, minX, minY, loadImage);
-      if (renderId !== previewRenderIdRef.current) return;
-
-      // ✅ seulement le dernier rendu autorisé est copié dans le preview
-      visibleCanvas.width = tempCanvas.width;
-      visibleCanvas.height = tempCanvas.height;
-
-      visibleCtx.setTransform(1, 0, 0, 1, 0, 0);
-      visibleCtx.clearRect(0, 0, visibleCanvas.width, visibleCanvas.height);
-      visibleCtx.drawImage(tempCanvas, 0, 0);
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
-  // ===============================
-  // 📥 EXPORT
-  // ===============================
-  const exportPNG = async () => {
-    setLoading(true);
-
-    try {
-      const loadImage = (src: string): Promise<HTMLImageElement> =>
-        new Promise((resolve, reject) => {
-          const img = new Image();
-          img.crossOrigin = "anonymous";
-          img.src = src;
-          img.onload = () => resolve(img);
-          img.onerror = reject;
-        });
-
-      const { minX, minY, width, height } = getExportBounds();
-
-      if (!isFinite(width) || !isFinite(height)) {
-        setLoading(false);
-        return;
-      }
-
-      const canvas = document.createElement("canvas");
-      const ctx = canvas.getContext("2d");
-      if (!ctx) {
-        setLoading(false);
-        return;
-      }
-
-      const SCALE = 6;
-
-      canvas.width = width * SCALE;
-      canvas.height = height * SCALE;
-
-      ctx.setTransform(SCALE, 0, 0, SCALE, 0, 0);
-      ctx.imageSmoothingEnabled = true;
-
-      await drawBackground(ctx, width, height, loadImage, false);
-      await drawItems(ctx, width, height, minX, minY, loadImage);
-
-      canvas.toBlob(
-        (blob) => {
-          if (!blob) {
-            setLoading(false);
+          if (!size) {
             return;
           }
 
-          const url = URL.createObjectURL(blob);
+          const w =
+            size.w;
 
-          const link = document.createElement("a");
-          link.href = url;
-          link.download =
-            background === "white" ? `${name}.jpg` : `${name}.png`;
-          link.click();
+          const h =
+            size.h;
 
-          URL.revokeObjectURL(url);
-          setTimeout(() => setLoading(false), 300);
-        },
-        background === "white" ? "image/jpeg" : "image/png",
-        0.95
+          const rotation =
+            ((Number(
+              item.rotation
+            ) || 0) *
+              Math.PI) /
+            180;
+
+          const corners =
+            [
+              {
+                x: -w / 2,
+                y: -h / 2,
+              },
+              {
+                x: w / 2,
+                y: -h / 2,
+              },
+              {
+                x: w / 2,
+                y: h / 2,
+              },
+              {
+                x: -w / 2,
+                y: h / 2,
+              },
+            ];
+
+          corners.forEach(
+            (
+              corner
+            ) => {
+              const rotatedX =
+                corner.x *
+                Math.cos(
+                  rotation
+                ) -
+                corner.y *
+                Math.sin(
+                  rotation
+                );
+
+              const rotatedY =
+                corner.x *
+                Math.sin(
+                  rotation
+                ) +
+                corner.y *
+                Math.cos(
+                  rotation
+                );
+
+              const worldX =
+                item.x +
+                rotatedX;
+
+              const worldY =
+                item.y +
+                rotatedY;
+
+              minX =
+                Math.min(
+                  minX,
+                  worldX
+                );
+
+              minY =
+                Math.min(
+                  minY,
+                  worldY
+                );
+
+              maxX =
+                Math.max(
+                  maxX,
+                  worldX
+                );
+
+              maxY =
+                Math.max(
+                  maxY,
+                  worldY
+                );
+            }
+          );
+        }
       );
-    } catch (e) {
-      console.error(e);
-      setLoading(false);
-    }
-  };
 
-  // ===============================
-  // AUTO PREVIEW
-  // ===============================
+      const PADDING =
+        20;
+
+      minX -=
+        PADDING;
+
+      minY -=
+        PADDING;
+
+      maxX +=
+        PADDING;
+
+      maxY +=
+        PADDING;
+
+      return {
+        minX,
+        minY,
+
+        width:
+          maxX - minX,
+
+        height:
+          maxY - minY,
+      };
+    };
+
+  /* =========================================================
+     BACKGROUND
+     ========================================================= */
+
+  const drawBackground =
+    async (
+      ctx:
+        CanvasRenderingContext2D,
+
+      width: number,
+      height: number,
+
+      loadImage: (
+        src: string
+      ) => Promise<HTMLImageElement>,
+
+      preview = false
+    ) => {
+      if (
+        background ===
+        "transparent" &&
+        preview
+      ) {
+        const CHECKER =
+          10;
+
+        for (
+          let y = 0;
+          y < height;
+          y += CHECKER
+        ) {
+          for (
+            let x = 0;
+            x < width;
+            x += CHECKER
+          ) {
+            ctx.fillStyle =
+              (Math.floor(
+                x / CHECKER
+              ) +
+                Math.floor(
+                  y /
+                  CHECKER
+                )) %
+                2 ===
+                0
+                ? "#5f6068"
+                : "#777982";
+
+            ctx.fillRect(
+              x,
+              y,
+              CHECKER,
+              CHECKER
+            );
+          }
+        }
+      }
+
+      if (
+        background ===
+        "white"
+      ) {
+        ctx.fillStyle =
+          "#ffffff";
+
+        ctx.fillRect(
+          0,
+          0,
+          width,
+          height
+        );
+      }
+
+      if (
+        background ===
+        "current" &&
+        currentBackground
+      ) {
+        if (
+          currentBackground.type ===
+          "css"
+        ) {
+          const color =
+            getComputedStyle(
+              document.documentElement
+            )
+              .getPropertyValue(
+                document.documentElement.classList.contains(
+                  "light"
+                )
+                  ? "--zinc-200"
+                  : "--zinc-600"
+              )
+              .trim();
+
+          ctx.fillStyle =
+            color;
+
+          ctx.fillRect(
+            0,
+            0,
+            width,
+            height
+          );
+        }
+
+        if (
+          currentBackground.type ===
+          "image" &&
+          currentBackground.src
+        ) {
+          const bgImg =
+            await loadImage(
+              currentBackground.src
+            );
+
+          ctx.drawImage(
+            bgImg,
+            0,
+            0,
+            width,
+            height
+          );
+        }
+      }
+    };
+
+  /* =========================================================
+     PREVIEW
+     ========================================================= */
+
+  const renderPreview =
+    async () => {
+      const hasItems =
+        !!boardPedals?.length ||
+        !!selectedBoards?.length;
+
+      if (
+        hasItems &&
+        (!displaySizes ||
+          Object.keys(
+            displaySizes
+          ).length ===
+          0)
+      ) {
+        return;
+      }
+
+      const renderId =
+        ++previewRenderIdRef.current;
+
+      try {
+        const loadImage =
+          (
+            src: string
+          ): Promise<HTMLImageElement> =>
+            new Promise(
+              (
+                resolve,
+                reject
+              ) => {
+                const img =
+                  new Image();
+
+                img.crossOrigin =
+                  "anonymous";
+
+                img.src =
+                  src;
+
+                img.onload =
+                  () =>
+                    resolve(
+                      img
+                    );
+
+                img.onerror =
+                  reject;
+              }
+            );
+
+        if (!hasItems) {
+          const visibleCanvas =
+            previewRef.current;
+
+          if (
+            !visibleCanvas
+          ) {
+            return;
+          }
+
+          const visibleCtx =
+            visibleCanvas.getContext(
+              "2d"
+            );
+
+          if (
+            !visibleCtx
+          ) {
+            return;
+          }
+
+          const width =
+            240;
+
+          const height =
+            135;
+
+          const SCALE =
+            3;
+
+          visibleCanvas.width =
+            width *
+            SCALE;
+
+          visibleCanvas.height =
+            height *
+            SCALE;
+
+          visibleCtx.setTransform(
+            SCALE,
+            0,
+            0,
+            SCALE,
+            0,
+            0
+          );
+
+          visibleCtx.clearRect(
+            0,
+            0,
+            width,
+            height
+          );
+
+          visibleCtx.imageSmoothingEnabled =
+            true;
+
+          await drawBackground(
+            visibleCtx,
+            width,
+            height,
+            loadImage,
+            true
+          );
+
+          return;
+        }
+
+        const {
+          minX,
+          minY,
+          width,
+          height,
+        } =
+          getExportBounds();
+
+        if (
+          !isFinite(
+            width
+          ) ||
+          !isFinite(
+            height
+          )
+        ) {
+          return;
+        }
+
+        const visibleCanvas =
+          previewRef.current;
+
+        if (
+          !visibleCanvas
+        ) {
+          return;
+        }
+
+        const visibleCtx =
+          visibleCanvas.getContext(
+            "2d"
+          );
+
+        if (
+          !visibleCtx
+        ) {
+          return;
+        }
+
+        const SCALE =
+          6;
+
+        const tempCanvas =
+          document.createElement(
+            "canvas"
+          );
+
+        const tempCtx =
+          tempCanvas.getContext(
+            "2d"
+          );
+
+        if (!tempCtx) {
+          return;
+        }
+
+        tempCanvas.width =
+          width *
+          SCALE;
+
+        tempCanvas.height =
+          height *
+          SCALE;
+
+        tempCtx.setTransform(
+          SCALE,
+          0,
+          0,
+          SCALE,
+          0,
+          0
+        );
+
+        tempCtx.clearRect(
+          0,
+          0,
+          width,
+          height
+        );
+
+        tempCtx.imageSmoothingEnabled =
+          true;
+
+        await drawBackground(
+          tempCtx,
+          width,
+          height,
+          loadImage,
+          true
+        );
+
+        if (
+          renderId !==
+          previewRenderIdRef.current
+        ) {
+          return;
+        }
+
+        await drawItems(
+          tempCtx,
+          minX,
+          minY,
+          loadImage
+        );
+
+        if (
+          renderId !==
+          previewRenderIdRef.current
+        ) {
+          return;
+        }
+
+        visibleCanvas.width =
+          tempCanvas.width;
+
+        visibleCanvas.height =
+          tempCanvas.height;
+
+        visibleCtx.setTransform(
+          1,
+          0,
+          0,
+          1,
+          0,
+          0
+        );
+
+        visibleCtx.clearRect(
+          0,
+          0,
+          visibleCanvas.width,
+          visibleCanvas.height
+        );
+
+        visibleCtx.drawImage(
+          tempCanvas,
+          0,
+          0
+        );
+      } catch (e) {
+        console.error(
+          e
+        );
+      }
+    };
+
+  /* =========================================================
+     DOWNLOAD IMAGE
+     ========================================================= */
+
+  const exportImage =
+    async () => {
+      if (
+        downloadLoading
+      ) {
+        return;
+      }
+
+      setDownloadLoading(
+        true
+      );
+
+      try {
+        const loadImage =
+          (
+            src: string
+          ): Promise<HTMLImageElement> =>
+            new Promise(
+              (
+                resolve,
+                reject
+              ) => {
+                const img =
+                  new Image();
+
+                img.crossOrigin =
+                  "anonymous";
+
+                img.src =
+                  src;
+
+                img.onload =
+                  () =>
+                    resolve(
+                      img
+                    );
+
+                img.onerror =
+                  reject;
+              }
+            );
+
+        const {
+          minX,
+          minY,
+          width,
+          height,
+        } =
+          getExportBounds();
+
+        if (
+          !isFinite(
+            width
+          ) ||
+          !isFinite(
+            height
+          )
+        ) {
+          setDownloadLoading(
+            false
+          );
+
+          return;
+        }
+
+        const canvas =
+          document.createElement(
+            "canvas"
+          );
+
+        const ctx =
+          canvas.getContext(
+            "2d"
+          );
+
+        if (!ctx) {
+          setDownloadLoading(
+            false
+          );
+
+          return;
+        }
+
+        const SCALE =
+          6;
+
+        canvas.width =
+          width *
+          SCALE;
+
+        canvas.height =
+          height *
+          SCALE;
+
+        ctx.setTransform(
+          SCALE,
+          0,
+          0,
+          SCALE,
+          0,
+          0
+        );
+
+        ctx.imageSmoothingEnabled =
+          true;
+
+        await drawBackground(
+          ctx,
+          width,
+          height,
+          loadImage,
+          false
+        );
+
+        await drawItems(
+          ctx,
+          minX,
+          minY,
+          loadImage
+        );
+
+        canvas.toBlob(
+          (blob) => {
+            if (!blob) {
+              setDownloadLoading(
+                false
+              );
+
+              return;
+            }
+
+            const url =
+              URL.createObjectURL(
+                blob
+              );
+
+            const link =
+              document.createElement(
+                "a"
+              );
+
+            link.href =
+              url;
+
+            link.download =
+              background ===
+                "white"
+                ? `${name}.jpg`
+                : `${name}.png`;
+
+            link.click();
+
+            URL.revokeObjectURL(
+              url
+            );
+
+            window.setTimeout(
+              () => {
+                setDownloadLoading(
+                  false
+                );
+              },
+              300
+            );
+          },
+
+          background ===
+            "white"
+            ? "image/jpeg"
+            : "image/png",
+
+          0.95
+        );
+      } catch (e) {
+        console.error(
+          e
+        );
+
+        setDownloadLoading(
+          false
+        );
+      }
+    };
+
+  /* =========================================================
+     CREATE SHARE LINK
+     ========================================================= */
+
+  const createShareLink =
+    async () => {
+      if (
+        shareLoading
+      ) {
+        return;
+      }
+
+      setShareLoading(
+        true
+      );
+
+      try {
+        const id =
+          crypto
+            .randomUUID()
+            .replaceAll(
+              "-",
+              ""
+            )
+            .slice(
+              0,
+              12
+            );
+
+        const selectedBackgroundSrc =
+          currentBackground?.type ===
+            "image"
+            ? currentBackground.src ||
+            null
+            : null;
+
+        const snapshot = {
+          version: 1,
+
+          project: {
+            name:
+              name.trim() ||
+              "My Pedalboard",
+
+            boardPedals,
+
+            selectedBoards,
+
+            signalPath,
+
+            zoom,
+
+            stageX:
+              typeof stageX ===
+                "number"
+                ? stageX
+                : 0,
+
+            stageY:
+              typeof stageY ===
+                "number"
+                ? stageY
+                : 0,
+          },
+
+          displaySizes,
+
+          appearance: {
+            canvasBg,
+
+            selectedBackgroundSrc,
+          },
+        };
+
+        const {
+          error:
+          insertError,
+        } =
+          await supabase
+            .from(
+              "shared_boards"
+            )
+            .insert({
+              id,
+
+              name:
+                name.trim() ||
+                "My Pedalboard",
+
+              data:
+                snapshot,
+            });
+
+        if (
+          insertError
+        ) {
+          throw insertError;
+        }
+
+        const url =
+          `${window.location.origin}/board/${id}`;
+
+        setShareUrl(
+          url
+        );
+      } catch (err) {
+        console.error(
+          "Error creating shared board:",
+          err
+        );
+      } finally {
+        setShareLoading(
+          false
+        );
+      }
+    };
+
+  /* =========================================================
+     COPY SHARE LINK
+     ========================================================= */
+
+  const copyShareLink =
+    async () => {
+      if (!shareUrl) {
+        return;
+      }
+
+      try {
+        await navigator.clipboard.writeText(
+          shareUrl
+        );
+
+        setCopied(
+          true
+        );
+
+        window.setTimeout(
+          () => {
+            setCopied(
+              false
+            );
+          },
+          1800
+        );
+      } catch (err) {
+        console.error(
+          "Unable to copy link:",
+          err
+        );
+      }
+    };
+
+  /* =========================================================
+     AUTO PREVIEW
+     ========================================================= */
+
   useEffect(() => {
     renderPreview();
-  }, [background, boardPedals, selectedBoards, displaySizes]);
+  }, [
+    background,
+    boardPedals,
+    selectedBoards,
+    displaySizes,
+    currentBackground,
+    isLightTheme,
+  ]);
 
+  /* =========================================================
+     UI
+     ========================================================= */
 
   return (
     <div
@@ -484,6 +1444,7 @@ export default function ExportPanel({
       }
     >
       {/* TITLE */}
+
       <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider">
         <img
           src={
@@ -493,71 +1454,68 @@ export default function ExportPanel({
           }
           alt=""
           aria-hidden="true"
-          draggable={false}
+          draggable={
+            false
+          }
           className="w-[18px] h-[18px] object-contain shrink-0"
         />
 
-        {t("export.title")}
+        {t(
+          "export.title"
+        )}
       </div>
 
       {/* NAME */}
+
       <div className="flex flex-col gap-2">
         <label className="text-[10px] uppercase tracking-wider font-bold">
-          {t("export.name")}
+          {t(
+            "export.name"
+          )}
         </label>
 
         <input
+          type="text"
           value={name}
-          onChange={(e) => setName(e.target.value)}
-          className="h-9 px-3 rounded-md bg-zinc-950 border border-zinc-700 text-[12px] font-mono focus:outline-none focus:border-blue-500"
+          onChange={(
+            e
+          ) =>
+            setName(
+              e.target.value
+            )
+          }
+          maxLength={
+            120
+          }
+          className="
+            h-9
+            px-3
+            rounded-md
+            bg-zinc-950
+            border
+            border-zinc-700
+            text-[12px]
+            font-mono
+            outline-none
+            focus:border-blue-500
+          "
         />
       </div>
 
-      {/* BACKGROUND */}
-      <div className="flex flex-col gap-2 -mt-2">
-        <label className="text-[10px] uppercase tracking-wider font-bold">
-          {t("export.background")}
-        </label>
-
-        <div className="flex flex-col gap-1 text-xs">
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="radio"
-              checked={background === "current"}
-              onChange={() => setBackground("current")}
-            />
-            Canvas (PNG)
-          </label>
-
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="radio"
-              checked={background === "transparent"}
-              onChange={() => setBackground("transparent")}
-            />
-            {t("export.transparent")}
-          </label>
-
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="radio"
-              checked={background === "white"}
-              onChange={() => setBackground("white")}
-            />
-            {t("export.white")}
-          </label>
-        </div>
-      </div>
-
       {/* PREVIEW */}
+
       <div className="flex flex-col gap-2 -mt-2">
         <label className="text-[10px] uppercase tracking-wider font-bold">
-          {t("export.preview")}
+          {t(
+            "export.preview"
+          )}
         </label>
 
         <div className="w-full overflow-hidden flex justify-center">
           <canvas
-            ref={previewRef}
+            ref={
+              previewRef
+            }
             className={
               isMobile
                 ? "block w-full h-auto rounded-md"
@@ -568,45 +1526,259 @@ export default function ExportPanel({
       </div>
 
       {/* DOWNLOAD */}
-      <button
-        onClick={() => exportPNG()}
-        className="
-    w-full
-    h-[35px]
-    px-3
-    rounded-lg
-    border-0
-    bg-blue-600
-    !text-white
-    text-[10px]
-    font-black
-    uppercase
-    flex
-    items-center
-    justify-center
-    gap-2
-    transition-colors
-    hover:bg-blue-500
-  "
-      >
-        <div className="relative flex items-center justify-center w-full">
-          <span
-            className={loading ? "opacity-0" : "opacity-100"}
-            style={{
-              transform: "translateZ(0)",
-              backfaceVisibility: "hidden",
-              WebkitFontSmoothing: "antialiased",
-            }}
-          >
-            {t("export.download")}
-          </span>
 
-          {loading && (
-            <div className="absolute w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+      <div className="flex flex-col gap-3">
+        <label className="text-[10px] uppercase tracking-wider font-bold">
+          {t(
+            "export.downloadTitle"
           )}
+        </label>
+
+        <div className="flex flex-col gap-1 text-xs">
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="radio"
+              checked={
+                background ===
+                "current"
+              }
+              onChange={() =>
+                setBackground(
+                  "current"
+                )
+              }
+            />
+
+            {t(
+              "export.canvas"
+            )}
+          </label>
+
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="radio"
+              checked={
+                background ===
+                "transparent"
+              }
+              onChange={() =>
+                setBackground(
+                  "transparent"
+                )
+              }
+            />
+
+            {t(
+              "export.transparent"
+            )}
+          </label>
+
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="radio"
+              checked={
+                background ===
+                "white"
+              }
+              onChange={() =>
+                setBackground(
+                  "white"
+                )
+              }
+            />
+
+            {t(
+              "export.white"
+            )}
+          </label>
         </div>
-      </button>
+
+        <button
+          type="button"
+          onClick={
+            exportImage
+          }
+          disabled={
+            downloadLoading
+          }
+          className="
+            w-full
+            h-[35px]
+            px-3
+            rounded-lg
+            border-0
+            bg-blue-600
+            !text-white
+            text-[10px]
+            font-black
+            uppercase
+            flex
+            items-center
+            justify-center
+            gap-2
+            transition-colors
+            hover:bg-blue-500
+            disabled:opacity-50
+            disabled:cursor-not-allowed
+          "
+        >
+          {downloadLoading ? (
+            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+          ) : (
+            <>
+              <Download
+                size={
+                  15
+                }
+              />
+
+              {t(
+                "export.download"
+              )}
+            </>
+          )}
+        </button>
+      </div>
+
+      {/* SHARE */}
+
+      <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-2">
+          <label className="text-[10px] uppercase tracking-wider font-bold">
+            {t(
+              "export.shareTitle"
+            )}
+          </label>
+
+          <p className="text-[11px] leading-relaxed text-zinc-400 m-0">
+            {t(
+              "export.shareDescription"
+            )}
+          </p>
+        </div>
+
+        {!shareUrl ? (
+          <>
+            <button
+              type="button"
+              onClick={
+                createShareLink
+              }
+              disabled={
+                shareLoading
+              }
+              className="
+                w-full
+                h-[35px]
+                px-3
+                rounded-lg
+                border-0
+                bg-blue-600
+                !text-white
+                text-[10px]
+                font-black
+                uppercase
+                flex
+                items-center
+                justify-center
+                gap-2
+                transition-colors
+                hover:bg-blue-500
+                disabled:opacity-50
+                disabled:cursor-not-allowed
+              "
+            >
+              {shareLoading ? (
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <>
+                  <Share2
+                    size={
+                      15
+                    }
+                  />
+
+                  {t(
+                    "export.createLink"
+                  )}
+                </>
+              )}
+            </button>
+          </>
+        ) : (
+          <>
+            {/* SHARE LINK */}
+
+            <div className="flex flex-col gap-2">
+              <div className="flex gap-2">
+                <div
+                  className="
+                    min-w-0
+                    flex-1
+                    h-9
+                    px-3
+                    rounded-md
+                    bg-zinc-950
+                    border
+                    border-zinc-700
+                    flex
+                    items-center
+                    text-[11px]
+                    font-mono
+                    overflow-hidden
+                  "
+                >
+                  <span className="truncate">
+                    {
+                      shareUrl
+                    }
+                  </span>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={
+                    copyShareLink
+                  }
+                  className="
+                    w-9
+                    h-9
+                    rounded-md
+                    bg-zinc-950
+                    border
+                    border-zinc-700
+                    flex
+                    items-center
+                    justify-center
+                    hover:border-blue-500
+                  "
+                >
+                  {copied ? (
+                    <Check
+                      size={
+                        15
+                      }
+                      className="text-green-500"
+                    />
+                  ) : (
+                    <Copy
+                      size={
+                        15
+                      }
+                    />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <div className="text-[11px] leading-relaxed text-zinc-400">
+              {t(
+                "export.ready"
+              )}
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
-
 }

@@ -2,8 +2,67 @@
 
 import React from "react";
 import { ExternalLink } from "lucide-react";
+import {
+  Stage,
+  Layer,
+  Group,
+} from "react-konva";
+import PedalImage from "@/components/PedalImage";
 import { mmToIn, formatWeight } from "@/utils/units";
 import type { Language } from "@/utils/i18n";
+
+const ENCLOSURE_SIZING_BRANDS = new Set([
+  "JHS Pedals",
+  "1981 Inventions",
+  "29 Pedals",
+  "3 Leaf Audio",
+  "Aguilar",
+  "Anasounds",
+  "Animals Pedal",
+  "BBE",
+  "Boss",
+  "Behringer",
+  "Benson",
+  "Carl Martin",
+  "Chase Bliss",
+  "Catalinbread",
+  "Crazy Tube Circuits",
+  "Danelectro",
+  "DOD",
+  "Dunlop",
+  "Dolmen Effects",
+  "EBS",
+  "EarthQuaker Devices",
+  "Electro-Harmonix",
+  "ENGL",
+  "Fender",
+  "Free The Tone",
+  "Fulltone",
+  "Harley Benton",
+  "J. Rockett",
+  "Keeley",
+  "Line 6",
+  "Lovepedal",
+  "Maestro",
+  "Mr. Black",
+  "MXR",
+  "One Control",
+  "PastFx",
+  "ProCo",
+  "Singular Sound",
+  "Spaceman",
+  "Strymon",
+  "T-Rex",
+  "Tech 21",
+  "TC Electronic",
+  "Third Man Hardware",
+  "Triungulo Lab",
+  "Walrus Audio",
+  "Wampler",
+  "Warm Audio",
+  "Wren and Cuff",
+  "Zoom",
+]);
 
 type Props = {
   selectedPedal: any;
@@ -47,7 +106,7 @@ function getLocalizedOverview(
     Language,
     string
   > = {
-    en: "overview_en",
+    en: "overview",
     fr: "overview_fr",
     es: "overview_es",
     de: "overview_de",
@@ -284,19 +343,6 @@ export default function PedalSpecs({
     t
   );
 
-  const normalizedPower = String(
-    selectedPedal.power || ""
-  )
-    .trim()
-    .toLowerCase();
-
-  const shouldShowDraw = ![
-    "ac",
-    "passive",
-    "usb",
-    "battery",
-  ].includes(normalizedPower);
-
   const status = hasValue(
     selectedPedal.status
   )
@@ -335,6 +381,30 @@ export default function PedalSpecs({
     depth > 0 &&
     width > depth;
 
+  /*
+    La miniature utilise maintenant le même
+    composant PedalImage que le Canvas.
+
+    Les dimensions BDD correspondent au boîtier.
+    PedalImage gère ensuite l'image complète et
+    les éventuels jacks qui dépassent.
+  */
+  const HERO_WIDTH = 200;
+  const HERO_HEIGHT = 170;
+
+  const maxBodyWidth =
+    isHorizontalPedal ? 180 : 140;
+
+  const maxBodyHeight = 140;
+
+  const heroScale =
+    width > 0 && depth > 0
+      ? Math.min(
+        maxBodyWidth / width,
+        maxBodyHeight / depth
+      )
+      : 1;
+
   const dimensions =
     units === "metric"
       ? `${width} x ${depth} mm`
@@ -365,50 +435,67 @@ export default function PedalSpecs({
   return (
     <div
       className="
-    h-full
-    min-h-0
-    overflow-y-auto
-    overflow-x-hidden
-    flex
-    flex-col
-    gap-5
-    animate-in
-    slide-in-from-left
-    duration-300
-    px-1
-    pb-0
+        h-full
+        min-h-0
+        overflow-y-auto
+        overflow-x-hidden
+        flex
+        flex-col
+        gap-5
+        animate-in
+        slide-in-from-left
+        duration-300
+        px-1
+        pb-0
 
-    [scrollbar-width:none]
-    [-ms-overflow-style:none]
-    [&::-webkit-scrollbar]:hidden
-  "
+        [scrollbar-width:none]
+        [-ms-overflow-style:none]
+        [&::-webkit-scrollbar]:hidden
+      "
     >
       {/* HERO PRODUIT */}
       <div className="shrink-0 flex flex-col items-center pt-1">
-        <div className="w-full min-h-[150px] flex items-center justify-center mb-4">
-          {image && (
-            <img
-              src={image}
-              alt={`${brand} ${name}`}
-              className="object-contain"
-              style={
-                isHorizontalPedal
-                  ? {
-                    width: "180px",
-                    height: "auto",
-                    maxHeight: "140px",
-                  }
-                  : {
-                    width: "auto",
-                    height: "140px",
-                    maxWidth: "140px",
-                  }
-              }
-              loading="lazy"
-              decoding="async"
-              draggable={false}
-            />
-          )}
+        <div className="w-full h-[170px] flex items-center justify-center mb-4">
+          {image &&
+            width > 0 &&
+            depth > 0 && (
+              <Stage
+                width={HERO_WIDTH}
+                height={HERO_HEIGHT}
+                listening={false}
+              >
+                <Layer listening={false}>
+                  <Group
+                    x={HERO_WIDTH / 2}
+                    y={HERO_HEIGHT / 2}
+                    scaleX={heroScale}
+                    scaleY={heroScale}
+                    listening={false}
+                  >
+                    <PedalImage
+                      url={image}
+                      width={width}
+                      depth={depth}
+                      jacksLocation={
+                        selectedPedal.jacksLocation ||
+                        selectedPedal.jacks ||
+                        ""
+                      }
+                      useEnclosureSizing={
+                        ENCLOSURE_SIZING_BRANDS.has(
+                          String(
+                            selectedPedal.brand ||
+                            ""
+                          ).trim()
+                        )
+                      }
+                      listening={false}
+                      showJacksMargin={false}
+                    />
+                  </Group>
+                </Layer>
+              </Stage>
+            )}
         </div>
 
         <div className="w-full min-w-0">
@@ -422,7 +509,7 @@ export default function PedalSpecs({
 
             {/* NOM */}
             {name && (
-              <div className="text-[12px] leading-snug whitespace-normal break-words">
+              <div className="text-[12px] truncate">
                 {name}
               </div>
             )}
@@ -430,27 +517,26 @@ export default function PedalSpecs({
             {/* TYPES */}
             {typeTags.length > 0 && (
               <div className="flex items-center gap-1.5 flex-wrap mt-2">
-                {typeTags
-                  .map((tag) => (
-                    <span
-                      key={tag}
-                      className="
-                        px-2.5
-                        py-1
-                        rounded-full
-                        bg-white
-                        text-zinc-950
-                        text-[9px]
-                        font-black
-                        leading-none
-                        whitespace-nowrap
-                      "
-                    >
-                      {t(
-                        `pedal.type.${tag}`
-                      )}
-                    </span>
-                  ))}
+                {typeTags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="
+                      px-2.5
+                      py-1
+                      rounded-full
+                      bg-white
+                      text-zinc-950
+                      text-[9px]
+                      font-black
+                      leading-none
+                      whitespace-nowrap
+                    "
+                  >
+                    {t(
+                      `pedal.type.${tag}`
+                    )}
+                  </span>
+                ))}
               </div>
             )}
           </div>
@@ -532,12 +618,10 @@ export default function PedalSpecs({
             value={power}
           />
 
-          {shouldShowDraw && (
-            <SpecRow
-              label={t("pedal.draw")}
-              value={draw}
-            />
-          )}
+          <SpecRow
+            label={t("pedal.draw")}
+            value={draw}
+          />
 
           <SpecRow
             label={t(

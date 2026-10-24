@@ -1729,6 +1729,51 @@ function detectEnclosure(
       minY +
       1;
 
+
+    const silhouetteRowOccupancy =
+      new Array(
+        visibleHeight
+      ).fill(0);
+
+    for (
+      let y = minY;
+      y <= maxY;
+      y++
+    ) {
+      let count = 0;
+
+      for (
+        let x = minX;
+        x <= maxX;
+        x++
+      ) {
+        const alpha =
+          pixels[
+          (y *
+            canvas.width +
+            x) *
+          4 +
+          3
+          ];
+
+        if (
+          alpha >
+          ALPHA_THRESHOLD
+        ) {
+          count++;
+        }
+      }
+
+      silhouetteRowOccupancy[
+        y - minY
+      ] = count;
+    }
+
+    const silhouetteIsRectangular =
+      isMostlyRectangular(
+        silhouetteRowOccupancy
+      );
+
     if (
       miniRectMode
     ) {
@@ -1770,7 +1815,8 @@ function detectEnclosure(
     }
 
     if (
-      standardRectMode
+      standardRectMode &&
+      silhouetteIsRectangular
     ) {
       const standardRect =
         detectStandardRectBounds(

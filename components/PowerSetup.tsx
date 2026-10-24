@@ -504,7 +504,7 @@ export default function PowerSetup({
           : "w-full bg-transparent border-0 rounded-none p-0"
       }
     >
-      <div className="flex items-center justify-between mb-5">
+      <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-2 text-xs uppercase tracking-wider font-bold">
           <img
             src={
@@ -612,7 +612,7 @@ export default function PowerSetup({
         </div>
       )}
 
-      <div className="mb-3 mt-6 text-[11px] uppercase tracking-wide font-bold">
+      <div className="mb-2 mt-6 text-[11px] uppercase tracking-wide font-bold">
         {t("powerSetup.sections.pedals")}
       </div>
 
@@ -657,7 +657,7 @@ export default function PowerSetup({
                     {/* OK / KO TOUJOURS VISIBLE */}
                     <div
                       className={`
-            text-[11px]
+            text-[10px]
             font-bold
             whitespace-nowrap
             shrink-0
@@ -676,15 +676,16 @@ export default function PowerSetup({
       )}
 
       {hasPedals && powerMessage && (
-        <div className="flex items-center justify-between mt-3">
+        <div className="flex items-center justify-between">
           <div
-            className={`text-[12px] ${hasFailingPedal
-              ? "text-red-500"
-              : extraPedals > 0
-                ? recommendationCanSolve
-                  ? "text-green-600"
-                  : "text-red-500"
-                : powerMessageColor
+            className={`text-[12px] ${extraPedals > 0 && recommendationCanSolve ? "mt-2 " : ""
+              }${hasFailingPedal
+                ? "text-red-500"
+                : extraPedals > 0
+                  ? recommendationCanSolve
+                    ? "text-green-600"
+                    : "text-red-500"
+                  : powerMessageColor
               }`}
           >
             {hasFailingPedal
@@ -700,11 +701,11 @@ export default function PowerSetup({
         </div>
       )}
 
-      <div className="mb-3 mt-6 text-[11px] uppercase tracking-wide font-bold">
+      <div className="mb-1 mt-6 text-[11px] uppercase tracking-wide font-bold">
         {t("powerSetup.sections.recommendation")}
       </div>
 
-      <div className="space-y-2 text-[11px] -mt-1">
+      <div className="space-y-2 text-[11px]">
         {!hasPedals && (
           <>
             <div className="text-blue-400">
@@ -718,7 +719,7 @@ export default function PowerSetup({
             {!hasPower && (
               <>
                 {isSinglePedal && singlePedal && (
-                  <div className="space-y-2">
+                  <div className="space-y-2 mb-2">
                     <div className="text-green-600">
                       {t("powerSetup.recommendation.singleAdapter")
                         .replace("{voltage}", String(singlePedalVoltage))
