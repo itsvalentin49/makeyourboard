@@ -612,7 +612,7 @@ export default function PowerSetup({
         </div>
       )}
 
-      <div className="mb-2 mt-6 text-[11px] uppercase tracking-wide font-bold">
+      <div className="mb-1 mt-6 text-[11px] uppercase tracking-wide font-bold">
         {t("powerSetup.sections.pedals")}
       </div>
 

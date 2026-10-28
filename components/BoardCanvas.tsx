@@ -26,11 +26,41 @@ const ENCLOSURE_SIZING_BRANDS = new Set([
   "1981 Inventions",
   "29 Pedals",
   "3 Leaf Audio",
+  "A3 Stompbox",
+  "Abasi",
+  "AC Noises",
+  "Aclam",
+  "Acorn",
+  "Aion",
+  "Alexander",
+  "All Pedal",
+  "Altero",
+  "Altoid",
+  "Ampeg",
+  "Amptweaker",
+  "AMT Electronics",
+  "Analog Alien",
+  "Analog Man",
+  "API Audio",
+  "ARC Effects",
+  "Arion",
+  "Ashdown Engineering",
+  "Audio Surplus Effects",
   "Aguilar",
   "Anasounds",
   "Animals Pedal",
   "BBE",
+  "Beetronics",
+  "Blackstar",
   "Boss",
+  "Browne Amplification",
+  "RedSeven Amplification",
+  "BSS",
+  "Caline",
+  "Caroline Guitar Company",
+  "Korg",
+  "Sonulab",
+  "KMA Machines",
   "Behringer",
   "Benson",
   "Carl Martin",
@@ -45,6 +75,7 @@ const ENCLOSURE_SIZING_BRANDS = new Set([
   "EarthQuaker Devices",
   "Electro-Harmonix",
   "ENGL",
+  "Ernie Ball",
   "Fender",
   "Free The Tone",
   "Fulltone",
@@ -59,6 +90,7 @@ const ENCLOSURE_SIZING_BRANDS = new Set([
   "One Control",
   "PastFx",
   "ProCo",
+  "Providence",
   "Singular Sound",
   "Spaceman",
   "Strymon",
@@ -71,6 +103,7 @@ const ENCLOSURE_SIZING_BRANDS = new Set([
   "Wampler",
   "Warm Audio",
   "Wren and Cuff",
+  "Xotic",
   "Zoom",
 ]);
 
@@ -984,6 +1017,30 @@ export default function BoardCanvas({
     x: number;
     y: number;
   } | null>(null);
+
+  // Quand on change de pedalboard, une sélection appartenant à l'ancien
+  // projet ne doit jamais survivre dans le nouveau canvas.
+  // useLayoutEffect remet aussi l'overlay à zéro avant le paint suivant,
+  // ce qui évite que les boutons d'action apparaissent brièvement au mauvais endroit.
+  const previousActiveProjectIdRef = useRef(activeProjectId);
+
+  useLayoutEffect(() => {
+    if (previousActiveProjectIdRef.current === activeProjectId) {
+      return;
+    }
+
+    previousActiveProjectIdRef.current = activeProjectId;
+
+    setSelectedInstanceId(null);
+    setSelectedBoardInstanceId(null);
+    setOverlayPosition(null);
+    setInfoPosition(null);
+  }, [
+    activeProjectId,
+    setSelectedInstanceId,
+    setSelectedBoardInstanceId,
+  ]);
+
   const [isDragging, setIsDragging] = useState(false);
   const [isStageDragging, setIsStageDragging] = useState(false);
   const [localSignalPath, setLocalSignalPath] = useState<any[]>(
