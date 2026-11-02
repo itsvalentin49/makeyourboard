@@ -61,6 +61,10 @@ type Props = {
   boardsLibrary: AnyRow[];
 
   powerLibrary: AnyRow[];
+  newPedals: AnyRow[];
+  newPedalsLoading: boolean;
+  libraryLoading: boolean;
+  libraryError: string | null;
 
   lastSelectedPedal: AnyRow | null;
 
@@ -188,6 +192,10 @@ export default function Sidebar({
   pedalsLibrary,
 
   boardsLibrary,
+  newPedals,
+  newPedalsLoading,
+  libraryLoading,
+  libraryError,
 
   powerLibrary,
 
@@ -1461,11 +1469,12 @@ export default function Sidebar({
           </div>
 
           {activeSidebarTab === "pedals" && (
-
             <SearchPedals
-
               pedalsLibrary={pedalsLibrary}
-
+              newPedals={newPedals}
+              newPedalsLoading={newPedalsLoading}
+              libraryLoading={libraryLoading}
+              libraryError={libraryError}
               pedalSearch={pedalSearch}
 
               setPedalSearch={setPedalSearch}

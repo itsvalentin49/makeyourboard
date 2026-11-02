@@ -340,6 +340,8 @@
     "result": "{count} résultat",
     "results": "{count} résultats",
     "latest": "Voici les dernières nouveautés.",
+    "loading": "Chargement de la bibliothèque de pédales…",
+    "loadError": "Impossible de charger la bibliothèque. Veuillez recharger la page.",
     "new": "NEW",
     "newReleases": "Nouveautés"
   },

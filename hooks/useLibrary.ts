@@ -91,15 +91,59 @@ async function fetchTable(table: string, orderCols: string[] = []) {
   return allRows;
 }
 
+async function fetchNewPedals(): Promise<AnyRow[]> {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const limitDate = new Date(today);
+  limitDate.setDate(today.getDate() - 30);
+
+  const formatDate = (date: Date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+  };
+
+  const { data, error } = await supabase
+    .from("pedals")
+    .select("*")
+    .gte("year", formatDate(limitDate))
+    .lte("year", formatDate(today))
+    .order("year", { ascending: false });
+
+  if (error) throw error;
+
+  return data ?? [];
+}
+
 export function useLibrary() {
   const [pedalsLibrary, setPedalsLibrary] = useState<AnyRow[]>([]);
   const [boardsLibrary, setBoardsLibrary] = useState<AnyRow[]>([]);
   const [powerLibrary, setPowerLibrary] = useState<AnyRow[]>([]);
+  const [newPedals, setNewPedals] = useState<AnyRow[]>([]);
+  const [newPedalsLoading, setNewPedalsLoading] = useState(true);
   const [libraryError, setLibraryError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     let cancelled = false;
+
+    fetchNewPedals()
+      .then((pedals) => {
+        if (!cancelled) {
+          setNewPedals(pedals);
+        }
+      })
+      .catch((err) => {
+        console.error("[Supabase] Failed to load new pedals:", err);
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setNewPedalsLoading(false);
+        }
+      });
 
     (async () => {
       try {
@@ -138,5 +182,13 @@ export function useLibrary() {
     };
   }, []);
 
-  return { pedalsLibrary, boardsLibrary, powerLibrary, libraryError, loading };
+  return {
+    pedalsLibrary,
+    boardsLibrary,
+    powerLibrary,
+    newPedals,
+    newPedalsLoading,
+    libraryError,
+    loading,
+  };
 }

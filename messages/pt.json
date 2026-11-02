@@ -339,6 +339,8 @@
     "result": "{count} resultado",
     "results": "{count} resultados",
     "latest": "Aqui estão as novidades mais recentes.",
+    "loading": "A carregar a biblioteca de pedais…",
+    "loadError": "Não foi possível carregar a biblioteca. Recarrega a página.",
     "new": "NOVO",
     "newReleases": "Novidades"
   },

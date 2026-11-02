@@ -339,6 +339,8 @@
     "result": "{count} risultato",
     "results": "{count} risultati",
     "latest": "Ecco le ultime novità.",
+    "loading": "Caricamento della libreria dei pedali…",
+    "loadError": "Impossibile caricare la libreria. Ricarica la pagina.",
     "new": "NUOVO",
     "newReleases": "Novità"
   },

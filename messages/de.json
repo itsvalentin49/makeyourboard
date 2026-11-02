@@ -339,6 +339,8 @@
     "result": "{count} Ergebnis",
     "results": "{count} Ergebnisse",
     "latest": "Hier sind die neuesten Ergänzungen.",
+    "loading": "Pedalbibliothek wird geladen…",
+    "loadError": "Die Bibliothek konnte nicht geladen werden. Bitte lade die Seite neu.",
     "new": "NEU",
     "newReleases": "Neuheiten"
   },

@@ -1,12 +1,16 @@
 "use client";
 
 import React, { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
-import { Search, X } from "lucide-react";
+import { LoaderCircle, Search, X } from "lucide-react";
 
 type AnyRow = Record<string, any>;
 
 type Props = {
   pedalsLibrary: AnyRow[];
+  newPedals: AnyRow[];
+  newPedalsLoading: boolean;
+  libraryLoading: boolean;
+  libraryError: string | null;
 
   pedalSearch: string;
   setPedalSearch: (v: string) => void;
@@ -363,6 +367,10 @@ function isNewPedal(value: any): boolean {
 export default function SearchPedals({
   pedalsLibrary,
   pedalSearch,
+  newPedals,
+  newPedalsLoading,
+  libraryLoading,
+  libraryError,
   setPedalSearch,
   setShowPedalResults,
   setShowBoardResults,
@@ -377,17 +385,11 @@ export default function SearchPedals({
 
   const visiblePedals = useMemo(() => {
     if (!isDeferredSearching) {
-      return pedalsLibrary
-        .filter((pedal) => isNewPedal(pedal.year))
-        .sort((a, b) => {
-          const dateA =
-            parseReleaseDate(a.year)?.getTime() || 0;
+      return newPedals;
+    }
 
-          const dateB =
-            parseReleaseDate(b.year)?.getTime() || 0;
-
-          return dateB - dateA;
-        });
+    if (libraryLoading || libraryError) {
+      return [];
     }
 
     const terms = search.split(" ").filter(Boolean);
@@ -509,6 +511,9 @@ export default function SearchPedals({
       });
   }, [
     pedalsLibrary,
+    newPedals,
+    libraryLoading,
+    libraryError,
     search,
     isDeferredSearching,
     t,
@@ -631,16 +636,28 @@ export default function SearchPedals({
       {/* NOMBRE DE RÉSULTATS */}
 
       {isSearching && (
-        <div className="mt-4 mb-2 shrink-0 text-[11px] font-bold">
-          {t(
-            visiblePedals.length <= 1
-              ? "pedalsMenu.result"
-              : "pedalsMenu.results"
-          ).replace(
-            "{count}",
-            String(
-              visiblePedals.length
-            )
+        <div
+          role="status"
+          aria-live="polite"
+          className="mt-4 mb-2 shrink-0 text-[11px] font-bold"
+        >
+          {libraryLoading ? (
+            <span className="flex items-center gap-2">
+              <LoaderCircle
+                size={14}
+                className="animate-spin motion-reduce:animate-none shrink-0"
+                aria-hidden="true"
+              />
+              {t("pedalsMenu.loading")}
+            </span>
+          ) : libraryError ? (
+            t("pedalsMenu.loadError")
+          ) : (
+            t(
+              visiblePedals.length <= 1
+                ? "pedalsMenu.result"
+                : "pedalsMenu.results"
+            ).replace("{count}", String(visiblePedals.length))
           )}
         </div>
       )}

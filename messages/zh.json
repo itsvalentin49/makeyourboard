@@ -339,6 +339,8 @@
     "result": "{count} 个结果",
     "results": "{count} 个结果",
     "latest": "以下是最新上架的产品。",
+    "loading": "正在加载效果器库…",
+    "loadError": "无法加载效果器库，请刷新页面。",
     "new": "新",
     "newReleases": "新品"
   },

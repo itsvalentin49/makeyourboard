@@ -137,7 +137,15 @@ export default function BoardEditor({
   const desktopCanvasRef = useRef<HTMLDivElement | null>(null);
   const mobileCanvasRef = useRef<HTMLDivElement | null>(null);
   const canvasContainerRef = useRef<HTMLDivElement | null>(null);
-  const { pedalsLibrary, boardsLibrary, powerLibrary } = useLibrary();
+  const {
+    pedalsLibrary,
+    boardsLibrary,
+    powerLibrary,
+    newPedals,
+    newPedalsLoading,
+    loading: libraryLoading,
+    libraryError,
+  } = useLibrary();
   const [projects, setProjects] = useState<Project[]>([]);
   const [activeProjectId, setActiveProjectId] = useState<number | null>(null);
   const [workingBoard, setWorkingBoard] = useState<Project>(DEFAULT_WORKING_BOARD);
@@ -1206,6 +1214,10 @@ export default function BoardEditor({
               pedalsLibrary={pedalsLibrary}
               boardsLibrary={boardsLibrary}
               powerLibrary={powerLibrary}
+              newPedals={newPedals}
+              newPedalsLoading={newPedalsLoading}
+              libraryLoading={libraryLoading}
+              libraryError={libraryError}
               setLastSelectedPedal={setLastSelectedPedal}
               lastSelectedPower={lastSelectedPower}
               setLastSelectedPower={setLastSelectedPower}
@@ -1532,6 +1544,10 @@ export default function BoardEditor({
                     pedalsLibrary={pedalsLibrary}
                     boardsLibrary={boardsLibrary}
                     powerLibrary={powerLibrary}
+                    newPedals={newPedals}
+                    newPedalsLoading={newPedalsLoading}
+                    libraryLoading={libraryLoading}
+                    libraryError={libraryError}
                     setLastSelectedPedal={setLastSelectedPedal}
                     lastSelectedPower={lastSelectedPower}
                     setLastSelectedPower={setLastSelectedPower}
@@ -1644,6 +1660,10 @@ export default function BoardEditor({
                 pedalsLibrary={pedalsLibrary}
                 boardsLibrary={boardsLibrary}
                 powerLibrary={powerLibrary}
+                newPedals={newPedals}
+                newPedalsLoading={newPedalsLoading}
+                libraryLoading={libraryLoading}
+                libraryError={libraryError}
                 setLastSelectedPedal={setLastSelectedPedal}
                 lastSelectedPower={lastSelectedPower}
                 setLastSelectedPower={setLastSelectedPower}

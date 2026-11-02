@@ -342,6 +342,8 @@
     "result": "{count} result",
     "results": "{count} results",
     "latest": "Here are the latest additions.",
+    "loading": "Loading pedal library…",
+    "loadError": "Unable to load the library. Please reload the page.",
     "new": "NEW",
     "newReleases": "New Releases"
   },
