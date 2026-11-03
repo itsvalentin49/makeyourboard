@@ -1,7 +1,8 @@
 "use client";
 
 import React from "react";
-import { ChevronDown, ArrowLeft, Sun, Moon, Check } from "lucide-react";
+import Link from "next/link";
+import { ChevronDown, Sun, Moon, Check, Send, FileText, Heart, ExternalLink, X } from "lucide-react";
 import type { Language } from "@/utils/i18n";
 
 type Background = {
@@ -26,6 +27,8 @@ type Props = {
 
   backgrounds: Background[];
   setContactOpen: (v: boolean) => void;
+  onContactViewChange?: (open: boolean) => void;
+  supportUrl?: string;
 };
 
 export default function SettingsPanel({
@@ -38,8 +41,11 @@ export default function SettingsPanel({
   setUnits,
   backgrounds,
   setContactOpen,
+  onContactViewChange,
+  supportUrl,
 
 }: Props) {
+  const [contactVisible, setContactVisible] = React.useState(false);
   const [bgOpen, setBgOpen] = React.useState(false);
   const [langOpen, setLangOpen] = React.useState(false);
   const [theme, setTheme] = React.useState<"dark" | "light">(() => {
@@ -143,6 +149,7 @@ export default function SettingsPanel({
   };
 
 
+  if (contactVisible) return <SettingsContactForm t={t} onBack={() => { setContactVisible(false); onContactViewChange?.(false); }} />;
   return (
     <div className="flex flex-col gap-4">
 
@@ -156,7 +163,7 @@ export default function SettingsPanel({
           <button
             type="button"
             onClick={() => setLangOpen((v) => !v)}
-            className="w-full h-[35px] bg-zinc-950 border border-zinc-800 rounded-lg px-4 text-[10px] text-left flex items-center justify-between hover:border-zinc-600 transition-colors"
+            className="w-full h-[36px] bg-zinc-950 border border-zinc-800 rounded-lg px-4 text-[10px] text-left flex items-center justify-between hover:border-zinc-600 transition-colors"
           >
             <span>{LANGUAGE_LABELS[language]}</span>
             <ChevronDown className={`size-3 transition-transform ${langOpen ? "rotate-180" : ""}`} />
@@ -358,7 +365,7 @@ export default function SettingsPanel({
             }}
             className="
         w-full
-        h-[40px]
+        h-[36px]
         px-3
         bg-zinc-950
         border
@@ -554,6 +561,104 @@ export default function SettingsPanel({
           )}
         </div>
       </div>
+      <div className="mt-2 flex flex-col gap-4 border-t border-zinc-700 pt-4">
+        <div className="flex flex-col gap-1">
+          <h3 className="mb-1 text-[10px] font-bold uppercase tracking-wider">{t("settings.resources")}</h3>
+          <Link href="/docs" className="flex min-h-9 items-center gap-3 rounded-md px-2 py-2 text-[11px] hover:bg-canvas">
+            <span aria-hidden="true" style={{ width: 24, height: 24, borderRadius: 6, background: "linear-gradient(145deg,#60a5fa,#2563eb)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}><FileText size={16} style={{ color: "white" }} /></span>
+            <span className="flex min-w-0 flex-1 flex-col gap-0.5"><span>{t("help.documentation")}</span><span className="text-[10px] leading-relaxed text-zinc-400">{t("settings.documentationDescription")}</span></span>
+          </Link>
+          <button type="button" onClick={() => { setContactVisible(true); onContactViewChange?.(true); }} className="flex min-h-9 items-center gap-3 rounded-md px-2 py-2 text-left text-[11px] hover:bg-canvas">
+            <span aria-hidden="true" style={{ width: 24, height: 24, borderRadius: 6, background: "linear-gradient(145deg,#38bdf8,#4f46e5)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}><Send size={15} strokeWidth={2} style={{ color: "white" }} /></span>
+            <span className="flex min-w-0 flex-1 flex-col gap-0.5"><span>{t("footer.feedback")}</span><span className="text-[10px] leading-relaxed text-zinc-400">{t("settings.contactDescription")}</span></span>
+          </button>
+        </div>
+        <div className="flex flex-col gap-1">
+          <h3 className="mb-1 text-[10px] font-bold uppercase tracking-wider">{t("settings.project")}</h3>
+          <a href="https://www.instagram.com/makeyourboard_/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 rounded-md px-2 py-2 text-[11px] hover:bg-canvas">
+            <img src="/logos/instagram.png" alt="" aria-hidden="true" style={{ width: 20, height: 20, objectFit: "contain", flexShrink: 0 }} />
+            <span className="flex min-w-0 flex-1 flex-col gap-0.5"><span>Instagram</span><span className="text-[10px] leading-relaxed text-zinc-400">{t("settings.instagramDescription")}</span></span>
+            <ExternalLink size={13} style={{ color: "#3b82f6" }} className="shrink-0" aria-hidden="true" />
+          </a>
+          {supportUrl && <a href={supportUrl} target="_blank" rel="noopener noreferrer" className="flex min-h-9 items-center gap-3 rounded-md px-2 py-2 text-[11px] hover:bg-canvas">
+            <Heart size={20} fill="#ef4444" stroke="#ef4444" aria-hidden="true" /><span className="flex min-w-0 flex-1 flex-col gap-0.5"><span>{t("settings.supportProject")}</span><span className="text-[10px] leading-relaxed text-zinc-400">{t("settings.supportDescription")}</span></span><ExternalLink size={13} style={{ color: "#3b82f6" }} aria-hidden="true" />
+          </a>}
+        </div>
+      </div>
     </div>
   );
+}
+function SettingsContactForm({ t, onBack }: { t: (key: string) => string; onBack: () => void }) {
+  const [email, setEmail] = React.useState("");
+  const [type, setType] = React.useState("question");
+  const [typeOpen, setTypeOpen] = React.useState(false);
+  const typeRef = React.useRef<HTMLDivElement>(null);
+  const typeButtonRef = React.useRef<HTMLButtonElement>(null);
+  React.useEffect(() => {
+    const outside = (event: MouseEvent) => { if (typeRef.current && !typeRef.current.contains(event.target as Node)) setTypeOpen(false); };
+    document.addEventListener("mousedown", outside);
+    return () => document.removeEventListener("mousedown", outside);
+  }, []);
+  const [message, setMessage] = React.useState("");
+  const [honeypot, setHoneypot] = React.useState("");
+  const [loading, setLoading] = React.useState(false);
+  const [success, setSuccess] = React.useState(false);
+  const [error, setError] = React.useState("");
+  const [emailError, setEmailError] = React.useState("");
+  const id = React.useId();
+  const field = "w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-[11px]";
+  return <form noValidate className="myb-settings-contact flex flex-col gap-4" onSubmit={async event => {
+    event.preventDefault(); if (loading || success || honeypot) return;
+    setError(""); setEmailError("");
+    if (!email.trim() || !message.trim()) { setError(t("contact.errorRequired")); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) { setEmailError(t("contact.errorInvalidEmail")); return; }
+    setLoading(true);
+    try {
+      const response = await fetch("/api/contact", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: email.trim(), subject: "MakeYourBoard Contact", message: message.trim(), type, honeypot }) });
+      if (!response.ok) throw new Error("Contact request failed");
+      setSuccess(true); setEmail(""); setMessage("");
+    } catch { setError(t("contact.errorGeneric")); } finally { setLoading(false); }
+  }}>
+    <style>{`
+      .myb-settings-contact input:focus,
+      .myb-settings-contact input:focus-visible,
+      .myb-settings-contact select:focus,
+      .myb-settings-contact select:focus-visible,
+      .myb-settings-contact textarea:focus,
+      .myb-settings-contact textarea:focus-visible {
+        outline: none !important;
+        box-shadow: none !important;
+        border-color: var(--zinc-800, #27272a) !important;
+      }
+      .myb-contact-close { cursor:pointer; transition:background-color 140ms ease,opacity 140ms ease; }
+      .myb-contact-close:hover { background-color:rgba(140,140,150,.18); }
+      .myb-contact-type-option:hover, .myb-contact-type-option:focus-visible { background-color:rgba(140,140,150,.18); }
+      .myb-contact-type-button:focus, .myb-contact-type-button:focus-visible { outline:none !important; box-shadow:none !important; }
+      .myb-contact-send { cursor: pointer; transition: background-color 140ms ease; }
+      .myb-contact-send:hover:not(:disabled) { background-color: #3b82f6 !important; }
+      .myb-contact-send:disabled { cursor: not-allowed; }
+      .myb-contact-send[data-success="true"] {background-color:#10b981 !important;color:white !important;opacity:1 !important;cursor:default;}
+    `}</style>
+    <div className="flex items-center justify-between gap-3" style={{ marginBottom: 16, minHeight: 24 }}>
+      <h2 className="m-0 text-xs font-bold uppercase tracking-wider">{t("contact.title")}</h2>
+      <button type="button" onClick={onBack} aria-label={t("sidebar.back")} className="myb-contact-close flex h-6 w-6 items-center justify-center rounded-md"><X size={18} aria-hidden="true" /></button>
+    </div>
+    <div className="flex flex-col" style={{ gap: 4 }}>
+      <label htmlFor={id + "-email"} className="flex flex-col gap-2 text-[10px] font-bold uppercase tracking-wider">{t("contact.email")}<input style={{ height: 36, minHeight: 36, boxSizing: "border-box" }} id={id + "-email"} type="email" value={email} onChange={e => { setEmail(e.target.value); setEmailError(""); }} aria-invalid={Boolean(emailError)} aria-describedby={emailError ? id + "-email-error" : undefined} placeholder={t("contact.placeholderEmail")} className={field + " font-normal normal-case tracking-normal"} /></label>
+      {emailError && <p id={id + "-email-error"} role="alert" className="m-0 text-[11px] leading-relaxed text-red-500" style={{ margin: 0 }}>{emailError}</p>}
+    </div>
+    <div ref={typeRef} className="relative flex flex-col gap-2" onKeyDown={event => { if (event.key === "Escape") { event.preventDefault(); setTypeOpen(false); typeButtonRef.current?.focus(); } }}>
+      <span id={id + "-type-label"} className="text-[10px] font-bold uppercase tracking-wider">{t("contact.type")}</span>
+      <button ref={typeButtonRef} id={id + "-type"} type="button" aria-labelledby={id + "-type-label " + id + "-type-value"} aria-expanded={typeOpen} aria-controls={id + "-type-menu"} onClick={() => setTypeOpen(open => !open)} className={field + " myb-contact-type-button flex items-center justify-between gap-2 text-left"} style={{ height: 36, minHeight: 36, boxSizing: "border-box", cursor: "pointer" }}>
+        <span id={id + "-type-value"}>{t("contact.types." + type)}</span><ChevronDown size={14} style={{ transform: typeOpen ? "rotate(180deg)" : "none", transition: "transform 140ms ease" }} aria-hidden="true" />
+      </button>
+      {typeOpen && <div id={id + "-type-menu"} className="overflow-hidden rounded-lg border border-zinc-800 bg-zinc-950" style={{ position: "absolute", top: "100%", left: 0, right: 0, marginTop: 4, zIndex: 50 }}>
+        {["question", "request", "bug", "other"].map(value => <button key={value} type="button" aria-pressed={type === value} className="myb-contact-type-option flex w-full items-center justify-between px-3 text-left text-[11px]" style={{ height: 32, cursor: "pointer" }} onClick={() => { setType(value); setTypeOpen(false); typeButtonRef.current?.focus(); }}><span>{t("contact.types." + value)}</span></button>)}
+      </div>}
+    </div>
+    <label htmlFor={id + "-message"} className="flex flex-col gap-2 text-[10px] font-bold uppercase tracking-wider">{t("contact.message")}<textarea id={id + "-message"} value={message} onChange={e => setMessage(e.target.value)} rows={6} placeholder={t("contact.placeholderMessage")} className={field + " resize-none font-normal normal-case tracking-normal"} /></label>
+    <input type="text" value={honeypot} onChange={e => setHoneypot(e.target.value)} style={{ display: "none" }} tabIndex={-1} autoComplete="off" aria-hidden="true" />
+    {error && <p role="alert" className="text-[11px] text-red-500">{error}</p>}
+    <button type="submit" style={{ height: 36, minHeight: 36, maxHeight: 36, boxSizing: "border-box", paddingTop: 0, paddingBottom: 0 }} aria-live="polite" data-success={success ? "true" : "false"} disabled={loading || success} className="myb-contact-send h-9 rounded-lg bg-blue-600 text-[10px] font-black uppercase !text-white disabled:opacity-50">{success ? t("contact.sent") : loading ? t("contact.sending") : t("contact.send")}</button>
+  </form>;
 }

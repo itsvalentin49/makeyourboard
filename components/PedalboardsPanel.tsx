@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { GripVertical, X } from "lucide-react";
+import { GripVertical, X, PanelsTopLeft } from "lucide-react";
 import type { Project } from "@/types/project";
 import { getTranslator, type Language } from "@/utils/i18n";
 
@@ -437,17 +437,7 @@ export default function PedalboardsPanel({
 
             <div className="flex items-center gap-2 text-xs uppercase tracking-wider font-bold px-2 pb-3">
 
-                <img
-                    src={
-                        isLightTheme
-                            ? "/images/tab-board-dark.webp"
-                            : "/images/tab-board-light.webp"
-                    }
-                    alt=""
-                    aria-hidden="true"
-                    draggable={false}
-                    className="w-[18px] h-[18px] object-contain shrink-0"
-                />
+                <PanelsTopLeft size={18} strokeWidth={2} aria-hidden="true" className="shrink-0" />
 
                 {t(
                     "canvasControls.pedalboards"
@@ -1073,24 +1063,12 @@ export default function PedalboardsPanel({
                         }
                     >
 
-                        <div className="text-[11px] font-bold mb-3">
-
-                            {t(
-                                "tabs.confirmDelete"
-                            ).replace(
-                                "{name}",
-                                projects.find(
-                                    (
-                                        project
-                                    ) =>
-                                        project.id ===
-                                        confirmDeleteProjectId
-                                )?.name ||
-                                "Pedalboard"
-                            )}
-
+                        <div className="mb-3 flex min-w-0 flex-col gap-2 text-[11px]">
+                            <p className="m-0 font-bold">{t("tabs.confirmDeletePrompt")}</p>
+                            <p className="m-0 font-bold" style={{ whiteSpace: "normal", overflowWrap: "anywhere" }}>
+                                {projects.find(project => project.id === confirmDeleteProjectId)?.name || "Pedalboard"}
+                            </p>
                         </div>
-
 
                         <div className="flex gap-2 justify-end">
 

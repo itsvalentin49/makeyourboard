@@ -1,11 +1,15 @@
 "use client";
 
+import { createPortal } from "react-dom";
 import React, { useEffect, useRef, useState } from "react";
 import { Cable, GripVertical } from "lucide-react";
+
+const SIGNAL_PATH_ENABLED = false;
 
 type AnyRow = Record<string, any>;
 
 type Props = {
+    desktopPanelHost?: HTMLDivElement | null;
     t: (key: string) => string;
 
     isMobile: boolean;
@@ -13,6 +17,9 @@ type Props = {
 
     showCableMenu: boolean;
     onToggleCableMenu: () => void;
+
+    showSignalPath?: boolean;
+    setShowSignalPath?: React.Dispatch<React.SetStateAction<boolean>>;
 
     showJacksMargin: boolean;
     setShowJacksMargin: React.Dispatch<
@@ -177,6 +184,7 @@ function getRecommendedSignalOrder(
 ========================================================= */
 
 export default function CablesPanel({
+    desktopPanelHost = null,
     t,
     isMobile,
     isLightTheme,
@@ -184,6 +192,8 @@ export default function CablesPanel({
     showCableMenu,
     onToggleCableMenu,
 
+    showSignalPath = false,
+    setShowSignalPath,
     showJacksMargin,
     setShowJacksMargin,
 
@@ -389,6 +399,9 @@ export default function CablesPanel({
     };
 
 
+    const renderPanel = (content: React.ReactNode) =>
+        !isMobile && desktopPanelHost ? createPortal(content, desktopPanelHost) : content;
+
     return (
         <div className="relative">
 
@@ -438,7 +451,7 @@ export default function CablesPanel({
           PANEL
       =================================================== */}
 
-            {showCableMenu && (
+            {showCableMenu && renderPanel(
                 <div
                     ref={rightSidebarRef}
                     className={
@@ -469,22 +482,19 @@ export default function CablesPanel({
 
                         <div className="flex items-center gap-2 text-xs uppercase tracking-wider font-bold mb-6">
 
-                            <img
-                                src={
-                                    isLightTheme
-                                        ? "/images/tab-cables-dark.webp"
-                                        : "/images/tab-cables-light.webp"
-                                }
-                                alt=""
-                                aria-hidden="true"
-                                draggable={false}
-                                className="w-[18px] h-[18px] object-contain shrink-0"
-                            />
+                            <Cable size={18} strokeWidth={2} aria-hidden="true" className="shrink-0" />
 
                             {t("cables.title")}
 
                         </div>
 
+
+                        {SIGNAL_PATH_ENABLED && setShowSignalPath && (
+                            <label className="mb-6 flex items-center justify-between gap-4 text-[10px] font-bold uppercase tracking-wide">
+                                {t("cables.signalPath")}
+                                <input type="checkbox" checked={showSignalPath} onChange={(event) => setShowSignalPath(event.target.checked)} className="h-4 w-4 accent-blue-600" />
+                            </label>
+                        )}
 
                         {/* =============================================
                 CABLE CLEARANCE

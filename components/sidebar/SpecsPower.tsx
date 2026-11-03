@@ -539,9 +539,6 @@ export default function SpecsPower({
         flex
         flex-col
         gap-5
-        animate-in
-        slide-in-from-left
-        duration-300
         px-1
         pb-8
 
@@ -559,40 +556,22 @@ export default function SpecsPower({
           HERO PRODUIT
           ========================= */}
 
-      <div className="shrink-0 flex flex-col items-center pt-2">
-        {image && (
-          <div
-            className="
-              w-full
-              min-h-[150px]
-              flex
-              items-center
-              justify-center
-              mb-4
-            "
-          >
+      <div className="shrink-0 flex flex-col items-center pt-1">
+        <div className="w-full h-[170px] shrink-0 flex items-center justify-center mb-4">
+          {image && (
             <img
+              key={image}
               src={image}
               alt={`${brand} ${name}`}
-              className="object-contain"
-              style={{
-                width:
-                  "180px",
-                height:
-                  "auto",
-                maxHeight:
-                  "135px",
-                maxWidth:
-                  "100%",
-              }}
-              loading="lazy"
-              decoding="async"
-              draggable={
-                false
-              }
+              className="!block !h-[135px] !w-[180px] object-contain"
+              style={{ width: 180, height: 135, objectFit: "contain" }}
+              loading="eager"
+              fetchPriority="high"
+              decoding="sync"
+              draggable={false}
             />
-          </div>
-        )}
+          )}
+        </div>
 
         <div className="w-full min-w-0">
           {/* MARQUE + BADGE */}

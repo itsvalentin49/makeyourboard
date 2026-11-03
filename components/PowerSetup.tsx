@@ -506,17 +506,7 @@ export default function PowerSetup({
     >
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-2 text-xs uppercase tracking-wider font-bold">
-          <img
-            src={
-              isLightTheme
-                ? "/images/tab-power2-dark.webp"
-                : "/images/tab-power2-light.webp"
-            }
-            alt=""
-            aria-hidden="true"
-            draggable={false}
-            className="w-[18px] h-[18px] object-contain shrink-0"
-          />
+          <Zap size={18} strokeWidth={2} aria-hidden="true" className="shrink-0" />
 
           {t("powerSetup.title")}
         </div>

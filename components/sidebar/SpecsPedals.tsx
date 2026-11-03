@@ -464,9 +464,6 @@ export default function PedalSpecs({
         flex
         flex-col
         gap-5
-        animate-in
-        slide-in-from-left
-        duration-300
         px-1
         pb-0
 
@@ -477,7 +474,7 @@ export default function PedalSpecs({
     >
       {/* HERO PRODUIT */}
       <div className="shrink-0 flex flex-col items-center pt-1">
-        <div className="w-full h-[170px] flex items-center justify-center mb-4">
+        <div className="w-full h-[170px] shrink-0 flex items-center justify-center mb-4">
           <PedalHeroPreview
             selectedPedal={selectedPedal}
             selectedInstanceId={selectedInstanceId}

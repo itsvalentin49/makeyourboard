@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
+import React, { useDeferredValue, useMemo } from "react";
 import { LoaderCircle, Search, X } from "lucide-react";
 
 type AnyRow = Record<string, any>;
@@ -46,307 +46,6 @@ function parseReleaseDate(value: any): Date | null {
   );
 }
 
-
-function getPhysicalThumbnailSize(pedal: AnyRow) {
-  const width = Number(pedal.width) || 0;
-  const depth = Number(pedal.depth) || 0;
-
-  const MAX_WIDTH = 52;
-  const MAX_HEIGHT = 38;
-
-  if (width <= 0 || depth <= 0) {
-    return {
-      width: MAX_WIDTH,
-      height: MAX_HEIGHT,
-    };
-  }
-
-  /*
-   * width / depth définit UNIQUEMENT la boîte physique.
-   * On agrandit cette boîte au maximum dans 52 × 38 px
-   * sans jamais modifier son ratio.
-   */
-  const scale = Math.min(
-    MAX_WIDTH / width,
-    MAX_HEIGHT / depth
-  );
-
-  return {
-    width: Math.max(1, width * scale),
-    height: Math.max(1, depth * scale),
-  };
-}
-
-type CropBounds = {
-  sx: number;
-  sy: number;
-  sw: number;
-  sh: number;
-};
-
-const thumbnailCropCache = new Map<
-  string,
-  Promise<CropBounds | null>
->();
-
-function getThumbnailCrop(
-  src: string,
-  image: HTMLImageElement
-): Promise<CropBounds | null> {
-  const cached = thumbnailCropCache.get(src);
-  if (cached) return cached;
-
-  const promise = new Promise<CropBounds | null>((resolve) => {
-    try {
-      const MAX_ANALYSIS_SIZE = 96;
-      const ratio = Math.min(
-        1,
-        MAX_ANALYSIS_SIZE / Math.max(image.naturalWidth, image.naturalHeight)
-      );
-
-      const analysisWidth = Math.max(
-        1,
-        Math.round(image.naturalWidth * ratio)
-      );
-      const analysisHeight = Math.max(
-        1,
-        Math.round(image.naturalHeight * ratio)
-      );
-
-      const analysis = document.createElement("canvas");
-      analysis.width = analysisWidth;
-      analysis.height = analysisHeight;
-
-      const context = analysis.getContext("2d", {
-        willReadFrequently: true,
-      });
-
-      if (!context) {
-        resolve(null);
-        return;
-      }
-
-      context.clearRect(0, 0, analysisWidth, analysisHeight);
-      context.drawImage(image, 0, 0, analysisWidth, analysisHeight);
-
-      const pixels = context.getImageData(
-        0,
-        0,
-        analysisWidth,
-        analysisHeight
-      ).data;
-
-      let minX = analysisWidth;
-      let minY = analysisHeight;
-      let maxX = -1;
-      let maxY = -1;
-      const ALPHA_THRESHOLD = 10;
-
-      for (let y = 0; y < analysisHeight; y++) {
-        for (let x = 0; x < analysisWidth; x++) {
-          const alpha =
-            pixels[(y * analysisWidth + x) * 4 + 3];
-
-          if (alpha > ALPHA_THRESHOLD) {
-            if (x < minX) minX = x;
-            if (x > maxX) maxX = x;
-            if (y < minY) minY = y;
-            if (y > maxY) maxY = y;
-          }
-        }
-      }
-
-      if (maxX < minX || maxY < minY) {
-        resolve(null);
-        return;
-      }
-
-      const scaleX = image.naturalWidth / analysisWidth;
-      const scaleY = image.naturalHeight / analysisHeight;
-
-      const sx = Math.max(0, Math.floor(minX * scaleX));
-      const sy = Math.max(0, Math.floor(minY * scaleY));
-      const sourceRight = Math.min(
-        image.naturalWidth,
-        Math.ceil((maxX + 1) * scaleX)
-      );
-      const sourceBottom = Math.min(
-        image.naturalHeight,
-        Math.ceil((maxY + 1) * scaleY)
-      );
-
-      resolve({
-        sx,
-        sy,
-        sw: Math.max(1, sourceRight - sx),
-        sh: Math.max(1, sourceBottom - sy),
-      });
-    } catch {
-      resolve(null);
-    }
-  });
-
-  thumbnailCropCache.set(src, promise);
-  return promise;
-}
-
-function PhysicalThumbnail({
-  src,
-  alt,
-  width,
-  height,
-}: {
-  src: string;
-  alt: string;
-  width: number;
-  height: number;
-}) {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const hostRef = useRef<HTMLDivElement | null>(null);
-  const [shouldLoad, setShouldLoad] = useState(false);
-  const [fallback, setFallback] = useState(false);
-
-  /*
-   * Ne charge/analyse que les miniatures proches de la zone visible.
-   * Une recherche large ne lance donc plus des centaines de new Image().
-   */
-  useEffect(() => {
-    const node = hostRef.current;
-    if (!node) return;
-
-    if (!("IntersectionObserver" in window)) {
-      setShouldLoad(true);
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries.some((entry) => entry.isIntersecting)) {
-          setShouldLoad(true);
-          observer.disconnect();
-        }
-      },
-      {
-        rootMargin: "160px 0px",
-      }
-    );
-
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, []);
-
-  useEffect(() => {
-    if (!shouldLoad) return;
-
-    let cancelled = false;
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const image = new Image();
-    image.crossOrigin = "anonymous";
-    image.decoding = "async";
-
-    image.onload = async () => {
-      if (cancelled) return;
-
-      try {
-        const crop = await getThumbnailCrop(src, image);
-        if (cancelled) return;
-
-        const sx = crop?.sx ?? 0;
-        const sy = crop?.sy ?? 0;
-        const sourceWidth = crop?.sw ?? image.naturalWidth;
-        const sourceHeight = crop?.sh ?? image.naturalHeight;
-
-        /*
-         * La boîte respecte width/depth.
-         * Le bitmap garde STRICTEMENT son ratio : contain uniquement.
-         */
-        const scale = Math.min(
-          width / sourceWidth,
-          height / sourceHeight
-        );
-
-        const drawWidth = sourceWidth * scale;
-        const drawHeight = sourceHeight * scale;
-        const dpr = Math.max(1, window.devicePixelRatio || 1);
-
-        canvas.width = Math.max(1, Math.round(width * dpr));
-        canvas.height = Math.max(1, Math.round(height * dpr));
-        canvas.style.width = `${width}px`;
-        canvas.style.height = `${height}px`;
-
-        const context = canvas.getContext("2d");
-        if (!context) {
-          setFallback(true);
-          return;
-        }
-
-        context.setTransform(dpr, 0, 0, dpr, 0, 0);
-        context.clearRect(0, 0, width, height);
-        context.imageSmoothingEnabled = true;
-        context.imageSmoothingQuality = "high";
-        context.drawImage(
-          image,
-          sx,
-          sy,
-          sourceWidth,
-          sourceHeight,
-          (width - drawWidth) / 2,
-          (height - drawHeight) / 2,
-          drawWidth,
-          drawHeight
-        );
-
-        setFallback(false);
-      } catch {
-        if (!cancelled) setFallback(true);
-      }
-    };
-
-    image.onerror = () => {
-      if (!cancelled) setFallback(true);
-    };
-
-    image.src = src;
-
-    return () => {
-      cancelled = true;
-    };
-  }, [src, width, height, shouldLoad]);
-
-  return (
-    <div
-      ref={hostRef}
-      className="flex items-center justify-center"
-      style={{
-        width: `${width}px`,
-        height: `${height}px`,
-      }}
-    >
-      {fallback ? (
-        <img
-          src={src}
-          alt={alt}
-          loading="lazy"
-          decoding="async"
-          className="block max-w-full max-h-full w-auto h-auto object-contain"
-        />
-      ) : (
-        <canvas
-          ref={canvasRef}
-          role="img"
-          aria-label={alt}
-          className="block"
-          style={{
-            width: `${width}px`,
-            height: `${height}px`,
-          }}
-        />
-      )}
-    </div>
-  );
-}
 
 function isNewPedal(value: any): boolean {
   const releaseDate = parseReleaseDate(value);
@@ -668,7 +367,7 @@ export default function SearchPedals({
         {/* TEXTE NOUVEAUTÉS */}
 
         {!isSearching && (
-          <div className="mt-4 shrink-0 text-[11px] font-bold">
+          <div className="mt-4 shrink-0 text-[10px] uppercase font-bold">
             {t("pedalsMenu.latest")}
           </div>
         )}
@@ -685,11 +384,6 @@ export default function SearchPedals({
               const isNew =
                 isNewPedal(
                   pedal.year
-                );
-
-              const thumbnailSize =
-                getPhysicalThumbnailSize(
-                  pedal
                 );
 
               return (
@@ -716,7 +410,7 @@ export default function SearchPedals({
                     rounded-lg
                     bg-zinc-800
                     hover:bg-zinc-700
-                    pl-[64px]
+                    pl-[72px]
                     pr-2
                     py-1
                     flex
@@ -735,7 +429,7 @@ export default function SearchPedals({
                       left-0
                       top-1/2
                       -translate-y-1/2
-                      w-[56px]
+                      w-[64px]
                       h-[42px]
                       flex
                       items-center
@@ -745,22 +439,15 @@ export default function SearchPedals({
                     "
                   >
                     {image ? (
-                      <div
-                        className="flex items-center justify-center"
-                        style={{
-                          width: `${thumbnailSize.width}px`,
-                          height: `${thumbnailSize.height}px`,
-                        }}
-                      >
-                        <PhysicalThumbnail
-                          src={image}
-                          alt={`${pedal.brand || ""} ${pedal.name || ""}`}
-                          width={thumbnailSize.width}
-                          height={thumbnailSize.height}
-                        />
-                      </div>
+                      <img
+                        src={image}
+                        alt={`${pedal.brand || ""} ${pedal.name || ""}`}
+                        loading="lazy"
+                        decoding="async"
+                        className="relative z-10 block max-w-[60px] max-h-[38px] object-contain"
+                      />
                     ) : (
-                      <div className="w-9 h-9 rounded-md bg-zinc-700" />
+                      <div className="relative z-10 w-12 h-6 rounded-md bg-zinc-700" />
                     )}
                   </div>
 

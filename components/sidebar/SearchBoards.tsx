@@ -12,7 +12,7 @@ import {
   ArrowLeft,
   CheckCircle2,
   CircleX,
-  ScanSearch,
+  WandSparkles,
   Search,
   X,
   Cable,
@@ -59,15 +59,22 @@ type Props = {
 };
 
 
-const POPULAR_BOARDS = [
-  "Pedaltrain Classic JR",
-  "Pedaltrain Nano +",
-  "RockBoard TRES 3.1",
-  "Temple Audio Solo 18 GM",
-  "RockBoard QUAD 4.2",
-  "Daddario XPND 2 Core",
-  "Harley Benton Spaceship 40",
-];
+function boardReleaseDate(value: unknown): Date | null {
+  const m = String(value ?? "").trim().match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!m) return null;
+  const date = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+  return date.getFullYear() === Number(m[1]) && date.getMonth() === Number(m[2]) - 1 && date.getDate() === Number(m[3]) ? date : null;
+}
+
+function isNewBoard(value: unknown): boolean {
+  const date = boardReleaseDate(value);
+  if (!date) return false;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const limit = new Date(today);
+  limit.setDate(today.getDate() - 365);
+  return date >= limit && date <= today;
+}
 
 function normalize(value: any) {
   return String(value || "")
@@ -187,60 +194,19 @@ export default function SearchBoards({
       .split(" ")
       .filter(Boolean);
 
-    const list = boardsLibrary.filter(
-      (board) => {
-        if (!terms.length) {
-          const fullName = normalize(
-            `${board.brand ?? ""} ${board.name ?? ""}`
-          );
-
-          const nameOnly = normalize(
-            board.name
-          );
-
-          return POPULAR_BOARDS.some(
-            (popular) => {
-              const popularName = normalize(
-                popular
-              );
-
-              return (
-                fullName === popularName ||
-                nameOnly === popularName
-              );
-            }
-          );
-        }
-
-        const haystack =
-          `${board.brand ?? ""} ${board.name ?? ""} ${board.type ?? ""}`
-            .toLowerCase();
-
-        return terms.every(
-          (term) => haystack.includes(term)
-        );
-      }
-    );
-
     if (!isSearching) {
-      return list.sort((a, b) => {
-        const index = (board: AnyRow) =>
-          POPULAR_BOARDS.findIndex(
-            (popular) => {
-              const p = normalize(popular);
-
-              return (
-                normalize(
-                  `${board.brand ?? ""} ${board.name ?? ""}`
-                ) === p ||
-                normalize(board.name) === p
-              );
-            }
-          );
-
-        return index(a) - index(b);
-      });
+      return boardsLibrary
+        .filter(board => normalize(board.status) === "active" && isNewBoard(board.year))
+        .sort((a, b) => String(b.year).localeCompare(String(a.year)) ||
+          String(a.brand ?? "").localeCompare(String(b.brand ?? "")) ||
+          String(a.name ?? "").localeCompare(String(b.name ?? "")))
+        .slice(0, 20);
     }
+
+    const list = boardsLibrary.filter(board => {
+      const haystack = `${board.brand ?? ""} ${board.name ?? ""} ${board.type ?? ""}`.toLowerCase();
+      return terms.every(term => haystack.includes(term));
+    });
 
     return list.sort(
       (a, b) =>
@@ -273,10 +239,8 @@ export default function SearchBoards({
       ? `${(width / 25.4).toFixed(1)} × ${(depth / 25.4).toFixed(1)} in`
       : `${Math.ceil(width)} × ${Math.ceil(depth)} mm`;
 
-  const pedalLabel =
-    pedalCount === 1
-      ? t("boardFinder.pedalLabel")
-      : t("boardFinder.pedalsLabel");
+  const resultLabel = t(matchCount === 0 ? "powerFinder.noResults" : matchCount === 1 ? "powerFinder.result" : "powerFinder.results")
+    .replace("{count}", String(matchCount));
 
   /* =========================
      NAVIGATION
@@ -331,213 +295,101 @@ export default function SearchBoards({
   return (
     <div className="flex flex-col mt-4 h-full min-h-0">
 
-      {/* =========================
-          CLASSIC MODE
-          ========================= */}
+      <div className="mb-2 shrink-0">
+        <div className="min-w-0 text-[11px] font-black uppercase tracking-wide">
+          {t("boardsMenu.title")}
+        </div>
+      </div>
 
-      {!isFinder && (
-        <>
-
-          {/* TITLE */}
-
-          <div className="mb-2 shrink-0">
-
-            <div className="min-w-0 text-[11px] font-black uppercase tracking-wide">
-              {t("boardsMenu.title")}
+      <div className="flex items-center gap-2 mb-4 shrink-0">
+        <div className="relative flex items-center flex-1 min-w-0">
+          {isFinder ? (
+            <div
+              className="w-full h-[30px] rounded-md flex items-center gap-2 min-w-0 px-3 text-[10px] font-black uppercase"
+              style={{ height: 30, minHeight: 30, backgroundColor: "#e5f8ec", color: "#14532d", fontSize: 10 }}
+              role="status"
+              aria-live="polite"
+              title={resultLabel}
+            >
+              {matchCount > 0 && (
+                <CheckCircle2 size={16} strokeWidth={2.4} className="shrink-0" aria-hidden="true" style={{ color: "#16a34a", stroke: "#16a34a" }} />
+              )}
+              <span className="truncate">{resultLabel}</span>
             </div>
-
-          </div>
-
-          {/* SEARCH */}
-
-          <div className="relative flex items-center mb-4 shrink-0">
-
-            <Search
-              size={15}
-              strokeWidth={2.5}
-              className="absolute left-4 text-[#6f6a5d]"
-            />
-
-            <input
-              ref={boardInputRef}
-              type="text"
-              autoComplete="off"
-              autoCorrect="off"
-              autoCapitalize="off"
-              spellCheck={false}
-              placeholder={t("boardsMenu.searchPlaceholder")}
-              className="w-full h-[30px] bg-white !text-black placeholder:!text-zinc-500 rounded-md pl-12 pr-11 text-[12px] font-bold outline-none"
-              value={boardSearch}
-
-              onClick={(event) => {
-                event.stopPropagation();
-
-                setShowPedalResults(false);
-                setShowBoardResults(true);
-              }}
-
-              onChange={(event) => {
-                setBoardSearch(
-                  event.target.value
-                );
-
-                setShowBoardResults(true);
-              }}
-            />
-
-            {boardSearch && (
-              <button
-                type="button"
-
+          ) : (
+            <>
+              <Search size={15} strokeWidth={2.5} className="absolute left-4 text-[#6f6a5d]" aria-hidden="true" />
+              <input
+                ref={boardInputRef}
+                type="text"
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="off"
+                spellCheck={false}
+                placeholder={t("boardsMenu.searchPlaceholder")}
+                aria-label={t("boardsMenu.searchPlaceholder")}
+                className="w-full h-[30px] bg-white !text-black placeholder:!text-zinc-500 rounded-md pl-12 pr-11 text-[12px] font-bold outline-none"
+                value={boardSearch}
                 onClick={(event) => {
                   event.stopPropagation();
-
-                  setBoardSearch("");
-                  boardInputRef.current?.focus();
+                  setShowPedalResults(false);
+                  setShowBoardResults(true);
                 }}
-
-                className="absolute right-4 flex items-center justify-center text-[#6f6a5d] hover:opacity-70 transition-opacity"
-              >
-                <X
-                  size={15}
-                  strokeWidth={3}
-                />
-              </button>
-            )}
-
-          </div>
-
-          {/* NOMBRE DE RÉSULTATS */}
-          {isSearching && (
-            <div className="mt-4 mb-2 shrink-0 text-[11px] font-bold">
-              {t(
-                visibleBoards.length <= 1
-                  ? "boardsMenu.result"
-                  : "boardsMenu.results"
-              ).replace(
-                "{count}",
-                String(visibleBoards.length)
-              )}
-            </div>
-          )}
-
-          {/* PEDALBOARD FINDER BUTTON */}
-
-          {canOpenFinder && !isSearching && (
-            <button
-              type="button"
-
-              onClick={(event) => {
-                event.stopPropagation();
-                openFinder();
-              }}
-
-              onMouseEnter={(event) => {
-                event.currentTarget.style.boxShadow =
-                  "0 0 0 1px #2563eb";
-              }}
-
-              onMouseLeave={(event) => {
-                event.currentTarget.style.boxShadow =
-                  "none";
-              }}
-
-              className="
-      mb-4
-      flex
-      w-full
-      shrink-0
-      cursor-pointer
-      items-center
-      gap-3
-      overflow-hidden
-      border
-      bg-transparent
-      px-3
-      py-0
-      text-left
-    "
-
-              style={{
-                borderRadius: "8px",
-
-                height: 54,
-                minHeight: 54,
-                maxHeight: 54,
-
-                flexShrink: 0,
-                boxSizing: "border-box",
-
-                borderWidth: "1px",
-                borderStyle: "solid",
-                borderColor: "#2563eb",
-
-                transition: "box-shadow 120ms ease-out",
-              }}
-            >
-
-              <ScanSearch
-                size={30}
-                strokeWidth={2}
-                color="#2563eb"
-                className="shrink-0"
-                aria-hidden="true"
-
-                style={{
-                  color: "#2563eb",
-                  stroke: "#2563eb",
+                onChange={(event) => {
+                  setBoardSearch(event.target.value);
+                  setShowBoardResults(true);
                 }}
               />
-
-              <span className="flex min-w-0 flex-1 flex-col">
-
-                <span className="block text-[11px] font-black uppercase leading-[1.25] tracking-tight">
-                  {t("boardFinder.button")}
-                </span>
-
-                <span className="block text-[10px] font-medium leading-[1.5]">
-                  {t("boardFinder.subtitle")}
-                </span>
-
-              </span>
-
-            </button>
+              {boardSearch && (
+                <button type="button" onClick={(event) => {
+                  event.stopPropagation();
+                  setBoardSearch("");
+                  boardInputRef.current?.focus();
+                }} className="absolute right-4 flex items-center justify-center text-[#6f6a5d] hover:opacity-70 transition-opacity"
+                  aria-label={t("powerMenu.clearSearch")}>
+                  <X size={15} strokeWidth={3} />
+                </button>
+              )}
+            </>
           )}
+        </div>
 
-        </>
-      )}
+        <button
+          type="button"
+          disabled={!isFinder && !canOpenFinder}
+          aria-label={t(isFinder ? "sidebar.back" : "boardFinder.button")}
+          title={t(isFinder ? "sidebar.back" : "boardFinder.button")}
+          onClick={(event) => {
+            event.stopPropagation();
+            if (isFinder) closeFinder();
+            else if (canOpenFinder) openFinder();
+          }}
+          onMouseEnter={(event) => {
+            event.currentTarget.style.setProperty("background-color", "#1d4ed8", "important");
+          }}
+          onMouseLeave={(event) => {
+            event.currentTarget.style.setProperty("background-color", "#2563eb", "important");
+          }}
+          ref={(element) => {
+            if (element) {
+              element.style.setProperty("background-color", "#2563eb", "important");
+              element.style.setProperty("color", "#ffffff", "important");
+            }
+          }}
+          className="shrink-0 flex items-center justify-center rounded-md cursor-pointer transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          style={{ width: 30, minWidth: 30, height: 30, minHeight: 30, padding: 0, border: "none", backgroundColor: "#2563eb", color: "#ffffff" }}
+        >
+          {isFinder ? (
+            <ArrowLeft size={22} strokeWidth={2} aria-hidden="true" style={{ color: "#ffffff", stroke: "#ffffff" }} />
+          ) : (
+            <WandSparkles size={22} strokeWidth={2} aria-hidden="true" style={{ color: "#ffffff", stroke: "#ffffff" }} />
+          )}
+        </button>
+      </div>
 
-      {/* =========================
-          FINDER NAVIGATION
-          ========================= */}
-
-      {isFinder && (
-        <div className="shrink-0">
-
-          <button
-            type="button"
-
-            onClick={(event) => {
-              event.stopPropagation();
-              closeFinder();
-            }}
-
-            className="mb-2 flex items-center gap-2 py-1 text-[11px] font-bold cursor-pointer"
-
-            aria-label={t("boardFinder.back")}
-          >
-
-            <ArrowLeft
-              size={17}
-              strokeWidth={2.3}
-            />
-
-            <span>
-              {t("boardFinder.back")}
-            </span>
-
-          </button>
-
+      {!isFinder && isSearching && (
+        <div className="mt-4 mb-2 shrink-0 text-[11px] font-bold">
+          {t(visibleBoards.length <= 1 ? "boardsMenu.result" : "boardsMenu.results").replace("{count}", String(visibleBoards.length))}
         </div>
       )}
 
@@ -548,74 +400,12 @@ export default function SearchBoards({
       {isFinder && (
         <div className="flex shrink-0 flex-col">
 
-          {/* RESULTS SUMMARY */}
-
-          {layout.status === "ready" &&
-            matchCount > 0 ? (
-
-            <div
-              className="mb-4 flex shrink-0 items-start gap-3 rounded-xl p-3"
-
-              style={{
-                backgroundColor: "#e5f8ec",
-              }}
-
-              role="status"
-            >
-
-              <CheckCircle2
-                size={30}
-                strokeWidth={2.4}
-                color="#16a34a"
-                className="mt-0.5 shrink-0"
-              />
-
-              <div className="min-w-0">
-
-                <div className="text-[10px] font-black leading-snug uppercase text-[#14532d]">
-                  {t("boardFinder.resultsFound").replace(
-                    "{count}",
-                    String(matchCount)
-                  )}
-
-                </div>
-
-
-                <div className="mt-1 text-[10px] tabular-nums text-[#166534]">
-                  {pedalCount} {pedalLabel}
-                  {" · "}
-                  {dimensionPair(
-                    layout.width,
-                    layout.depth
-                  )}
-                </div>
-
-
-              </div>
-
+          {layout.status === "ready" && matchCount === 0 && (
+            <div className="mb-4 flex items-start gap-2 text-[11px] leading-relaxed" role="status">
+              <CircleX size={16} className="shrink-0 text-red-500" />
+              <span>{t("boardFinder.noMatch")}</span>
             </div>
-
-          ) : layout.status === "ready" ? (
-
-            /* NO COMPATIBLE BOARD */
-
-            <div
-              className="mb-4 flex items-start gap-2 text-[11px] leading-relaxed"
-              role="status"
-            >
-
-              <CircleX
-                size={16}
-                className="shrink-0 text-red-500"
-              />
-
-              <span>
-                {t("boardFinder.noMatch")}
-              </span>
-
-            </div>
-
-          ) : null}
+          )}
 
           {/* MULTIPLE BOARDS WARNING */}
 
@@ -661,9 +451,9 @@ export default function SearchBoards({
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
 
         {!isFinder && !isSearching && (
-          <div className="mb-1 mt-4 shrink-0 text-[11px] font-bold">
+          <div className="mb-1 mt-4 shrink-0 text-[10px] uppercase font-bold">
 
-            {t("boardsMenu.popular")}
+            {t("pedalsMenu.latest")}
 
           </div>
         )}
@@ -676,7 +466,7 @@ export default function SearchBoards({
               board.thumbnail || null;
 
             const showCompatibilityCheck =
-              recommendedBoards.has(board);
+              isFinder && recommendedBoards.has(board);
 
             const boardWidth =
               Number(board.width);
@@ -769,10 +559,13 @@ export default function SearchBoards({
 
                     </div>
 
-                    <div className="mt-0.5 line-clamp-2 text-[10px] font-bold leading-tight text-zinc-300">
-
-                      {board.name}
-
+                    <div className="flex items-center gap-1.5 min-w-0 text-[10px] font-bold text-zinc-300 leading-tight mt-0.5">
+                      <span className="truncate min-w-0">{board.name}</span>
+                      {isNewBoard(board.year) && (
+                        <span className="text-[8px] font-black uppercase tracking-wider text-green-500 shrink-0">
+                          {t("pedalsMenu.new")}
+                        </span>
+                      )}
                     </div>
 
                     {hasBoardDimensions && (

@@ -235,32 +235,6 @@ export default function BoardSpecs({
   isCustomBoard,
   buildThomannUrl,
 }: Props) {
-  const [isLightTheme, setIsLightTheme] =
-    React.useState(true);
-
-  React.useEffect(() => {
-    const html = document.documentElement;
-
-    const updateTheme = () => {
-      setIsLightTheme(
-        html.classList.contains("light")
-      );
-    };
-
-    updateTheme();
-
-    const observer =
-      new MutationObserver(updateTheme);
-
-    observer.observe(html, {
-      attributes: true,
-      attributeFilter: ["class"],
-    });
-
-    return () => {
-      observer.disconnect();
-    };
-  }, []);
   if (
     !selectedBoardDetails ||
     isCustomBoard
@@ -368,9 +342,6 @@ export default function BoardSpecs({
         flex
         flex-col
         gap-5
-        animate-in
-        slide-in-from-left
-        duration-300
         px-1
         pb-8
 
@@ -386,39 +357,27 @@ export default function BoardSpecs({
     >
       {/* HERO BOARD */}
 
-      <div className="shrink-0 flex flex-col items-center pt-2">
-        {image && (
-          <div className="w-full min-h-[150px] flex items-center justify-center mb-4">
-
+      <div className="shrink-0 flex flex-col items-center pt-1">
+        <div className="w-full h-[170px] shrink-0 flex items-center justify-center mb-4">
+          {image && (
             <div
               className="flex items-center justify-center rounded-lg"
-              style={{
-                width: "250px",
-                paddingTop: "20px",
-                paddingBottom: "20px",
-                backgroundColor: isLightTheme
-                  ? "transparent"
-                  : "#e5e7eb",
-              }}
+              style={{ width: 250, height: 150, backgroundColor: "#e5e7eb" }}
             >
               <img
+                key={image}
                 src={image}
                 alt={`${brand} ${name}`}
-                className="object-contain"
-                style={{
-                  width: "200px",
-                  height: "auto",
-                  maxHeight: "145px",
-                  maxWidth: "100%",
-                }}
-                loading="lazy"
-                decoding="async"
+                className="!block !h-[110px] !w-[200px] object-contain"
+                style={{ width: 200, height: 110, objectFit: "contain" }}
+                loading="eager"
+                fetchPriority="high"
+                decoding="sync"
                 draggable={false}
               />
             </div>
-
-          </div>
-        )}
+          )}
+        </div>
 
         <div className="w-full min-w-0">
           {/* MARQUE + BADGE */}

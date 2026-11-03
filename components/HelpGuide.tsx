@@ -17,6 +17,7 @@ import SidebarLogo from "@/components/sidebar/SidebarLogo";
 type Props = {
   t: (key: string) => string;
   mobile?: boolean;
+  embedded?: boolean;
   open: boolean;
   onClose: () => void;
   onContact?: () => void;
@@ -26,6 +27,7 @@ type Props = {
 export function HelpGuide({
   t,
   mobile = false,
+  embedded = false,
   open,
   onClose,
   onContact,
@@ -45,7 +47,7 @@ export function HelpGuide({
   return (
     <div
       className={
-        mobile
+        embedded ? "w-full" : mobile
           ? `
           fixed
           z-[100]
@@ -65,7 +67,7 @@ export function HelpGuide({
       }
     >
       {/* OVERLAY DESKTOP UNIQUEMENT */}
-      {!mobile && (
+      {!mobile && !embedded && (
         <div
           className="absolute inset-0 z-0 bg-black/20"
           onClick={closeGuide}
@@ -75,7 +77,7 @@ export function HelpGuide({
       {/* CONTENU */}
       <div
         className={
-          mobile
+          embedded ? "relative w-full bg-transparent" : mobile
             ? `
             relative
             w-full
@@ -106,7 +108,7 @@ export function HelpGuide({
       >
 
         {/* LOGO — desktop uniquement */}
-        {!mobile && (
+        {!mobile && !embedded && (
           <div className="flex justify-center mb-6">
             <SidebarLogo />
           </div>

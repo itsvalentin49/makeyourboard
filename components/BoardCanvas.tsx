@@ -1,8 +1,9 @@
 "use client";
 
+import { createPortal } from "react-dom";
 import React, { useRef, useLayoutEffect, useEffect, useState } from "react";
 import { Stage, Layer, Group, Rect, Text, Circle as KonvaCircle, Image as KonvaImage, } from "react-konva";
-import { Zap, Weight, Minus, Cable, Plus, Check, Upload, AlertTriangle, RotateCw, Circle, Trash2, X, Share2, Info, List, Settings, PanelsTopLeft, Download, ArrowUp, ArrowDown } from "lucide-react";
+import { Zap, Weight, Minus, Cable, Plus, Check, Upload, AlertTriangle, RotateCw, Circle, Trash2, X, Share2, Info, List, Settings, PanelsTopLeft, Download, ArrowUp, ArrowDown, CircleHelp, SlidersHorizontal } from "lucide-react";
 import PedalImage from "@/components/PedalImage";
 import { formatWeight } from "@/utils/units";
 import { getTranslator } from "@/utils/i18n";
@@ -18,6 +19,10 @@ import { HelpGuide } from "@/components/HelpGuide";
 import SignalPath, { SignalPoint } from "@/components/SignalPath";
 import type { Language } from "@/utils/i18n";
 
+
+// Keep the guide implementation available, with all entry points disabled.
+const HELP_ENABLED = false;
+const SIGNAL_PATH_ENABLED = false;
 
 type AnyRow = Record<string, any>;
 
@@ -122,6 +127,7 @@ type Background = {
 };
 
 type Props = {
+  desktopToolbarHost?: HTMLDivElement | null;
   viewer?: boolean;
 
   activeProject: {
@@ -316,7 +322,12 @@ function extractOutputs(details: string) {
 }
 
 
+function CanvasPanelsPortal({ host, children }: { host: HTMLDivElement | null; children: React.ReactNode }) {
+  return host ? createPortal(children, host) : <>{children}</>;
+}
+
 export default function BoardCanvas({
+  desktopToolbarHost = null,
   activeProject,
   units,
   language,
@@ -368,7 +379,10 @@ export default function BoardCanvas({
 }: Props) {
 
   const t = getTranslator(language);
+  const [desktopPanelHost, setDesktopPanelHost] = useState<HTMLDivElement | null>(null);
   const [showSettings, setShowSettings] = useState(false);
+  const [settingsContactVisible, setSettingsContactVisible] = useState(false);
+  useEffect(() => { if (!showSettings) setSettingsContactVisible(false); }, [showSettings]);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [renderMobileMenu, setRenderMobileMenu] = useState(false);
   const [isLightTheme, setIsLightTheme] = useState(true);
@@ -376,6 +390,7 @@ export default function BoardCanvas({
 
   useEffect(() => {
     if (!openHelpRef) return;
+    if (!HELP_ENABLED) { openHelpRef.current = null; return; }
 
     openHelpRef.current = () => {
       setHelpOpen((v) => !v);
@@ -387,7 +402,7 @@ export default function BoardCanvas({
   }, [openHelpRef]);
 
   useEffect(() => {
-    if (!showIntro) return;
+    if (!HELP_ENABLED || !showIntro) return;
 
     const hidden = localStorage.getItem("myb_help_hidden");
 
@@ -424,6 +439,21 @@ export default function BoardCanvas({
     setShowSettings(false);
     setShowList(false);
     setHelpOpen(false);
+  };
+  const toggleUnifiedPanel = (panel: "boards" | "cables" | "power" | "settings" | "help" | "export") => {
+    const wasOpen = panel === "boards" ? showBoardsMenu
+      : panel === "cables" ? showCableMenu
+        : panel === "power" ? showPower
+          : panel === "settings" ? showSettings
+            : panel === "help" ? helpOpen : showExportPanel;
+    closeBottomPanels();
+    if (wasOpen) return;
+    if (panel === "boards") setShowBoardsMenu(true);
+    else if (panel === "cables") setShowCableMenu(true);
+    else if (panel === "power") setShowPower(true);
+    else if (panel === "settings") setShowSettings(true);
+    else if (panel === "help") setHelpOpen(true);
+    else setShowExportPanel(true);
   };
   const [knob] = useImage("/images/knob.webp");
   const [footswitch] = useImage("/images/footswitch.webp");
@@ -879,6 +909,7 @@ export default function BoardCanvas({
 
       if (boardsMenuRef.current?.contains(target)) return;
       if (boardsButtonRef.current?.contains(target)) return;
+      if (desktopToolbarHost?.contains(target)) return;
 
       setShowBoardsMenu(false);
     };
@@ -888,7 +919,7 @@ export default function BoardCanvas({
     return () => {
       document.removeEventListener("mousedown", handleClickOutsideBoards);
     };
-  }, [showBoardsMenu]);
+  }, [showBoardsMenu, desktopToolbarHost]);
 
 
 
@@ -905,7 +936,8 @@ export default function BoardCanvas({
       showCableMenu ||
       showPower ||
       showExportPanel ||
-      showSettings
+      showSettings ||
+      (Boolean(desktopToolbarHost) && helpOpen)
     );
 
   useLayoutEffect(() => {
@@ -916,7 +948,8 @@ export default function BoardCanvas({
       showCableMenu ||
       showPower ||
       showExportPanel ||
-      showSettings;
+      showSettings ||
+      (Boolean(desktopToolbarHost) && helpOpen);
 
     if (!sidebarOpen) return;
 
@@ -948,6 +981,8 @@ export default function BoardCanvas({
     showPower,
     showExportPanel,
     showSettings,
+    helpOpen,
+    desktopToolbarHost,
   ]);
 
   const mobileCanvasPanelOpen =
@@ -996,7 +1031,7 @@ export default function BoardCanvas({
 `;
   const desktopRightSidebarClass = `
   z-[100]
-  fixed
+  absolute
   top-0
   right-0
   bottom-0
@@ -1012,6 +1047,13 @@ export default function BoardCanvas({
   [&::-webkit-scrollbar]:hidden
 `;
   const desktopRightSidebarStyle: React.CSSProperties = {
+    borderTop: "1px solid rgba(140, 140, 150, 0.3)",
+    position: desktopToolbarHost ? "absolute" : "fixed",
+    top: 0,
+    bottom: 0,
+    right: 0,
+    marginTop: 0,
+    pointerEvents: "auto",
     width: "340px",
     boxSizing: "border-box",
   };
@@ -1489,7 +1531,7 @@ export default function BoardCanvas({
       ref={containerRef}
       className={`
   relative w-full h-full overflow-hidden
-  ${isMobile ? "pb-6 touch-none" : "pb-20"}
+  ${isMobile ? "pb-6 touch-none" : desktopToolbarHost ? "" : "pb-20"}
   ${canvasBg === "neutral" ? "bg-canvas" : ""}
 `}
       style={
@@ -1507,6 +1549,55 @@ export default function BoardCanvas({
 
 
 
+
+      {!viewer && !isMobile && desktopToolbarHost && (
+        <div ref={setDesktopPanelHost} className="absolute inset-0 z-[100] pointer-events-none" />
+      )}
+
+      {!viewer && !isMobile && desktopToolbarHost && createPortal(
+        <nav aria-label={t("canvasControls.boards")} className="myb-topbar flex w-full items-center gap-1.5" onClick={(event) => event.stopPropagation()}>
+          <style>{`
+            .myb-topbar .myb-topbar-button:hover {
+              background-color: #09090b !important;
+              color: var(--foreground);
+            }
+            html.light .myb-topbar .myb-topbar-button:hover {
+              background-color: rgba(24, 24, 27, 0.08) !important;
+              color: var(--foreground);
+            }
+          `}</style>
+          {([[
+            { id: "boards", label: activeProject.name || t("canvasControls.pedalboard"), Icon: PanelsTopLeft, open: showBoardsMenu },
+            { id: "cables", label: t("cables.title"), Icon: Cable, open: showCableMenu },
+            { id: "power", label: t("canvasControls.power"), Icon: Zap, open: showPower },
+            { id: "export", label: t("export.button"), Icon: Upload, open: showExportPanel },
+          ], [
+            ...(HELP_ENABLED ? [{ id: "help", label: t("help.title"), Icon: CircleHelp, open: helpOpen } as const] : []),
+            { id: "settings", label: t("settings.title"), Icon: SlidersHorizontal, open: showSettings },
+          ]] as const).map((group, index) => <div key={index} style={{ display: "flex", alignItems: "center", justifyContent: index === 0 ? "center" : "flex-end", gap: 8, flex: index === 0 ? "1 1 0%" : "0 0 auto", minWidth: 0 }}>
+            {group.map(({ id, label, Icon, open }) => (
+              <React.Fragment key={id}>
+                <button type="button" aria-label={label} aria-expanded={open}
+                  ref={id === "boards" ? boardsButtonRef : undefined}
+                  onClick={() => toggleUnifiedPanel(id)}
+                  style={open || id === "boards" ? {
+                    backgroundColor: id === "boards" ? "var(--zinc-900, #18181b)" : "rgba(140, 140, 150, 0.18)",
+                    border: "1px solid rgba(140, 140, 150, 0.4)",
+                    color: "var(--foreground)",
+                  } : { border: "1px solid transparent" }}
+                  className={`myb-topbar-button flex h-9 min-w-0 shrink-0 items-center justify-center gap-2 rounded-lg px-4 text-[12px] font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-zinc-500 ${""
+                    }`}
+                >
+                  <Icon size={20} strokeWidth={2} className="shrink-0" />
+                  {id !== "settings" && id !== "help" && (
+                    <span className={`truncate ${id === "boards" ? "max-w-[150px]" : "max-w-[120px]"}`}>{label}</span>
+                  )}
+                </button>
+                {id === "boards" && <span aria-hidden="true" style={{ display: "block", width: 1, height: 24, marginLeft: 10, marginRight: 10, flexShrink: 0, backgroundColor: "rgba(140, 140, 150, 0.45)" }} />}
+              </React.Fragment>
+            ))}</div>)}
+        </nav>, desktopToolbarHost
+      )}
 
       {/* --- MODE VIEWER (CENTER BOTTOM) --- */}
       {viewer && (
@@ -1968,22 +2059,10 @@ export default function BoardCanvas({
       {!viewer && !(isMobile && mobileSidebarOpen) && (
         <>
           <div
-            className="
-    fixed
-    bottom-6
-    left-0
-    right-0
-    lg:left-76
-    flex
-    items-center
-    justify-center
-    gap-3
-    z-50
-    px-4
-  "
+            className={!isMobile && desktopToolbarHost ? "contents" : "fixed bottom-6 left-0 right-0 lg:left-76 flex items-center justify-center gap-3 z-50 px-4"}
           >
 
-            {(
+            {(isMobile || !desktopToolbarHost) && (
               <>
 
 
@@ -2209,17 +2288,7 @@ ${isMobile
       uppercase
     "
                         >
-                          <img
-                            src={
-                              isLightTheme
-                                ? "/images/tab-board-dark.webp"
-                                : "/images/tab-board-light.webp"
-                            }
-                            alt=""
-                            aria-hidden="true"
-                            draggable={false}
-                            className="w-[18px] h-[18px] object-contain shrink-0"
-                          />
+                          <PanelsTopLeft size={18} strokeWidth={2} aria-hidden="true" className="shrink-0" />
 
                           {t("canvasControls.boards")}
                         </div>
@@ -2305,17 +2374,7 @@ ${isMobile
       uppercase
     "
                         >
-                          <img
-                            src={
-                              isLightTheme
-                                ? "/images/tab-cables-dark.webp"
-                                : "/images/tab-cables-light.webp"
-                            }
-                            alt=""
-                            aria-hidden="true"
-                            draggable={false}
-                            className="w-[18px] h-[18px] object-contain shrink-0"
-                          />
+                          <Cable size={18} strokeWidth={2} aria-hidden="true" className="shrink-0" />
 
                           {t("canvasControls.cables")}
                         </div>
@@ -2398,17 +2457,7 @@ ${isMobile
       uppercase
     "
                         >
-                          <img
-                            src={
-                              isLightTheme
-                                ? "/images/tab-power2-dark.webp"
-                                : "/images/tab-power2-light.webp"
-                            }
-                            alt=""
-                            aria-hidden="true"
-                            draggable={false}
-                            className="w-[18px] h-[18px] object-contain shrink-0"
-                          />
+                          <Zap size={18} strokeWidth={2} aria-hidden="true" className="shrink-0" />
 
                           {t("canvasControls.power")}
                         </div>
@@ -2622,7 +2671,7 @@ ${isMobile
             {/* BOARDS */}
             <div className="relative">
               <button
-                ref={boardsButtonRef}
+                ref={desktopToolbarHost && !isMobile ? undefined : boardsButtonRef}
                 onClick={() => {
                   setShowBoardsMenu((v) => !v);
                   setShowPower(false);
@@ -2653,38 +2702,40 @@ ${isMobile
 
               {showBoardsMenu && (
                 <>
-                  <div
-                    ref={(node) => {
-                      boardsMenuRef.current = node;
-                      rightSidebarRef.current = node;
-                    }}
-                    className={
-                      isMobile
-                        ? mobileFullPanelClass
-                        : desktopRightSidebarClass
-                    }
-                    style={
-                      isMobile
-                        ? undefined
-                        : desktopRightSidebarStyle
-                    }
-                  >
-                    <PedalboardsPanel
-                      projects={projects}
-                      activeProjectId={activeProjectId}
-                      setActiveProjectId={setActiveProjectId}
-                      createNewProject={createNewProject}
-                      deleteProject={deleteProject}
-                      startEditing={startEditing}
-                      editingProjectId={editingProjectId}
-                      tempName={tempName}
-                      setTempName={setTempName}
-                      saveName={saveName}
-                      language={language}
-                      isLightTheme={isLightTheme}
-                      isMobile={isMobile}
-                    />
-                  </div>
+                  <CanvasPanelsPortal host={!isMobile && desktopToolbarHost ? desktopPanelHost : null}>
+                    <div
+                      ref={(node) => {
+                        boardsMenuRef.current = node;
+                        rightSidebarRef.current = node;
+                      }}
+                      className={
+                        isMobile
+                          ? mobileFullPanelClass
+                          : desktopRightSidebarClass
+                      }
+                      style={
+                        isMobile
+                          ? undefined
+                          : desktopRightSidebarStyle
+                      }
+                    >
+                      <PedalboardsPanel
+                        projects={projects}
+                        activeProjectId={activeProjectId}
+                        setActiveProjectId={setActiveProjectId}
+                        createNewProject={createNewProject}
+                        deleteProject={deleteProject}
+                        startEditing={startEditing}
+                        editingProjectId={editingProjectId}
+                        tempName={tempName}
+                        setTempName={setTempName}
+                        saveName={saveName}
+                        language={language}
+                        isLightTheme={isLightTheme}
+                        isMobile={isMobile}
+                      />
+                    </div>
+                  </CanvasPanelsPortal>
                 </>
               )}
             </div>
@@ -2692,6 +2743,7 @@ ${isMobile
 
             {/* CABLES */}
             <CablesPanel
+              desktopPanelHost={desktopToolbarHost && !isMobile ? desktopPanelHost : null}
               t={t}
               isMobile={isMobile}
               isLightTheme={isLightTheme}
@@ -2704,6 +2756,8 @@ ${isMobile
                 setShowList(false);
                 setShowSettings(false);
               }}
+              showSignalPath={SIGNAL_PATH_ENABLED && showSignalPath}
+              setShowSignalPath={setShowSignalPath}
               showJacksMargin={showJacksMargin}
               setShowJacksMargin={setShowJacksMargin}
               showSignalChain={showSignalChain}
@@ -2758,54 +2812,56 @@ ${isMobile
                 <>
                   <div className="fixed inset-0 z-40 pointer-events-none" />
 
-                  <div
-                    ref={rightSidebarRef}
-                    className={
-                      isMobile
-                        ? `${mobileFullPanelClass}
+                  <CanvasPanelsPortal host={!isMobile && desktopToolbarHost ? desktopPanelHost : null}>
+                    <div
+                      ref={rightSidebarRef}
+                      className={
+                        isMobile
+                          ? `${mobileFullPanelClass}
          overscroll-contain
          [scrollbar-width:none]
          [-ms-overflow-style:none]
          [&::-webkit-scrollbar]:hidden`
-                        : desktopRightSidebarClass
-                    }
-                    style={
-                      isMobile
-                        ? undefined
-                        : desktopRightSidebarStyle
-                    }
-                    onWheel={(e) => {
-                      e.stopPropagation();
-                    }}
-                  >
-                    <PowerSetup
-                      t={t}
-                      isLightTheme={isLightTheme}
-                      isMobile={isMobile}
-                      powerUnits={powerUnits}
-                      pedalAssignments={pedalAssignments}
-                      hasPower={hasPower}
-                      hasPedals={hasPedals}
-                      hasFailingPedal={hasFailingPedal}
-                      powerMessage={powerMessage}
-                      powerMessageColor={powerMessageColor}
-                      isSinglePedal={isSinglePedal}
-                      singlePedal={singlePedal}
-                      singlePedalVoltage={singlePedalVoltage}
-                      singlePedalDraw={singlePedalDraw}
-                      singlePedalCanUseBattery={singlePedalCanUseBattery}
-                      isAnalogOnlySmall={isAnalogOnlySmall}
-                      isMixedWithSingleDigital={isMixedWithSingleDigital}
-                      isMixedWithMultipleDigital={isMixedWithMultipleDigital}
-                      isLargeBoard={isLargeBoard}
-                      hasDaisyChainTuner={hasDaisyChainTuner}
-                      extraPedals={extraPedals}
-                      shouldShowNotEnough={shouldShowNotEnough}
-                      shouldShowDaisy={shouldShowDaisy}
-                      daisyPedalNames={daisyPedalNames}
-                      extractOutputs={extractOutputs}
-                    />
-                  </div>
+                          : desktopRightSidebarClass
+                      }
+                      style={
+                        isMobile
+                          ? undefined
+                          : desktopRightSidebarStyle
+                      }
+                      onWheel={(e) => {
+                        e.stopPropagation();
+                      }}
+                    >
+                      <PowerSetup
+                        t={t}
+                        isLightTheme={isLightTheme}
+                        isMobile={isMobile}
+                        powerUnits={powerUnits}
+                        pedalAssignments={pedalAssignments}
+                        hasPower={hasPower}
+                        hasPedals={hasPedals}
+                        hasFailingPedal={hasFailingPedal}
+                        powerMessage={powerMessage}
+                        powerMessageColor={powerMessageColor}
+                        isSinglePedal={isSinglePedal}
+                        singlePedal={singlePedal}
+                        singlePedalVoltage={singlePedalVoltage}
+                        singlePedalDraw={singlePedalDraw}
+                        singlePedalCanUseBattery={singlePedalCanUseBattery}
+                        isAnalogOnlySmall={isAnalogOnlySmall}
+                        isMixedWithSingleDigital={isMixedWithSingleDigital}
+                        isMixedWithMultipleDigital={isMixedWithMultipleDigital}
+                        isLargeBoard={isLargeBoard}
+                        hasDaisyChainTuner={hasDaisyChainTuner}
+                        extraPedals={extraPedals}
+                        shouldShowNotEnough={shouldShowNotEnough}
+                        shouldShowDaisy={shouldShowDaisy}
+                        daisyPedalNames={daisyPedalNames}
+                        extractOutputs={extractOutputs}
+                      />
+                    </div>
+                  </CanvasPanelsPortal>
                 </>
               )}
             </div>
@@ -2855,36 +2911,38 @@ ${isMobile
               {showExportPanel && (
                 <>
                   <div className="fixed inset-0 z-40 pointer-events-none" />
-                  <div
-                    ref={rightSidebarRef}
-                    className={
-                      isMobile
-                        ? mobileFullPanelClass
-                        : desktopRightSidebarClass
-                    }
-                    style={
-                      isMobile
-                        ? undefined
-                        : desktopRightSidebarStyle
-                    }
-                  >
-                    <ExportPanel
-                      isLightTheme={isLightTheme}
-                      isMobile={isMobile}
-                      boardPedals={activeProject.boardPedals}
-                      selectedBoards={activeProject.selectedBoards}
-                      displaySizes={displaySizes}
-                      boardName={activeProject.name}
-                      canvasBg={canvasBg}
-                      currentBackground={currentBackground}
-                      signalPath={activeProject.signalPath}
-                      zoom={activeProject.zoom ?? 200}
-                      stageX={activeProject.stageX}
-                      stageY={activeProject.stageY}
+                  <CanvasPanelsPortal host={!isMobile && desktopToolbarHost ? desktopPanelHost : null}>
+                    <div
+                      ref={rightSidebarRef}
+                      className={
+                        isMobile
+                          ? mobileFullPanelClass
+                          : desktopRightSidebarClass
+                      }
+                      style={
+                        isMobile
+                          ? undefined
+                          : desktopRightSidebarStyle
+                      }
+                    >
+                      <ExportPanel
+                        isLightTheme={isLightTheme}
+                        isMobile={isMobile}
+                        boardPedals={activeProject.boardPedals}
+                        selectedBoards={activeProject.selectedBoards}
+                        displaySizes={displaySizes}
+                        boardName={activeProject.name}
+                        canvasBg={canvasBg}
+                        currentBackground={currentBackground}
+                        signalPath={activeProject.signalPath}
+                        zoom={activeProject.zoom ?? 200}
+                        stageX={activeProject.stageX}
+                        stageY={activeProject.stageY}
 
-                      onClose={() => setShowExportPanel(false)}
-                    />
-                  </div>
+                        onClose={() => setShowExportPanel(false)}
+                      />
+                    </div>
+                  </CanvasPanelsPortal>
                 </>
               )}
             </div>
@@ -2923,54 +2981,44 @@ ${isMobile
                 <>
                   <div className="fixed inset-0 z-40 pointer-events-none" />
 
-                  <div
-                    ref={rightSidebarRef}
-                    className={
-                      isMobile
-                        ? mobileFullPanelClass
-                        : desktopRightSidebarClass
-                    }
-                    style={
-                      isMobile
-                        ? undefined
-                        : desktopRightSidebarStyle
-                    }
-                  >
+                  <CanvasPanelsPortal host={!isMobile && desktopToolbarHost ? desktopPanelHost : null}>
                     <div
+                      ref={rightSidebarRef}
                       className={
                         isMobile
-                          ? "w-full min-h-full bg-zinc-800 border-0 rounded-none p-6"
-                          : "w-full bg-transparent border-0 rounded-none p-0"
+                          ? mobileFullPanelClass
+                          : desktopRightSidebarClass
                       }
-                    >                      <div className="flex items-center gap-2 text-xs uppercase tracking-wider font-bold mb-6">
-                        <img
-                          src={
-                            isLightTheme
-                              ? "/images/tab-settings-dark.webp"
-                              : "/images/tab-settings-light.webp"
-                          }
-                          alt=""
-                          aria-hidden="true"
-                          draggable={false}
-                          className="w-[18px] h-[18px] object-contain shrink-0"
+                      style={
+                        isMobile
+                          ? undefined
+                          : desktopRightSidebarStyle
+                      }
+                    >
+                      <div
+                        className={
+                          isMobile
+                            ? "w-full min-h-full bg-zinc-800 border-0 rounded-none p-6"
+                            : "w-full bg-transparent border-0 rounded-none p-0"
+                        }
+                      >                      {!settingsContactVisible && <div className="flex items-center gap-2 text-xs uppercase tracking-wider font-bold" style={{ marginBottom: 32, minHeight: 24 }}><SlidersHorizontal size={18} aria-hidden="true" className="shrink-0" />{t("settings.title")}</div>}
+
+                        <SettingsPanel
+                          t={t}
+                          canvasBg={canvasBg}
+                          setCanvasBg={setCanvasBg}
+                          language={language}
+                          setLanguage={setLanguage ?? (() => { })}
+                          units={units}
+                          setUnits={setUnits ?? (() => { })}
+                          backgrounds={BACKGROUNDS}
+                          setContactOpen={setContactOpen}
+                          onContactViewChange={setSettingsContactVisible}
+                          supportUrl="https://buy.stripe.com/14A8wPeGZ8uQ0tQ96I8Zq00"
                         />
-
-                        {t("settings.title")}
                       </div>
-
-                      <SettingsPanel
-                        t={t}
-                        canvasBg={canvasBg}
-                        setCanvasBg={setCanvasBg}
-                        language={language}
-                        setLanguage={setLanguage ?? (() => { })}
-                        units={units}
-                        setUnits={setUnits ?? (() => { })}
-                        backgrounds={BACKGROUNDS}
-                        setContactOpen={setContactOpen}
-                      />
                     </div>
-                  </div>
+                  </CanvasPanelsPortal>
                 </>
               )}
             </div>
@@ -3602,9 +3650,11 @@ ${isMobile
                     jacksLocation={
                       p.jacksLocation || p.jacks || ""
                     }
-                    useEnclosureSizing={ENCLOSURE_SIZING_BRANDS.has(
-                      String(p.brand || "").trim()
-                    )}
+                    useEnclosureSizing={
+                      p.slug === "custom-upload" || ENCLOSURE_SIZING_BRANDS.has(
+                        String(p.brand || "").trim()
+                      )
+                    }
                     onSizeReady={(nw, nh) => handleSizeUpdate?.(p.instanceId, nw, nh)}
                     marginRef={(node) => {
                       if (node) {
@@ -3803,7 +3853,7 @@ ${isMobile
 
 
 
-          {showSignalPath && (
+          {SIGNAL_PATH_ENABLED && showSignalPath && (
             <Layer listening={true}>
               <SignalPath
                 mode="cables"
@@ -3988,7 +4038,7 @@ ${isMobile
               })}
           </Layer>
 
-          {showSignalPath && (
+          {SIGNAL_PATH_ENABLED && showSignalPath && (
             <Layer listening={true}>
               <SignalPath
                 mode="points"
@@ -4011,7 +4061,8 @@ ${isMobile
 
       {!viewer &&
         !isMobile &&
-        !helpOpen && (
+        !desktopToolbarHost &&
+        HELP_ENABLED && !helpOpen && (
           <div
             className="
         fixed
@@ -4091,21 +4142,45 @@ ${isMobile
 
       {/* ================= HELP GUIDE ================= */}
 
-      <HelpGuide
-        t={t}
-        mobile={isMobile}
-        open={helpOpen}
-        onClose={() => setHelpOpen(false)}
-        onContact={() => {
-          setHelpOpen(false);
-          setContactOpen(true);
+      {helpOpen && desktopToolbarHost && !isMobile ? (
+        <CanvasPanelsPortal host={desktopPanelHost}>
+          <div ref={rightSidebarRef} className={desktopRightSidebarClass} style={desktopRightSidebarStyle} onClick={(event) => event.stopPropagation()}>
+            <HelpGuide
+              embedded={Boolean(desktopToolbarHost) && !isMobile}
+              t={t}
+              mobile={isMobile}
+              open={HELP_ENABLED && helpOpen}
+              onClose={() => setHelpOpen(false)}
+              onContact={() => {
+                setHelpOpen(false);
+                setContactOpen(true);
 
-          if (isMobile) {
-            setMobileSidebarOpen(true);
-          }
-        }}
-        supportUrl="https://buy.stripe.com/14A8wPeGZ8uQ0tQ96I8Zq00"
-      />
+                if (isMobile) {
+                  setMobileSidebarOpen(true);
+                }
+              }}
+              supportUrl="https://buy.stripe.com/14A8wPeGZ8uQ0tQ96I8Zq00"
+            />
+          </div>
+        </CanvasPanelsPortal>
+      ) : (
+        <HelpGuide
+          embedded={Boolean(desktopToolbarHost) && !isMobile}
+          t={t}
+          mobile={isMobile}
+          open={HELP_ENABLED && helpOpen}
+          onClose={() => setHelpOpen(false)}
+          onContact={() => {
+            setHelpOpen(false);
+            setContactOpen(true);
+
+            if (isMobile) {
+              setMobileSidebarOpen(true);
+            }
+          }}
+          supportUrl="https://buy.stripe.com/14A8wPeGZ8uQ0tQ96I8Zq00"
+        />
+      )}
 
     </div>
   );

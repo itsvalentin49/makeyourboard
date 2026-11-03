@@ -143,8 +143,6 @@ export default function BoardEditor({
     powerLibrary,
     newPedals,
     newPedalsLoading,
-    loading: libraryLoading,
-    libraryError,
   } = useLibrary();
   const [projects, setProjects] = useState<Project[]>([]);
   const [activeProjectId, setActiveProjectId] = useState<number | null>(null);
@@ -372,6 +370,8 @@ export default function BoardEditor({
   /**
    * Helpers
    */
+  const [desktopToolbarHost, setDesktopToolbarHost] = useState<HTMLDivElement | null>(null);
+
   const closeSearchMenus = () => {
     setShowPedalResults(false);
     setShowBoardResults(false);
@@ -846,6 +846,7 @@ export default function BoardEditor({
 
     const newPedal: BoardItem = {
       ...pedal,
+      ...{ powerFinderElectrical: { voltage: pedal.voltage, draw: pedal.draw, power: pedal.power, circuit: pedal.circuit, current_type: pedal.current_type, polarity: pedal.polarity, connector: pedal.connector, power_modes: pedal.power_modes, ground: pedal.ground, requires_isolation: pedal.requires_isolation } },
       instanceId: now,
       zIndex: now,
       x: newX,
@@ -1071,6 +1072,7 @@ export default function BoardEditor({
       year: item?.year || "",
       manual: item?.manual || "",
 
+      ...{ powerFinderElectrical: { voltage: item?.voltage, draw: item?.draw, power: item?.power, circuit: item?.circuit, current_type: item?.current_type, polarity: item?.polarity, connector: item?.connector, power_modes: item?.power_modes, ground: item?.ground, requires_isolation: item?.requires_isolation } },
       voltage: Number(item?.voltage) || 9,
       draw: Number(item?.draw) || 0,
       weight: Number(item?.weight) || 0,
@@ -1206,91 +1208,98 @@ export default function BoardEditor({
       <div className="h-full w-full">
 
         {/* ================= DESKTOP ≥1024 ================= */}
-        <div className="hidden lg:flex h-full">
+        <div className="hidden lg:flex h-full flex-col">
+          <header className="relative z-[110] flex shrink-0 items-center bg-zinc-800" style={{ height: 48, minHeight: 48, maxHeight: 48, paddingTop: 0, paddingBottom: 0 }}>
+            <div className="w-76 shrink-0 self-start px-6" style={{ paddingTop: 10 }}>
+              <SidebarLogo />
+            </div>
+            <div ref={setDesktopToolbarHost} className="min-w-0 flex-1 px-5" />
+          </header>
 
-          <div className="flex flex-1 min-h-0">
+          <div className="flex flex-1 min-h-0 min-w-0">
 
-            <Sidebar
-              pedalsLibrary={pedalsLibrary}
-              boardsLibrary={boardsLibrary}
-              powerLibrary={powerLibrary}
-              newPedals={newPedals}
-              newPedalsLoading={newPedalsLoading}
-              libraryLoading={libraryLoading}
-              libraryError={libraryError}
-              setLastSelectedPedal={setLastSelectedPedal}
-              lastSelectedPower={lastSelectedPower}
-              setLastSelectedPower={setLastSelectedPower}
-              showPedalResults={showPedalResults}
-              setShowPedalResults={setShowPedalResults}
-              showBoardResults={showBoardResults}
-              setShowBoardResults={setShowBoardResults}
-              pedalSearch={pedalSearch}
-              setPedalSearch={setPedalSearch}
-              boardSearch={boardSearch}
-              setBoardSearch={setBoardSearch}
-              selectedPedal={
-                isUserCreatedPedal
-                  ? undefined
-                  : selectedPedal
-              }
+            <div className="flex min-h-0 shrink-0 flex-col bg-zinc-800" style={{ paddingTop: 20 }}>
+              <Sidebar
+                hideLogo
+                pedalsLibrary={pedalsLibrary}
+                finderPedals={activeProject.boardPedals}
+                newPedals={newPedals}
+                newPedalsLoading={newPedalsLoading}
+                boardsLibrary={boardsLibrary}
+                powerLibrary={powerLibrary}
+                setLastSelectedPedal={setLastSelectedPedal}
+                lastSelectedPower={lastSelectedPower}
+                setLastSelectedPower={setLastSelectedPower}
+                showPedalResults={showPedalResults}
+                setShowPedalResults={setShowPedalResults}
+                showBoardResults={showBoardResults}
+                setShowBoardResults={setShowBoardResults}
+                pedalSearch={pedalSearch}
+                setPedalSearch={setPedalSearch}
+                boardSearch={boardSearch}
+                setBoardSearch={setBoardSearch}
+                selectedPedal={
+                  isUserCreatedPedal
+                    ? undefined
+                    : selectedPedal
+                }
 
-              selectedBoardDetails={
-                isCustomBoard
-                  ? undefined
-                  : selectedBoardDetails
-              }
+                selectedBoardDetails={
+                  isCustomBoard
+                    ? undefined
+                    : selectedBoardDetails
+                }
 
-              selectedInstanceId={
-                isUserCreatedPedal
-                  ? null
-                  : selectedInstanceId
-              }
+                selectedInstanceId={
+                  isUserCreatedPedal
+                    ? null
+                    : selectedInstanceId
+                }
 
-              selectedBoardInstanceId={
-                isCustomBoard
-                  ? null
-                  : selectedBoardInstanceId
-              }
-              lastSelectedPedal={lastSelectedPedal}
-              lastSelectedBoard={lastSelectedBoard}
-              setSelectedInstanceId={setSelectedInstanceId}
-              setSelectedBoardInstanceId={setSelectedBoardInstanceId}
-              customName={customName}
-              setCustomName={setCustomName}
-              customWidth={customWidth}
-              setCustomWidth={setCustomWidth}
-              customDepth={customDepth}
-              setCustomDepth={setCustomDepth}
-              customColor={customColor}
-              setCustomColor={setCustomColor}
-              addPedal={addPedal}
-              selectBoard={selectBoard}
-              selectSuggestedBoard={selectSuggestedBoard}
-              finderPedals={activeProject.boardPedals}
-              existingBoards={activeProject.selectedBoards || []}
-              addCustomItem={addCustomItem}
-              rotatePedal={rotatePedal}
-              movePedalFront={movePedalFront}
-              movePedalBack={movePedalBack}
-              moveBoardFront={moveBoardFront}
-              moveBoardBack={moveBoardBack}
-              deletePedal={deletePedal}
-              rotateBoard={rotateBoard}
-              deleteBoard={deleteBoard}
-              canvasBg={canvasBg}
-              setCanvasBg={setCanvasBg}
-              language={language}
-              setLanguage={setLanguage}
-              units={units}
-              setUnits={setUnits}
-              customType={customType}
-              setCustomType={setCustomType}
-              makeOpen={makeOpen}
-              setMakeOpen={setMakeOpen}
-              contactOpen={contactOpen}
-              setContactOpen={setContactOpen}
-            />
+                selectedBoardInstanceId={
+                  isCustomBoard
+                    ? null
+                    : selectedBoardInstanceId
+                }
+                lastSelectedPedal={lastSelectedPedal}
+                lastSelectedBoard={lastSelectedBoard}
+                setSelectedInstanceId={setSelectedInstanceId}
+                setSelectedBoardInstanceId={setSelectedBoardInstanceId}
+                customName={customName}
+                setCustomName={setCustomName}
+                customWidth={customWidth}
+                setCustomWidth={setCustomWidth}
+                customDepth={customDepth}
+                setCustomDepth={setCustomDepth}
+                customColor={customColor}
+                setCustomColor={setCustomColor}
+                addPedal={addPedal}
+                selectBoard={selectBoard}
+                selectSuggestedBoard={selectSuggestedBoard}
+                existingBoards={activeProject.selectedBoards || []}
+                addCustomItem={addCustomItem}
+                rotatePedal={rotatePedal}
+                movePedalFront={movePedalFront}
+                movePedalBack={movePedalBack}
+                moveBoardFront={moveBoardFront}
+                moveBoardBack={moveBoardBack}
+                deletePedal={deletePedal}
+                rotateBoard={rotateBoard}
+                deleteBoard={deleteBoard}
+                canvasBg={canvasBg}
+                setCanvasBg={setCanvasBg}
+                language={language}
+                setLanguage={setLanguage}
+                units={units}
+                setUnits={setUnits}
+                customType={customType}
+                setCustomType={setCustomType}
+                makeOpen={makeOpen}
+                setMakeOpen={setMakeOpen}
+                contactOpen={contactOpen}
+                setContactOpen={setContactOpen}
+              />
+            </div>
 
             <div
               ref={desktopCanvasRef}
@@ -1298,6 +1307,7 @@ export default function BoardEditor({
             >
               <div className="flex-1 relative overflow-hidden">
                 <BoardCanvas
+                  desktopToolbarHost={desktopToolbarHost}
                   activeProject={activeProject}
                   units={units}
                   language={language}
@@ -1542,12 +1552,11 @@ export default function BoardEditor({
 
                   <Sidebar
                     pedalsLibrary={pedalsLibrary}
-                    boardsLibrary={boardsLibrary}
-                    powerLibrary={powerLibrary}
+                    finderPedals={activeProject.boardPedals}
                     newPedals={newPedals}
                     newPedalsLoading={newPedalsLoading}
-                    libraryLoading={libraryLoading}
-                    libraryError={libraryError}
+                    boardsLibrary={boardsLibrary}
+                    powerLibrary={powerLibrary}
                     setLastSelectedPedal={setLastSelectedPedal}
                     lastSelectedPower={lastSelectedPower}
                     setLastSelectedPower={setLastSelectedPower}
@@ -1586,7 +1595,6 @@ export default function BoardEditor({
                       setMobileSidebarOpen(false);
                     }}
                     selectSuggestedBoard={selectSuggestedBoard}
-                    finderPedals={activeProject.boardPedals}
                     existingBoards={activeProject.selectedBoards || []}
                     addCustomItem={(item) => {
                       addCustomItem(item);
@@ -1658,12 +1666,11 @@ export default function BoardEditor({
 
               <Sidebar
                 pedalsLibrary={pedalsLibrary}
-                boardsLibrary={boardsLibrary}
-                powerLibrary={powerLibrary}
+                finderPedals={activeProject.boardPedals}
                 newPedals={newPedals}
                 newPedalsLoading={newPedalsLoading}
-                libraryLoading={libraryLoading}
-                libraryError={libraryError}
+                boardsLibrary={boardsLibrary}
+                powerLibrary={powerLibrary}
                 setLastSelectedPedal={setLastSelectedPedal}
                 lastSelectedPower={lastSelectedPower}
                 setLastSelectedPower={setLastSelectedPower}

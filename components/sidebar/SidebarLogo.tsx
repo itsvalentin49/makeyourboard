@@ -1,13 +1,10 @@
-
 "use client";
 
 type Props = {
   compact?: boolean;
 };
 
-export default function SidebarLogo({
-  compact = false,
-}: Props) {
+export default function SidebarLogo({ compact = false }: Props) {
   return (
     <div
       className={
@@ -19,11 +16,29 @@ export default function SidebarLogo({
       <div
         className={
           compact
-            ? "text-[22px] font-black tracking-tight leading-none"
-            : "text-[34px] font-black tracking-tight leading-none"
+            ? "relative text-[22px] font-black tracking-tight leading-none"
+            : "relative text-[34px] font-black tracking-tight leading-none"
         }
+        style={{ overflow: "visible" }}
       >
         MakeYourBoard
+
+        <img
+          src="/images/bonnet-noel.png"
+          alt=""
+          aria-hidden="true"
+          draggable={false}
+          style={{
+            position: "absolute",
+            width: "1.15em",
+            height: "1.15em",
+            left: "-0.18em",
+            top: "-0.36em",
+            objectFit: "contain",
+            pointerEvents: "none",
+            zIndex: 1,
+          }}
+        />
       </div>
 
       <div
@@ -48,7 +63,6 @@ export default function SidebarLogo({
         >
           PEDALBOARD
         </span>
-
 
         <span
           style={{
