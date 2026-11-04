@@ -193,11 +193,11 @@
     },
     "resources": "Ressourcen",
     "project": "Das Projekt",
-    "instagramDescription": "Bleib über Neuigkeiten von MakeYourBoard auf dem Laufenden.",
+    "instagramDescription": "Bleib über Neuigkeiten auf dem Laufenden.",
     "supportProject": "MakeYourBoard unterstützen",
     "documentationDescription": "Erfahre, wie du MakeYourBoard verwendest.",
     "contactDescription": "Eine Frage, eine Idee oder einen Fehler zu melden?",
-    "supportDescription": "Deine Unterstützung hilft mir, diese Website kostenlos zu halten."
+    "supportDescription": "Danke für deine Hilfe!"
   },
   "backgrounds": {
     "neutral": "Neutral",

@@ -193,11 +193,11 @@
     },
     "resources": "资源",
     "project": "项目",
-    "instagramDescription": "关注 MakeYourBoard 的最新动态。",
+    "instagramDescription": "关注最新动态。",
     "supportProject": "支持 MakeYourBoard",
     "documentationDescription": "了解如何使用 MakeYourBoard。",
     "contactDescription": "有问题、想法或需要报告的错误？",
-    "supportDescription": "你的支持帮助我让本站保持免费。"
+    "supportDescription": "感谢你的帮助！"
   },
   "backgrounds": {
     "neutral": "中性",
