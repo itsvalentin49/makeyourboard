@@ -1211,105 +1211,104 @@ export default function BoardEditor({
 
         {/* ================= DESKTOP ≥1024 ================= */}
         <div className="hidden lg:flex h-full flex-col">
-          <header className="relative z-[110] flex shrink-0 items-center bg-zinc-800" style={{ height: 48, minHeight: 48, maxHeight: 48, paddingTop: 0, paddingBottom: 0 }}>
-            <div className="w-76 shrink-0 self-start px-6" style={{ paddingTop: 10 }}>
-              <SidebarLogo />
-            </div>
-            <div ref={setDesktopToolbarHost} className="min-w-0 flex-1 px-5" />
-          </header>
-
           <div className="flex flex-1 min-h-0 min-w-0">
 
-            <div className="flex min-h-0 shrink-0 flex-col bg-zinc-800" style={{ paddingTop: 20 }}>
-              <Sidebar
-                hideLogo
-                pedalsLibrary={pedalsLibrary}
-                finderPedals={activeProject.boardPedals}
-                newPedals={newPedals}
-                newPedalsLoading={newPedalsLoading}
-                libraryLoading={libraryLoading}
-                libraryError={libraryError}
-                boardsLibrary={boardsLibrary}
-                powerLibrary={powerLibrary}
-                setLastSelectedPedal={setLastSelectedPedal}
-                lastSelectedPower={lastSelectedPower}
-                setLastSelectedPower={setLastSelectedPower}
-                showPedalResults={showPedalResults}
-                setShowPedalResults={setShowPedalResults}
-                showBoardResults={showBoardResults}
-                setShowBoardResults={setShowBoardResults}
-                pedalSearch={pedalSearch}
-                setPedalSearch={setPedalSearch}
-                boardSearch={boardSearch}
-                setBoardSearch={setBoardSearch}
-                selectedPedal={
-                  isUserCreatedPedal
-                    ? undefined
-                    : selectedPedal
-                }
+            <div className="flex min-h-0 shrink-0 flex-col bg-zinc-800 w-76">
+              <div className="shrink-0 px-6" style={{ paddingTop: 10, paddingBottom: 20 }}>
+                <SidebarLogo />
+              </div>
+              <div className="flex flex-1 min-h-0 flex-col">
+                <Sidebar
+                  hideLogo
+                  pedalsLibrary={pedalsLibrary}
+                  finderPedals={activeProject.boardPedals}
+                  newPedals={newPedals}
+                  newPedalsLoading={newPedalsLoading}
+                  libraryLoading={libraryLoading}
+                  libraryError={libraryError}
+                  boardsLibrary={boardsLibrary}
+                  powerLibrary={powerLibrary}
+                  setLastSelectedPedal={setLastSelectedPedal}
+                  lastSelectedPower={lastSelectedPower}
+                  setLastSelectedPower={setLastSelectedPower}
+                  showPedalResults={showPedalResults}
+                  setShowPedalResults={setShowPedalResults}
+                  showBoardResults={showBoardResults}
+                  setShowBoardResults={setShowBoardResults}
+                  pedalSearch={pedalSearch}
+                  setPedalSearch={setPedalSearch}
+                  boardSearch={boardSearch}
+                  setBoardSearch={setBoardSearch}
+                  selectedPedal={
+                    isUserCreatedPedal
+                      ? undefined
+                      : selectedPedal
+                  }
 
-                selectedBoardDetails={
-                  isCustomBoard
-                    ? undefined
-                    : selectedBoardDetails
-                }
+                  selectedBoardDetails={
+                    isCustomBoard
+                      ? undefined
+                      : selectedBoardDetails
+                  }
 
-                selectedInstanceId={
-                  isUserCreatedPedal
-                    ? null
-                    : selectedInstanceId
-                }
+                  selectedInstanceId={
+                    isUserCreatedPedal
+                      ? null
+                      : selectedInstanceId
+                  }
 
-                selectedBoardInstanceId={
-                  isCustomBoard
-                    ? null
-                    : selectedBoardInstanceId
-                }
-                lastSelectedPedal={lastSelectedPedal}
-                lastSelectedBoard={lastSelectedBoard}
-                setSelectedInstanceId={setSelectedInstanceId}
-                setSelectedBoardInstanceId={setSelectedBoardInstanceId}
-                customName={customName}
-                setCustomName={setCustomName}
-                customWidth={customWidth}
-                setCustomWidth={setCustomWidth}
-                customDepth={customDepth}
-                setCustomDepth={setCustomDepth}
-                customColor={customColor}
-                setCustomColor={setCustomColor}
-                addPedal={addPedal}
-                selectBoard={selectBoard}
-                selectSuggestedBoard={selectSuggestedBoard}
-                existingBoards={activeProject.selectedBoards || []}
-                addCustomItem={addCustomItem}
-                rotatePedal={rotatePedal}
-                movePedalFront={movePedalFront}
-                movePedalBack={movePedalBack}
-                moveBoardFront={moveBoardFront}
-                moveBoardBack={moveBoardBack}
-                deletePedal={deletePedal}
-                rotateBoard={rotateBoard}
-                deleteBoard={deleteBoard}
-                canvasBg={canvasBg}
-                setCanvasBg={setCanvasBg}
-                language={language}
-                setLanguage={setLanguage}
-                units={units}
-                setUnits={setUnits}
-                customType={customType}
-                setCustomType={setCustomType}
-                makeOpen={makeOpen}
-                setMakeOpen={setMakeOpen}
-                contactOpen={contactOpen}
-                setContactOpen={setContactOpen}
-              />
+                  selectedBoardInstanceId={
+                    isCustomBoard
+                      ? null
+                      : selectedBoardInstanceId
+                  }
+                  lastSelectedPedal={lastSelectedPedal}
+                  lastSelectedBoard={lastSelectedBoard}
+                  setSelectedInstanceId={setSelectedInstanceId}
+                  setSelectedBoardInstanceId={setSelectedBoardInstanceId}
+                  customName={customName}
+                  setCustomName={setCustomName}
+                  customWidth={customWidth}
+                  setCustomWidth={setCustomWidth}
+                  customDepth={customDepth}
+                  setCustomDepth={setCustomDepth}
+                  customColor={customColor}
+                  setCustomColor={setCustomColor}
+                  addPedal={addPedal}
+                  selectBoard={selectBoard}
+                  selectSuggestedBoard={selectSuggestedBoard}
+                  existingBoards={activeProject.selectedBoards || []}
+                  addCustomItem={addCustomItem}
+                  rotatePedal={rotatePedal}
+                  movePedalFront={movePedalFront}
+                  movePedalBack={movePedalBack}
+                  moveBoardFront={moveBoardFront}
+                  moveBoardBack={moveBoardBack}
+                  deletePedal={deletePedal}
+                  rotateBoard={rotateBoard}
+                  deleteBoard={deleteBoard}
+                  canvasBg={canvasBg}
+                  setCanvasBg={setCanvasBg}
+                  language={language}
+                  setLanguage={setLanguage}
+                  units={units}
+                  setUnits={setUnits}
+                  customType={customType}
+                  setCustomType={setCustomType}
+                  makeOpen={makeOpen}
+                  setMakeOpen={setMakeOpen}
+                  contactOpen={contactOpen}
+                  setContactOpen={setContactOpen}
+                />
+              </div>
             </div>
 
             <div
               ref={desktopCanvasRef}
               className="flex-1 min-w-0 bg-[#323234] flex flex-col overflow-hidden"
             >
-              <div className="flex-1 relative overflow-hidden">
+              <div className="flex-1 min-h-0 relative overflow-hidden">
+                <div ref={setDesktopToolbarHost} className="absolute inset-0 z-[110] pointer-events-none" />
                 <BoardCanvas
                   desktopToolbarHost={desktopToolbarHost}
                   activeProject={activeProject}

@@ -486,3 +486,109 @@ html:not(.light) .hover\:bg-zinc-300:hover {
 .light .hover\:bg-zinc-300:hover {
   background-color: var(--zinc-300) !important;
 }
+
+/* Compact, expandable desktop canvas tools. Colours follow the current theme. */
+.myb-tool-rail {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  pointer-events: auto;
+  box-sizing: border-box;
+  padding: 5px;
+  border: 1px solid var(--zinc-700);
+  border-radius: 14px;
+  background: var(--zinc-800);
+  color: var(--foreground);
+  box-shadow: 0 6px 22px rgb(0 0 0 / 14%);
+  max-height: calc(100% - 24px);
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.myb-tool-rail::-webkit-scrollbar {
+  display: none;
+}
+
+.myb-tool-rail-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.myb-tool-rail-button,
+.myb-tool-rail-toggle {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 44px;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--foreground);
+  cursor: pointer;
+  transition: background-color 140ms, border-color 140ms;
+}
+
+.myb-tool-rail-button {
+  gap: 12px;
+  padding: 0 9px;
+  text-align: left;
+}
+
+.myb-tool-rail-button svg,
+.myb-tool-rail-toggle svg {
+  flex-shrink: 0;
+}
+
+.myb-tool-rail-toggle {
+  justify-content: center;
+  height: 32px;
+  margin-bottom: 5px;
+}
+
+.myb-tool-rail[data-expanded="true"] .myb-tool-rail-toggle {
+  justify-content: flex-end;
+  padding-right: 11px;
+}
+
+.myb-tool-rail-button:hover,
+.myb-tool-rail-toggle:hover {
+  background: var(--zinc-900);
+}
+
+.myb-tool-rail-button[data-active="true"] {
+  background: var(--zinc-700);
+  border-color: var(--zinc-500);
+}
+
+.myb-tool-rail-button:focus-visible,
+.myb-tool-rail-toggle:focus-visible {
+  outline: 2px solid var(--zinc-500);
+  outline-offset: -2px;
+}
+
+.myb-tool-rail-label {
+  font-size: 12px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.myb-tool-rail-divider {
+  height: 1px;
+  background: var(--zinc-700);
+  margin: 5px 4px;
+}
+
+html.light .myb-tool-rail {
+  box-shadow: 0 6px 22px rgb(0 0 0 / 8%);
+}
+
+html.light .myb-tool-rail-button[data-active="true"] {
+  background: var(--zinc-700);
+  border-color: var(--zinc-500);
+}

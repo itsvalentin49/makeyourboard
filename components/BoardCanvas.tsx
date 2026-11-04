@@ -3,7 +3,7 @@
 import { createPortal } from "react-dom";
 import React, { useRef, useLayoutEffect, useEffect, useState } from "react";
 import { Stage, Layer, Group, Rect, Text, Circle as KonvaCircle, Image as KonvaImage, } from "react-konva";
-import { Zap, Weight, Minus, Cable, Plus, Check, Upload, AlertTriangle, RotateCw, Circle, Trash2, X, Share2, Info, List, Settings, PanelsTopLeft, Download, ArrowUp, ArrowDown, CircleHelp, SlidersHorizontal } from "lucide-react";
+import { Zap, Weight, Minus, Cable, Plus, Check, Upload, AlertTriangle, RotateCw, Circle, Trash2, X, Share2, Info, List, Settings, PanelsTopLeft, Download, ArrowUp, ArrowDown, CircleHelp, SlidersHorizontal, ChevronsLeft, ChevronsRight } from "lucide-react";
 import PedalImage from "@/components/PedalImage";
 import { formatWeight } from "@/utils/units";
 import { getTranslator } from "@/utils/i18n";
@@ -287,6 +287,29 @@ export default function BoardCanvas({
 
   const t = getTranslator(language);
   const [desktopPanelHost, setDesktopPanelHost] = useState<HTMLDivElement | null>(null);
+  const [railExpanded, setRailExpanded] = useState(false);
+  const railWidth = railExpanded ? 190 : 56;
+  const railLabels: Record<Language, { expand: string; collapse: string }> = {
+    fr: { expand: "Afficher les noms", collapse: "Masquer les noms" },
+    en: { expand: "Show labels", collapse: "Hide labels" },
+    de: { expand: "Beschriftungen anzeigen", collapse: "Beschriftungen ausblenden" },
+    es: { expand: "Mostrar nombres", collapse: "Ocultar nombres" },
+    it: { expand: "Mostra nomi", collapse: "Nascondi nomi" },
+    pt: { expand: "Mostrar nomes", collapse: "Ocultar nomes" },
+    zh: { expand: "显示名称", collapse: "隐藏名称" },
+  };
+  useEffect(() => {
+    try { setRailExpanded(sessionStorage.getItem("myb-tool-rail-expanded") === "true"); }
+    catch { /* Storage can be unavailable in private contexts. */ }
+  }, []);
+  const toggleRail = () => {
+    setRailExpanded((expanded) => {
+      const next = !expanded;
+      try { sessionStorage.setItem("myb-tool-rail-expanded", String(next)); } catch { }
+      return next;
+    });
+  };
+
   const [showSettings, setShowSettings] = useState(false);
   const [settingsContactVisible, setSettingsContactVisible] = useState(false);
   useEffect(() => { if (!showSettings) setSettingsContactVisible(false); }, [showSettings]);
@@ -847,6 +870,27 @@ export default function BoardCanvas({
       (Boolean(desktopToolbarHost) && helpOpen)
     );
 
+  useEffect(() => {
+    if (!desktopRightPanelOpen) return;
+    const handleOutsidePanel = (event: PointerEvent) => {
+      const target = event.target;
+      if (!(target instanceof Node)) return;
+      if (rightSidebarRef.current?.contains(target)) return;
+      if (desktopPanelHost?.contains(target)) return;
+      setShowBoardsMenu(false);
+      setShowCableMenu(false);
+      setShowPower(false);
+      setShowExportPanel(false);
+      setShowSettings(false);
+      setShowList(false);
+      setHelpOpen(false);
+      setRailExpanded(false);
+      try { sessionStorage.setItem("myb-tool-rail-expanded", "false"); } catch { }
+    };
+    document.addEventListener("pointerdown", handleOutsidePanel, true);
+    return () => document.removeEventListener("pointerdown", handleOutsidePanel, true);
+  }, [desktopRightPanelOpen, desktopPanelHost]);
+
   useLayoutEffect(() => {
     if (isMobile || !rightSidebarRef.current) return;
 
@@ -959,6 +1003,7 @@ export default function BoardCanvas({
     top: 0,
     bottom: 0,
     right: 0,
+    maxWidth: "100%",
     marginTop: 0,
     pointerEvents: "auto",
     width: "340px",
@@ -1461,48 +1506,97 @@ export default function BoardCanvas({
         <div ref={setDesktopPanelHost} className="absolute inset-0 z-[100] pointer-events-none" />
       )}
 
-      {!viewer && !isMobile && desktopToolbarHost && createPortal(
-        <nav aria-label={t("canvasControls.boards")} className="myb-topbar flex w-full items-center gap-1.5" onClick={(event) => event.stopPropagation()}>
+      {!viewer && !isMobile && desktopToolbarHost && !desktopRightPanelOpen && createPortal(
+        <nav
+          aria-label={t("canvasControls.boards")}
+          className="myb-tool-rail"
+          data-expanded={railExpanded}
+          style={{
+            position: "absolute", top: "50%", right: 12,
+            transform: "translateY(-50%)", width: railWidth,
+            pointerEvents: "auto", zIndex: 120,
+            background: "var(--zinc-800, #27272a)",
+            color: "var(--foreground, #ededed)",
+            border: "1px solid var(--zinc-700, #3f3f46)",
+            borderRadius: 14, padding: 5, boxSizing: "border-box",
+            maxHeight: "calc(100% - 24px)", overflowY: "auto",
+            boxShadow: "0 6px 22px rgba(0,0,0,0.14)",
+          }}
+          onClick={(event) => event.stopPropagation()}
+          onMouseDown={(event) => event.stopPropagation()}
+          onWheel={(event) => event.stopPropagation()}
+        >
           <style>{`
-            .myb-topbar .myb-topbar-button:hover {
-              background-color: #09090b !important;
-              color: var(--foreground);
-            }
-            html.light .myb-topbar .myb-topbar-button:hover {
-              background-color: rgba(24, 24, 27, 0.08) !important;
-              color: var(--foreground);
-            }
-          `}</style>
-          {([[
-            { id: "boards", label: activeProject.name || t("canvasControls.pedalboard"), Icon: PanelsTopLeft, open: showBoardsMenu },
-            { id: "cables", label: t("cables.title"), Icon: Cable, open: showCableMenu },
-            { id: "power", label: t("canvasControls.power"), Icon: Zap, open: showPower },
-            { id: "export", label: t("export.button"), Icon: Upload, open: showExportPanel },
-          ], [
-            ...(HELP_ENABLED ? [{ id: "help", label: t("help.title"), Icon: CircleHelp, open: helpOpen } as const] : []),
-            { id: "settings", label: t("settings.title"), Icon: SlidersHorizontal, open: showSettings },
-          ]] as const).map((group, index) => <div key={index} style={{ display: "flex", alignItems: "center", justifyContent: index === 0 ? "center" : "flex-end", gap: 8, flex: index === 0 ? "1 1 0%" : "0 0 auto", minWidth: 0 }}>
-            {group.map(({ id, label, Icon, open }) => (
+.myb-tool-rail {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  pointer-events: auto;
+  box-sizing: border-box;
+  padding: 5px;
+  border: 1px solid var(--zinc-700);
+  border-radius: 14px;
+  background: var(--zinc-800);
+  color: var(--foreground);
+  box-shadow: 0 6px 22px rgb(0 0 0 / 14%);
+  max-height: calc(100% - 24px);
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.myb-tool-rail::-webkit-scrollbar { display: none; }
+.myb-tool-rail-actions { display: flex; flex-direction: column; gap: 4px; }
+.myb-tool-rail-button, .myb-tool-rail-toggle {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 44px;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--foreground);
+  cursor: pointer;
+  transition: background-color 140ms, border-color 140ms;
+}
+.myb-tool-rail-button { gap: 12px; padding: 0 9px; text-align: left; }
+.myb-tool-rail-button svg, .myb-tool-rail-toggle svg { flex-shrink: 0; }
+.myb-tool-rail-toggle { justify-content: center; height: 32px; margin-bottom: 5px; }
+.myb-tool-rail[data-expanded="true"] .myb-tool-rail-toggle { justify-content: flex-end; padding-right: 11px; }
+.myb-tool-rail-button:hover, .myb-tool-rail-toggle:hover { background: var(--zinc-900); }
+.myb-tool-rail-button[data-active="true"] { background: var(--zinc-700); border-color: var(--zinc-500); }
+.myb-tool-rail-button:focus-visible, .myb-tool-rail-toggle:focus-visible { outline: 2px solid var(--zinc-500); outline-offset: -2px; }
+.myb-tool-rail-label { font-size: 12px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.myb-tool-rail-divider { height: 1px; background: var(--zinc-700); margin: 5px 4px; }
+html.light .myb-tool-rail { box-shadow: 0 6px 22px rgb(0 0 0 / 8%); }
+html.light .myb-tool-rail-button[data-active="true"] { background: var(--zinc-700); border-color: var(--zinc-500); }
+`}</style>
+          <button type="button" className="myb-tool-rail-toggle"
+            aria-label={railExpanded ? railLabels[language].collapse : railLabels[language].expand}
+            aria-expanded={railExpanded} aria-controls="myb-tool-rail-actions"
+            onClick={toggleRail}>
+            {railExpanded ? <ChevronsRight size={20} /> : <ChevronsLeft size={20} />}
+          </button>
+          <div id="myb-tool-rail-actions" className="myb-tool-rail-actions">
+            {([
+              { id: "boards", label: t("canvasControls.boards"), Icon: PanelsTopLeft, open: showBoardsMenu },
+              { id: "cables", label: t("cables.title"), Icon: Cable, open: showCableMenu },
+              { id: "power", label: t("canvasControls.power"), Icon: Zap, open: showPower },
+              { id: "export", label: t("export.button"), Icon: Upload, open: showExportPanel },
+              { id: "settings", label: t("settings.title"), Icon: SlidersHorizontal, open: showSettings },
+            ] as const).map(({ id, label, Icon, open }) => (
               <React.Fragment key={id}>
-                <button type="button" aria-label={label} aria-expanded={open}
+                <button type="button" className="myb-tool-rail-button"
+                  aria-label={label} title={railExpanded ? undefined : label} aria-expanded={open} data-active={open}
                   ref={id === "boards" ? boardsButtonRef : undefined}
-                  onClick={() => toggleUnifiedPanel(id)}
-                  style={open || id === "boards" ? {
-                    backgroundColor: id === "boards" ? "var(--zinc-900, #18181b)" : "rgba(140, 140, 150, 0.18)",
-                    border: "1px solid rgba(140, 140, 150, 0.4)",
-                    color: "var(--foreground)",
-                  } : { border: "1px solid transparent" }}
-                  className={`myb-topbar-button flex h-9 min-w-0 shrink-0 items-center justify-center gap-2 rounded-lg px-4 text-[12px] font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-zinc-500 ${""
-                    }`}
-                >
-                  <Icon size={20} strokeWidth={2} className="shrink-0" />
-                  {id !== "settings" && id !== "help" && (
-                    <span className={`truncate ${id === "boards" ? "max-w-[150px]" : "max-w-[120px]"}`}>{label}</span>
-                  )}
+                  onClick={() => toggleUnifiedPanel(id)}>
+                  <Icon size={24} strokeWidth={2} aria-hidden="true" />
+                  {railExpanded && <span className="myb-tool-rail-label">{label}</span>}
                 </button>
-                {id === "boards" && <span aria-hidden="true" style={{ display: "block", width: 1, height: 24, marginLeft: 10, marginRight: 10, flexShrink: 0, backgroundColor: "rgba(140, 140, 150, 0.45)" }} />}
               </React.Fragment>
-            ))}</div>)}
+            ))}
+          </div>
         </nav>, desktopToolbarHost
       )}
 
