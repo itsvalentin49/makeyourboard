@@ -1311,12 +1311,11 @@ export default function CustomPanel(props: CustomPanelProps) {
         <style>{`
         .myb-custom-choice {
           background-color: #ffffff !important;
-          border: 1px solid #a1a1aa !important;
+          border: 1px solid transparent !important;
           color: #18181b !important;
           transition: background-color 140ms ease, border-color 140ms ease;
         }
-        .myb-custom-choice:hover,
-        .myb-custom-choice[aria-expanded="true"] {
+        .myb-custom-choice:hover {
           background-color: #ffffff !important;
           border-color: #a1a1aa !important;
           box-shadow: none;
