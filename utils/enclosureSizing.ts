@@ -90,4 +90,8 @@ export const ENCLOSURE_SIZING_BRANDS = new Set([
     "Xotic",
     "Zoom",
     "Pedal Pawn",
+    "Peterson",
+    "Old Blood Noise Endeavors",
+    "Dr. No Effects",
+    "Jam Pedals"
 ]);
