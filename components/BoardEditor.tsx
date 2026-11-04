@@ -143,6 +143,8 @@ export default function BoardEditor({
     powerLibrary,
     newPedals,
     newPedalsLoading,
+    loading: libraryLoading,
+    libraryError,
   } = useLibrary();
   const [projects, setProjects] = useState<Project[]>([]);
   const [activeProjectId, setActiveProjectId] = useState<number | null>(null);
@@ -1225,6 +1227,8 @@ export default function BoardEditor({
                 finderPedals={activeProject.boardPedals}
                 newPedals={newPedals}
                 newPedalsLoading={newPedalsLoading}
+                libraryLoading={libraryLoading}
+                libraryError={libraryError}
                 boardsLibrary={boardsLibrary}
                 powerLibrary={powerLibrary}
                 setLastSelectedPedal={setLastSelectedPedal}
@@ -1555,6 +1559,8 @@ export default function BoardEditor({
                     finderPedals={activeProject.boardPedals}
                     newPedals={newPedals}
                     newPedalsLoading={newPedalsLoading}
+                    libraryLoading={libraryLoading}
+                    libraryError={libraryError}
                     boardsLibrary={boardsLibrary}
                     powerLibrary={powerLibrary}
                     setLastSelectedPedal={setLastSelectedPedal}
@@ -1669,6 +1675,8 @@ export default function BoardEditor({
                 finderPedals={activeProject.boardPedals}
                 newPedals={newPedals}
                 newPedalsLoading={newPedalsLoading}
+                libraryLoading={libraryLoading}
+                libraryError={libraryError}
                 boardsLibrary={boardsLibrary}
                 powerLibrary={powerLibrary}
                 setLastSelectedPedal={setLastSelectedPedal}
