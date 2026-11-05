@@ -93,5 +93,10 @@ export const ENCLOSURE_SIZING_BRANDS = new Set([
     "Peterson",
     "Old Blood Noise Endeavors",
     "Dr. No Effects",
-    "Jam Pedals"
+    "Jam Pedals",
+    "Cornerstone",
+    "Daddario",
+    "Daredevil Pedals",
+    "Darkglass",
+    "Dawner Prince"
 ]);

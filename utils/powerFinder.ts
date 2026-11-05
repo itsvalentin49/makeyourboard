@@ -49,7 +49,7 @@ export function parseOutputs(details: unknown, expected: unknown, t: Translator 
         if (!m) throw new Error(t("powerFinder.diagnostics.outputFormat").replace("{value}", part));
         const count = Number(m[1]); const vs = m[3].replace(/\s/g, "").split("/").map(Number);
         const cs = m[4].replace(/\s/g, "").split("/").map(Number);
-        if (!Number.isSafeInteger(count) || count < 1 || count > 64 || vs.some(v => !number(v)) || cs.some(c => !number(c)) || new Set(vs).size !== vs.length || (vs.length > 1 && !m[2]) || (cs.length !== 1 && cs.length !== vs.length)) throw new Error(t("powerFinder.diagnostics.outputsInvalid"));
+        if (!Number.isSafeInteger(count) || count < 1 || count > 64 || vs.some(v => !number(v)) || cs.some(c => !number(c)) || new Set(vs).size !== vs.length || (cs.length !== 1 && cs.length !== vs.length)) throw new Error(t("powerFinder.diagnostics.outputsInvalid"));
         for (let i = 0; i < count; i++) out.push({ index: out.length + 1, modes: vs.map((voltage, j) => ({ voltage, current: cs[j] ?? cs[0] })) });
     }
     if (out.length !== number(expected)) throw new Error(t("powerFinder.diagnostics.outputCountMismatch"));
@@ -78,6 +78,23 @@ function pedalProfile(r: Row): Row {
     return {
         current_type: currentType(r.current_type ?? r.power) || "DC", polarity: "center-negative", connector: "5.5x2.1mm", ...defined(r),
         draw: Math.max(number(r.draw) ?? 0, bossTuner ? 85 : bossComp ? 90 : sansamp || muff ? 100 : 0) || r.draw
+    };
+}
+/** Known negative-ground analogue circuits; draw always comes from the catalogue.
+ * RAT 2 connector varies by revision: the wiring UI explicitly requires a suitable cable.
+ * Never override explicit electrical metadata supplied by the catalogue.
+ */
+function setupPedalProfile(input: Row): Row {
+    const r = pedalProfile(input);
+    const brand = text(r.brand).replace(/[^a-z0-9]/g, "");
+    const rat = brand === "proco" && /^rat\s*2$/.test(text(r.name));
+    const centavo = brand === "warmaudio" && /^centavo(?:\s|$)/.test(text(r.name));
+    const sansamp = brand === "tech21" && /^sansamp bass driver di (?:v2|\(v2\))$/.test(text(r.name));
+    const muff = brand === "electroharmonix" && text(r.name) === "bass big muff pi";
+    if (!rat && !centavo && !sansamp && !muff) return r;
+    return {
+        circuit: "analog", ground: "negative", requires_isolation: false,
+        current_type: "DC", polarity: "center-negative", ...defined(r)
     };
 }
 function isOriginalOneSpot(r: Row): boolean {
@@ -355,4 +372,105 @@ export function recommendPower(results: Result[], boards: Row[] = []): Result[] 
         if (chosen.length === 10) break;
     }
     return chosen.sort(compareRecommendations);
+}
+
+
+/** Canvas planner: supply instances and physical outlets are never merged. */
+export type SetupOutlet = { supplyIndex: number; output: number; modes: Mode[]; assignment: Assignment | null };
+export type SetupPlan = { outlets: SetupOutlet[]; unpowered: Row[]; passive: Row[]; unsupported: Row[]; count: number; powered: number; complete: boolean; searchLimited: boolean };
+export function planPowerSetup(items: Row[], supplies: Row[], maxNodes = 100000): SetupPlan {
+    // Explicit zero only: blank / absent consumption must not be treated as passive.
+    const zeroDraw = (r: Row) => r.draw === 0 || (typeof r.draw === "string" && /^0+(?:[.,]0+)?\s*(?:mA)?$/i.test(r.draw.trim()));
+    const passive = items.filter(r => !isSupply(r) && (ignored(r) || zeroDraw(r)));
+    const ps = items.filter(r => !isSupply(r) && !ignored(r) && !zeroDraw(r)).map((r, i) => pedal(setupPedalProfile(r), i));
+    const unsupported: Row[] = [];
+    const profiles = supplies.map(supplyProfile);
+    const outlets: SetupOutlet[] = [];
+    profiles.forEach((s, supplyIndex) => {
+        try {
+            if (/shared/i.test(String(s.details ?? "")) || s.shared_banks != null || s.output_metadata != null) throw new Error();
+            if (!bool(s.isolated) && !isOriginalOneSpot(s)) throw new Error();
+            parseOutputs(s.details, s.outputs).forEach(o => outlets.push({ supplyIndex, output: o.index, modes: o.modes, assignment: null }));
+        } catch { unsupported.push(supplies[supplyIndex]); }
+    });
+    const eligible = (p: Pedal, o: SetupOutlet, m: Mode) => {
+        const s = profiles[o.supplyIndex];
+        const ct = currentType(s.current_type), pol = polarity(s.polarity), con = connector(s.connector);
+        return p.modes.some(pm => pm.voltage === m.voltage && pm.current <= m.current) &&
+            !!p.currentType && !(ct && ct !== p.currentType) &&
+            !(pol && p.polarity && pol !== p.polarity) && !(con && p.connector && con !== p.connector);
+    };
+    const ordered = [...ps].sort((a, b) => {
+        const choices = (p: Pedal) => outlets.reduce((n, o) => n + o.modes.filter(m => eligible(p, o, m)).length, 0);
+        return choices(a) - choices(b) || Number(b.tuner) - Number(a.tuner) || a.index - b.index;
+    });
+    type Group = { outlet: number; mode: Mode; members: Pedal[] };
+    let nodes = 0, searchLimited = false, best: Group[] = [], bestCount = 0, bestShared = Infinity;
+    const draw = (g: Group) => g.members.reduce((n, p) => n + (p.modes.find(m => m.voltage === g.mode.voltage)?.current ?? Infinity), 0);
+    const withinBudget = (groups: Group[]) => profiles.every((s, i) => {
+        const limit = number(s.capacity_watts);
+        return !limit || groups.filter(g => outlets[g.outlet].supplyIndex === i).reduce((n, g) => n + draw(g) * g.mode.voltage / 1000, 0) <= limit + 1e-9;
+    });
+    const shareable = (members: Pedal[], mode: Mode) => {
+        if (mode.voltage !== 9) return false;
+        // Use the catalogue circuit field. Optional ground/polarity columns are
+        // absent from legacy rows; explicit conflicts still prohibit sharing.
+        const safe = (p: Pedal) => p.currentType === "dc" &&
+            p.modes.some(m => m.voltage === 9 && m.current > 0) &&
+            p.polarity !== "positive" && text(p.row.ground) !== "positive" && !bool(p.row.requires_isolation);
+        if (members.some(p => !safe(p))) return false;
+        const knownConnectors = members.map(p => p.connector).filter(Boolean);
+        if (new Set(knownConnectors).size > 1) return false;
+        const tuners = members.filter(p => p.tuner);
+        const others = members.filter(p => !p.tuner);
+        if (others.some(p => text(p.row.circuit) !== "analog")) return false;
+        if (!tuners.length) return members.length <= 3;
+        // Conservative application policy. The upstream outlet must ALSO carry
+        // the tuner itself plus every downstream pedal (checked by draw()).
+        return tuners.length === 1 && others.length <= 1 && others.reduce((n, p) =>
+            n + (p.modes.find(m => m.voltage === 9)?.current ?? Infinity), 0) <= 200;
+    };
+    const visit = (at: number, groups: Group[], count: number, allowShare: boolean, partial: boolean): boolean => {
+        if (++nodes > maxNodes) { searchLimited = true; return false; }
+        const shared = groups.reduce((n, g) => n + g.members.length - 1, 0);
+        if (count > bestCount || (count === bestCount && shared < bestShared)) {
+            bestCount = count; bestShared = shared; best = groups.map(g => ({ ...g, members: [...g.members] }));
+        }
+        if (at === ordered.length) return count === ps.length;
+        if (partial && count + ordered.length - at < bestCount) return false;
+        const p = ordered[at];
+        const seen = new Set<string>();
+        for (let oi = 0; oi < outlets.length; oi++) {
+            if (groups.some(g => g.outlet === oi)) continue;
+            const o = outlets[oi];
+            const signature = JSON.stringify([o.supplyIndex, o.modes]);
+            if (seen.has(signature)) continue;
+            seen.add(signature);
+            for (const mode of o.modes) {
+                if (!eligible(p, o, mode)) continue;
+                const next = [...groups, { outlet: oi, mode, members: [p] }];
+                if (withinBudget(next) && visit(at + 1, next, count + 1, allowShare, partial)) return true;
+            }
+        }
+        if (allowShare) for (let gi = 0; gi < groups.length; gi++) {
+            const g = groups[gi], o = outlets[g.outlet];
+            const members = [...g.members, p];
+            if (!eligible(p, o, g.mode) || !shareable(members, g.mode)) continue;
+            const changed = { ...g, members };
+            if (draw(changed) > g.mode.current) continue;
+            const next = groups.map((v, i) => i === gi ? changed : v);
+            if (withinBudget(next) && visit(at + 1, next, count + 1, allowShare, partial)) return true;
+        }
+        return partial ? visit(at + 1, groups, count, allowShare, partial) : false;
+    };
+    if (!visit(0, [], 0, false, false) && !searchLimited) {
+        if (!visit(0, [], 0, true, false) && !searchLimited) visit(0, [], 0, true, true);
+    }
+    const allocated = new Set<number>();
+    best.forEach(g => {
+        g.members.forEach(p => allocated.add(p.index));
+        const members = [...g.members].sort((a, b) => Number(b.tuner) - Number(a.tuner) || a.index - b.index);
+        outlets[g.outlet].assignment = { output: outlets[g.outlet].output, voltage: g.mode.voltage, capacity: g.mode.current, draw: draw(g), pedals: members.map(p => p.row), via: members.length === 1 ? "individual" : members.some(p => p.tuner) ? "tuner" : "daisy", alternatives: outlets[g.outlet].modes.map(m => m.voltage) };
+    });
+    return { outlets, passive, unsupported, unpowered: ps.filter(p => !allocated.has(p.index)).map(p => p.row), count: ps.length, powered: allocated.size, complete: allocated.size === ps.length && ps.length > 0, searchLimited };
 }

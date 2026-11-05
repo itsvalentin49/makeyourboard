@@ -532,5 +532,24 @@
     "itemType": "Type d’élément",
     "boardFinish": "Finition",
     "imageLoaded": "Image chargée"
+  },
+  "powerSetupPlan": {
+    "title": "Alimentation",
+    "empty": "Ajoutez des pédales au canvas.",
+    "addSupply": "Ajoutez une alimentation au canvas.",
+    "supply": "Alimentation",
+    "free": "sorties libres",
+    "output": "Sortie",
+    "unused": "Libre",
+    "setVoltage": "Régler sur",
+    "tuner": "Utilisez la sortie DC OUT de la Boss TU-3 pour alimenter la {pedal}.",
+    "daisy": "Utilisez un câble daisy chain pour alimenter ces pédales.",
+    "load": "Courant utilisé",
+    "remaining": "Pédales à alimenter",
+    "noPlan": "Une alimentation supplémentaire ou plus adaptée est nécessaire.",
+    "unsupported": "Alimentations non prises en charge :",
+    "limited": "Calcul interrompu : ce plan peut être amélioré.",
+    "success": "Vos pédales sont parfaitement alimentées. Let’s Rock !",
+    "failure": "Utilisez une alimentation plus puissante ou avec plus de sorties, ou ajoutez-en une deuxième."
   }
 }
