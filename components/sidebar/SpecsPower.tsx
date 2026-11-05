@@ -55,7 +55,7 @@ function getLocalizedOverview(
   language: Language
 ) {
   const overviewByLanguage: Record<Language, string> = {
-    en: "overview",
+    en: "overview_en",
     fr: "overview_fr",
     es: "overview_es",
     de: "overview_de",

@@ -1562,8 +1562,9 @@ export default function BoardCanvas({
 }
 .myb-tool-rail-button { gap: 12px; padding: 0 9px; text-align: left; }
 .myb-tool-rail-button svg, .myb-tool-rail-toggle svg { flex-shrink: 0; }
-.myb-tool-rail-toggle { justify-content: center; height: 32px; margin-bottom: 5px; }
-.myb-tool-rail[data-expanded="true"] .myb-tool-rail-toggle { justify-content: flex-end; padding-right: 11px; }
+.myb-tool-rail-header { display: flex; align-items: center; justify-content: space-between; height: 32px; margin-bottom: 5px; }
+.myb-tool-rail-title { padding-left: 10px; font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--zinc-400); }
+.myb-tool-rail-toggle { justify-content: center; width: 44px; height: 32px; margin: 0; margin-left: auto; padding: 0; }
 .myb-tool-rail-button:hover, .myb-tool-rail-toggle:hover { background: var(--zinc-900); }
 .myb-tool-rail-button[data-active="true"] { background: var(--zinc-700); border-color: var(--zinc-500); }
 .myb-tool-rail-button:focus-visible, .myb-tool-rail-toggle:focus-visible { outline: 2px solid var(--zinc-500); outline-offset: -2px; }
@@ -1572,12 +1573,17 @@ export default function BoardCanvas({
 html.light .myb-tool-rail { box-shadow: 0 6px 22px rgb(0 0 0 / 8%); }
 html.light .myb-tool-rail-button[data-active="true"] { background: var(--zinc-700); border-color: var(--zinc-500); }
 `}</style>
-          <button type="button" className="myb-tool-rail-toggle"
-            aria-label={railExpanded ? railLabels[language].collapse : railLabels[language].expand}
-            aria-expanded={railExpanded} aria-controls="myb-tool-rail-actions"
-            onClick={toggleRail}>
-            {railExpanded ? <ChevronsRight size={20} /> : <ChevronsLeft size={20} />}
-          </button>
+          <div className="myb-tool-rail-header">
+            {railExpanded && (
+              <span className="myb-tool-rail-title">{t("canvasControls.tools")}</span>
+            )}
+            <button type="button" className="myb-tool-rail-toggle"
+              aria-label={railExpanded ? railLabels[language].collapse : railLabels[language].expand}
+              aria-expanded={railExpanded} aria-controls="myb-tool-rail-actions"
+              onClick={toggleRail}>
+              {railExpanded ? <ChevronsRight size={20} /> : <ChevronsLeft size={20} />}
+            </button>
+          </div>
           <div id="myb-tool-rail-actions" className="myb-tool-rail-actions">
             {([
               { id: "boards", label: t("canvasControls.boards"), Icon: PanelsTopLeft, open: showBoardsMenu },
