@@ -428,8 +428,8 @@ export default function Sidebar({ pedalsLibrary, boardsLibrary, newPedals, newPe
       </>
     </div>) : selectedPedal && (selectedPedal.type === "power" || selectedPedal.capacity) ? (<SpecsPower selectedPower={selectedPedal} units={units} language={language} t={t} isUSA={isUSA} isEurope={isEurope} buildThomannUrl={buildThomannUrl} selectedInstanceId={selectedInstanceId} rotatePedal={rotatePedal} movePedalFront={movePedalFront} movePedalBack={movePedalBack} deletePedal={deletePedal} />) : selectedPedal ? (<SpecsPedal selectedPedal={selectedPedal} selectedInstanceId={selectedInstanceId} units={units} language={language} t={t} isCustomPedal={isCustomPedal} isImportedPedal={isImportedPedal} isUSA={isUSA} isEurope={isEurope} buildThomannUrl={buildThomannUrl} />) : selectedBoardDetails ? (<SpecsBoards selectedBoardDetails={selectedBoardDetails} units={units} language={language} t={t} isCustomBoard={isCustomBoard} buildThomannUrl={buildThomannUrl} getStoresForCountry={getStoresForCountry} hasBoardCommercialLinks={hasBoardCommercialLinks} selectedBoardInstanceId={selectedBoardInstanceId} rotateBoard={rotateBoard} moveBoardFront={moveBoardFront} moveBoardBack={moveBoardBack} deleteBoard={deleteBoard} isUSA={isUSA} isEurope={isEurope} />) : (
       // LIBRARY (default view)
-      <div className="px-1 mt-0 flex flex-col gap-[28px] flex-1 min-h-0 overflow-visible">
-        <div className="shrink-0">
+      <div className="px-1 mt-0 flex flex-col flex-1 min-h-0 overflow-visible" style={{ gap: 20 }}>
+        <div className="shrink-0" style={{ paddingTop: 8 }}>
           <div
             className="w-full overflow-visible"
             style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0, 1fr))", gap: 8, alignItems: "start" }}

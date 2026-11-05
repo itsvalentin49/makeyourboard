@@ -6,7 +6,7 @@ type AnyRow = Record<string, any>;
 
 const PEDAL_FORMATS = [
     { width: 38, depth: 92, name: "Xotic EP Booster", image: "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals-thumbs/xotic-ep.webp", jackLocations: ["left", "right"] },
-    { width: 60, depth: 112, name: "MXR Phase 90", image: "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals-thumbs/mxr-m101-v3.webp?v=1791401169793", jackLocations: ["left", "right"] },
+    { width: 60, depth: 112, name: "MXR Phase 90", image: "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals-thumbs/mxr-m169-v3.webp?v=1791401146937", jackLocations: ["left", "right"] },
     { width: 66, depth: 122, name: "JHS Morning Glory V4", image: "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals-thumbs/jhs-morning-glory-mk4-v2.webp?v=1790875734076", jackLocations: ["left", "right"] },
     { width: 94, depth: 119, name: "EHX Little Big Muff", image: "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals-thumbs/ehx-little-big-muff-pi-v3.webp", jackLocations: ["left", "right"] },
     { width: 102, depth: 114, name: "Strymon El Capistan V2", image: "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals-thumbs/strymon-elcap-v2-v2.webp", jackLocations: ["top"] },
@@ -607,7 +607,7 @@ function CustomBuilder({ customType, customName, setCustomName, customWidth, set
                                         key={`${width}x${depth}`}
                                         type="button"
                                         aria-pressed={selected}
-                                        aria-label={`${name} — ${width} × ${depth} mm`}
+                                        aria-label={name}
                                         title={name}
                                         onClick={() => {
                                             const formatValue = (value: number) => units === "metric"
@@ -700,14 +700,20 @@ function CustomBuilder({ customType, customName, setCustomName, customWidth, set
                 <div className="flex min-w-0 flex-col gap-1 text-[10px] font-medium">
                     <span className="myb-field-heading">{t("customPanel.jackLocations")}</span>
                     <div role="group" aria-label={t("customPanel.jackLocations")} className="myb-jack-options">
-                        {LOCATION_OPTIONS.map(option => <button key={option.value} type="button"
-                            aria-pressed={jackLocations.includes(option.value)}
-                            className="myb-jack-option"
-                            onClick={() => setJackLocations(current => current.includes(option.value)
-                                ? current.filter(location => location !== option.value)
-                                : [...current, option.value])}>
-                            {option.label}
-                        </button>)}
+                        {LOCATION_OPTIONS.map(option => <label key={option.value} className="myb-jack-option">
+                            <input type="checkbox" className="myb-jack-input"
+                                checked={jackLocations.includes(option.value)}
+                                onChange={event => {
+                                    const checked = event.target.checked;
+                                    setJackLocations(current => checked
+                                        ? current.includes(option.value) ? current : [...current, option.value]
+                                        : current.filter(location => location !== option.value));
+                                }} />
+                            <span className="myb-jack-checkbox" aria-hidden="true">
+                                {jackLocations.includes(option.value) && <Check size={10} strokeWidth={3} />}
+                            </span>
+                            <span>{option.label}</span>
+                        </label>)}
                     </div>
                 </div>
                 {/* VOLTAGE + AMPÉRAGE */}
@@ -1074,7 +1080,7 @@ export default function CustomPanel(props: CustomPanelProps) {
     };
     return (<section className="myb-custom-panel mt-4 flex flex-1 min-h-0 flex-col">
         <style>{`
-        .myb-custom-panel .myb-custom-title { margin-bottom: 6px !important; }
+        .myb-custom-panel .myb-custom-title { margin: 0 0 8px !important; }
         .myb-custom-panel .myb-name-field,
         .myb-custom-panel .myb-add-button {
           height: 34px !important; min-height: 34px !important; max-height: 34px !important;
@@ -1139,6 +1145,20 @@ export default function CustomPanel(props: CustomPanelProps) {
         .myb-custom-panel .myb-preview-section {
           display: flex; flex-direction: column; gap: 4px !important; margin-top: 0 !important;
         }
+        .myb-custom-panel .myb-custom-tabs {
+          height: 30px !important; min-height: 30px !important; max-height: 30px !important;
+          box-sizing: border-box; padding: 2px !important; background: #ffffff !important;
+        }
+        .myb-custom-panel .myb-custom-tabs .myb-type-choice {
+          height: 26px !important; min-height: 0 !important; max-height: 26px !important;
+          padding-top: 0 !important; padding-bottom: 0 !important; color: #111111;
+        }
+        .myb-custom-panel .myb-custom-tabs .myb-type-choice[aria-pressed="true"],
+        .light .myb-custom-panel .myb-custom-tabs .myb-type-choice[aria-pressed="true"] {
+          color: #111111 !important;
+          background: #e5e7eb !important;
+          border-color: transparent !important;
+        }
         .myb-custom-panel .myb-type-choice,
         .myb-custom-panel .myb-format-choice { border: 1px solid transparent !important; box-shadow: none !important; }
         .myb-custom-panel .myb-type-choice[aria-pressed="true"] { border-color: #111111 !important; }
@@ -1176,6 +1196,11 @@ export default function CustomPanel(props: CustomPanelProps) {
         .myb-custom-panel .myb-field-label,
         .myb-custom-panel .myb-image-hint { color: #a1a1aa !important; }
         .myb-custom-panel .myb-field-unit { flex-shrink: 0; color: #a1a1aa; }
+        .light .myb-custom-panel .myb-field-label,
+        .light .myb-custom-panel .myb-field-unit,
+        .light .myb-custom-panel .myb-image-hint {
+          color: #626975 !important;
+        }
         .myb-custom-panel .myb-custom-color {
           position: relative; overflow: hidden;
           background: conic-gradient(#ff5252, #ffff00, #00e676, #00b0ff, #7c4dff, #ff40ff, #ff5252);
@@ -1190,9 +1215,21 @@ export default function CustomPanel(props: CustomPanelProps) {
           background: var(--zinc-950, #09090b); border: 1px solid transparent !important;
           border-radius: 6px; cursor: pointer; box-shadow: none !important;
         }
-        .myb-custom-panel .myb-jack-option[aria-pressed="true"] {
-          border-color: transparent !important;
-          background: rgba(140,140,150,.18) !important;
+        .myb-custom-panel .myb-jack-option { display: flex; align-items: center; justify-content: center; gap: 4px; }
+        .myb-custom-panel .myb-jack-input {
+          position: absolute; width: 1px; height: 1px; margin: 0; padding: 0; opacity: 0;
+        }
+        .myb-custom-panel .myb-jack-checkbox {
+          display: flex; align-items: center; justify-content: center;
+          width: 14px; height: 14px; flex: 0 0 14px; box-sizing: border-box;
+          border: 1px solid #71717a; border-radius: 3px; color: #ffffff;
+          background: transparent;
+        }
+        .myb-custom-panel .myb-jack-input:checked + .myb-jack-checkbox {
+          border-color: #2563eb; background: #2563eb;
+        }
+        .myb-custom-panel .myb-jack-input:focus-visible + .myb-jack-checkbox {
+          outline: 2px solid #60a5fa; outline-offset: 2px;
         }
 
 
@@ -1220,7 +1257,7 @@ export default function CustomPanel(props: CustomPanelProps) {
         </h2>
         <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar pb-6">
             <div role="group" aria-label={t("customPanel.itemType")}
-                className="rounded-lg bg-zinc-950 p-0.5"
+                className="myb-custom-tabs rounded-md"
                 style={{ display: "grid", gridTemplateColumns: "repeat(3,minmax(0,1fr))", gap: 4 }}>
                 {(["pedal", "board", "import"] as const).map(tab => {
                     const selected = tab === "import" ? mode === "import" : mode === "custom" && props.customType === tab;

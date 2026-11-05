@@ -418,7 +418,7 @@
   "locations": {
     "top": "Top",
     "right": "Right",
-    "bottom": "Bottom",
+    "bottom": "Down",
     "left": "Left"
   },
   "boardTextures": {
