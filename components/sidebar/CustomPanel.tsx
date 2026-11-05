@@ -312,6 +312,9 @@ function CustomBuilder({ customType, customName, setCustomName, customWidth, set
     const [boardTexture, setBoardTexture] = useState<BoardTexture>("wood");
     const [boardTextureOpen, setBoardTextureOpen] = useState(false);
     const [jackLocations, setJackLocations] = useState<LocationValue[]>(DEFAULT_JACK_LOCATIONS);
+    const [jackMenuOpen, setJackMenuOpen] = useState(false);
+    const jackMenuRef = useRef<HTMLDivElement>(null);
+    const jackMenuId = React.useId();
     const customVoltageRef = useRef<HTMLDivElement>(null);
     const boardTextureRef = useRef<HTMLDivElement>(null);
     const formatsRef = useRef<HTMLDivElement>(null);
@@ -381,6 +384,7 @@ function CustomBuilder({ customType, customName, setCustomName, customWidth, set
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             const target = event.target as Node;
+            if (jackMenuRef.current && !jackMenuRef.current.contains(target)) setJackMenuOpen(false);
             if (customVoltageRef.current &&
                 !customVoltageRef.current.contains(target)) {
                 setCustomVoltageOpen(false);
@@ -402,6 +406,7 @@ function CustomBuilder({ customType, customName, setCustomName, customWidth, set
         setCustomDepth("");
     };
     const closeAllMenus = () => {
+        setJackMenuOpen(false);
 
         setCustomVoltageOpen(false);
         setBoardTextureOpen(false);
@@ -583,28 +588,8 @@ function CustomBuilder({ customType, customName, setCustomName, customWidth, set
                             .replaceAll("{unit}", unitLabel)}
                     </p>
                 </DimensionsGroup>
-                {/* JACKS + ALIMENTATION */}
-                <div className="flex min-w-0 flex-col gap-1 text-[10px] font-medium">
-                    <span className="myb-field-heading">{t("customPanel.jackLocations")}</span>
-                    <div role="group" aria-label={t("customPanel.jackLocations")} className="myb-jack-options">
-                        {LOCATION_OPTIONS.map(option => <label key={option.value} className="myb-jack-option">
-                            <input type="checkbox" className="myb-jack-input"
-                                checked={jackLocations.includes(option.value)}
-                                onChange={event => {
-                                    const checked = event.target.checked;
-                                    setJackLocations(current => checked
-                                        ? current.includes(option.value) ? current : [...current, option.value]
-                                        : current.filter(location => location !== option.value));
-                                }} />
-                            <span className="myb-jack-checkbox" aria-hidden="true">
-                                {jackLocations.includes(option.value) && <Check size={10} strokeWidth={3} />}
-                            </span>
-                            <span>{option.label}</span>
-                        </label>)}
-                    </div>
-                </div>
-                {/* NOM + TENSION + CONSOMMATION */}
-                <div className="myb-name-power-row" style={{ display: "grid", gridTemplateColumns: "repeat(3,minmax(0,1fr))", gap: 8 }}>
+                {/* NOM + POSITION DES JACKS */}
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(2,minmax(0,1fr))", gap: 8, alignItems: "start" }}>
                     <label className="flex min-w-0 flex-col gap-1 text-[10px] font-medium"><span className="myb-field-heading">{t("customPanel.namePlaceholder")}</span><input type="text" aria-label={t("customPanel.namePlaceholder")} value={customName} onChange={(event) => setCustomName(event.target.value)} className="myb-name-field 
                   w-full
                   h-[34px]
@@ -617,6 +602,45 @@ function CustomBuilder({ customType, customName, setCustomName, customWidth, set
                   outline-none
                   focus:border-zinc-600
                 "/></label>
+                    <div className="flex min-w-0 flex-col gap-1 text-[10px] font-medium">
+                        <span className="myb-field-heading">{t("customPanel.jackLocations")}</span>
+                        <div ref={jackMenuRef} className="relative h-[34px]" onKeyDown={event => {
+                            if (event.key === "Escape") {
+                                event.preventDefault();
+                                setJackMenuOpen(false);
+                                jackMenuRef.current?.querySelector<HTMLButtonElement>("button")?.focus();
+                            }
+                        }}>
+                            <button type="button" aria-label={t("customPanel.jackLocations")}
+                                aria-expanded={jackMenuOpen} aria-controls={jackMenuId}
+                                onClick={() => { const next = !jackMenuOpen; closeAllMenus(); setJackMenuOpen(next); }}
+                                className="flex h-[34px] w-full min-w-0 items-center justify-between rounded-md border border-zinc-800 bg-zinc-950 px-3 text-left text-[10px]">
+                                <span className="truncate">{LOCATION_OPTIONS.filter(option => jackLocations.includes(option.value)).map(option => option.label).join(", ") || "—"}</span>
+                                <ChevronDown size={14} className="ml-2 shrink-0 text-zinc-500" style={{ transform: jackMenuOpen ? "rotate(180deg)" : undefined }} />
+                            </button>
+                            {jackMenuOpen && <div id={jackMenuId} role="group" aria-label={t("customPanel.jackLocations")}
+                                className="myb-jack-menu absolute left-0 top-full z-50 mt-1 w-full overflow-hidden rounded-lg border border-zinc-800 bg-zinc-950 shadow-2xl">
+                                {LOCATION_OPTIONS.map(option => <label key={option.value} className="myb-jack-option">
+                                    <input type="checkbox" className="myb-jack-input"
+                                        checked={jackLocations.includes(option.value)}
+                                        onChange={event => {
+                                            const checked = event.target.checked;
+                                            setJackLocations(current => checked
+                                                ? current.includes(option.value) ? current : [...current, option.value]
+                                                : current.filter(location => location !== option.value));
+                                        }} />
+                                    <span className="myb-jack-checkbox" aria-hidden="true">
+                                        {jackLocations.includes(option.value) && <Check size={10} strokeWidth={3} />}
+                                    </span>
+                                    <span>{option.label}</span>
+                                </label>)}
+                            </div>}
+                        </div>
+                    </div>
+                </div>
+                {/* TENSION + CONSOMMATION */}
+                <div className="min-w-0" style={{ display: "grid", gridTemplateColumns: "repeat(2,minmax(0,1fr))", gap: 8 }}>
+
                     <div className="flex min-w-0 flex-col gap-1 text-[10px] font-medium"><span className="myb-field-heading">{withoutUnit(t("customPanel.voltage"))}</span><div ref={customVoltageRef} className="relative h-[34px]">
                         <button type="button" onClick={() => {
                             const nextOpen = !customVoltageOpen;
@@ -990,12 +1014,12 @@ export default function CustomPanel(props: CustomPanelProps) {
           scroll-padding-bottom: 20px; overscroll-behavior-y: contain;
         }
         .myb-custom-panel .myb-add-button { flex-shrink: 0 !important; }
-        .myb-custom-panel .myb-name-power-row { min-width: 0; align-items: start; }
-        .myb-custom-panel .myb-name-power-row > * { min-width: 0; }
-        .myb-custom-panel .myb-name-power-row .myb-field-heading { white-space: nowrap; font-size: 9px !important; }
-        .myb-custom-panel .myb-name-power-row input,
-        .myb-custom-panel .myb-name-power-row button { padding-left: 6px; padding-right: 6px; }
-        .myb-custom-panel .myb-name-power-row .myb-inline-field { padding-left: 6px; padding-right: 6px; gap: 3px; }
+        .myb-custom-panel .myb-jack-menu .myb-jack-option {
+          justify-content: flex-start; gap: 8px; height: 30px; padding: 0 10px; border-radius: 0;
+        }
+        .myb-custom-panel .myb-jack-menu .myb-jack-option:hover {
+          background: color-mix(in srgb, currentColor 10%, transparent);
+        }
         .myb-custom-panel .myb-custom-title { margin: 0 0 8px !important; }
         .myb-custom-panel .myb-name-field,
         .myb-custom-panel .myb-add-button {
