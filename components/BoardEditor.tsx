@@ -1027,7 +1027,7 @@ export default function BoardEditor({
       slug: item?.slug || (isUploadedImage ? "custom-upload" : "custom"),
       type: item?.type || (itemType === "pedal" ? "Custom" : "board"),
       brand: item?.brand || "Custom",
-      name: item?.name?.trim() || customName.trim() || "Custom",
+      name: item?.name?.trim() || customName.trim() || (itemType === "pedal" ? "" : "Custom"),
 
       width: widthMm,
       depth: depthMm,
