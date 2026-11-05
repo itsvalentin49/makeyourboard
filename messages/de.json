@@ -193,11 +193,11 @@
     },
     "resources": "Ressourcen",
     "project": "Das Projekt",
-    "instagramDescription": "Bleib über Neuigkeiten auf dem Laufenden.",
+    "instagramDescription": "Bleib über die neuesten Updates informiert.",
     "supportProject": "MakeYourBoard unterstützen",
     "documentationDescription": "Erfahre, wie du MakeYourBoard verwendest.",
     "contactDescription": "Eine Frage, eine Idee oder einen Fehler zu melden?",
-    "supportDescription": "Danke für deine Hilfe!"
+    "supportDescription": "Danke für deine Unterstützung!"
   },
   "backgrounds": {
     "neutral": "Neutral",
@@ -532,5 +532,24 @@
     "itemType": "Elementtyp",
     "boardFinish": "Oberfläche",
     "imageLoaded": "Bild geladen"
+  },
+  "powerSetupPlan": {
+    "title": "Stromversorgung",
+    "empty": "Füge Pedale zur Arbeitsfläche hinzu.",
+    "addSupply": "Füge ein Netzteil hinzu.",
+    "supply": "Netzteil",
+    "free": "freie Ausgänge",
+    "output": "Ausgang",
+    "unused": "Frei",
+    "setVoltage": "Einstellen auf",
+    "tuner": "Versorge {pedal} über den DC OUT des Boss TU-3.",
+    "daisy": "Versorge diese Pedale mit einem Daisy-Chain-Kabel.",
+    "load": "Stromverbrauch",
+    "remaining": "Noch zu versorgende Pedale",
+    "noPlan": "Ein zusätzliches oder geeigneteres Netzteil ist erforderlich.",
+    "unsupported": "Nicht unterstützte Netzteile:",
+    "limited": "Suchlimit erreicht: Der Plan kann verbessert werden.",
+    "success": "Deine Pedale sind bestens versorgt. Let’s Rock!",
+    "failure": "Nutze ein leistungsstärkeres Netzteil, eines mit mehr Ausgängen oder ein zweites Netzteil."
   }
 }

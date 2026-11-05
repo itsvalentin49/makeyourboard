@@ -197,7 +197,7 @@
     "supportProject": "Apoyar MakeYourBoard",
     "documentationDescription": "Descubre cómo usar MakeYourBoard.",
     "contactDescription": "¿Tienes una pregunta, una idea o un error que comunicar?",
-    "supportDescription": "¡Gracias por echar una mano!"
+    "supportDescription": "¡Gracias por echarnos una mano!"
   },
   "backgrounds": {
     "neutral": "Neutro",
@@ -532,5 +532,24 @@
     "itemType": "Tipo de elemento",
     "boardFinish": "Acabado",
     "imageLoaded": "Imagen cargada"
+  },
+  "powerSetupPlan": {
+    "title": "Alimentación",
+    "empty": "Añade pedales al lienzo.",
+    "addSupply": "Añade una fuente al lienzo.",
+    "supply": "Fuente",
+    "free": "salidas libres",
+    "output": "Salida",
+    "unused": "Libre",
+    "setVoltage": "Ajustar a",
+    "tuner": "Usa la salida DC OUT del Boss TU-3 para alimentar {pedal}.",
+    "daisy": "Usa un cable daisy chain para alimentar estos pedales.",
+    "load": "Consumo",
+    "remaining": "Pedales por alimentar",
+    "noPlan": "Necesitas otra fuente de alimentación o una más adecuada.",
+    "unsupported": "Fuentes no admitidas:",
+    "limited": "Límite de búsqueda alcanzado: el plan puede mejorarse.",
+    "success": "Tus pedales están perfectamente alimentados. ¡Let’s Rock!",
+    "failure": "Usa una fuente más potente o con más salidas, o añade una segunda."
   }
 }

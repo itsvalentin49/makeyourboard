@@ -197,7 +197,7 @@
     "supportProject": "支持 MakeYourBoard",
     "documentationDescription": "了解如何使用 MakeYourBoard。",
     "contactDescription": "有问题、想法或需要报告的错误？",
-    "supportDescription": "感谢你的帮助！"
+    "supportDescription": "感谢你的支持！"
   },
   "backgrounds": {
     "neutral": "中性",
@@ -532,5 +532,24 @@
     "itemType": "项目类型",
     "boardFinish": "表面处理",
     "imageLoaded": "图片已加载"
+  },
+  "powerSetupPlan": {
+    "title": "电源",
+    "empty": "请在画布上添加效果器。",
+    "addSupply": "请在画布上添加电源。",
+    "supply": "电源",
+    "free": "个空闲输出",
+    "output": "输出",
+    "unused": "空闲",
+    "setVoltage": "设置为",
+    "tuner": "使用 Boss TU-3 的 DC OUT 为 {pedal} 供电。",
+    "daisy": "使用菊花链线为这些效果器供电。",
+    "load": "已用电流",
+    "remaining": "尚待供电的效果器",
+    "noPlan": "需要额外或更合适的电源。",
+    "unsupported": "暂不支持的电源：",
+    "limited": "已达到搜索上限，此方案仍可优化。",
+    "success": "所有效果器均已获得充足供电。Let’s Rock！",
+    "failure": "请使用功率更大或输出更多的电源，或增加第二台电源。"
   }
 }

@@ -193,7 +193,7 @@
     },
     "resources": "Resources",
     "project": "The project",
-    "instagramDescription": "Stay up to date with the latest news.",
+    "instagramDescription": "Follow the latest updates.",
     "supportProject": "Support MakeYourBoard",
     "documentationDescription": "Learn how to use MakeYourBoard.",
     "contactDescription": "Have a question, an idea or a bug to report?",
@@ -532,5 +532,24 @@
     "itemType": "Item type",
     "boardFinish": "Finish",
     "imageLoaded": "Image loaded"
+  },
+  "powerSetupPlan": {
+    "title": "Power supply",
+    "empty": "Add pedals to the canvas.",
+    "addSupply": "Add a power supply to the canvas.",
+    "supply": "Supply",
+    "free": "free outputs",
+    "output": "Output",
+    "unused": "Free",
+    "setVoltage": "Set to",
+    "tuner": "Use the Boss TU-3 DC OUT to power {pedal}.",
+    "daisy": "Use a daisy chain cable to power these pedals.",
+    "load": "Current used",
+    "remaining": "Pedals to power",
+    "noPlan": "An additional or more suitable power supply is needed.",
+    "unsupported": "Unsupported supplies:",
+    "limited": "Search limit reached: this plan may be improved.",
+    "success": "Your pedals are fully powered. Let’s Rock!",
+    "failure": "Use a more powerful supply or one with more outputs, or add a second supply."
   }
 }
