@@ -451,7 +451,7 @@ export default function SearchBoards({
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
 
         {!isFinder && !isSearching && (
-          <div className="mb-1 mt-4 shrink-0 text-[10px] uppercase font-bold">
+          <div className="mb-1 mt-4 shrink-0 text-[11px] font-bold">
 
             {t("pedalsMenu.latest")}
 

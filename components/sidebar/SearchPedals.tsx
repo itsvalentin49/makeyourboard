@@ -367,7 +367,7 @@ export default function SearchPedals({
         {/* TEXTE NOUVEAUTÉS */}
 
         {!isSearching && (
-          <div className="mt-4 shrink-0 text-[10px] uppercase font-bold">
+          <div className="mt-4 shrink-0 text-[11px] font-bold">
             {t("pedalsMenu.latest")}
           </div>
         )}

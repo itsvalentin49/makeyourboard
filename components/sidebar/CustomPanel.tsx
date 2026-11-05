@@ -13,7 +13,7 @@ export type { CustomPedalLayout } from "@/utils/customPedalLayout";
 const withoutUnit = (label: string) => label.replace(/\s*\((?:V|mA)\)\s*$/i, "");
 function DimensionsGroup({ title, children }: { title: string; children: React.ReactNode }) {
     return <div className="myb-field-group">
-        <div className="myb-field-heading text-[10px] font-medium">{title}</div>
+        <div className="myb-field-heading text-[11px] font-medium">{title}</div>
         {children}
     </div>;
 }
@@ -131,7 +131,7 @@ function ImportBuilder({ addCustomItem, units, t }: ImportBuilderProps) {
     return (<form onSubmit={submit} className="mt-2 flex flex-col gap-2 pb-4">
         <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr)", gap: 8, alignItems: "start" }}>
             <div className="flex min-w-0 flex-col gap-1">
-                <label htmlFor={`${id}-image`} className="myb-field-heading text-[10px] font-medium">{t("customPanel.chooseImage")}</label>
+                <label htmlFor={`${id}-image`} className="myb-field-heading text-[11px] font-medium">{t("customPanel.chooseImage")}</label>
                 <input ref={fileInputRef} id={`${id}-image`} type="file" disabled={Boolean(uploadImage) || imageLoading} accept="image/png,image/jpeg,image/webp" className="hidden" onChange={event => {
                     void handleLocalImageUpload(event.target.files?.[0] || null);
                     event.target.value = "";
@@ -486,7 +486,7 @@ function CustomBuilder({ customType, customName, setCustomName, customWidth, set
             {/* FORMULAIRE PÉDALE */}
             {customType === "pedal" && (<div className="flex flex-col gap-2 mt-2">
                 <div className="myb-field-group">
-                    <div className="myb-field-heading text-[10px] font-medium">{t("customPanel.format") === "customPanel.format" ? "Format" : t("customPanel.format")}</div>
+                    <div className="myb-field-heading text-[11px] font-medium">{t("customPanel.format") === "customPanel.format" ? "Format" : t("customPanel.format")}</div>
                     <div className="myb-formats-carousel">
                         <button type="button" className="myb-carousel-arrow myb-carousel-previous"
                             aria-label={previousFormats === "customPanel.previousFormats" ? "Previous formats" : previousFormats}
@@ -713,7 +713,7 @@ function CustomBuilder({ customType, customName, setCustomName, customWidth, set
                 </div>
                 {/* APERÇU PÉDALE */}
                 <div className="myb-preview-section flex flex-col gap-2 mt-0">
-                    <div className="myb-field-heading text-[10px] font-medium">
+                    <div className="myb-field-heading text-[11px] font-medium">
                         {t("export.preview")}
                     </div>
                     <div ref={previewAreaRef} className="myb-pedal-preview-box
@@ -776,7 +776,7 @@ hover:bg-blue-500
             {customType === "board" && (<div className="flex flex-col gap-2 mt-2">
                 {/* DIMENSIONS */}
                 <div className="myb-field-group">
-                    <div className="myb-field-heading text-[10px] font-medium">{t("customPanel.boardDimensions") === "customPanel.boardDimensions" ? "Dimensions" : t("customPanel.boardDimensions")}</div>
+                    <div className="myb-field-heading text-[11px] font-medium">{t("customPanel.boardDimensions") === "customPanel.boardDimensions" ? "Dimensions" : t("customPanel.boardDimensions")}</div>
                     <div className="min-w-0" style={{ display: "grid", gridTemplateColumns: "repeat(2,minmax(0,1fr))", gap: 8 }}>
                         <DimensionField label={t("customPanel.width")} unit={units === "metric" ? "mm" : "in"} min={minValue} max={maxValue} step={units === "metric"
                             ? 1
@@ -920,7 +920,7 @@ hover:bg-blue-500
                 </div></div>
                 {/* APERÇU BOARD */}
                 <div className="myb-preview-section flex flex-col gap-2 mt-0">
-                    <div className="myb-field-heading text-[10px] font-medium">
+                    <div className="myb-field-heading text-[11px] font-medium">
                         {t("export.preview")}
                     </div>
                     <div className="
@@ -1068,7 +1068,7 @@ export default function CustomPanel(props: CustomPanelProps) {
           aspect-ratio: auto; box-sizing: border-box; padding: 7px !important;
         }
         .myb-custom-panel .myb-format-stage { height: 46px; width: 100%; display: flex; align-items: flex-end; justify-content: center; padding: 4px 0; box-sizing: border-box; }
-        .myb-custom-panel .myb-format-caption { font-size: 9px; line-height: 1.2; font-weight: 700; }
+        .myb-custom-panel .myb-format-caption { font-size: 11px; line-height: 1.2; font-weight: 700; }
         .myb-custom-panel .myb-format-dimensions { font-size: 9px; line-height: 1.2; white-space: nowrap; }
         .myb-custom-panel .myb-format-choice { gap: 3px !important; }
         .myb-custom-panel .myb-pedal-preview-box {
@@ -1096,7 +1096,7 @@ export default function CustomPanel(props: CustomPanelProps) {
         .myb-custom-panel .myb-field-heading {
           text-transform: none !important;
           font-weight: 700 !important;
-          font-size: 10px !important;
+          font-size: 11px !important;
           letter-spacing: normal !important;
           margin-top: 4px;
           margin-bottom: 0 !important;
@@ -1220,12 +1220,12 @@ export default function CustomPanel(props: CustomPanelProps) {
         <div className="myb-custom-scroll flex-1 min-h-0 overflow-y-auto no-scrollbar">
             <div role="group" aria-label={t("customPanel.itemType")}
                 className="myb-custom-tabs rounded-md"
-                style={{ display: "grid", gridTemplateColumns: "repeat(3,minmax(0,1fr))", gap: 4 }}>
+                style={{ display: "grid", gridTemplateColumns: "repeat(3,minmax(0,1fr))", gap: 4, marginBottom: 20 }}>
                 {(["pedal", "board", "import"] as const).map(tab => {
                     const selected = tab === "import" ? mode === "import" : mode === "custom" && props.customType === tab;
                     const label = t(tab === "import" ? "customPanel.modeImport" : tab === "pedal" ? "customPanel.pedal" : "customPanel.board");
                     return <button key={tab} type="button" aria-pressed={selected}
-                        className={`myb-type-choice h-[34px] rounded-md text-[10px] font-bold ${selected ? "bg-canvas" : "bg-transparent"}`}
+                        className={`myb-type-choice h-[34px] rounded-md text-[11px] font-bold ${selected ? "bg-canvas" : "bg-transparent"}`}
                         onClick={() => {
                             if (tab === "import") {
                                 toggle("import");
