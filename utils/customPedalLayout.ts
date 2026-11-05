@@ -1,7 +1,7 @@
 export type LocationValue = "top" | "bottom" | "left" | "right";
 export type HardwarePoint = { x: number; y: number };
 export type CustomPedalLayout = {
-    version: 1 | 2;
+    version: 1 | 2 | 3;
     formatId: string;
     knobs: readonly HardwarePoint[];
     footswitches: readonly HardwarePoint[];
@@ -15,14 +15,14 @@ export type PedalFormat = {
 const singleFootswitch = [{ x: 0.5, y: 0.8 }];
 const threeKnobs = [{ x: 0.22, y: 0.22 }, { x: 0.5, y: 0.22 }, { x: 0.78, y: 0.22 }];
 const makeLayout = (formatId: string, knobs: HardwarePoint[], footswitches: HardwarePoint[] = singleFootswitch): CustomPedalLayout => ({
-    version: 2, formatId, knobs, footswitches,
+    version: 3, formatId, knobs, footswitches,
     knobSizeMm: ({ mini: 16, compact: 20, standard: 22, large: 24, double: 24, horizontal: 26 } as Record<string, number>)[formatId] ?? 16,
-    footswitchSizeMm: 18,
+    footswitchSizeMm: 16,
 });
 export const PEDAL_FORMATS: readonly PedalFormat[] = [
     { id: "mini", width: 38, depth: 92, labelKey: "mini", jackLocations: ["left", "right"], layout: makeLayout("mini", [{ x: 0.5, y: 0.2 }]) },
-    { id: "compact", width: 60, depth: 112, labelKey: "compact", jackLocations: ["left", "right"], layout: makeLayout("compact", [{ x: 0.27, y: 0.2 }, { x: 0.73, y: 0.2 }, { x: 0.5, y: 0.39 }]) },
-    { id: "standard", width: 66, depth: 122, labelKey: "standard", jackLocations: ["left", "right"], layout: makeLayout("standard", [{ x: 0.27, y: 0.2 }, { x: 0.73, y: 0.2 }, { x: 0.5, y: 0.39 }]) },
+    { id: "compact", width: 60, depth: 112, labelKey: "compact", jackLocations: ["left", "right"], layout: makeLayout("compact", [{ x: 0.27, y: 0.2 }, { x: 0.73, y: 0.2 }]) },
+    { id: "standard", width: 66, depth: 122, labelKey: "standard", jackLocations: ["left", "right"], layout: makeLayout("standard", [{ x: 0.27, y: 0.2 }, { x: 0.73, y: 0.2 }, { x: 0.27, y: 0.4 }, { x: 0.73, y: 0.4 }]) },
     { id: "large", width: 94, depth: 119, labelKey: "large", jackLocations: ["left", "right"], layout: makeLayout("large", threeKnobs) },
     { id: "double", width: 102, depth: 114, labelKey: "double", jackLocations: ["top"], layout: makeLayout("double", threeKnobs, [{ x: 0.27, y: 0.8 }, { x: 0.73, y: 0.8 }]) },
     { id: "horizontal", width: 171, depth: 127, labelKey: "horizontal", jackLocations: ["top"], layout: makeLayout("horizontal", threeKnobs, [{ x: 0.22, y: 0.8 }, { x: 0.78, y: 0.8 }]) },
@@ -52,15 +52,21 @@ export function resolveCustomPedalLayout(value: unknown, width: number, depth: n
         const pointsValid = (points: unknown): points is HardwarePoint[] => Array.isArray(points)
             && points.length <= 24 && points.every(point => point && Number.isFinite(point.x) && Number.isFinite(point.y)
                 && point.x >= 0 && point.x <= 1 && point.y >= 0 && point.y <= 1);
-        if ((row.version === 1 || row.version === 2) && typeof row.formatId === "string" && pointsValid(row.knobs) && pointsValid(row.footswitches)
+        if ((row.version === 1 || row.version === 2 || row.version === 3) && typeof row.formatId === "string" && pointsValid(row.knobs) && pointsValid(row.footswitches)
             && typeof row.knobSizeMm === "number" && Number.isFinite(row.knobSizeMm) && row.knobSizeMm > 0 && row.knobSizeMm <= 100
             && typeof row.footswitchSizeMm === "number" && Number.isFinite(row.footswitchSizeMm) && row.footswitchSizeMm > 0 && row.footswitchSizeMm <= 100) {
             const footswitchSizeMm = row.version === 1 && row.footswitchSizeMm === 12
                 && PEDAL_FORMATS.some(format => format.id === row.formatId) ? 16 : row.footswitchSizeMm;
-            return {
-                version: 2, formatId: row.formatId, knobs: row.knobs.map(point => ({ ...point })),
+            const previousThreeKnobLayout = [{ x: 0.27, y: 0.2 }, { x: 0.73, y: 0.2 }, { x: 0.5, y: 0.39 }];
+            const updatePreset = row.version < 3 && (row.formatId === "standard" || row.formatId === "compact") && row.knobs.length === 3
+                && row.knobs.every((point, index) => Math.abs(point.x - previousThreeKnobLayout[index].x) < 0.000001
+                    && Math.abs(point.y - previousThreeKnobLayout[index].y) < 0.000001);
+            const resolved: CustomPedalLayout = {
+                version: 3, formatId: row.formatId,
+                knobs: (updatePreset ? PEDAL_FORMATS.find(format => format.id === row.formatId)!.layout.knobs : row.knobs).map(point => ({ ...point })),
                 footswitches: row.footswitches.map(point => ({ ...point })), knobSizeMm: row.knobSizeMm, footswitchSizeMm
             };
+            return updatePreset ? getSizedPedalLayout(resolved, width, depth, width, depth) : resolved;
         }
     }
     const format = PEDAL_FORMATS.find(item => Math.abs(item.width - width) < 0.02 && Math.abs(item.depth - depth) < 0.02) || PEDAL_FORMATS[2];
@@ -74,7 +80,14 @@ export function getPedalHardwareGeometry(layout: CustomPedalLayout, widthMm: num
         y: point.y * renderHeight - diameterMm * scale / 2,
         width: diameterMm * scale, height: diameterMm * scale,
     }));
-    return { knobs: place(layout.knobs, layout.knobSizeMm), footswitches: place(layout.footswitches, layout.footswitchSizeMm) };
+    const footswitches = place(layout.footswitches, layout.footswitchSizeMm);
+    const ledSize = 5 * scale;
+    const leds = footswitches.map(footswitch => ({
+        x: footswitch.x + footswitch.width / 2 - ledSize / 2,
+        y: footswitch.y - 4 * scale - ledSize,
+        width: ledSize, height: ledSize,
+    }));
+    return { knobs: place(layout.knobs, layout.knobSizeMm), footswitches, leds };
 }
 export function getPedalJackGeometry(locations: readonly LocationValue[], widthMm: number, depthMm: number, renderWidth: number, renderHeight: number) {
     const scale = Math.min(renderWidth / widthMm, renderHeight / depthMm);

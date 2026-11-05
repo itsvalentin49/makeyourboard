@@ -262,6 +262,7 @@ export function CustomPedalVisual({ widthMm, depthMm, scale, customColor, custom
             {customColor && <div style={{ position: "absolute", inset: 0, backgroundColor: customColor, opacity: 0.7, pointerEvents: "none" }} />}
             {hardware(geometry.knobs, "/images/knob.webp")}
             {customName.trim() && <div style={{ position: "absolute", left: "6%", top: "50%", transform: "translateY(-50%)", width: "88%", textAlign: "center", color: "#000000", fontWeight: 900, fontSize: 8 * scale, lineHeight: 1, textTransform: "uppercase", overflowWrap: "anywhere" }}>{customName.trim()}</div>}
+            {hardware(geometry.leds, "/images/led.webp")}
             {hardware(geometry.footswitches, "/images/footswitch.webp")}
         </div>
     </div>;
@@ -333,7 +334,7 @@ function CustomBuilder({ customType, customName, setCustomName, customWidth, set
         return translated && translated !== key ? translated : format.labelKey.charAt(0).toUpperCase() + format.labelKey.slice(1);
     };
     useEffect(() => {
-        const sources = ["custom-pedal", "knob", "footswitch", "jack-top", "jack-down", "jack-left", "jack-right"];
+        const sources = ["custom-pedal", "knob", "footswitch", "led", "jack-top", "jack-down", "jack-left", "jack-right"];
         const images = sources.map(name => {
             const image = new Image();
             image.src = `/images/${name}.webp`;

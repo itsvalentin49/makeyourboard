@@ -389,6 +389,7 @@ export default function BoardCanvas({
   };
   const [knob] = useImage("/images/knob.webp");
   const [footswitch] = useImage("/images/footswitch.webp");
+  const [led] = useImage("/images/led.webp");
 
   const [jackLeft] = useImage("/images/jack-left.webp");
   const [jackRight] = useImage("/images/jack-right.webp");
@@ -3591,6 +3592,10 @@ ${isMobile
                             y={part.height * 0.12} width={Math.max(part.width * 0.03, 0.7 * scale)} height={part.height * 0.38}
                             fill="#ffffff" cornerRadius={scale} listening={false} />
                         </Group>
+                      ))}
+                      {led && geometry.leds.map((part, index) => (
+                        <KonvaImage key={`led-${index}`} image={led}
+                          width={part.width} height={part.height} x={part.x - size.w / 2} y={part.y - size.h / 2} listening={false} />
                       ))}
                       {footswitch && geometry.footswitches.map((part, index) => (
                         <KonvaImage key={`footswitch-${index}`} image={footswitch}
