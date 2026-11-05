@@ -98,5 +98,6 @@ export const ENCLOSURE_SIZING_BRANDS = new Set([
     "Daddario",
     "Daredevil Pedals",
     "Darkglass",
-    "Dawner Prince"
+    "Dawner Prince",
+    "Native Audio"
 ]);
