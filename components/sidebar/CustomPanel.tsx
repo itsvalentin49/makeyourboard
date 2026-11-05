@@ -529,20 +529,9 @@ function CustomBuilder({ customType, customName, setCustomName, customWidth, set
                             aria-controls={formatsId} onClick={() => scrollFormats(1)}><ChevronRight size={16} /></button>
                     </div>
                 </div>
-                {/* NOM + COULEUR */}
+                {/* COULEUR */}
                 <div className="flex min-w-0 flex-col gap-2">
-                    <label className="flex min-w-0 flex-col gap-1 text-[10px] font-medium"><span className="myb-field-heading">{t("customPanel.namePlaceholder")}</span><input type="text" aria-label={t("customPanel.namePlaceholder")} value={customName} onChange={(event) => setCustomName(event.target.value)} className="myb-name-field 
-                  w-full
-                  h-[34px]
-                  bg-zinc-950
-                  border
-                  border-zinc-800
-                  rounded-md
-                  px-3
-                  text-[10px]
-                  outline-none
-                  focus:border-zinc-600
-                "/></label>
+
                     <div className="flex w-full min-w-0 flex-col gap-1 text-[10px] font-medium">
                         <span className="myb-field-heading">{t("customPanel.color")}</span>
                         <div role="group" aria-label={t("customPanel.color")} className="myb-color-row">
@@ -614,8 +603,20 @@ function CustomBuilder({ customType, customName, setCustomName, customWidth, set
                         </label>)}
                     </div>
                 </div>
-                {/* VOLTAGE + AMPÉRAGE */}
-                <div className="min-w-0" style={{ display: "grid", gridTemplateColumns: "repeat(2,minmax(0,1fr))", gap: 8 }}>
+                {/* NOM + TENSION + CONSOMMATION */}
+                <div className="myb-name-power-row" style={{ display: "grid", gridTemplateColumns: "repeat(3,minmax(0,1fr))", gap: 8 }}>
+                    <label className="flex min-w-0 flex-col gap-1 text-[10px] font-medium"><span className="myb-field-heading">{t("customPanel.namePlaceholder")}</span><input type="text" aria-label={t("customPanel.namePlaceholder")} value={customName} onChange={(event) => setCustomName(event.target.value)} className="myb-name-field 
+                  w-full
+                  h-[34px]
+                  bg-zinc-950
+                  border
+                  border-zinc-800
+                  rounded-md
+                  px-3
+                  text-[10px]
+                  outline-none
+                  focus:border-zinc-600
+                "/></label>
                     <div className="flex min-w-0 flex-col gap-1 text-[10px] font-medium"><span className="myb-field-heading">{withoutUnit(t("customPanel.voltage"))}</span><div ref={customVoltageRef} className="relative h-[34px]">
                         <button type="button" onClick={() => {
                             const nextOpen = !customVoltageOpen;
@@ -989,6 +990,12 @@ export default function CustomPanel(props: CustomPanelProps) {
           scroll-padding-bottom: 20px; overscroll-behavior-y: contain;
         }
         .myb-custom-panel .myb-add-button { flex-shrink: 0 !important; }
+        .myb-custom-panel .myb-name-power-row { min-width: 0; align-items: start; }
+        .myb-custom-panel .myb-name-power-row > * { min-width: 0; }
+        .myb-custom-panel .myb-name-power-row .myb-field-heading { white-space: nowrap; font-size: 9px !important; }
+        .myb-custom-panel .myb-name-power-row input,
+        .myb-custom-panel .myb-name-power-row button { padding-left: 6px; padding-right: 6px; }
+        .myb-custom-panel .myb-name-power-row .myb-inline-field { padding-left: 6px; padding-right: 6px; gap: 3px; }
         .myb-custom-panel .myb-custom-title { margin: 0 0 8px !important; }
         .myb-custom-panel .myb-name-field,
         .myb-custom-panel .myb-add-button {
