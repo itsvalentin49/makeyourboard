@@ -479,7 +479,7 @@ export default function Sidebar({ pedalsLibrary, boardsLibrary, newPedals, newPe
                   },
                 };
                 const style = tabStyle[tab.key];
-                return (<button key={tab.key} type="button" onClick={() => {
+                return (<button key={tab.key} type="button" aria-pressed={active} onClick={() => {
                   setActiveSidebarTab(tab.key as any);
                   setShowPedalResults(false);
                   setShowBoardResults(false);
@@ -493,9 +493,7 @@ export default function Sidebar({ pedalsLibrary, boardsLibrary, newPedals, newPe
                   borderRadius: "14px",
                   background: style.background,
                   border: "1px solid rgba(0,0,0,0.035)",
-                  boxShadow: active
-                    ? "0 0 0 1px var(--foreground)"
-                    : "none",
+                  boxShadow: "none",
                   transform: "scale(1)",
                   transition: "transform 140ms ease-out, border-color 140ms ease-out, box-shadow 140ms ease-out",
                 }} onMouseEnter={(e) => {

@@ -151,7 +151,16 @@ export default function SettingsPanel({
 
   if (contactVisible) return <SettingsContactForm t={t} onBack={() => { setContactVisible(false); onContactViewChange?.(false); }} />;
   return (
-    <div className="flex flex-col gap-4">
+    <div className="myb-settings-panel flex flex-col gap-4">
+      <style>{`
+        .light .myb-settings-panel [data-settings-selection="true"] {
+          border-color: var(--color-canvas, var(--canvas, #adb5bd)) !important;
+        }
+        .light .myb-settings-panel .myb-settings-hover:hover,
+        .light .myb-settings-panel .myb-settings-hover:focus-visible {
+          background-color: var(--zinc-700, #f4f4f5) !important;
+        }
+      `}</style>
 
       {/* LANGUAGE */}
       <div className="flex flex-col gap-2">
@@ -178,7 +187,7 @@ export default function SettingsPanel({
                     setLanguage(l);
                     setLangOpen(false);
                   }}
-                  className="w-full h-[25px] px-4 text-left text-[10px] flex items-center hover:bg-canvas"
+                  className="w-full h-[25px] px-4 text-left text-[10px] flex items-center myb-settings-hover hover:bg-canvas"
                 >
                   {LANGUAGE_LABELS[l]}
                 </button>
@@ -206,15 +215,17 @@ export default function SettingsPanel({
           >
             {/* OPTION SÉLECTIONNÉE */}
             <div
+              aria-hidden="true"
+              data-settings-selection="true"
+              style={{ border: "1px solid #111111", boxSizing: "border-box" }}
               className={`
     absolute
     top-0
     h-full
     w-1/2
     rounded-md
-    border
-    border-blue-500
-    bg-blue-500/10
+    pointer-events-none
+    bg-canvas
     transition-transform
     duration-200
     ease-out
@@ -242,6 +253,8 @@ export default function SettingsPanel({
               return (
                 <button
                   key={u.key}
+                  type="button"
+                  aria-pressed={isActive}
                   onClick={() => setUnits(u.key as any)}
                   className="
               relative z-10
@@ -280,15 +293,17 @@ export default function SettingsPanel({
         >
           {/* OPTION SÉLECTIONNÉE */}
           <div
+            aria-hidden="true"
+            data-settings-selection="true"
+            style={{ border: "1px solid #111111", boxSizing: "border-box" }}
             className={`
     absolute
     top-0
     h-full
     w-1/2
     rounded-md
-    border
-    border-blue-500
-    bg-blue-500/10
+    pointer-events-none
+    bg-canvas
     transition-transform
     duration-200
     ease-out
@@ -318,6 +333,7 @@ export default function SettingsPanel({
               <button
                 key={item.key}
                 type="button"
+                aria-pressed={isActive}
                 onClick={() =>
                   handleThemeChange(item.key as "dark" | "light")
                 }
@@ -479,7 +495,7 @@ export default function SettingsPanel({
                   justify-between
                   text-left
                   text-[10px]
-                  hover:bg-canvas
+                  myb-settings-hover hover:bg-canvas
                   transition-colors
                   ${active
                           ? "font-black"
@@ -564,23 +580,23 @@ export default function SettingsPanel({
       <div className="mt-2 flex flex-col gap-4 border-t border-zinc-700 pt-4">
         <div className="flex flex-col gap-1">
           <h3 className="mb-1 text-[10px] font-bold uppercase tracking-wider">{t("settings.resources")}</h3>
-          <Link href="/docs" className="flex min-h-9 items-center gap-3 rounded-md px-2 py-2 text-[11px] hover:bg-canvas">
+          <Link href="/docs" className="flex min-h-9 items-center gap-3 rounded-md px-2 py-2 text-[11px] myb-settings-hover hover:bg-canvas">
             <span aria-hidden="true" style={{ width: 24, height: 24, borderRadius: 6, background: "linear-gradient(145deg,#60a5fa,#2563eb)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}><FileText size={16} style={{ color: "white" }} /></span>
             <span className="flex min-w-0 flex-1 flex-col gap-0.5"><span>{t("help.documentation")}</span><span className="text-[10px] leading-relaxed text-zinc-400">{t("settings.documentationDescription")}</span></span>
           </Link>
-          <button type="button" onClick={() => { setContactVisible(true); onContactViewChange?.(true); }} className="flex min-h-9 items-center gap-3 rounded-md px-2 py-2 text-left text-[11px] hover:bg-canvas">
+          <button type="button" onClick={() => { setContactVisible(true); onContactViewChange?.(true); }} className="flex min-h-9 items-center gap-3 rounded-md px-2 py-2 text-left text-[11px] myb-settings-hover hover:bg-canvas">
             <span aria-hidden="true" style={{ width: 24, height: 24, borderRadius: 6, background: "linear-gradient(145deg,#38bdf8,#4f46e5)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}><Send size={15} strokeWidth={2} style={{ color: "white" }} /></span>
             <span className="flex min-w-0 flex-1 flex-col gap-0.5"><span>{t("footer.feedback")}</span><span className="text-[10px] leading-relaxed text-zinc-400">{t("settings.contactDescription")}</span></span>
           </button>
         </div>
         <div className="flex flex-col gap-1">
           <h3 className="mb-1 text-[10px] font-bold uppercase tracking-wider">{t("settings.project")}</h3>
-          <a href="https://www.instagram.com/makeyourboard_/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 rounded-md px-2 py-2 text-[11px] hover:bg-canvas">
+          <a href="https://www.instagram.com/makeyourboard_/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 rounded-md px-2 py-2 text-[11px] myb-settings-hover hover:bg-canvas">
             <img src="/logos/instagram.png" alt="" aria-hidden="true" style={{ width: 20, height: 20, objectFit: "contain", flexShrink: 0 }} />
             <span className="flex min-w-0 flex-1 flex-col gap-0.5"><span>Instagram</span><span className="text-[10px] leading-relaxed text-zinc-400">{t("settings.instagramDescription")}</span></span>
             <ExternalLink size={13} style={{ color: "#3b82f6" }} className="shrink-0" aria-hidden="true" />
           </a>
-          {supportUrl && <a href={supportUrl} target="_blank" rel="noopener noreferrer" className="flex min-h-9 items-center gap-3 rounded-md px-2 py-2 text-[11px] hover:bg-canvas">
+          {supportUrl && <a href={supportUrl} target="_blank" rel="noopener noreferrer" className="flex min-h-9 items-center gap-3 rounded-md px-2 py-2 text-[11px] myb-settings-hover hover:bg-canvas">
             <Heart size={20} fill="#ef4444" stroke="#ef4444" aria-hidden="true" /><span className="flex min-w-0 flex-1 flex-col gap-0.5"><span>{t("settings.supportProject")}</span><span className="text-[10px] leading-relaxed text-zinc-400">{t("settings.supportDescription")}</span></span><ExternalLink size={13} style={{ color: "#3b82f6" }} aria-hidden="true" />
           </a>}
         </div>
