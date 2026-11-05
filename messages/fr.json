@@ -460,30 +460,7 @@
     "unnamed": "Sans nom",
     "mountingPossible": "Peut se placer sous le board",
     "mountingUnknown": "Placement dessous à vérifier",
-    "mountingTooltip": "Board Flat : placement estimé selon le seuil de 28 mm. Fixation et dégagement des câbles à vérifier.",
-    "diagnostics": {
-      "outputFormat": "Format de sorties non reconnu : {value}",
-      "outputsInvalid": "Sorties ambiguës ou invalides",
-      "outputCountMismatch": "Le nombre de sorties ne correspond pas à outputs",
-      "invalidModes": "power_modes invalide",
-      "missingVoltage": "tension absente ou plage sans consommation par tension",
-      "missingDraw": "consommation absente, nulle ou ambiguë",
-      "multipleVoltages": "plusieurs tensions : renseigner power_modes",
-      "missingCurrentType": "AC/DC non renseigné",
-      "missingPolarity": "polarité non renseignée",
-      "missingConnector": "connecteur non renseigné",
-      "noPoweredPedals": "Ajoutez une pédale nécessitant une alimentation externe.",
-      "sharedExcluded": "Alimentation exclue : sorties marquées shared",
-      "isolationUnknown": "Isolation non confirmée",
-      "missingBudget": "Budget global en watts non renseigné (capacity n’a pas d’unité explicite)",
-      "supplyCurrentType": "Alimentation : type AC/DC à vérifier",
-      "supplyPolarity": "Alimentation : polarité à vérifier",
-      "supplyConnector": "Alimentation : connecteur du câble vers la pédale à vérifier",
-      "unsupportedMetadata": "Métadonnées de sorties ou banques non prises en charge",
-      "electricalMismatch": "Type de courant, polarité ou connecteur incompatible",
-      "searchLimit": "Recherche interrompue : aucune conclusion de compatibilité",
-      "noAssignment": "Aucune attribution électrique valide"
-    }
+    "mountingTooltip": "Board Flat : placement estimé selon le seuil de 28 mm. Fixation et dégagement des câbles à vérifier."
   },
   "customPanel": {
     "title": "Custom",

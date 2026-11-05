@@ -418,7 +418,7 @@
   "locations": {
     "top": "Top",
     "right": "Right",
-    "bottom": "Down",
+    "bottom": "Bottom",
     "left": "Left"
   },
   "boardTextures": {
@@ -509,8 +509,8 @@
     "maxSize": "Max size: 300 KB",
     "imageDimensions": "Dimensions: min 30 mm / max 500 mm",
     "chooseImage": "Choose an image",
-    "voltage": "Voltage (V)",
-    "current": "Current draw (mA)",
+    "voltage": "Voltage",
+    "current": "Current draw",
     "add": "Add",
     "modeCustom": "Customise",
     "modeImport": "Import",
@@ -526,13 +526,28 @@
     "imageTooLarge": "The image must be 300 KB or smaller.",
     "imageLoadError": "Unable to load this image. Try again.",
     "optionalPower": "Power — optional",
-    "consumption": "Current draw (mA)",
+    "consumption": "Current draw",
     "addToBoard": "Add to board",
     "defaultPedalName": "Custom pedal",
     "enclosureDimensions": "Enclosure excluding jacks: {min} to {max} {unit}.",
     "itemType": "Item type",
     "boardFinish": "Finish",
-    "imageLoaded": "Image loaded"
+    "imageLoaded": "Image loaded",
+    "height": "Height",
+    "backToCustom": "Back to Custom",
+    "chooseCustomColor": "Choose a custom colour",
+    "format": "Format",
+    "boardDimensions": "Dimensions",
+    "previousFormats": "Previous formats",
+    "nextFormats": "Next formats",
+    "formatNames": {
+      "mini": "Mini",
+      "compact": "Compact",
+      "standard": "Standard",
+      "large": "Large",
+      "double": "Double",
+      "horizontal": "Horizontal"
+    }
   },
   "powerSetupPlan": {
     "title": "Power supply",
