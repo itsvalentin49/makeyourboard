@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 
 import Sidebar from "@/components/sidebar/Sidebar";
 import BoardCanvas from "@/components/BoardCanvas";
+import { resolveCustomPedalLayout } from "@/utils/customPedalLayout";
 import SettingsPanel from "@/components/SettingsPanel";
 import { useLibrary } from "@/hooks/useLibrary";
 import type { AnyRow, BoardItem, Project } from "@/types/project";
@@ -1031,6 +1032,9 @@ export default function BoardEditor({
 
       width: widthMm,
       depth: depthMm,
+      customLayout: itemType === "pedal" && !isUploadedImage
+        ? resolveCustomPedalLayout(item.customLayout, widthMm, depthMm)
+        : undefined,
 
       imageId: item?.imageId || null,
 

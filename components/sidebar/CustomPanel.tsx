@@ -4,14 +4,11 @@ import { Check, ChevronDown, ChevronLeft, ChevronRight, Import as ImportIcon, X 
 import { saveCustomImage } from "@/utils/customImageStore";
 type AnyRow = Record<string, any>;
 
-const PEDAL_FORMATS = [
-    { width: 38, depth: 92, name: "Xotic EP Booster", image: "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals-thumbs/xotic-ep.webp", jackLocations: ["left", "right"] },
-    { width: 60, depth: 112, name: "MXR Phase 90", image: "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals-thumbs/mxr-m169-v3.webp?v=1791401146937", jackLocations: ["left", "right"] },
-    { width: 66, depth: 122, name: "JHS Morning Glory V4", image: "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals-thumbs/jhs-morning-glory-mk4-v2.webp?v=1790875734076", jackLocations: ["left", "right"] },
-    { width: 94, depth: 119, name: "EHX Little Big Muff", image: "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals-thumbs/ehx-little-big-muff-pi-v3.webp", jackLocations: ["left", "right"] },
-    { width: 102, depth: 114, name: "Strymon El Capistan V2", image: "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals-thumbs/strymon-elcap-v2-v2.webp", jackLocations: ["top"] },
-    { width: 171, depth: 127, name: "Warm Audio Centavo Silver", image: "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals-thumbs/warm-audio-centavo-silver.webp", jackLocations: ["top"] },
-] as const;
+import {
+    PEDAL_FORMATS, getSizedPedalLayout, getPedalHardwareGeometry, getPedalJackGeometry,
+    type HardwareGeometry, type CustomPedalLayout, type PedalFormat, type LocationValue
+} from "@/utils/customPedalLayout";
+export type { CustomPedalLayout } from "@/utils/customPedalLayout";
 
 const withoutUnit = (label: string) => label.replace(/\s*\((?:V|mA)\)\s*$/i, "");
 function DimensionsGroup({ title, children }: { title: string; children: React.ReactNode }) {
@@ -219,215 +216,74 @@ type BoardTextureOption = {
     label: string;
     image: string;
 };
-type LocationValue = "top" | "bottom" | "left" | "right";
 type LocationOption = {
     value: LocationValue;
     label: string;
 };
-type PedalPreviewProps = {
-    previewWidthMm: number;
-    previewDepthMm: number;
-    previewWidthPx: number;
-    previewHeightPx: number;
-    previewScale: number;
-    customColor: string;
-    customName: string;
-    jackLocations: LocationValue[];
+type CustomPedalVisualProps = {
+    widthMm: number; depthMm: number; scale: number;
+    customColor: string; customName: string;
+    jackLocations: readonly LocationValue[];
+    layout: CustomPedalLayout;
 };
-function PedalPreview({ previewWidthMm, previewDepthMm, previewWidthPx, previewHeightPx, previewScale, customColor, customName, jackLocations }: PedalPreviewProps) {
-    /*
-      Valeurs identiques au rendu Custom Pedal du canvas.
-    */
-    const CANVAS_KNOB_SIZE = 25;
-    const CANVAS_FOOTSWITCH_SIZE = 18;
-    const CANVAS_KNOB_TOP = 14;
-    const CANVAS_FOOTSWITCH_TOP_FROM_BOTTOM = 30;
-    const CANVAS_HARDWARE_SPREAD = 1.25;
-    const CANVAS_TEXT_SIZE = 8;
-    const previewKnobSizePx = CANVAS_KNOB_SIZE * previewScale;
-    const previewFootswitchSizePx = CANVAS_FOOTSWITCH_SIZE * previewScale;
-    const previewKnobTopPx = CANVAS_KNOB_TOP * previewScale;
-    const previewFootswitchTopPx = previewHeightPx -
-        CANVAS_FOOTSWITCH_TOP_FROM_BOTTOM *
-        previewScale;
-    const previewTextSizePx = CANVAS_TEXT_SIZE * previewScale;
-    const previewHideHardware = previewWidthMm < 70 &&
-        previewDepthMm < 70;
-    const previewKnobCount = previewWidthMm < 70
-        ? 1
-        : previewWidthMm <= 100
-            ? 2
-            : 3;
-    const previewSideJackWidth = 14 * previewScale;
-    const previewSideJackHeight = 18 * previewScale;
-    const previewHorizontalJackWidth = 18 * previewScale;
-    const previewHorizontalJackHeight = 14 * previewScale;
-    const PREVIEW_JACK_OUTSIDE_RATIO = 0.55;
-    const previewSideJackOffset = previewSideJackWidth *
-        PREVIEW_JACK_OUTSIDE_RATIO;
-    const previewHorizontalJackOffset = previewHorizontalJackHeight *
-        PREVIEW_JACK_OUTSIDE_RATIO;
-    return (
-        <div className="
-                    relative
-                    shrink-0
-                    overflow-visible
-                  " style={{
-                width: `${previewWidthPx}px`,
-                height: `${previewHeightPx}px`,
-            }}>
-            {/* JACK GAUCHE */}
-            {jackLocations.includes("left") && (<img src="/images/jack-left.webp" alt="" draggable={false} className="
-                        absolute
-                        z-0
-                        object-contain
-                        pointer-events-none
-                      " style={{
-                    width: `${previewSideJackWidth}px`,
-                    height: `${previewSideJackHeight}px`,
-                    left: `${-previewSideJackOffset}px`,
-                    top: `${previewHeightPx / 2 -
-                        previewSideJackHeight / 2}px`,
-                }} />)}
-            {/* JACK DROIT */}
-            {jackLocations.includes("right") && (<img src="/images/jack-right.webp" alt="" draggable={false} className="
-                        absolute
-                        z-0
-                        object-contain
-                        pointer-events-none
-                      " style={{
-                    width: `${previewSideJackWidth}px`,
-                    height: `${previewSideJackHeight}px`,
-                    right: `${-previewSideJackOffset}px`,
-                    top: `${previewHeightPx / 2 -
-                        previewSideJackHeight / 2}px`,
-                }} />)}
-            {/* JACK BAS */}
-            {jackLocations.includes("bottom") && (<img src="/images/jack-down.webp" alt="" draggable={false} className="
-                        absolute
-                        z-0
-                        object-contain
-                        pointer-events-none
-                      " style={{
-                    width: `${previewHorizontalJackWidth}px`,
-                    height: `${previewHorizontalJackHeight}px`,
-                    left: `${previewWidthPx / 2 -
-                        previewHorizontalJackWidth / 2}px`,
-                    bottom: `${-previewHorizontalJackOffset}px`,
-                }} />)}
-            {/* JACKS DU HAUT */}
-            {jackLocations.includes("top") && (<>
-                <img src="/images/jack-top.webp" alt="" draggable={false} className="
-                          absolute
-                          z-0
-                          object-contain
-                          pointer-events-none
-                        " style={{
-                        width: `${previewHorizontalJackWidth}px`,
-                        height: `${previewHorizontalJackHeight}px`,
-                        left: `${previewWidthPx * 0.3 -
-                            previewHorizontalJackWidth / 2}px`,
-                        top: `${-previewHorizontalJackOffset}px`,
-                    }} />
-                <img src="/images/jack-top.webp" alt="" draggable={false} className="
-                          absolute
-                          z-0
-                          object-contain
-                          pointer-events-none
-                        " style={{
-                        width: `${previewHorizontalJackWidth}px`,
-                        height: `${previewHorizontalJackHeight}px`,
-                        left: `${previewWidthPx * 0.7 -
-                            previewHorizontalJackWidth / 2}px`,
-                        top: `${-previewHorizontalJackOffset}px`,
-                    }} />
-            </>)}
-            {/* ENCLOSURE */}
-            <div className="
-                      absolute
-                      inset-0
-                      z-10
-                      overflow-hidden
-                      rounded-[6px]
-                      shadow-lg
-                      transition-all
-                      duration-200
-                    ">
-                <img src="/images/custom-pedal.webp" alt="" draggable={false} className="
-                        absolute
-                        inset-0
-                        w-full
-                        h-full
-                        object-fill
-                        pointer-events-none
-                      "/>
-                {customColor && (<div className="
-                          absolute
-                          inset-0
-                          pointer-events-none
-                        " style={{
-                        backgroundColor: customColor,
-                        opacity: 0.7,
-                    }} />)}
-                {/* POTENTIOMÈTRES */}
-                {!previewHideHardware &&
-                    Array.from({
-                        length: previewKnobCount,
-                    }).map((_, index) => {
-                        const spacing = previewWidthPx /
-                            (previewKnobCount + 1);
-                        const offsetFromCenter = (index -
-                            (previewKnobCount - 1) / 2) *
-                            spacing *
-                            CANVAS_HARDWARE_SPREAD;
-                        return (<img key={index} src="/images/knob.webp" alt="" draggable={false} className="
-          absolute
-          object-contain
-          pointer-events-none
-        " style={{
-                                width: `${previewKnobSizePx}px`,
-                                height: `${previewKnobSizePx}px`,
-                                left: `${previewWidthPx / 2 +
-                                    offsetFromCenter -
-                                    previewKnobSizePx / 2}px`,
-                                top: `${previewKnobTopPx}px`,
-                            }} />);
-                    })}
-                {/* NOM */}
-                <div className="
-                        absolute
-                        left-1/2
-                        top-1/2
-                        -translate-x-1/2
-                        -translate-y-1/2
-                        w-[88%]
-                        text-center
-                        text-black
-                        font-black
-                        uppercase
-                        leading-none
-                        break-words
-                        pointer-events-none
-                      " style={{
-                        fontSize: `${previewTextSizePx}px`,
-                    }}>
-                    {customName.trim()}
-                </div>
-                {/* FOOTSWITCH */}
-                {!previewHideHardware && (<img src="/images/footswitch.webp" alt="" draggable={false} className="
-      absolute
-      object-contain
-      pointer-events-none
-    " style={{
-                        width: `${previewFootswitchSizePx}px`,
-                        height: `${previewFootswitchSizePx}px`,
-                        left: `${previewWidthPx / 2 -
-                            previewFootswitchSizePx / 2}px`,
-                        top: `${previewFootswitchTopPx}px`,
-                    }} />)}
-            </div>
+// The same renderer and serialized layout can also be used by the canvas.
+export function CustomPedalVisual({ widthMm, depthMm, scale, customColor, customName, jackLocations, layout }: CustomPedalVisualProps) {
+    const width = widthMm * scale;
+    const height = depthMm * scale;
+    const geometry = getPedalHardwareGeometry(layout, widthMm, depthMm, width, height);
+    const hardware = (parts: HardwareGeometry[], src: string) => parts.map((part, index) => (
+        <span key={`${src}-${index}`} style={{
+            position: "absolute", width: part.width, height: part.height,
+            left: part.x, top: part.y, pointerEvents: "none"
+        }}>
+            <img src={src} alt="" draggable={false} loading="eager" decoding="sync"
+                style={{ display: "block", width: "100%", height: "100%", objectFit: "contain" }} />
+            {src === "/images/knob.webp" && <span className="myb-knob-indicator" style={{
+                position: "absolute", left: "50%", top: "12%", transform: "translateX(-50%)",
+                width: "3%", minWidth: 0.7 * scale, height: "38%", borderRadius: 1, background: "#ffffff", pointerEvents: "none",
+            }} />}
+        </span>
+    ));
+    return <div className="myb-custom-pedal-visual" aria-hidden="true" style={{
+        "--pedal-width": `${width}px`, "--pedal-depth": `${height}px`,
+        position: "relative", width, height, minWidth: width, minHeight: height,
+        flex: "none", isolation: "isolate",
+    } as React.CSSProperties}>
+        {getPedalJackGeometry(jackLocations, widthMm, depthMm, width, height).map((jack, index) => (
+            <img key={`${jack.side}-${index}`} src={jack.src} alt="" draggable={false}
+                style={{
+                    position: "absolute", zIndex: 0, pointerEvents: "none", objectFit: "contain",
+                    width: jack.width, height: jack.height, left: jack.x, top: jack.y
+                }} />
+        ))}
+        <div style={{ position: "absolute", inset: 0, zIndex: 1, borderRadius: 6 * scale, overflow: "hidden" }}>
+            <img src="/images/custom-pedal.webp" alt="" draggable={false}
+                style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "fill", pointerEvents: "none" }} />
+            {customColor && <div style={{ position: "absolute", inset: 0, backgroundColor: customColor, opacity: 0.7, pointerEvents: "none" }} />}
+            {hardware(geometry.knobs, "/images/knob.webp")}
+            {customName.trim() && <div style={{ position: "absolute", left: "6%", top: "50%", transform: "translateY(-50%)", width: "88%", textAlign: "center", color: "#000000", fontWeight: 900, fontSize: 8 * scale, lineHeight: 1, textTransform: "uppercase", overflowWrap: "anywhere" }}>{customName.trim()}</div>}
+            {hardware(geometry.footswitches, "/images/footswitch.webp")}
         </div>
-    );
+    </div>;
+}
+export function getPedalPreviewScale(widthMm: number, depthMm: number, containerWidth: number) {
+    const availableWidth = Math.max(1, containerWidth - 26);
+    const availableHeight = 114;
+    const commonScale = Math.min(availableWidth / 190, availableHeight / 150, 1);
+    return Math.min(commonScale, availableWidth / (widthMm + 16), availableHeight / (depthMm + 16));
+}
+function useContainerWidth(ref: React.RefObject<HTMLDivElement | null>, fallback: number, enabled: boolean) {
+    const [width, setWidth] = useState(fallback);
+    useEffect(() => {
+        const element = ref.current;
+        if (!element || !enabled) return;
+        const measure = () => { if (element.clientWidth > 0) setWidth(element.clientWidth); };
+        measure();
+        const observer = new ResizeObserver(measure);
+        observer.observe(element);
+        return () => observer.disconnect();
+    }, [ref, enabled]);
+    return width;
 }
 function CustomBuilder({ customType, customName, setCustomName, customWidth, setCustomWidth, customDepth, setCustomDepth, customColor, setCustomColor, addCustomItem, isPedalValid, isBoardValid, minValue, maxValue, displayMin, displayMax, units, unitLabel, withUnit, t, }: CustomBuilderProps) {
     const DEFAULT_JACK_LOCATIONS: LocationValue[] = [];
@@ -459,6 +315,30 @@ function CustomBuilder({ customType, customName, setCustomName, customWidth, set
     const customVoltageRef = useRef<HTMLDivElement>(null);
     const boardTextureRef = useRef<HTMLDivElement>(null);
     const formatsRef = useRef<HTMLDivElement>(null);
+    const previewAreaRef = useRef<HTMLDivElement>(null);
+    const [selectedFormatId, setSelectedFormatId] = useState<string | null>(null);
+    const formatsWidth = useContainerWidth(formatsRef, 260, customType === "pedal");
+    const previewAreaWidth = useContainerWidth(previewAreaRef, 260, customType === "pedal");
+    const thumbnailScale = Math.max(0.1, Math.min((formatsWidth / 3 - 22) / 190, 0.28));
+    const activeFormat = PEDAL_FORMATS.find(format => format.id === selectedFormatId)
+        || PEDAL_FORMATS.find(format => Math.abs(Number(customWidth) * (units === "metric" ? 1 : 25.4) - format.width) < 0.02
+            && Math.abs(Number(customDepth) * (units === "metric" ? 1 : 25.4) - format.depth) < 0.02)
+        || PEDAL_FORMATS[2];
+    const formatLabel = (format: PedalFormat) => {
+        const key = `customPanel.formatNames.${format.labelKey}`;
+        const translated = t(key);
+        return translated && translated !== key ? translated : format.labelKey.charAt(0).toUpperCase() + format.labelKey.slice(1);
+    };
+    useEffect(() => {
+        const sources = ["custom-pedal", "knob", "footswitch", "jack-top", "jack-down", "jack-left", "jack-right"];
+        const images = sources.map(name => {
+            const image = new Image();
+            image.src = `/images/${name}.webp`;
+            if (image.decode) void image.decode().catch(() => { });
+            return image;
+        });
+        return () => { images.length = 0; };
+    }, []);
     const formatsId = React.useId();
     const scrollFormats = (direction: -1 | 1) => {
         const element = formatsRef.current;
@@ -535,6 +415,7 @@ function CustomBuilder({ customType, customName, setCustomName, customWidth, set
         setHasSelectedColor(false);
         setCustomVoltage("");
         setCustomDraw("100");
+        setSelectedFormatId(null);
         setJackLocations([
             ...DEFAULT_JACK_LOCATIONS,
         ]);
@@ -549,8 +430,8 @@ function CustomBuilder({ customType, customName, setCustomName, customWidth, set
       Valeurs par défaut utilisées lorsque les dimensions
       ne sont pas encore saisies.
     */
-    const DEFAULT_PEDAL_PREVIEW_WIDTH_MM = 70;
-    const DEFAULT_PEDAL_PREVIEW_DEPTH_MM = 110;
+    const DEFAULT_PEDAL_PREVIEW_WIDTH_MM = activeFormat.width;
+    const DEFAULT_PEDAL_PREVIEW_DEPTH_MM = activeFormat.depth;
     const DEFAULT_BOARD_PREVIEW_WIDTH_MM = 406.4;
     const DEFAULT_BOARD_PREVIEW_DEPTH_MM = 203.2;
     const enteredWidth = Number(customWidth);
@@ -561,23 +442,33 @@ function CustomBuilder({ customType, customName, setCustomName, customWidth, set
     const defaultPreviewDepthMm = customType === "board"
         ? DEFAULT_BOARD_PREVIEW_DEPTH_MM
         : DEFAULT_PEDAL_PREVIEW_DEPTH_MM;
-    const previewWidthMm = enteredWidth > 0
-        ? units === "metric"
-            ? enteredWidth
-            : enteredWidth * 25.4
-        : defaultPreviewWidthMm;
-    const previewDepthMm = enteredDepth > 0
-        ? units === "metric"
-            ? enteredDepth
-            : enteredDepth * 25.4
-        : defaultPreviewDepthMm;
+    const lastPedalDimensions = useRef({ width: DEFAULT_PEDAL_PREVIEW_WIDTH_MM, depth: DEFAULT_PEDAL_PREVIEW_DEPTH_MM });
+    const enteredWidthMm = units === "metric" ? enteredWidth : enteredWidth * 25.4;
+    const enteredDepthMm = units === "metric" ? enteredDepth : enteredDepth * 25.4;
+    const validWidth = Number.isFinite(enteredWidthMm) && enteredWidthMm >= 30 && enteredWidthMm <= 300;
+    const validDepth = Number.isFinite(enteredDepthMm) && enteredDepthMm >= 30 && enteredDepthMm <= 300;
+    useEffect(() => {
+        if (customType !== "pedal") return;
+        if (validWidth) lastPedalDimensions.current.width = enteredWidthMm;
+        if (validDepth) lastPedalDimensions.current.depth = enteredDepthMm;
+    }, [customType, validWidth, validDepth, enteredWidthMm, enteredDepthMm]);
+    const previewWidthMm = customType === "board"
+        ? enteredWidthMm > 0 ? enteredWidthMm : defaultPreviewWidthMm
+        : !customWidth.trim() ? defaultPreviewWidthMm : validWidth ? enteredWidthMm : lastPedalDimensions.current.width;
+    const previewDepthMm = customType === "board"
+        ? enteredDepthMm > 0 ? enteredDepthMm : defaultPreviewDepthMm
+        : !customDepth.trim() ? defaultPreviewDepthMm : validDepth ? enteredDepthMm : lastPedalDimensions.current.depth;
     /*
       Le board utilise une largeur maximale plus petite
       afin de conserver davantage de marge sur les côtés.
     */
     const previewMaxWidth = customType === "board" ? 215 : 170;
     const previewMaxHeight = 100;
-    const previewScale = Math.min(previewMaxWidth / previewWidthMm, previewMaxHeight / previewDepthMm);
+    // Pedals share a fixed scale for the available viewport; their dimensions never set the zoom.
+    const previewScale = customType === "board"
+        ? Math.min(previewMaxWidth / previewWidthMm, previewMaxHeight / previewDepthMm)
+        : getPedalPreviewScale(previewWidthMm, previewDepthMm, previewAreaWidth);
+    const effectiveLayout = getSizedPedalLayout(activeFormat.layout, activeFormat.width, activeFormat.depth, previewWidthMm, previewDepthMm);
     const previewWidthPx = Math.max(customType === "board" ? 80 : 38, previewWidthMm * previewScale);
     const previewHeightPx = Math.max(customType === "board" ? 36 : 55, previewDepthMm * previewScale);
     return (<div className="
@@ -598,21 +489,23 @@ function CustomBuilder({ customType, customName, setCustomName, customWidth, set
                         <div ref={formatsRef} id={formatsId} role="group" tabIndex={0}
                             aria-label={`${withUnit(t("customPanel.width"))} / ${withUnit(t("customPanel.depth"))}`}
                             className="myb-formats-track">
-                            {PEDAL_FORMATS.map(({ width, depth, name, image, jackLocations: formatJackLocations }) => {
+                            {PEDAL_FORMATS.map(format => {
+                                const { width, depth, jackLocations: formatJackLocations } = format;
+                                const name = formatLabel(format);
                                 const widthMm = Number(customWidth) * (units === "imperial" ? 25.4 : 1);
                                 const depthMm = Number(customDepth) * (units === "imperial" ? 25.4 : 1);
-                                const selected = Math.abs(widthMm - width) < 0.02 && Math.abs(depthMm - depth) < 0.02;
+                                const selected = activeFormat.id === format.id && Math.abs(widthMm - width) < 0.02 && Math.abs(depthMm - depth) < 0.02;
                                 return (
                                     <button
                                         key={`${width}x${depth}`}
                                         type="button"
                                         aria-pressed={selected}
-                                        aria-label={name}
-                                        title={name}
+                                        aria-label={`${name} — ${width} × ${depth} mm`}
                                         onClick={() => {
                                             const formatValue = (value: number) => units === "metric"
                                                 ? String(value)
                                                 : String(Number((value / 25.4).toFixed(6)));
+                                            setSelectedFormatId(format.id);
                                             setCustomWidth(formatValue(width));
                                             setCustomDepth(formatValue(depth));
                                             setJackLocations([...formatJackLocations]);
@@ -620,7 +513,12 @@ function CustomBuilder({ customType, customName, setCustomName, customWidth, set
                                         className="myb-format-choice flex flex-col items-center justify-center gap-2 rounded-lg bg-zinc-950 p-2 transition-colors"
                                         style={{ border: "1px solid transparent" }}
                                     >
-                                        <img src={image} alt="" draggable={false} className="myb-format-image" />
+                                        <span className="myb-format-stage">
+                                            <CustomPedalVisual widthMm={width} depthMm={depth} scale={thumbnailScale}
+                                                customColor={customColor} customName="" jackLocations={formatJackLocations} layout={getSizedPedalLayout(format.layout, width, depth, width, depth)} />
+                                        </span>
+                                        <span className="myb-format-caption">{name}</span>
+                                        <span className="myb-format-dimensions">{width} × {depth} mm</span>
                                         {selected && <Check size={12} strokeWidth={3} aria-hidden="true" className="myb-selection-check" />}
                                     </button>
                                 );
@@ -793,7 +691,7 @@ function CustomBuilder({ customType, customName, setCustomName, customWidth, set
                     <div className="myb-field-heading text-[10px] font-medium">
                         {t("export.preview")}
                     </div>
-                    <div className="myb-pedal-preview-box
+                    <div ref={previewAreaRef} className="myb-pedal-preview-box
                   min-h-[120px]
                   rounded-lg
                   border
@@ -806,13 +704,17 @@ function CustomBuilder({ customType, customName, setCustomName, customWidth, set
                   justify-center
                   overflow-hidden
                 ">
-                        <PedalPreview previewWidthMm={previewWidthMm} previewDepthMm={previewDepthMm} previewWidthPx={previewWidthPx} previewHeightPx={previewHeightPx} previewScale={previewScale} customColor={customColor} customName={customName} jackLocations={jackLocations} />
+                        <div className="myb-pedal-preview-stage">
+                            <CustomPedalVisual widthMm={previewWidthMm} depthMm={previewDepthMm} scale={previewScale}
+                                customColor={customColor} customName={customName} jackLocations={jackLocations} layout={effectiveLayout} />
+                        </div>
                     </div>
                 </div>
                 {/* AJOUTER LA PÉDALE */}
                 <button type="button" disabled={!isPedalValid} onClick={() => {
                     addCustomItem({
-                        name: customName,
+                        name: customName.trim(),
+                        customLayout: effectiveLayout,
                         color: customColor ||
                             undefined,
                         voltage: Number(customVoltage) ||
@@ -1080,6 +982,13 @@ export default function CustomPanel(props: CustomPanelProps) {
     };
     return (<section className="myb-custom-panel mt-4 flex flex-1 min-h-0 flex-col">
         <style>{`
+        .myb-custom-panel { flex: 1 1 0%; min-height: 0; overflow: hidden; }
+        .myb-custom-panel .myb-custom-scroll {
+          min-height: 0; flex: 1 1 0%; overflow-y: auto;
+          padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+          scroll-padding-bottom: 20px; overscroll-behavior-y: contain;
+        }
+        .myb-custom-panel .myb-add-button { flex-shrink: 0 !important; }
         .myb-custom-panel .myb-custom-title { margin: 0 0 8px !important; }
         .myb-custom-panel .myb-name-field,
         .myb-custom-panel .myb-add-button {
@@ -1124,8 +1033,30 @@ export default function CustomPanel(props: CustomPanelProps) {
         .myb-custom-panel .myb-carousel-next { right: -5px; }
         .myb-custom-panel .myb-format-choice {
           scroll-snap-align: start;
-          width: 100%; height: 62px !important; min-height: 62px !important; max-height: 62px !important;
+          width: 100%; height: 88px !important; min-height: 88px !important; max-height: 88px !important;
           aspect-ratio: auto; box-sizing: border-box; padding: 7px !important;
+        }
+        .myb-custom-panel .myb-format-stage { height: 46px; width: 100%; display: flex; align-items: flex-end; justify-content: center; padding: 4px 0; box-sizing: border-box; }
+        .myb-custom-panel .myb-format-caption { font-size: 9px; line-height: 1.2; font-weight: 700; }
+        .myb-custom-panel .myb-format-dimensions { font-size: 9px; line-height: 1.2; white-space: nowrap; }
+        .myb-custom-panel .myb-format-choice { gap: 3px !important; }
+        .myb-custom-panel .myb-pedal-preview-box {
+          display: block !important; height: 140px !important; min-height: 140px !important;
+          max-height: 140px !important; overflow: hidden !important; padding: 12px !important;
+        }
+        .myb-custom-panel .myb-pedal-preview-stage {
+          display: grid; place-items: center;
+          width: 100%; height: 100%; min-width: 0; min-height: 0; padding: 0;
+          box-sizing: border-box; overflow: visible;
+        }
+        .myb-custom-panel .myb-custom-pedal-visual img,
+        .myb-custom-panel .myb-custom-pedal-visual span {
+          transition: none !important; animation: none !important;
+        }
+        .myb-custom-panel .myb-custom-pedal-visual {
+          display: block; flex: none !important;
+          width: var(--pedal-width) !important; min-width: var(--pedal-width) !important;
+          height: var(--pedal-depth) !important; min-height: var(--pedal-depth) !important;
         }
         .myb-custom-panel .myb-format-image {
           display: block; width: 100%; height: 100%; max-height: 46px;
@@ -1255,7 +1186,7 @@ export default function CustomPanel(props: CustomPanelProps) {
         <h2 className="myb-custom-title mb-1 shrink-0 text-[11px] font-black uppercase tracking-wide">
             {t("customPanel.title")}
         </h2>
-        <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar pb-6">
+        <div className="myb-custom-scroll flex-1 min-h-0 overflow-y-auto no-scrollbar">
             <div role="group" aria-label={t("customPanel.itemType")}
                 className="myb-custom-tabs rounded-md"
                 style={{ display: "grid", gridTemplateColumns: "repeat(3,minmax(0,1fr))", gap: 4 }}>

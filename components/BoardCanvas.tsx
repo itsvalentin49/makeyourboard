@@ -21,6 +21,8 @@ import type { Language } from "@/utils/i18n";
 import { ENCLOSURE_SIZING_BRANDS } from "@/utils/enclosureSizing";
 
 
+import { resolveCustomPedalLayout, getPedalHardwareGeometry, getPedalJackGeometry, parsePedalJackLocations } from "@/utils/customPedalLayout";
+
 const HELP_ENABLED = false;
 const SIGNAL_PATH_ENABLED = false;
 
@@ -3509,142 +3511,27 @@ ${isMobile
                     }
                   }}
                 >
-                  {/* JACKS CUSTOM — mêmes proportions que dans le preview */}
-                  {p.slug === "custom" &&
-                    displaySizes[p.instanceId] &&
-                    (() => {
-                      const size = displaySizes[p.instanceId];
-
-                      const rawJackLocations = String(
-                        p.jacksLocation || p.jacks || ""
-                      ).toLowerCase();
-
-                      const hasTopJack =
-                        rawJackLocations.includes("top");
-
-                      const hasBottomJack =
-                        rawJackLocations.includes("bottom") ||
-                        rawJackLocations.includes("down");
-
-                      const hasLeftJack =
-                        rawJackLocations.includes("left");
-
-                      const hasRightJack =
-                        rawJackLocations.includes("right");
-
-                      /*
-                        Les images latérales contiennent déjà beaucoup
-                        d'espace visuel autour du jack.
-                  
-                        Il faut donc un cadre Konva très étroit pour obtenir
-                        le même rendu apparent que dans le preview.
-                      */
-                      const SIDE_JACK_WIDTH = 5;
-                      const SIDE_JACK_HEIGHT = 18;
-
-                      const HORIZONTAL_JACK_WIDTH = 18;
-                      const HORIZONTAL_JACK_HEIGHT = 5;
-
-                      /*
-                        Seulement une petite partie du cadre dépasse.
-                        Le reste passe derrière l'enclosure.
-                      */
-                      const SIDE_VISIBLE_RATIO = 0.55;
-                      const HORIZONTAL_VISIBLE_RATIO = 0.55;
-
-                      const sideVisibleWidth =
-                        SIDE_JACK_WIDTH * SIDE_VISIBLE_RATIO;
-
-                      const horizontalVisibleHeight =
-                        HORIZONTAL_JACK_HEIGHT *
-                        HORIZONTAL_VISIBLE_RATIO;
-
-                      return (
-                        <>
-                          {/* JACK GAUCHE */}
-                          {hasLeftJack && jackLeft && (
-                            <KonvaImage
-                              image={jackLeft}
-                              width={SIDE_JACK_WIDTH}
-                              height={SIDE_JACK_HEIGHT}
-                              x={
-                                -size.w / 2 -
-                                sideVisibleWidth
-                              }
-                              y={-SIDE_JACK_HEIGHT / 2}
-                              listening={false}
-                            />
-                          )}
-
-                          {/* JACK DROIT */}
-                          {hasRightJack && jackRight && (
-                            <KonvaImage
-                              image={jackRight}
-                              width={SIDE_JACK_WIDTH}
-                              height={SIDE_JACK_HEIGHT}
-                              x={
-                                size.w / 2 -
-                                SIDE_JACK_WIDTH +
-                                sideVisibleWidth
-                              }
-                              y={-SIDE_JACK_HEIGHT / 2}
-                              listening={false}
-                            />
-                          )}
-
-                          {/* JACK BAS */}
-                          {hasBottomJack && jackDown && (
-                            <KonvaImage
-                              image={jackDown}
-                              width={HORIZONTAL_JACK_WIDTH}
-                              height={HORIZONTAL_JACK_HEIGHT}
-                              x={-HORIZONTAL_JACK_WIDTH / 2}
-                              y={
-                                size.h / 2 -
-                                HORIZONTAL_JACK_HEIGHT +
-                                horizontalVisibleHeight
-                              }
-                              listening={false}
-                            />
-                          )}
-
-                          {/* DEUX JACKS EN HAUT */}
-                          {hasTopJack && jackTop && (
-                            <>
-                              <KonvaImage
-                                image={jackTop}
-                                width={HORIZONTAL_JACK_WIDTH}
-                                height={HORIZONTAL_JACK_HEIGHT}
-                                x={
-                                  -size.w * 0.2 -
-                                  HORIZONTAL_JACK_WIDTH / 2
-                                }
-                                y={
-                                  -size.h / 2 -
-                                  horizontalVisibleHeight
-                                }
-                                listening={false}
-                              />
-
-                              <KonvaImage
-                                image={jackTop}
-                                width={HORIZONTAL_JACK_WIDTH}
-                                height={HORIZONTAL_JACK_HEIGHT}
-                                x={
-                                  size.w * 0.2 -
-                                  HORIZONTAL_JACK_WIDTH / 2
-                                }
-                                y={
-                                  -size.h / 2 -
-                                  horizontalVisibleHeight
-                                }
-                                listening={false}
-                              />
-                            </>
-                          )}
-                        </>
-                      );
-                    })()}
+                  {/* Shared millimeter geometry: identical to the Custom preview. */}
+                  {p.slug === "custom" && displaySizes[p.instanceId] && (() => {
+                    const size = displaySizes[p.instanceId];
+                    const images = { top: jackTop, bottom: jackDown, left: jackLeft, right: jackRight };
+                    return getPedalJackGeometry(parsePedalJackLocations(p.jacksLocation || p.jacks),
+                      Number(p.width), Number(p.depth), size.w, size.h).map((jack, index) => {
+                        const image = images[jack.side];
+                        if (!image) return null;
+                        // Match CSS object-fit: contain in CustomPedalVisual, preserving the original image ratio.
+                        const naturalWidth = image.naturalWidth || image.width;
+                        const naturalHeight = image.naturalHeight || image.height;
+                        if (!naturalWidth || !naturalHeight) return null;
+                        const imageScale = Math.min(jack.width / naturalWidth, jack.height / naturalHeight);
+                        const imageWidth = naturalWidth * imageScale;
+                        const imageHeight = naturalHeight * imageScale;
+                        return <KonvaImage key={`${jack.side}-${index}`} image={image}
+                          width={imageWidth} height={imageHeight}
+                          x={jack.x + (jack.width - imageWidth) / 2 - size.w / 2}
+                          y={jack.y + (jack.height - imageHeight) / 2 - size.h / 2} listening={false} />;
+                      });
+                  })()}
 
                   <PedalImage
                     url={p.image || p.image_url || p.photo || null}
@@ -3686,85 +3573,31 @@ ${isMobile
                     }
                   />
 
-                  {/* 🎛 CUSTOM CONTROLS */}
-                  {p.slug === "custom" &&
-                    displaySizes[p.instanceId] &&
-                    knob &&
-                    footswitch &&
-                    (() => {
-                      const size = displaySizes[p.instanceId];
-                      const hasColor = !!p.color;
-
-                      const hideHardware =
-                        size.w < 70 &&
-                        size.h < 70;
-
-                      const SMALL_KNOB = 25;
-                      const MEDIUM_KNOB = 25;
-                      const LARGE_KNOB = 25;
-
-                      const knobSize =
-                        p.width < 70
-                          ? SMALL_KNOB
-                          : p.width <= 100
-                            ? MEDIUM_KNOB
-                            : LARGE_KNOB;
-
-                      const footswitchSize = 18;
-
-                      const knobCount =
-                        p.width < 70 ? 1 : p.width <= 100 ? 2 : 3;
-
-                      const knobY = -size.h / 2 + 14;
-                      const spacing = size.w / (knobCount + 1);
-                      const spread = 1.25;
-
-                      return (
-                        <>
-                          {hasColor && (
-                            <Rect
-                              x={-size.w / 2}
-                              y={-size.h / 2}
-                              width={size.w}
-                              height={size.h}
-                              fill={p.color}
-                              opacity={0.7}
-                              cornerRadius={5}
-                            />
-                          )}
-
-                          {!hideHardware && (
-                            <>
-                              {Array.from({ length: knobCount }).map((_, i) => {
-                                const offsetFromCenter =
-                                  (i - (knobCount - 1) / 2) * spacing * spread;
-
-                                return (
-                                  <KonvaImage
-                                    key={i}
-                                    image={knob}
-                                    width={knobSize}
-                                    height={knobSize}
-                                    x={offsetFromCenter - knobSize / 2}
-                                    y={knobY}
-                                    listening={false}
-                                  />
-                                );
-                              })}
-
-                              <KonvaImage
-                                image={footswitch}
-                                width={footswitchSize}
-                                height={footswitchSize}
-                                x={-footswitchSize / 2}
-                                y={size.h / 2 - 30}
-                                listening={false}
-                              />
-                            </>
-                          )}
-                        </>
-                      );
-                    })()}
+                  {/* Stored profile supplies the actual knob/footswitch diameters and positions. */}
+                  {p.slug === "custom" && displaySizes[p.instanceId] && (() => {
+                    const size = displaySizes[p.instanceId];
+                    const widthMm = Number(p.width);
+                    const depthMm = Number(p.depth);
+                    const layout = resolveCustomPedalLayout(p.customLayout, widthMm, depthMm);
+                    const geometry = getPedalHardwareGeometry(layout, widthMm, depthMm, size.w, size.h);
+                    const scale = Math.min(size.w / widthMm, size.h / depthMm);
+                    return <>
+                      {p.color && <Rect x={-size.w / 2} y={-size.h / 2} width={size.w} height={size.h}
+                        fill={p.color} opacity={0.7} cornerRadius={6 * scale} listening={false} />}
+                      {knob && geometry.knobs.map((part, index) => (
+                        <Group key={`knob-${index}`} x={part.x - size.w / 2} y={part.y - size.h / 2} listening={false}>
+                          <KonvaImage image={knob} width={part.width} height={part.height} listening={false} />
+                          <Rect x={part.width / 2 - Math.max(part.width * 0.03, 0.7 * scale) / 2}
+                            y={part.height * 0.12} width={Math.max(part.width * 0.03, 0.7 * scale)} height={part.height * 0.38}
+                            fill="#ffffff" cornerRadius={scale} listening={false} />
+                        </Group>
+                      ))}
+                      {footswitch && geometry.footswitches.map((part, index) => (
+                        <KonvaImage key={`footswitch-${index}`} image={footswitch}
+                          width={part.width} height={part.height} x={part.x - size.w / 2} y={part.y - size.h / 2} listening={false} />
+                      ))}
+                    </>;
+                  })()}
 
                   {p.slug === "custom" && p.name && displaySizes[p.instanceId] && (
                     <Text

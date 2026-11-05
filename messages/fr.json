@@ -539,7 +539,15 @@
     "format": "Format",
     "boardDimensions": "Dimensions",
     "previousFormats": "Formats précédents",
-    "nextFormats": "Formats suivants"
+    "nextFormats": "Formats suivants",
+    "formatNames": {
+      "mini": "Mini",
+      "compact": "Compact",
+      "standard": "Standard",
+      "large": "Large",
+      "double": "Double",
+      "horizontal": "Horizontal"
+    }
   },
   "powerSetupPlan": {
     "title": "Alimentation",

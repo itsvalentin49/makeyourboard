@@ -314,12 +314,12 @@ export default function Sidebar({ pedalsLibrary, boardsLibrary, newPedals, newPe
     }, {});
   };
   return (<div className={`
-  relative z-40 w-full lg:w-76 shrink-0
+  relative z-40 w-full lg:w-76 shrink-0 min-h-0
   bg-zinc-800
   px-6 pt-3 pb-6 flex flex-col gap-4
   overflow-hidden touch-pan-y
   h-full
-`} style={{ WebkitOverflowScrolling: "touch" }} onClick={(e) => {
+`} style={{ WebkitOverflowScrolling: "touch", boxSizing: "border-box", paddingBottom: activeSidebarTab === "custom" && !contactOpen ? 8 : undefined }} onClick={(e) => {
       e.stopPropagation();
       setShowPedalResults(false);
       setShowBoardResults(false);
@@ -428,7 +428,7 @@ export default function Sidebar({ pedalsLibrary, boardsLibrary, newPedals, newPe
       </>
     </div>) : selectedPedal && (selectedPedal.type === "power" || selectedPedal.capacity) ? (<SpecsPower selectedPower={selectedPedal} units={units} language={language} t={t} isUSA={isUSA} isEurope={isEurope} buildThomannUrl={buildThomannUrl} selectedInstanceId={selectedInstanceId} rotatePedal={rotatePedal} movePedalFront={movePedalFront} movePedalBack={movePedalBack} deletePedal={deletePedal} />) : selectedPedal ? (<SpecsPedal selectedPedal={selectedPedal} selectedInstanceId={selectedInstanceId} units={units} language={language} t={t} isCustomPedal={isCustomPedal} isImportedPedal={isImportedPedal} isUSA={isUSA} isEurope={isEurope} buildThomannUrl={buildThomannUrl} />) : selectedBoardDetails ? (<SpecsBoards selectedBoardDetails={selectedBoardDetails} units={units} language={language} t={t} isCustomBoard={isCustomBoard} buildThomannUrl={buildThomannUrl} getStoresForCountry={getStoresForCountry} hasBoardCommercialLinks={hasBoardCommercialLinks} selectedBoardInstanceId={selectedBoardInstanceId} rotateBoard={rotateBoard} moveBoardFront={moveBoardFront} moveBoardBack={moveBoardBack} deleteBoard={deleteBoard} isUSA={isUSA} isEurope={isEurope} />) : (
       // LIBRARY (default view)
-      <div className="px-1 mt-0 flex flex-col flex-1 min-h-0 overflow-visible" style={{ gap: 20 }}>
+      <div className="px-1 mt-0 flex flex-col flex-1 min-h-0 overflow-visible" style={{ gap: 20, overflow: activeSidebarTab === "custom" ? "hidden" : "visible" }}>
         <div className="shrink-0" style={{ paddingTop: 8 }}>
           <div
             className="w-full overflow-visible"
@@ -531,6 +531,6 @@ export default function Sidebar({ pedalsLibrary, boardsLibrary, newPedals, newPe
         {activeSidebarTab === "custom" && (<CustomPanel customType={customType} setCustomType={setCustomType} customName={customName} setCustomName={setCustomName} customColor={customColor} setCustomColor={setCustomColor} customWidth={customWidth} setCustomWidth={setCustomWidth} customDepth={customDepth} setCustomDepth={setCustomDepth} addCustomItem={addCustomItem} isPedalValid={isPedalValid} isBoardValid={isBoardValid} minValue={minValue} maxValue={maxValue} displayMin={displayMin} displayMax={displayMax} units={units} unitLabel={unitLabel} withUnit={withUnit} t={t} />)}
       </div>)}
     {/* PUSH TO BOTTOM (desktop only) */}
-    <div className="mt-auto" />
+    {activeSidebarTab !== "custom" && <div className="mt-auto" />}
   </div>);
 }
