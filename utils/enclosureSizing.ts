@@ -103,5 +103,6 @@ export const ENCLOSURE_SIZING_BRANDS = new Set([
     "Universal Audio",
     "Woodbrass",
     "Dark Devices",
-    "Death by Audio"
+    "Death by Audio",
+    "Turbulent Audio"
 ]);
