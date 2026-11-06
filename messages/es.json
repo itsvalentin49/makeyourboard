@@ -492,6 +492,7 @@
     "board": "Pedalera",
     "nameOptional": "Nombre",
     "namePlaceholder": "Nombre",
+    "nameExample": "Fuzz",
     "enterDimensions": "Dimensiones",
     "dimensionError": "Dimensiones: mín. {min} {unit} / máx. {max} {unit}",
     "width": "Anchura",
@@ -546,7 +547,7 @@
       "standard": "Estándar",
       "large": "Grande",
       "double": "Doble",
-      "horizontal": "Horizontal"
+      "horizontal": "XLarge"
     }
   },
   "powerSetupPlan": {

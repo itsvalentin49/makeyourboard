@@ -101,5 +101,7 @@ export const ENCLOSURE_SIZING_BRANDS = new Set([
     "Dawner Prince",
     "Native Audio",
     "Universal Audio",
-    "Woodbrass"
+    "Woodbrass",
+    "Dark Devices",
+    "Death by Audio"
 ]);

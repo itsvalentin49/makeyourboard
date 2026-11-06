@@ -11,6 +11,10 @@ import {
 export type { CustomPedalLayout } from "@/utils/customPedalLayout";
 
 const withoutUnit = (label: string) => label.replace(/\s*\((?:V|mA)\)\s*$/i, "");
+function getNameExample(t: (key: string) => string) {
+    const value = t("customPanel.nameExample");
+    return value && value !== "customPanel.nameExample" ? value : t("pedal.type.Fuzz");
+}
 function DimensionsGroup({ title, children }: { title: string; children: React.ReactNode }) {
     return <div className="myb-field-group">
         <div className="myb-field-heading text-[11px] font-medium">{title}</div>
@@ -33,6 +37,55 @@ function CurrentField({ label, ...props }: React.InputHTMLAttributes<HTMLInputEl
         </span>
     </label>;
 }
+export function formatVoltageSelection(values: readonly number[]) {
+    const sorted = [...new Set(values)].sort((a, b) => a - b);
+    if (!sorted.length) return "—";
+    return `${sorted.length === 1 ? sorted[0] : `${sorted[0]}-${sorted[sorted.length - 1]}`}V DC`;
+}
+export function customVoltageData(values: readonly number[], current: number) {
+    const selected = [...new Set(values.length ? values : [9])].sort((a, b) => a - b);
+    return {
+        voltage: selected[0], power: formatVoltageSelection(selected),
+        power_modes: selected.map(voltage => ({ voltage, current }))
+    };
+}
+function VoltageDropdown({ label, values, setValues, open, setOpen, onOpen }: {
+    label: string; values: number[]; setValues: React.Dispatch<React.SetStateAction<number[]>>;
+    open: boolean; setOpen: React.Dispatch<React.SetStateAction<boolean>>; onOpen?: () => void;
+}) {
+    const ref = useRef<HTMLDivElement>(null);
+    const id = React.useId();
+    useEffect(() => {
+        if (!open) return;
+        const outside = (event: MouseEvent) => { if (!ref.current?.contains(event.target as Node)) setOpen(false); };
+        document.addEventListener("mousedown", outside);
+        return () => document.removeEventListener("mousedown", outside);
+    }, [open, setOpen]);
+    return <div className="flex min-w-0 flex-col gap-1 text-[10px] font-medium">
+        <span className="myb-field-heading">{withoutUnit(label)}</span>
+        <div ref={ref} className="relative h-[34px]" onKeyDown={event => {
+            if (event.key === "Escape") { event.preventDefault(); setOpen(false); ref.current?.querySelector<HTMLButtonElement>("button")?.focus(); }
+        }}>
+            <button type="button" aria-label={withoutUnit(label)} aria-expanded={open} aria-controls={id}
+                className="flex h-[34px] w-full min-w-0 items-center justify-between rounded-md border border-zinc-800 bg-zinc-950 px-3 text-left text-[10px]"
+                onClick={() => { const next = !open; if (next) onOpen?.(); setOpen(next); }}>
+                <span className="truncate">{formatVoltageSelection(values)}</span>
+                <ChevronDown size={14} className="ml-2 shrink-0 text-zinc-500" style={{ transform: open ? "rotate(180deg)" : undefined }} />
+            </button>
+            {open && <div id={id} role="group" aria-label={withoutUnit(label)} className="myb-jack-menu absolute left-0 top-full z-50 mt-1 w-full overflow-hidden rounded-lg border border-zinc-800 bg-zinc-950 shadow-2xl">
+                {[9, 12, 18, 24].map(voltage => <label key={voltage} className="myb-jack-option myb-menu-option hover:bg-canvas">
+                    <input type="checkbox" className="myb-jack-input" checked={values.includes(voltage)} onChange={event => {
+                        const checked = event.target.checked;
+                        setValues(current => checked ? [...new Set([...current, voltage])].sort((a, b) => a - b)
+                            : current.length > 1 ? current.filter(value => value !== voltage) : current);
+                    }} />
+                    <span>{voltage}V DC</span>
+                    <span className="myb-jack-checkbox" aria-hidden="true">{values.includes(voltage) && <Check size={10} strokeWidth={3} />}</span>
+                </label>)}
+            </div>}
+        </div>
+    </div>;
+}
 type ImportBuilderProps = {
     addCustomItem: (item: AnyRow) => void;
     units: "metric" | "imperial";
@@ -45,7 +98,8 @@ function ImportBuilder({ addCustomItem, units, t }: ImportBuilderProps) {
     const [uploadImageId, setUploadImageId] = useState<string | null>(null);
     const [uploadWidth, setUploadWidth] = useState("");
     const [uploadDepth, setUploadDepth] = useState("");
-    const [uploadVoltage, setUploadVoltage] = useState("");
+    const [uploadVoltage, setUploadVoltage] = useState<number[]>([9]);
+    const [uploadVoltageOpen, setUploadVoltageOpen] = useState(false);
     const [uploadDraw, setUploadDraw] = useState("100");
     const [imageLoading, setImageLoading] = useState(false);
     const [imageError, setImageError] = useState("");
@@ -116,8 +170,7 @@ function ImportBuilder({ addCustomItem, units, t }: ImportBuilderProps) {
             slug: "custom-upload", type: "pedal",
             imageId: uploadImageId, image: uploadImage, image_url: uploadImage, photo: uploadImage,
             width: widthMm, depth: depthMm,
-            voltage: Number(uploadVoltage) || 9,
-            power: uploadVoltage ? `${uploadVoltage}V DC` : "9V DC",
+            ...customVoltageData(uploadVoltage, uploadDraw.trim() ? Number(uploadDraw) : 100),
             draw: uploadDraw.trim() ? Number(uploadDraw) : 100,
             weight: 0,
         });
@@ -125,7 +178,8 @@ function ImportBuilder({ addCustomItem, units, t }: ImportBuilderProps) {
         setUploadModel("");
         setUploadWidth("");
         setUploadDepth("");
-        setUploadVoltage("");
+        setUploadVoltage([9]);
+        setUploadVoltageOpen(false);
         setUploadDraw("100");
     };
     return (<form onSubmit={submit} className="mt-2 flex flex-col gap-2 pb-4">
@@ -142,19 +196,19 @@ function ImportBuilder({ addCustomItem, units, t }: ImportBuilderProps) {
                     </div> : <button type="button" aria-label={t("customPanel.chooseImage")}
                         aria-busy={imageLoading} onClick={() => fileInputRef.current?.click()} disabled={imageLoading}
                         className="myb-import-image myb-upload-button rounded-lg bg-zinc-950 disabled:opacity-50">
-                        <ImportIcon size={18} aria-hidden="true" />
+                        <ImportIcon size={28} strokeWidth={2} className="myb-upload-icon" aria-hidden="true" />
                     </button>}
                     {uploadImage && <button type="button" onClick={removeImage}
                         aria-label={t("customPanel.removeImage")} title={t("customPanel.removeImage")}
                         className="myb-remove-upload"><X size={14} /></button>}
                 </div>
+                <p className="myb-image-hint text-[9px] leading-relaxed" style={{ margin: "-4px 0 0" }}>{t("customPanel.imageHint")}</p>
             </div>
             <label className="flex min-w-0 flex-col gap-1 text-[10px] font-medium">
                 <span className="myb-field-heading">{t("customPanel.namePlaceholder")}</span>
-                <input type="text" aria-label={t("customPanel.namePlaceholder")} value={uploadModel} onChange={event => setUploadModel(event.target.value)} className={`myb-name-field ${fieldClass}`} />
+                <input type="text" placeholder={getNameExample(t)} aria-label={t("customPanel.namePlaceholder")} value={uploadModel} onChange={event => setUploadModel(event.target.value)} className={`myb-name-field ${fieldClass}`} />
             </label>
         </div>
-        <p className="myb-image-hint text-[9px] leading-relaxed">{t("customPanel.imageHint")}</p>
         {imageError && <p role="alert" className="text-[10px] text-red-400">{imageError}</p>}
         <DimensionsGroup title={t("customPanel.enterDimensions").replace(/\s*\([^)]*\)\s*$/, "")}>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 8 }}>
@@ -169,13 +223,7 @@ function ImportBuilder({ addCustomItem, units, t }: ImportBuilderProps) {
             </p>
         </DimensionsGroup>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 8 }}>
-            <label className="flex min-w-0 flex-col gap-1 text-[10px] font-medium">
-                <span className="myb-field-heading">{withoutUnit(t("customPanel.voltage"))}</span>
-                <select aria-label={withoutUnit(t("customPanel.voltage"))} value={uploadVoltage} onChange={event => setUploadVoltage(event.target.value)} className={fieldClass}>
-                    <option value="">9V DC</option>
-                    {[12, 18, 24].map(voltage => <option key={voltage} value={voltage}>{voltage}V DC</option>)}
-                </select>
-            </label>
+            <VoltageDropdown label={t("customPanel.voltage")} values={uploadVoltage} setValues={setUploadVoltage} open={uploadVoltageOpen} setOpen={setUploadVoltageOpen} />
             <CurrentField label={t("customPanel.consumption")} min={0} step="any" inputMode="decimal" value={uploadDraw} onChange={event => setUploadDraw(event.target.value)} />
         </div>
         <button type="submit" disabled={!isUploadValid} className="mt-1 flex h-[34px] w-full items-center justify-center rounded-md myb-add-button bg-blue-600 text-[10px] font-black uppercase !text-white hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-40">
@@ -307,7 +355,7 @@ function CustomBuilder({ customType, customName, setCustomName, customWidth, set
     ];
     const [hasSelectedColor, setHasSelectedColor] = useState(false);
     const [pickedColor, setPickedColor] = useState("#ea580c");
-    const [customVoltage, setCustomVoltage] = useState("");
+    const [customVoltage, setCustomVoltage] = useState<number[]>([9]);
     const [customDraw, setCustomDraw] = useState("100");
     const [customVoltageOpen, setCustomVoltageOpen] = useState(false);
     const [boardTexture, setBoardTexture] = useState<BoardTexture>("wood");
@@ -316,7 +364,6 @@ function CustomBuilder({ customType, customName, setCustomName, customWidth, set
     const [jackMenuOpen, setJackMenuOpen] = useState(false);
     const jackMenuRef = useRef<HTMLDivElement>(null);
     const jackMenuId = React.useId();
-    const customVoltageRef = useRef<HTMLDivElement>(null);
     const boardTextureRef = useRef<HTMLDivElement>(null);
     const formatsRef = useRef<HTMLDivElement>(null);
     const previewAreaRef = useRef<HTMLDivElement>(null);
@@ -386,10 +433,7 @@ function CustomBuilder({ customType, customName, setCustomName, customWidth, set
         const handleClickOutside = (event: MouseEvent) => {
             const target = event.target as Node;
             if (jackMenuRef.current && !jackMenuRef.current.contains(target)) setJackMenuOpen(false);
-            if (customVoltageRef.current &&
-                !customVoltageRef.current.contains(target)) {
-                setCustomVoltageOpen(false);
-            }
+
             if (boardTextureRef.current &&
                 !boardTextureRef.current.contains(target)) {
                 setBoardTextureOpen(false);
@@ -419,7 +463,7 @@ function CustomBuilder({ customType, customName, setCustomName, customWidth, set
         resetCommonFields();
         setCustomColor("");
         setHasSelectedColor(false);
-        setCustomVoltage("");
+        setCustomVoltage([9]);
         setCustomDraw("100");
         setSelectedFormatId(null);
         setJackLocations([
@@ -591,7 +635,7 @@ function CustomBuilder({ customType, customName, setCustomName, customWidth, set
                 </DimensionsGroup>
                 {/* NOM + POSITION DES JACKS */}
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(2,minmax(0,1fr))", gap: 8, alignItems: "start" }}>
-                    <label className="flex min-w-0 flex-col gap-1 text-[10px] font-medium"><span className="myb-field-heading">{t("customPanel.namePlaceholder")}</span><input type="text" aria-label={t("customPanel.namePlaceholder")} value={customName} onChange={(event) => setCustomName(event.target.value)} className="myb-name-field 
+                    <label className="flex min-w-0 flex-col gap-1 text-[10px] font-medium"><span className="myb-field-heading">{t("customPanel.namePlaceholder")}</span><input type="text" placeholder={getNameExample(t)} aria-label={t("customPanel.namePlaceholder")} value={customName} onChange={(event) => setCustomName(event.target.value)} className="myb-name-field 
                   w-full
                   h-[34px]
                   bg-zinc-950
@@ -621,7 +665,7 @@ function CustomBuilder({ customType, customName, setCustomName, customWidth, set
                             </button>
                             {jackMenuOpen && <div id={jackMenuId} role="group" aria-label={t("customPanel.jackLocations")}
                                 className="myb-jack-menu absolute left-0 top-full z-50 mt-1 w-full overflow-hidden rounded-lg border border-zinc-800 bg-zinc-950 shadow-2xl">
-                                {LOCATION_OPTIONS.map(option => <label key={option.value} className="myb-jack-option">
+                                {LOCATION_OPTIONS.map(option => <label key={option.value} className="myb-jack-option myb-menu-option hover:bg-canvas">
                                     <input type="checkbox" className="myb-jack-input"
                                         checked={jackLocations.includes(option.value)}
                                         onChange={event => {
@@ -642,74 +686,7 @@ function CustomBuilder({ customType, customName, setCustomName, customWidth, set
                 {/* TENSION + CONSOMMATION */}
                 <div className="min-w-0" style={{ display: "grid", gridTemplateColumns: "repeat(2,minmax(0,1fr))", gap: 8 }}>
 
-                    <div className="flex min-w-0 flex-col gap-1 text-[10px] font-medium"><span className="myb-field-heading">{withoutUnit(t("customPanel.voltage"))}</span><div ref={customVoltageRef} className="relative h-[34px]">
-                        <button type="button" onClick={() => {
-                            const nextOpen = !customVoltageOpen;
-                            closeAllMenus();
-                            setCustomVoltageOpen(nextOpen);
-                        }} className="
-                    w-full
-                    h-[34px]
-                    px-3
-                    bg-zinc-950
-                    border
-                    border-zinc-800
-                    rounded-md
-                    text-[10px]
-                    text-left
-                    flex
-                    items-center
-                    justify-between
-                    hover:border-zinc-600
-                    transition-colors
-                  ">
-                            <span>
-                                {customVoltage
-                                    ? `${customVoltage}V DC`
-                                    : "9V DC"}
-                            </span>
-                            <ChevronDown size={14} className={`
-                      text-zinc-500
-                      transition-transform
-                      ${customVoltageOpen
-                                    ? "rotate-180"
-                                    : ""}
-                    `} />
-                        </button>
-                        {customVoltageOpen && (<div className="
-                      absolute
-                      z-50
-                      top-full
-                      mt-1
-                      w-full
-                      bg-zinc-950
-                      border
-                      border-zinc-800
-                      rounded-lg
-                      overflow-hidden
-                    ">
-                            {[
-                                "9",
-                                "12",
-                                "18",
-                                "24",
-                            ].map((voltage) => (<button key={voltage} type="button" onClick={() => {
-                                setCustomVoltage(voltage);
-                                setCustomVoltageOpen(false);
-                            }} className="
-                          w-full
-                          h-[25px]
-                          px-3
-                          text-left
-                          text-[10px]
-                          flex
-                          items-center
-                          hover:bg-canvas
-                        ">
-                                {voltage}V DC
-                            </button>))}
-                        </div>)}
-                    </div></div>
+                    <VoltageDropdown label={t("customPanel.voltage")} values={customVoltage} setValues={setCustomVoltage} open={customVoltageOpen} setOpen={setCustomVoltageOpen} onOpen={closeAllMenus} />
                     <CurrentField label={t("customPanel.current")} min={0} value={customDraw} onChange={(event) => setCustomDraw(event.target.value)} />
                 </div>
                 {/* APERÇU PÉDALE */}
@@ -743,11 +720,7 @@ function CustomBuilder({ customType, customName, setCustomName, customWidth, set
                         customLayout: effectiveLayout,
                         color: customColor ||
                             undefined,
-                        voltage: Number(customVoltage) ||
-                            9,
-                        power: customVoltage
-                            ? `${customVoltage}V DC`
-                            : "9V DC",
+                        ...customVoltageData(customVoltage, customDraw.trim() ? Number(customDraw) || 0 : 100),
                         draw: customDraw.trim() ? Number(customDraw) || 0 : 100,
                         jacksLocation: jackLocations.join(", "),
                         powerLocation: "top",
@@ -1016,12 +989,19 @@ export default function CustomPanel(props: CustomPanelProps) {
         }
         .myb-custom-panel .myb-add-button { flex-shrink: 0 !important; }
         .myb-custom-panel .myb-jack-menu .myb-jack-option {
-          justify-content: flex-start; gap: 8px; height: 30px; padding: 0 10px; border-radius: 0;
+          justify-content: space-between; gap: 8px; height: 30px; padding: 0 10px; border-radius: 0;
         }
-        .myb-custom-panel .myb-jack-menu .myb-jack-option:hover {
-          background: color-mix(in srgb, currentColor 10%, transparent);
-        }
+        .myb-custom-panel .myb-jack-menu .myb-jack-checkbox { order: 2; }
+        .myb-custom-panel .myb-jack-menu .myb-jack-option > span:not(.myb-jack-checkbox) { order: 1; }
+        .myb-custom-panel .myb-menu-option:hover { background-color: var(--canvas, var(--color-canvas, var(--zinc-700, #3f3f46))) !important; }
+        .light .myb-custom-panel .myb-menu-option:hover { background-color: var(--zinc-700, #e5e7eb) !important; }
+        .myb-custom-panel .myb-carousel-arrow { transition: background-color 140ms ease; }
+        .myb-custom-panel .myb-carousel-arrow:hover,
+        .myb-custom-panel .myb-carousel-arrow:focus-visible { background: color-mix(in srgb, currentColor 24%, transparent) !important; }
         .myb-custom-panel .myb-custom-title { margin: 0 0 8px !important; }
+        .myb-custom-panel .myb-name-field::placeholder { color: #a1a1aa !important; opacity: 1 !important; }
+        .light .myb-custom-panel .myb-name-field::placeholder { color: #626975 !important; }
+        .myb-custom-panel .myb-name-field:focus::placeholder { color: transparent !important; }
         .myb-custom-panel .myb-name-field,
         .myb-custom-panel .myb-add-button {
           height: 34px !important; min-height: 34px !important; max-height: 34px !important;
@@ -1188,10 +1168,10 @@ export default function CustomPanel(props: CustomPanelProps) {
           border: 1px solid #71717a; border-radius: 3px; color: #ffffff;
           background: transparent;
         }
-        .myb-custom-panel .myb-jack-input:checked + .myb-jack-checkbox {
+        .myb-custom-panel .myb-jack-input:checked ~ .myb-jack-checkbox {
           border-color: #2563eb; background: #2563eb;
         }
-        .myb-custom-panel .myb-jack-input:focus-visible + .myb-jack-checkbox {
+        .myb-custom-panel .myb-jack-input:focus-visible ~ .myb-jack-checkbox {
           outline: 2px solid #60a5fa; outline-offset: 2px;
         }
 
@@ -1200,6 +1180,14 @@ export default function CustomPanel(props: CustomPanelProps) {
           border: none !important;
           cursor: pointer;
           transition: background-color 140ms ease;
+        }
+        .myb-custom-panel .myb-upload-icon {
+          width: 28px; height: 28px; flex-shrink: 0;
+          transition: transform 140ms ease, color 140ms ease;
+        }
+        .myb-custom-panel .myb-import-image:hover:not(:disabled) .myb-upload-icon,
+        .myb-custom-panel .myb-import-image:focus-visible .myb-upload-icon {
+          transform: scale(1.12);
         }
         .myb-import-image:hover:not(:disabled) {
           background-color: var(--zinc-900, #18181b);

@@ -492,6 +492,7 @@
     "board": "效果器板",
     "nameOptional": "名称",
     "namePlaceholder": "名称",
+    "nameExample": "法兹",
     "enterDimensions": "尺寸",
     "dimensionError": "尺寸：最小 {min} {unit} / 最大 {max} {unit}",
     "width": "宽度",
@@ -546,7 +547,7 @@
       "standard": "标准",
       "large": "大型",
       "double": "双开关",
-      "horizontal": "横向"
+      "horizontal": "加大号"
     }
   },
   "powerSetupPlan": {

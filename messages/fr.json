@@ -469,6 +469,7 @@
     "board": "Board",
     "nameOptional": "Nom",
     "namePlaceholder": "Nom",
+    "nameExample": "Fuzz",
     "enterDimensions": "Dimensions",
     "dimensionError": "Dimensions : min {min} {unit} / max {max} {unit}",
     "width": "Largeur",
@@ -523,7 +524,7 @@
       "standard": "Standard",
       "large": "Large",
       "double": "Double",
-      "horizontal": "Horizontal"
+      "horizontal": "XLarge"
     }
   },
   "powerSetupPlan": {

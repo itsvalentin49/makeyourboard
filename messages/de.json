@@ -492,6 +492,7 @@
     "board": "Board",
     "nameOptional": "Name",
     "namePlaceholder": "Name",
+    "nameExample": "Fuzz",
     "enterDimensions": "Abmessungen",
     "dimensionError": "Abmessungen: min. {min} {unit} / max. {max} {unit}",
     "width": "Breite",
