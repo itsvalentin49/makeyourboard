@@ -304,10 +304,10 @@ export function CustomPedalVisual({ widthMm, depthMm, scale, customColor, custom
                     width: jack.width, height: jack.height, left: jack.x, top: jack.y
                 }} />
         ))}
-        <div style={{ position: "absolute", inset: 0, zIndex: 1, borderRadius: 6 * scale, overflow: "hidden" }}>
+        <div style={{ position: "absolute", inset: 0, zIndex: 1, overflow: "hidden" }}>
             <img src="/images/custom-pedal.webp" alt="" draggable={false}
                 style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "fill", pointerEvents: "none" }} />
-            {customColor && <div style={{ position: "absolute", inset: 0, backgroundColor: customColor, opacity: 0.7, pointerEvents: "none" }} />}
+            {customColor && <div style={{ position: "absolute", inset: 0, backgroundColor: customColor, opacity: 0.7, pointerEvents: "none", maskImage: 'url("/images/custom-pedal.webp")', WebkitMaskImage: 'url("/images/custom-pedal.webp")', maskSize: "100% 100%", WebkitMaskSize: "100% 100%", maskRepeat: "no-repeat", WebkitMaskRepeat: "no-repeat" }} />}
             {hardware(geometry.knobs, "/images/knob.webp")}
             {customName.trim() && <div style={{ position: "absolute", left: "6%", top: "50%", transform: "translateY(-50%)", width: "88%", textAlign: "center", color: "#000000", fontWeight: 900, fontSize: 8 * scale, lineHeight: 1, textTransform: "uppercase", overflowWrap: "anywhere" }}>{customName.trim()}</div>}
             {hardware(geometry.leds, "/images/led.webp")}

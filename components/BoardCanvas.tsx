@@ -235,6 +235,27 @@ function CanvasPanelsPortal({ host, children }: { host: HTMLDivElement | null; c
   return host ? createPortal(children, host) : <>{children}</>;
 }
 
+// Tint follows the source image alpha, including its real corners and soft edges.
+function CustomPedalTint({ color, width, height }: { color: string; width: number; height: number }) {
+  const [source] = useImage("/images/custom-pedal.webp");
+  const tint = React.useMemo(() => {
+    if (!source) return undefined;
+    const mask = document.createElement("canvas");
+    mask.width = source.naturalWidth || source.width;
+    mask.height = source.naturalHeight || source.height;
+    const context = mask.getContext("2d");
+    if (!context) return undefined;
+    context.drawImage(source, 0, 0, mask.width, mask.height);
+    context.globalCompositeOperation = "source-in";
+    context.fillStyle = color;
+    context.fillRect(0, 0, mask.width, mask.height);
+    return mask;
+  }, [source, color]);
+  if (!tint) return null;
+  return <KonvaImage image={tint} x={-width / 2} y={-height / 2}
+    width={width} height={height} opacity={0.7} listening={false} />;
+}
+
 export default function BoardCanvas({
   desktopToolbarHost = null,
   activeProject,
@@ -3583,8 +3604,7 @@ ${isMobile
                     const geometry = getPedalHardwareGeometry(layout, widthMm, depthMm, size.w, size.h);
                     const scale = Math.min(size.w / widthMm, size.h / depthMm);
                     return <>
-                      {p.color && <Rect x={-size.w / 2} y={-size.h / 2} width={size.w} height={size.h}
-                        fill={p.color} opacity={0.7} cornerRadius={6 * scale} listening={false} />}
+                      {p.color && <CustomPedalTint color={p.color} width={size.w} height={size.h} />}
                       {knob && geometry.knobs.map((part, index) => (
                         <Group key={`knob-${index}`} x={part.x - size.w / 2} y={part.y - size.h / 2} listening={false}>
                           <KonvaImage image={knob} width={part.width} height={part.height} listening={false} />
