@@ -104,5 +104,9 @@ export const ENCLOSURE_SIZING_BRANDS = new Set([
     "Woodbrass",
     "Dark Devices",
     "Death by Audio",
-    "Turbulent Audio"
+    "Turbulent Audio",
+    "Hangman FX",
+    "Melofty",
+    "Cosmodio",
+    "DevTech Audio"
 ]);

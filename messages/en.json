@@ -119,8 +119,8 @@
     },
     "bypass": {
       "label": "Bypass",
-      "True Bypass": "True bypass",
-      "Buffered Bypass": "Buffered bypass",
+      "True Bypass": "True Bypass",
+      "Buffered Bypass": "Buffered Bypass",
       "Switchable": "Switchable",
       "N/A": "N/A"
     },
