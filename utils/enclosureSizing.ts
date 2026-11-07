@@ -110,5 +110,8 @@ export const ENCLOSURE_SIZING_BRANDS = new Set([
     "Cosmodio",
     "DevTech Audio",
     "Diamond",
-    "Gator"
+    "Gator",
+    "Hagerman",
+    "Valeton",
+    "Mattoverse Electronics"
 ]);

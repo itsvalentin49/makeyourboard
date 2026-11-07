@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { GripVertical, X, PanelsTopLeft } from "lucide-react";
+import { GripVertical, X } from "lucide-react";
+import Image from "next/image";
 import type { Project } from "@/types/project";
 import { getTranslator, type Language } from "@/utils/i18n";
 
@@ -437,7 +438,14 @@ export default function PedalboardsPanel({
 
             <div className="flex items-center gap-2 text-xs uppercase tracking-wider font-bold px-2 pb-3">
 
-                <PanelsTopLeft size={18} strokeWidth={2} aria-hidden="true" className="shrink-0" />
+                <Image
+                    src={isLightTheme ? "/images/tab-board-dark.webp" : "/images/tab-board-light.webp"}
+                    alt=""
+                    width={18}
+                    height={18}
+                    draggable={false}
+                    className="size-[18px] shrink-0 object-contain"
+                />
 
                 {t(
                     "canvasControls.pedalboards"

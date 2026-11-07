@@ -47,6 +47,7 @@ type PedalImageProps = {
   useEnclosureSizing?: boolean;
   onImageReady?: () => void;
   hidePlaceholder?: boolean;
+  outlineOpacity?: number;
 };
 
 type ImagePlacement = {
@@ -55,6 +56,45 @@ type ImagePlacement = {
   x: number;
   y: number;
 };
+
+const visibleImageBounds = new WeakMap<HTMLImageElement, ImagePlacement>();
+
+function getOutlineBounds(image: HTMLImageElement, placement: ImagePlacement): ImagePlacement {
+  let bounds = visibleImageBounds.get(image);
+  if (!bounds) {
+    bounds = { x: 0, y: 0, width: 1, height: 1 };
+    try {
+      const canvas = document.createElement("canvas");
+      const scale = Math.min(1, MAX_ANALYSIS_SIZE / Math.max(image.naturalWidth, image.naturalHeight));
+      canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+      canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+      const context = canvas.getContext("2d", { willReadFrequently: true });
+      if (context) {
+        context.drawImage(image, 0, 0, canvas.width, canvas.height);
+        const { data } = context.getImageData(0, 0, canvas.width, canvas.height);
+        const visible = getVisiblePixelBounds(data, canvas.width, canvas.height);
+        if (visible) {
+          bounds = {
+            x: visible.minX / canvas.width,
+            y: visible.minY / canvas.height,
+            width: (visible.maxX - visible.minX + 1) / canvas.width,
+            height: (visible.maxY - visible.minY + 1) / canvas.height,
+          };
+        }
+      }
+    } catch {
+      // Use the drawn image rectangle if its pixels cannot be read.
+    }
+    visibleImageBounds.set(image, bounds);
+  }
+
+  return {
+    x: placement.x + bounds.x * placement.width,
+    y: placement.y + bounds.y * placement.height,
+    width: bounds.width * placement.width,
+    height: bounds.height * placement.height,
+  };
+}
 
 type EnclosureBounds = {
   bodyLeft: number;
@@ -3898,6 +3938,7 @@ export default function PedalImage({
   useEnclosureSizing = false,
   onImageReady,
   hidePlaceholder = false,
+  outlineOpacity,
 }: PedalImageProps) {
   const [img, setImg] =
     useState<HTMLImageElement | null>(
@@ -4386,6 +4427,13 @@ export default function PedalImage({
     hasBottom,
   ]);
 
+  const outlineBounds = React.useMemo(() => {
+    if (outlineOpacity === undefined) return null;
+    if (img && imagePlacement) return getOutlineBounds(img, imagePlacement);
+    if (hidePlaceholder) return null;
+    return { x: -scaledWidth / 2, y: -scaledHeight / 2, width: scaledWidth, height: scaledHeight };
+  }, [outlineOpacity, img, imagePlacement, hidePlaceholder, scaledWidth, scaledHeight]);
+
   return (
     <Group>
       {/* MARGE JACKS */}
@@ -4477,6 +4525,17 @@ export default function PedalImage({
               ? 0
               : 3
           }
+        />
+      )}
+
+      {outlineBounds && (
+        <Rect
+          {...outlineBounds}
+          stroke="white"
+          strokeWidth={0.5}
+          opacity={outlineOpacity}
+          cornerRadius={3}
+          listening={false}
         />
       )}
 

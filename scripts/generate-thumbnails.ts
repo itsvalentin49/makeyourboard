@@ -52,22 +52,25 @@ async function main() {
   }
   if (!bucket.public) throw new Error("Le bucket thumbnails doit être public.");
 
-  // Read all tables before changing any URLs. Do not filter on thumbnail.
+  // Collect missing thumbnails before starting uploads.
   const catalog: { table: TableName; items: Item[] }[] = [];
   for (const table of TABLES) {
     const items: Item[] = [];
-    let offset = 0;
-    for (;;) {
-      const { data, error } = await supabase
+    let lastId: Item["id"] | undefined;
+    for (; ;) {
+      let query = supabase
         .from(table)
         .select("id, image, thumbnail, width, depth")
+        .or("thumbnail.is.null,thumbnail.eq.")
         .order("id", { ascending: true })
-        .range(offset, offset + 499);
+        .limit(500);
+      if (lastId !== undefined) query = query.gt("id", lastId);
+      const { data, error } = await query;
       if (error) throw new Error(`Lecture ${table} : ${error.message}`);
       const page = (data ?? []) as Item[];
       if (page.length === 0) break;
       items.push(...page);
-      offset += page.length;
+      lastId = page[page.length - 1].id;
     }
     catalog.push({ table, items });
   }
@@ -84,7 +87,7 @@ async function main() {
   const failures: { table: TableName; id: Item["id"]; error: string }[] = [];
 
   for (const { table, items } of catalog) {
-    console.log(`\n${table} : ${items.length} produits à examiner`);
+    console.log(`\n${table} : ${items.length} miniatures manquantes`);
     for (const item of items) {
       if (!item.image?.trim()) {
         skipped++;
@@ -155,10 +158,10 @@ async function main() {
   console.log(`\nTerminé : ${success} réussites, ${failed} échecs, ${skipped} sans image.`);
   console.log(`Rapport : ${reportPath}`);
   if (failed || skipped) {
-    console.log("Conserve pedals-thumbs : certains produits n’ont pas reçu de nouvelle miniature.");
+    console.log("Certaines miniatures manquent encore. Consulte le rapport.");
     process.exitCode = 1;
   } else {
-    console.log("Toutes les miniatures du catalogue ont été régénérées dans thumbnails.");
+    console.log("Toutes les miniatures manquantes détectées ont été traitées.");
   }
 }
 

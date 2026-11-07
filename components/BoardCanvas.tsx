@@ -3,7 +3,7 @@
 import { createPortal } from "react-dom";
 import React, { useRef, useLayoutEffect, useEffect, useState } from "react";
 import { Stage, Layer, Group, Rect, Text, Circle as KonvaCircle, Image as KonvaImage, } from "react-konva";
-import { Zap, Weight, Minus, Cable, Plus, Check, Upload, AlertTriangle, RotateCw, Circle, Trash2, X, Share2, Info, List, Settings, PanelsTopLeft, Download, ArrowUp, ArrowDown, CircleHelp, SlidersHorizontal, ChevronsLeft, ChevronsRight } from "lucide-react";
+import { Zap, Weight, Minus, Cable, Plus, Check, Upload, AlertTriangle, RotateCw, Circle, Trash2, X, Share2, Info, List, Settings, PanelsTopLeft, Download, ArrowUp, ArrowDown, CircleHelp, ChevronsLeft, ChevronsRight } from "lucide-react";
 import PedalImage from "@/components/PedalImage";
 import { formatWeight } from "@/utils/units";
 import { getTranslator } from "@/utils/i18n";
@@ -339,6 +339,8 @@ export default function BoardCanvas({
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [renderMobileMenu, setRenderMobileMenu] = useState(false);
   const [isLightTheme, setIsLightTheme] = useState(true);
+  const boardIconSrc = isLightTheme ? "/images/tab-board-dark.webp" : "/images/tab-board-light.webp";
+  const settingsIconSrc = isLightTheme ? "/images/tab-settings-dark.webp" : "/images/tab-settings-light.webp";
   const [helpOpen, setHelpOpen] = useState(false);
 
   useEffect(() => {
@@ -1610,18 +1612,29 @@ html.light .myb-tool-rail-button[data-active="true"] { background: var(--zinc-70
           </div>
           <div id="myb-tool-rail-actions" className="myb-tool-rail-actions">
             {([
-              { id: "boards", label: t("canvasControls.boards"), Icon: PanelsTopLeft, open: showBoardsMenu },
+              { id: "boards", label: t("canvasControls.boards"), Icon: null, open: showBoardsMenu },
               { id: "cables", label: t("cables.title"), Icon: Cable, open: showCableMenu },
               { id: "power", label: t("canvasControls.power"), Icon: Zap, open: showPower },
               { id: "export", label: t("export.button"), Icon: Upload, open: showExportPanel },
-              { id: "settings", label: t("settings.title"), Icon: SlidersHorizontal, open: showSettings },
+              { id: "settings", label: t("settings.title"), Icon: null, open: showSettings },
             ] as const).map(({ id, label, Icon, open }) => (
               <React.Fragment key={id}>
                 <button type="button" className="myb-tool-rail-button"
                   aria-label={label} title={railExpanded ? undefined : label} aria-expanded={open} data-active={open}
                   ref={id === "boards" ? boardsButtonRef : undefined}
                   onClick={() => toggleUnifiedPanel(id)}>
-                  <Icon size={24} strokeWidth={2} aria-hidden="true" />
+                  {Icon ? (
+                    <Icon size={24} strokeWidth={2} aria-hidden="true" />
+                  ) : (
+                    <Image
+                      src={id === "boards" ? boardIconSrc : settingsIconSrc}
+                      alt=""
+                      width={24}
+                      height={24}
+                      draggable={false}
+                      className="size-6 shrink-0 object-contain"
+                    />
+                  )}
                   {railExpanded && <span className="myb-tool-rail-label">{label}</span>}
                 </button>
               </React.Fragment>
@@ -2319,7 +2332,8 @@ ${isMobile
       uppercase
     "
                         >
-                          <PanelsTopLeft size={18} strokeWidth={2} aria-hidden="true" className="shrink-0" />
+                          <Image src={boardIconSrc} alt="" width={18} height={18}
+                            draggable={false} className="size-[18px] shrink-0 object-contain" />
 
                           {t("canvasControls.boards")}
                         </div>
@@ -2673,11 +2687,7 @@ ${isMobile
     "
                         >
                           <img
-                            src={
-                              isLightTheme
-                                ? "/images/tab-settings-dark.webp"
-                                : "/images/tab-settings-light.webp"
-                            }
+                            src={settingsIconSrc}
                             alt=""
                             aria-hidden="true"
                             draggable={false}
@@ -3032,7 +3042,14 @@ ${isMobile
                             ? "w-full min-h-full bg-zinc-800 border-0 rounded-none p-6"
                             : "w-full bg-transparent border-0 rounded-none p-0"
                         }
-                      >                      {!settingsContactVisible && <div className="flex items-center gap-2 text-xs uppercase tracking-wider font-bold" style={{ marginBottom: 32, minHeight: 24 }}><SlidersHorizontal size={18} aria-hidden="true" className="shrink-0" />{t("settings.title")}</div>}
+                      >
+                        {!settingsContactVisible && (
+                          <div className="flex items-center gap-2 text-xs uppercase tracking-wider font-bold" style={{ marginBottom: 32, minHeight: 24 }}>
+                            <Image src={settingsIconSrc} alt="" width={18} height={18}
+                              draggable={false} className="size-[18px] shrink-0 object-contain" />
+                            {t("settings.title")}
+                          </div>
+                        )}
 
                         <SettingsPanel
                           t={t}
@@ -3426,13 +3443,9 @@ ${isMobile
               const p = item;
 
               const pedalSize = displaySizes[p.instanceId];
-
-
-
-              const selectionWidth =
-                pedalSize
-                  ? pedalSize.w
-                  : 0;
+              const outlineOpacity = selectedInstanceId === p.instanceId
+                ? 1
+                : !isDragging && hoveredPedalId === p.instanceId ? 0.25 : undefined;
 
               return (
                 <Group
@@ -3558,6 +3571,7 @@ ${isMobile
                   <PedalImage
                     url={p.image || p.image_url || p.photo || null}
                     imageId={p.imageId || null}
+                    outlineOpacity={p.slug === "custom" ? undefined : outlineOpacity}
                     width={p.width}
                     depth={p.depth}
                     color={p.color}
@@ -3643,37 +3657,19 @@ ${isMobile
                     />
                   )}
 
-                  {/* 💎 Hover halo */}
-                  {!isDragging &&
-                    hoveredPedalId === p.instanceId &&
-                    selectedInstanceId !== p.instanceId &&
-                    displaySizes[p.instanceId] && (
-                      <Rect
-                        x={-selectionWidth / 2}
-                        y={-displaySizes[p.instanceId].h / 2}
-                        width={selectionWidth}
-                        height={displaySizes[p.instanceId].h}
-                        stroke="white"
-                        strokeWidth={0.5}
-                        opacity={0.25}
-                        cornerRadius={3}
-                        listening={false}
-                      />
-                    )}
-
-                  {selectedInstanceId === p.instanceId &&
-                    displaySizes[p.instanceId] && (
-                      <Rect
-                        x={-selectionWidth / 2}
-                        y={-displaySizes[p.instanceId].h / 2}
-                        width={selectionWidth}
-                        height={displaySizes[p.instanceId].h}
-                        stroke="white"
-                        strokeWidth={0.5}
-                        cornerRadius={3}
-                        listening={false}
-                      />
-                    )}
+                  {p.slug === "custom" && outlineOpacity !== undefined && pedalSize && (
+                    <Rect
+                      x={-pedalSize.w / 2}
+                      y={-pedalSize.h / 2}
+                      width={pedalSize.w}
+                      height={pedalSize.h}
+                      stroke="white"
+                      strokeWidth={0.5}
+                      opacity={outlineOpacity}
+                      cornerRadius={3}
+                      listening={false}
+                    />
+                  )}
 
                   {/* ================= SIGNAL CHAIN NUMBER ================= */}
                   {showSignalChain &&
