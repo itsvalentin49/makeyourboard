@@ -142,6 +142,8 @@ export default function BoardEditor({
     pedalsLibrary,
     boardsLibrary,
     powerLibrary,
+    boardsStatus,
+    powerStatus,
     newPedals,
     newPedalsLoading,
     loading: libraryLoading,
@@ -1232,6 +1234,8 @@ export default function BoardEditor({
                   libraryError={libraryError}
                   boardsLibrary={boardsLibrary}
                   powerLibrary={powerLibrary}
+                  boardsStatus={boardsStatus}
+                  powerStatus={powerStatus}
                   setLastSelectedPedal={setLastSelectedPedal}
                   lastSelectedPower={lastSelectedPower}
                   setLastSelectedPower={setLastSelectedPower}
@@ -1566,6 +1570,8 @@ export default function BoardEditor({
                     libraryError={libraryError}
                     boardsLibrary={boardsLibrary}
                     powerLibrary={powerLibrary}
+                    boardsStatus={boardsStatus}
+                    powerStatus={powerStatus}
                     setLastSelectedPedal={setLastSelectedPedal}
                     lastSelectedPower={lastSelectedPower}
                     setLastSelectedPower={setLastSelectedPower}
@@ -1682,6 +1688,8 @@ export default function BoardEditor({
                 libraryError={libraryError}
                 boardsLibrary={boardsLibrary}
                 powerLibrary={powerLibrary}
+                boardsStatus={boardsStatus}
+                powerStatus={powerStatus}
                 setLastSelectedPedal={setLastSelectedPedal}
                 lastSelectedPower={lastSelectedPower}
                 setLastSelectedPower={setLastSelectedPower}

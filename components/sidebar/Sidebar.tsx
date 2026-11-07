@@ -12,12 +12,15 @@ import SearchPedals from "@/components/sidebar/SearchPedals";
 import SearchBoards from "@/components/sidebar/SearchBoards";
 import CustomPanel from "@/components/sidebar/CustomPanel";
 import SearchPower from "@/components/sidebar/SearchPower";
+import type { CatalogStatus } from "@/hooks/useLibrary";
 type AnyRow = Record<string, any>;
 type Props = {
   // Data
   pedalsLibrary: AnyRow[];
   boardsLibrary: AnyRow[];
   powerLibrary: AnyRow[];
+  boardsStatus: CatalogStatus;
+  powerStatus: CatalogStatus;
   newPedals: AnyRow[];
   newPedalsLoading: boolean;
   libraryLoading?: boolean;
@@ -84,7 +87,7 @@ type Props = {
   isMobile?: boolean;
   hideLogo?: boolean;
 };
-export default function Sidebar({ pedalsLibrary, boardsLibrary, newPedals, newPedalsLoading, libraryLoading = false, libraryError = null, powerLibrary, showPedalResults, setShowPedalResults, showBoardResults, setShowBoardResults, pedalSearch, setPedalSearch, boardSearch, setBoardSearch, selectedPedal, selectedBoardDetails, selectedInstanceId, selectedBoardInstanceId, setSelectedInstanceId, setSelectedBoardInstanceId, customName, setCustomName, customWidth, setCustomWidth, customDepth, setCustomDepth, customColor, setCustomColor, customType, setCustomType, addPedal, selectBoard, selectSuggestedBoard, finderPedals = [], existingBoards = [], addCustomItem, rotatePedal, deletePedal, rotateBoard, movePedalFront, movePedalBack, deleteBoard, moveBoardFront, moveBoardBack, canvasBg, setCanvasBg, language, setLanguage, units, setUnits, makeOpen, setMakeOpen, contactOpen, setContactOpen, isMobile = false, lastSelectedPedal, lastSelectedBoard, setLastSelectedPedal, lastSelectedPower, setLastSelectedPower, }: Props) {
+export default function Sidebar({ pedalsLibrary, boardsLibrary, newPedals, newPedalsLoading, libraryLoading = false, libraryError = null, powerLibrary, boardsStatus, powerStatus, showPedalResults, setShowPedalResults, showBoardResults, setShowBoardResults, pedalSearch, setPedalSearch, boardSearch, setBoardSearch, selectedPedal, selectedBoardDetails, selectedInstanceId, selectedBoardInstanceId, setSelectedInstanceId, setSelectedBoardInstanceId, customName, setCustomName, customWidth, setCustomWidth, customDepth, setCustomDepth, customColor, setCustomColor, customType, setCustomType, addPedal, selectBoard, selectSuggestedBoard, finderPedals = [], existingBoards = [], addCustomItem, rotatePedal, deletePedal, rotateBoard, movePedalFront, movePedalBack, deleteBoard, moveBoardFront, moveBoardBack, canvasBg, setCanvasBg, language, setLanguage, units, setUnits, makeOpen, setMakeOpen, contactOpen, setContactOpen, isMobile = false, lastSelectedPedal, lastSelectedBoard, setLastSelectedPedal, lastSelectedPower, setLastSelectedPower, }: Props) {
   const t = getTranslator(language);
   // Older saved projects may not contain the profile column. Recover it from
   // the current catalogue without replacing the board instance or its geometry.
@@ -524,8 +527,8 @@ export default function Sidebar({ pedalsLibrary, boardsLibrary, newPedals, newPe
           setLastSelectedPedal(p);
           addPedal(p);
         }} pedalInputRef={pedalInputRef} t={t} groupItems={groupItems} />)}
-        {activeSidebarTab === "boards" && (<SearchBoards boardsLibrary={boardsLibrary} boardSearch={boardSearch} setBoardSearch={setBoardSearch} showBoardResults={showBoardResults} setShowBoardResults={setShowBoardResults} setShowPedalResults={setShowPedalResults} selectBoard={selectBoard} selectSuggestedBoard={selectSuggestedBoard} finderPedals={finderPedals} existingBoards={existingBoards} units={units} boardInputRef={boardInputRef} t={t} groupItems={groupItems} />)}
-        {activeSidebarTab === "power" && (<SearchPower finderPedals={finderPedals} existingBoards={powerFinderBoards} pedalsLibrary={pedalsLibrary} powerLibrary={powerLibrary} powerSearch={powerSearch} setPowerSearch={setPowerSearch} showPowerResults={showPowerResults} setShowPowerResults={setShowPowerResults} setShowPedalResults={setShowPedalResults} setShowBoardResults={setShowBoardResults} addPower={(p) => {
+        {activeSidebarTab === "boards" && (<SearchBoards boardsLibrary={boardsLibrary} catalogStatus={boardsStatus} boardSearch={boardSearch} setBoardSearch={setBoardSearch} showBoardResults={showBoardResults} setShowBoardResults={setShowBoardResults} setShowPedalResults={setShowPedalResults} selectBoard={selectBoard} selectSuggestedBoard={selectSuggestedBoard} finderPedals={finderPedals} existingBoards={existingBoards} units={units} boardInputRef={boardInputRef} t={t} groupItems={groupItems} />)}
+        {activeSidebarTab === "power" && (<SearchPower catalogStatus={powerStatus} pedalsLoading={libraryLoading} finderPedals={finderPedals} existingBoards={powerFinderBoards} pedalsLibrary={pedalsLibrary} powerLibrary={powerLibrary} powerSearch={powerSearch} setPowerSearch={setPowerSearch} showPowerResults={showPowerResults} setShowPowerResults={setShowPowerResults} setShowPedalResults={setShowPedalResults} setShowBoardResults={setShowBoardResults} addPower={(p) => {
           addPower(p);
         }} powerInputRef={powerInputRef} powerDropdownRef={powerDropdownRef} t={t} groupItems={groupItems} />)}
         {activeSidebarTab === "custom" && (<CustomPanel customType={customType} setCustomType={setCustomType} customName={customName} setCustomName={setCustomName} customColor={customColor} setCustomColor={setCustomColor} customWidth={customWidth} setCustomWidth={setCustomWidth} customDepth={customDepth} setCustomDepth={setCustomDepth} addCustomItem={addCustomItem} isPedalValid={isPedalValid} isBoardValid={isBoardValid} minValue={minValue} maxValue={maxValue} displayMin={displayMin} displayMax={displayMax} units={units} unitLabel={unitLabel} withUnit={withUnit} t={t} />)}

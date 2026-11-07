@@ -1,14 +1,18 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import { Search, X, WandSparkles, ArrowLeft, CheckCircle2 } from "lucide-react";
+import { Search, X, WandSparkles, ArrowLeft, CheckCircle2, LoaderCircle } from "lucide-react";
 
 import { findPowerSupplies, hydratePedals, recommendPower, powerMountingHint, label } from "@/utils/powerFinder";
+
+import type { CatalogStatus } from "@/hooks/useLibrary";
 
 type AnyRow = Record<string, any>;
 
 type Props = {
   powerLibrary: AnyRow[];
+  catalogStatus: CatalogStatus;
+  pedalsLoading: boolean;
   finderPedals: AnyRow[];
   existingBoards?: AnyRow[];
   pedalsLibrary: AnyRow[];
@@ -89,6 +93,8 @@ export default function SearchPower({
   existingBoards = [],
   pedalsLibrary,
   powerLibrary,
+  catalogStatus,
+  pedalsLoading,
   powerSearch,
   setPowerSearch,
   setShowPowerResults,
@@ -273,6 +279,7 @@ export default function SearchPower({
 
         <button
           type="button"
+          disabled={catalogStatus !== "ready" || pedalsLoading}
           aria-label={t(finderOpen ? "sidebar.back" : "powerFinder.open")}
           title={t(finderOpen ? "sidebar.back" : "powerFinder.open")}
           onClick={(event) => {
@@ -294,7 +301,7 @@ export default function SearchPower({
               element.style.setProperty("color", "#ffffff", "important");
             }
           }}
-          className="shrink-0 flex items-center justify-center rounded-md cursor-pointer transition-colors"
+          className="shrink-0 flex items-center justify-center rounded-md cursor-pointer transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           style={{
             width: 30,
             minWidth: 30,
@@ -314,7 +321,26 @@ export default function SearchPower({
         </button>
       </div>
 
-      {finderOpen && finder ? (
+      {catalogStatus !== "ready" ? (
+        <div
+          role="status"
+          aria-live="polite"
+          className="mt-4 mb-2 flex shrink-0 items-center gap-2 text-[11px] font-bold"
+        >
+          {catalogStatus === "loading" ? (
+            <>
+              <LoaderCircle
+                size={14}
+                className="animate-spin motion-reduce:animate-none shrink-0"
+                aria-hidden="true"
+              />
+              {t("customPanel.loadingImage")}
+            </>
+          ) : (
+            t("pedalsMenu.loadError")
+          )}
+        </div>
+      ) : finderOpen && finder ? (
         <div className="flex flex-col min-h-0 flex-1 overflow-hidden">
           {finder.matches.length === 0 && (
             <p className="mb-4 text-[11px] text-zinc-400" role="status">

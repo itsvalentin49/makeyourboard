@@ -16,6 +16,7 @@ import {
   Search,
   X,
   Cable,
+  LoaderCircle,
 } from "lucide-react";
 
 import {
@@ -24,10 +25,13 @@ import {
   physicalPedals,
 } from "@/utils/boardFinder";
 
+import type { CatalogStatus } from "@/hooks/useLibrary";
+
 type AnyRow = Record<string, any>;
 
 type Props = {
   boardsLibrary: AnyRow[];
+  catalogStatus: CatalogStatus;
 
   boardSearch: string;
   setBoardSearch: (v: string) => void;
@@ -84,6 +88,7 @@ function normalize(value: any) {
 
 export default function SearchBoards({
   boardsLibrary,
+  catalogStatus,
   boardSearch,
   setBoardSearch,
   setShowBoardResults,
@@ -141,6 +146,7 @@ export default function SearchBoards({
   const pedalCount = pedals.length;
 
   const canOpenFinder =
+    catalogStatus === "ready" &&
     pedalCount >= 2 &&
     Boolean(selectSuggestedBoard);
 
@@ -387,7 +393,28 @@ export default function SearchBoards({
         </button>
       </div>
 
-      {!isFinder && isSearching && (
+      {catalogStatus !== "ready" && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="mt-4 mb-2 flex shrink-0 items-center gap-2 text-[11px] font-bold"
+        >
+          {catalogStatus === "loading" ? (
+            <>
+              <LoaderCircle
+                size={14}
+                className="animate-spin motion-reduce:animate-none shrink-0"
+                aria-hidden="true"
+              />
+              {t("customPanel.loadingImage")}
+            </>
+          ) : (
+            t("pedalsMenu.loadError")
+          )}
+        </div>
+      )}
+
+      {catalogStatus === "ready" && !isFinder && isSearching && (
         <div className="mt-4 mb-2 shrink-0 text-[11px] font-bold">
           {t(visibleBoards.length <= 1 ? "boardsMenu.result" : "boardsMenu.results").replace("{count}", String(visibleBoards.length))}
         </div>
@@ -450,7 +477,7 @@ export default function SearchBoards({
 
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
 
-        {!isFinder && !isSearching && (
+        {catalogStatus === "ready" && !isFinder && !isSearching && (
           <div className="mb-1 mt-4 shrink-0 text-[11px] font-bold">
 
             {t("pedalsMenu.latest")}
@@ -460,7 +487,7 @@ export default function SearchBoards({
 
         <div className="flex min-h-0 flex-1 flex-col gap-0 overflow-y-auto no-scrollbar pb-6">
 
-          {displayedBoards.map((board) => {
+          {catalogStatus === "ready" && displayedBoards.map((board) => {
 
             const image =
               board.thumbnail || null;

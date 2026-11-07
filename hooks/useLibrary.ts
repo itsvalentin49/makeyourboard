@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import type { AnyRow } from "@/types/project";
 
+export type CatalogStatus = "loading" | "ready" | "error";
+
 type NormalizedErr = {
   message: string;
   meta?: Record<string, unknown>;
@@ -122,6 +124,8 @@ export function useLibrary() {
   const [pedalsLibrary, setPedalsLibrary] = useState<AnyRow[]>([]);
   const [boardsLibrary, setBoardsLibrary] = useState<AnyRow[]>([]);
   const [powerLibrary, setPowerLibrary] = useState<AnyRow[]>([]);
+  const [boardsStatus, setBoardsStatus] = useState<CatalogStatus>("loading");
+  const [powerStatus, setPowerStatus] = useState<CatalogStatus>("loading");
   const [newPedals, setNewPedals] = useState<AnyRow[]>([]);
   const [newPedalsLoading, setNewPedalsLoading] = useState(true);
   const [libraryError, setLibraryError] = useState<string | null>(null);
@@ -145,37 +149,34 @@ export function useLibrary() {
         }
       });
 
-    (async () => {
+    async function loadCatalog(
+      table: "pedals" | "boards" | "power",
+      setRows: (rows: AnyRow[]) => void,
+      settle: (error: string | null) => void,
+    ) {
       try {
-        setLoading(true);
-        setLibraryError(null);
-
-        const [pedals, boards, power] = await Promise.all([
-
-          fetchTable("pedals", ["brand", "name"]),
-          fetchTable("boards", ["brand", "name"]),
-          fetchTable("power", ["brand", "name"]),
-        ]);
-
+        const rows = await fetchTable(table, ["brand", "name"]);
         if (cancelled) return;
-
-        setPedalsLibrary(pedals);
-        setBoardsLibrary(boards);
-        setPowerLibrary(power);
-
-
-
+        setRows(rows);
+        settle(null);
       } catch (err) {
         if (cancelled) return;
-
-        const n = normalizeSupabaseError(err);
-        console.error("[Supabase] useLibrary failed:", n.message, n.meta, err);
-        setLibraryError(n.message || "Failed to load library");
-      } finally {
-        if (cancelled) return;
-        setLoading(false);
+        const { message, meta } = normalizeSupabaseError(err);
+        console.error(`[Supabase] Failed to load ${table}:`, message, meta, err);
+        settle(message || "Failed to load library");
       }
-    })();
+    }
+
+    void loadCatalog("pedals", setPedalsLibrary, (error) => {
+      setLibraryError(error);
+      setLoading(false);
+    });
+    void loadCatalog("boards", setBoardsLibrary, (error) => {
+      setBoardsStatus(error ? "error" : "ready");
+    });
+    void loadCatalog("power", setPowerLibrary, (error) => {
+      setPowerStatus(error ? "error" : "ready");
+    });
 
     return () => {
       cancelled = true;
@@ -186,6 +187,8 @@ export function useLibrary() {
     pedalsLibrary,
     boardsLibrary,
     powerLibrary,
+    boardsStatus,
+    powerStatus,
     newPedals,
     newPedalsLoading,
     libraryError,
