@@ -108,5 +108,7 @@ export const ENCLOSURE_SIZING_BRANDS = new Set([
     "Hangman FX",
     "Melofty",
     "Cosmodio",
-    "DevTech Audio"
+    "DevTech Audio",
+    "Diamond",
+    "Gator"
 ]);
