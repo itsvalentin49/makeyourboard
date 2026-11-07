@@ -540,7 +540,11 @@ export default function SearchBoards({
                       alt={`${board.brand || ""} ${board.name || ""}`}
                       loading="lazy"
                       decoding="async"
-                      className="relative z-10 block max-w-[60px] max-h-[38px] object-contain"
+                      className="relative z-10 block object-contain"
+                      style={{
+                        maxWidth: isLightTheme ? 60 : 46,
+                        maxHeight: isLightTheme ? 38 : 36,
+                      }}
                     />
                   ) : (
                     <div className="relative z-10 w-12 h-6 rounded-md bg-zinc-700" />
