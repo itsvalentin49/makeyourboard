@@ -1,0 +1,57 @@
+[
+  {
+    "table": "pedals",
+    "items": [
+      {
+        "id": 23860,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgoldfx-athena-grey-v2.webp",
+        "thumbnail": "",
+        "width": 66,
+        "depth": 122
+      },
+      {
+        "id": 23871,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/catalinbread-fx90-early-verb-v2.webp",
+        "thumbnail": null,
+        "width": 60,
+        "depth": 112
+      },
+      {
+        "id": 23872,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/catalinbread-cb30-red-v2.webp",
+        "thumbnail": null,
+        "width": 60,
+        "depth": 112
+      },
+      {
+        "id": 23873,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/catalinbread-cb30-blue-v2.webp",
+        "thumbnail": null,
+        "width": 60,
+        "depth": 112
+      },
+      {
+        "id": 23874,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/catalinbread-cb30-green-v2.webp",
+        "thumbnail": null,
+        "width": 60,
+        "depth": 112
+      },
+      {
+        "id": 23875,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/catalinbread-cb30-purple-v2.webp",
+        "thumbnail": null,
+        "width": 60,
+        "depth": 112
+      }
+    ]
+  },
+  {
+    "table": "power",
+    "items": []
+  },
+  {
+    "table": "boards",
+    "items": []
+  }
+]

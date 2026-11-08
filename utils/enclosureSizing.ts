@@ -113,5 +113,7 @@ export const ENCLOSURE_SIZING_BRANDS = new Set([
     "Gator",
     "Hagerman",
     "Valeton",
-    "Mattoverse Electronics"
+    "Mattoverse Electronics",
+    "Yuer",
+    "SolidGoldFX"
 ]);

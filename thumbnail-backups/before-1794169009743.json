@@ -1,0 +1,106 @@
+[
+  {
+    "table": "pedals",
+    "items": [
+      {
+        "id": 23817,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgoldfx-athena-purple-v2.webp",
+        "thumbnail": "",
+        "width": 66,
+        "depth": 122
+      },
+      {
+        "id": 23859,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgoldfx-agent13-v2.webp",
+        "thumbnail": null,
+        "width": 66,
+        "depth": 122
+      },
+      {
+        "id": 23860,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgoldfx-athena-v2.webp",
+        "thumbnail": null,
+        "width": 66,
+        "depth": 122
+      },
+      {
+        "id": 23861,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgoldfx-em-iii-silver-v2.webp",
+        "thumbnail": null,
+        "width": 66,
+        "depth": 122
+      },
+      {
+        "id": 23862,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgoldfx-los-calientes-v2.webp",
+        "thumbnail": null,
+        "width": 66,
+        "depth": 122
+      },
+      {
+        "id": 23863,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgoldfx-supafunk-giacomo-v2.webp",
+        "thumbnail": null,
+        "width": 66,
+        "depth": 122
+      },
+      {
+        "id": 23864,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgoldfx-buffer-blue-v2.webp",
+        "thumbnail": null,
+        "width": 92,
+        "depth": 38
+      },
+      {
+        "id": 23865,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgoldfx-electroman-green-v2.webp",
+        "thumbnail": null,
+        "width": 119,
+        "depth": 94
+      },
+      {
+        "id": 23866,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgoldfx-communication-breakdown-v2.webp",
+        "thumbnail": null,
+        "width": 119,
+        "depth": 94
+      },
+      {
+        "id": 23867,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgoldfx-formula76-v2.webp",
+        "thumbnail": null,
+        "width": 119,
+        "depth": 94
+      },
+      {
+        "id": 23868,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgold-nu33-chessblue-v2.webp",
+        "thumbnail": null,
+        "width": 119,
+        "depth": 94
+      },
+      {
+        "id": 23869,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgold-lysis-seafoam-v2.webp",
+        "thumbnail": null,
+        "width": 119,
+        "depth": 94
+      },
+      {
+        "id": 23870,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgoldfx-stutterbox-v2.webp",
+        "thumbnail": null,
+        "width": 119,
+        "depth": 94
+      }
+    ]
+  },
+  {
+    "table": "power",
+    "items": []
+  },
+  {
+    "table": "boards",
+    "items": []
+  }
+]

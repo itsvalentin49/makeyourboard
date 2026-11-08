@@ -1,0 +1,22 @@
+{
+  "success": 0,
+  "failed": 3,
+  "skipped": 0,
+  "failures": [
+    {
+      "table": "power",
+      "id": 576,
+      "error": "Téléchargement HTTP 400"
+    },
+    {
+      "table": "power",
+      "id": 577,
+      "error": "Téléchargement HTTP 400"
+    },
+    {
+      "table": "power",
+      "id": 578,
+      "error": "Téléchargement HTTP 400"
+    }
+  ]
+}

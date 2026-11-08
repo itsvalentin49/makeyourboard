@@ -1,0 +1,36 @@
+[
+  {
+    "table": "pedals",
+    "items": []
+  },
+  {
+    "table": "power",
+    "items": [
+      {
+        "id": 576,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/power/yuer-pr07-v2.webp",
+        "thumbnail": null,
+        "width": 160,
+        "depth": 60
+      },
+      {
+        "id": 577,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/power/yuer-pr02-v2.webp",
+        "thumbnail": null,
+        "width": 142,
+        "depth": 77
+      },
+      {
+        "id": 578,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/power/yuer-pr04-v2.webp",
+        "thumbnail": null,
+        "width": 161,
+        "depth": 38
+      }
+    ]
+  },
+  {
+    "table": "boards",
+    "items": []
+  }
+]

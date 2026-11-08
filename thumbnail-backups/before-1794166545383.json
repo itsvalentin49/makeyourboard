@@ -1,0 +1,337 @@
+[
+  {
+    "table": "pedals",
+    "items": [
+      {
+        "id": 23813,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgoldfx-76-mk2-v2.webp",
+        "thumbnail": null,
+        "width": 66,
+        "depth": 122
+      },
+      {
+        "id": 23814,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgoldfx-76-octave-fuzz-v2.webp",
+        "thumbnail": null,
+        "width": 66,
+        "depth": 122
+      },
+      {
+        "id": 23815,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgoldfx-76-plus-v2.webp",
+        "thumbnail": null,
+        "width": 119,
+        "depth": 94
+      },
+      {
+        "id": 23816,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgoldfx-apollo-ii-v2.webp",
+        "thumbnail": null,
+        "width": 119,
+        "depth": 94
+      },
+      {
+        "id": 23817,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgoldfx-athena-v2.webp",
+        "thumbnail": null,
+        "width": 66,
+        "depth": 122
+      },
+      {
+        "id": 23818,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgoldfx-aurras-v2.webp",
+        "thumbnail": null,
+        "width": 66,
+        "depth": 122
+      },
+      {
+        "id": 23819,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgoldfx-boost-bc108-v2.webp",
+        "thumbnail": null,
+        "width": 38,
+        "depth": 92
+      },
+      {
+        "id": 23820,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgoldfx-boost-bc549-v2.webp",
+        "thumbnail": null,
+        "width": 38,
+        "depth": 92
+      },
+      {
+        "id": 23821,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgoldfx-beta-dlx-v2.webp",
+        "thumbnail": null,
+        "width": 119,
+        "depth": 94
+      },
+      {
+        "id": 23822,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgoldfx-beta-mk2-v2.webp",
+        "thumbnail": null,
+        "width": 60,
+        "depth": 112
+      },
+      {
+        "id": 23823,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgoldfx-beta-mk2-germanium-v2.webp",
+        "thumbnail": null,
+        "width": 60,
+        "depth": 112
+      },
+      {
+        "id": 23824,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgoldfx-beta-lm308-mk2-v2.webp",
+        "thumbnail": null,
+        "width": 60,
+        "depth": 112
+      },
+      {
+        "id": 23825,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgoldfx-beta-v-bass-preamp-v2.webp",
+        "thumbnail": null,
+        "width": 66,
+        "depth": 122
+      },
+      {
+        "id": 23826,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgoldfx-buffer-v2.webp",
+        "thumbnail": null,
+        "width": 38,
+        "depth": 92
+      },
+      {
+        "id": 23827,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgoldfx-commodore-v2.webp",
+        "thumbnail": null,
+        "width": 119,
+        "depth": 94
+      },
+      {
+        "id": 23828,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgoldfx-counter-current-v2.webp",
+        "thumbnail": null,
+        "width": 119,
+        "depth": 94
+      },
+      {
+        "id": 23829,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgoldfx-electroman-v2.webp",
+        "thumbnail": null,
+        "width": 119,
+        "depth": 94
+      },
+      {
+        "id": 23830,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgoldfx-em3-v2.webp",
+        "thumbnail": null,
+        "width": 66,
+        "depth": 122
+      },
+      {
+        "id": 23831,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgoldfx-ether-v2.webp",
+        "thumbnail": null,
+        "width": 66,
+        "depth": 122
+      },
+      {
+        "id": 23832,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgoldfx-funk-lite-v2.webp",
+        "thumbnail": null,
+        "width": 60,
+        "depth": 112
+      },
+      {
+        "id": 23833,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgoldfx-funkzilla-v2.webp",
+        "thumbnail": null,
+        "width": 119,
+        "depth": 94
+      },
+      {
+        "id": 23834,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgoldfx-fuzzbox-v2.webp",
+        "thumbnail": null,
+        "width": 66,
+        "depth": 122
+      },
+      {
+        "id": 23835,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgoldfx-hive-v2.webp",
+        "thumbnail": null,
+        "width": 60,
+        "depth": 112
+      },
+      {
+        "id": 23836,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgoldfx-horizon-v2.webp",
+        "thumbnail": null,
+        "width": 60,
+        "depth": 112
+      },
+      {
+        "id": 23837,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgoldfx-if6was9-v2.webp",
+        "thumbnail": null,
+        "width": 60,
+        "depth": 112
+      },
+      {
+        "id": 23838,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgoldfx-if6was9-red-v2.webp",
+        "thumbnail": null,
+        "width": 66,
+        "depth": 122
+      },
+      {
+        "id": 23839,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgoldfx-imperial-bc183-v2.webp",
+        "thumbnail": null,
+        "width": 60,
+        "depth": 112
+      },
+      {
+        "id": 23840,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgoldfx-imperial-mk2-v2.webp",
+        "thumbnail": null,
+        "width": 119,
+        "depth": 94
+      },
+      {
+        "id": 23841,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgoldfx-boost-jfet-v2.webp",
+        "thumbnail": null,
+        "width": 38,
+        "depth": 92
+      },
+      {
+        "id": 23842,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgoldfx-lysis-v2.webp",
+        "thumbnail": null,
+        "width": 119,
+        "depth": 94
+      },
+      {
+        "id": 23843,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgoldfx-lysis-mk2-v2.webp",
+        "thumbnail": null,
+        "width": 119,
+        "depth": 94
+      },
+      {
+        "id": 23844,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgoldfx-nu33-v2.webp",
+        "thumbnail": null,
+        "width": 119,
+        "depth": 94
+      },
+      {
+        "id": 23845,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgoldfx-oblivion-v2.webp",
+        "thumbnail": null,
+        "width": 119,
+        "depth": 94
+      },
+      {
+        "id": 23846,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgoldfx-rosie-v2.webp",
+        "thumbnail": null,
+        "width": 60,
+        "depth": 112
+      },
+      {
+        "id": 23847,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgoldfx-sasori-v2.webp",
+        "thumbnail": null,
+        "width": 60,
+        "depth": 112
+      },
+      {
+        "id": 23848,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgoldfx-spanish-castle-v2.webp",
+        "thumbnail": null,
+        "width": 119,
+        "depth": 94
+      },
+      {
+        "id": 23849,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgoldfx-stutter-lite-v2.webp",
+        "thumbnail": null,
+        "width": 60,
+        "depth": 112
+      },
+      {
+        "id": 23850,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgoldfx-supafunk-v2.webp",
+        "thumbnail": null,
+        "width": 66,
+        "depth": 122
+      },
+      {
+        "id": 23851,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgoldfx-super-drive-v2.webp",
+        "thumbnail": null,
+        "width": 66,
+        "depth": 122
+      },
+      {
+        "id": 23852,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgoldfx-surf-rider-iii-v2.webp",
+        "thumbnail": null,
+        "width": 119,
+        "depth": 94
+      },
+      {
+        "id": 23853,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgoldfx-surf-rider-4-v2.webp",
+        "thumbnail": null,
+        "width": 66,
+        "depth": 122
+      },
+      {
+        "id": 23854,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgoldfx-surf-rider-red-v2.webp",
+        "thumbnail": null,
+        "width": 66,
+        "depth": 122
+      },
+      {
+        "id": 23855,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgoldfx-surf-rider-4-pink-v2.webp",
+        "thumbnail": null,
+        "width": 66,
+        "depth": 122
+      },
+      {
+        "id": 23856,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgoldfx-the-stack-v2.webp",
+        "thumbnail": null,
+        "width": 119,
+        "depth": 94
+      },
+      {
+        "id": 23857,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgoldfx-zeta-dlx-v2.webp",
+        "thumbnail": null,
+        "width": 119,
+        "depth": 94
+      },
+      {
+        "id": 23858,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/solidgoldfx-zeta-mk2-v2.webp",
+        "thumbnail": null,
+        "width": 60,
+        "depth": 112
+      }
+    ]
+  },
+  {
+    "table": "power",
+    "items": []
+  },
+  {
+    "table": "boards",
+    "items": []
+  }
+]
