@@ -115,5 +115,8 @@ export const ENCLOSURE_SIZING_BRANDS = new Set([
     "Valeton",
     "Mattoverse Electronics",
     "Yuer",
-    "SolidGoldFX"
+    "SolidGoldFX",
+    "DigiTech",
+    "Silktone",
+    "VFE Pedals"
 ]);
