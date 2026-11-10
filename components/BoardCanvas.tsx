@@ -3,7 +3,7 @@
 import { createPortal } from "react-dom";
 import React, { useRef, useLayoutEffect, useEffect, useId, useState, useCallback } from "react";
 import { Stage, Layer, Group, Rect, Text, Circle as KonvaCircle, Image as KonvaImage, } from "react-konva";
-import { Zap, Weight, Minus, Cable, Plus, Check, Upload, AlertTriangle, RotateCw, Circle, Trash2, X, Share2, List, Settings, PanelsTopLeft, Download, ArrowUp, ArrowDown, CircleHelp, ChevronsLeft, ChevronsRight, Replace, CopyPlus, Ellipsis } from "lucide-react";
+import { Zap, Weight, Minus, Cable, Plus, Check, Upload, AlertTriangle, RotateCw, Circle, Trash2, X, Share2, List, Settings, PanelsTopLeft, Download, ArrowUp, ArrowDown, CircleHelp, ChevronsLeft, ChevronsRight, Replace, CopyPlus, Ellipsis, Info } from "lucide-react";
 import PedalImage from "@/components/PedalImage";
 import pedalActions from "./PedalActions.module.css";
 import { formatWeight } from "@/utils/units";
@@ -822,6 +822,29 @@ export default function BoardCanvas({
   const pinchAnchor = useRef<{ x: number; y: number } | null>(null);
   const pinchStartScale = useRef<number>(1);
   const [stageSize, setStageSize] = useState({ width: 0, height: 0 });
+  const hasStage = stageSize.width > 0 && stageSize.height > 0;
+  const showAlignmentGrid = !viewer && canvasBg === "neutral";
+
+  useLayoutEffect(() => {
+    const stage = stageRef.current;
+    const container = containerRef.current;
+    if (!hasStage || !showAlignmentGrid || !stage || !container) return;
+
+    function updateGrid() {
+      if (!container) return;
+
+      const step = 24 * stage.scaleX();
+      // Keep dots on the same grid as the canvas zooms out.
+      const visibleStep = step * 2 ** Math.max(0, Math.ceil(Math.log2(12 / step)));
+      container.style.setProperty("--alignment-grid-step", `${visibleStep}px`);
+      container.style.setProperty("--alignment-grid-x", `${stage.x()}px`);
+      container.style.setProperty("--alignment-grid-y", `${stage.y()}px`);
+    }
+
+    updateGrid();
+    stage.on("xChange.alignmentGrid yChange.alignmentGrid scaleXChange.alignmentGrid", updateGrid);
+    return () => stage.off(".alignmentGrid");
+  }, [hasStage, showAlignmentGrid]);
 
 
   useEffect(() => {
@@ -1398,11 +1421,13 @@ export default function BoardCanvas({
     : item.instanceId === selectedInstanceId);
   const isBoardTarget = menuTarget?.kind === "board";
   const canReplace = Boolean(menuTarget && !isBoardTarget && !isPowerSupply(menuTarget) && replacePedal);
+  const canShowMobileInfo = isMobile && menuTarget && !isBoardTarget &&
+    !isPowerSupply(menuTarget) && menuTarget.brand !== "Custom" && menuTarget.slug !== "custom-upload";
   const actionHeight = stageSize.height - (isMobile ? 68 : 0);
   const quickWidth = Math.max(0, Math.min(isMobile ? 144 : 112, stageSize.width - 16));
   const quickHeight = isMobile ? 44 : 38;
-  const menuWidth = Math.max(0, Math.min(192, stageSize.width - 16));
-  const menuHeight = isMobile ? (canReplace ? 233 : 196) : (canReplace ? 179 : 151);
+  const menuWidth = Math.max(0, Math.min(isMobile ? 156 : 192, stageSize.width - 16));
+  const menuHeight = isMobile ? (canReplace ? 233 : 196) + (canShowMobileInfo ? 37 : 0) : (canReplace ? 179 : 151);
   const menuGap = 6;
   const actionPositions = menuTarget && overlayPosition?.halfWidth !== undefined &&
     overlayPosition.bottom !== undefined && overlayPosition.bottom >= 0 &&
@@ -1464,6 +1489,9 @@ export default function BoardCanvas({
   const itemId = menuTarget?.instanceId;
   const itemActions = itemId === undefined ? [] : [
     { key: "pedal.actions.rotate", Icon: RotateCw, hint: "R", shortcut: "R", run: () => (isBoardTarget ? rotateBoard : rotatePedal)(itemId) },
+    ...(canShowMobileInfo ? [
+      { key: "pedal.actions.info", Icon: Info, run: () => openMobileItemInfo(), hint: "", shortcut: "" },
+    ] : []),
     { key: "replacement.duplicate", Icon: CopyPlus, hint: "D", shortcut: "D", run: () => duplicateCanvasItem(itemId, isBoardTarget ? "board" : "pedal") },
     {
       key: "replacement.forward", Icon: ArrowUp, hint: "↑", shortcut: "ArrowUp",
@@ -1575,10 +1603,15 @@ export default function BoardCanvas({
     setSelectedInstanceId(null);
   }
 
+  function openMobileItemInfo() {
+    setItemMenuExpanded(false);
+    setMobileCanvasPanelOpen?.(false);
+    setMobileSidebarOpen(true);
+  }
+
   function tapCanvasPedal(id: number) {
     if (isMobile && selectedInstanceId === id && menuTarget?.instanceId === id) {
-      setMobileCanvasPanelOpen?.(false);
-      setMobileSidebarOpen(true);
+      openMobileItemInfo();
     }
     setSelectedInstanceId(id);
     setSelectedBoardInstanceId(null);
@@ -1593,6 +1626,7 @@ export default function BoardCanvas({
   relative w-full h-full overflow-hidden
   ${isMobile ? "pb-6 touch-none" : desktopToolbarHost ? "" : "pb-20"}
   ${canvasBg === "neutral" ? "bg-canvas" : ""}
+  ${showAlignmentGrid ? pedalActions.neutralGrid : ""}
 `}
       style={
         canvasBg === "neutral"
@@ -1786,7 +1820,7 @@ html.light .myb-tool-rail-button[data-active="true"] { background: var(--zinc-70
             {itemActions.filter(({ key }) => key === "pedal.actions.rotate" || key === "pedal.actions.delete")
               .map(({ key, Icon, shortcut, run }) => (
                 <button key={key} type="button" className={pedalActions.quickButton} onClick={run}
-                  aria-label={t(key)} title={t(key)} aria-keyshortcuts={shortcut}
+                  aria-label={t(key)} title={t(key)} aria-keyshortcuts={isMobile ? undefined : shortcut}
                   data-danger={key === "pedal.actions.delete" || undefined}>
                   <Icon size={17} aria-hidden="true" />
                 </button>
@@ -1807,11 +1841,11 @@ html.light .myb-tool-rail-button[data-active="true"] { background: var(--zinc-70
           {itemMenuExpanded && (
             <div id={itemActionsId} className={pedalActions.menu} style={actionPositions.menu}>
               {itemActions.map(({ key, Icon, hint, shortcut, run }) => (
-                <button key={key} type="button" onClick={run} disabled={!run} aria-keyshortcuts={shortcut}
+                <button key={key} type="button" onClick={run} disabled={!run} aria-keyshortcuts={isMobile ? undefined : shortcut}
                   className={pedalActions.action} data-danger={key === "pedal.actions.delete" || undefined}>
                   <Icon size={17} aria-hidden="true" />
                   <span>{t(key)}</span>
-                  <kbd aria-hidden="true">{hint}</kbd>
+                  {!isMobile && <kbd aria-hidden="true">{hint}</kbd>}
                 </button>
               ))}
             </div>
@@ -2796,7 +2830,7 @@ ${isMobile
       }
 
       {/* --- LE STAGE (CANVAS) --- */}
-      {stageSize.width > 0 && stageSize.height > 0 && (
+      {hasStage && (
 
         <Stage
           ref={stageRef}

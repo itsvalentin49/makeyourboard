@@ -17,6 +17,8 @@
     "artists": "使用 TU-3 的艺人"
   },
   "gear": {
+    "showList": "列表视图",
+    "showGrid": "网格视图",
     "resultOne": "{count} 个结果",
     "resultOther": "{count} 个结果",
     "filters": "筛选",
@@ -69,6 +71,7 @@
     "features": "规格",
     "description": "描述",
     "actions": {
+      "info": "详情",
       "title": "操作",
       "more": "更多操作",
       "rotate": "旋转",

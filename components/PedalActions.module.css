@@ -31,6 +31,8 @@
   border-radius: 7px;
   color: inherit;
   cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .quickButton {
@@ -68,16 +70,14 @@
   white-space: nowrap;
 }
 
-.quickButton:hover,
+.quickButton:active,
 .quickButton[aria-expanded="true"],
-.action:not(:disabled):hover {
-  background: var(--zinc-200);
+.action:not(:disabled):active {
+  background: var(--zinc-700);
 }
 
-@media (prefers-color-scheme: dark) {
-
+@media (hover: hover) {
   .quickButton:hover,
-  .quickButton[aria-expanded="true"],
   .action:not(:disabled):hover {
     background: var(--zinc-700);
   }
@@ -203,4 +203,14 @@
     height: 100dvh;
     padding-bottom: env(safe-area-inset-bottom);
   }
+}
+
+.neutralGrid {
+  background-image: radial-gradient(
+    circle at 1px 1px,
+    color-mix(in srgb, var(--foreground) 17%, transparent) .65px,
+    transparent 1.15px
+  );
+  background-size: var(--alignment-grid-step, 24px) var(--alignment-grid-step, 24px);
+  background-position: var(--alignment-grid-x, 0) var(--alignment-grid-y, 0);
 }

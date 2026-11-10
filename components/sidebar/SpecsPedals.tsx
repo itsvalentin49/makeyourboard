@@ -8,7 +8,7 @@ import type { Language } from "@/utils/i18n";
 
 type Props = {
   selectedPedal: any;
-  embedded?: boolean;
+  embedded?: { header: React.ReactNode; footer: React.ReactNode };
   selectedInstanceId: number | null;
 
   units: "metric" | "imperial";
@@ -362,7 +362,7 @@ function PedalHeroPreview({
 
 export default function PedalSpecs({
   selectedPedal,
-  embedded = false,
+  embedded,
   selectedInstanceId,
   units,
   language,
@@ -480,7 +480,7 @@ export default function PedalSpecs({
 
   return (
     <div
-      className={embedded ? "flex flex-col gap-5" : `
+      className={embedded ? gearStyles.detailText : `
         h-full
         min-h-0
         overflow-y-auto
@@ -496,6 +496,7 @@ export default function PedalSpecs({
         [&::-webkit-scrollbar]:hidden
       `}
     >
+      {embedded?.header}
       {/* HERO PRODUIT */}
       {!embedded && <div className="shrink-0 flex flex-col items-center pt-1">
         <div className="w-full h-[170px] shrink-0 flex items-center justify-center mb-4">
@@ -552,7 +553,7 @@ export default function PedalSpecs({
 
       {/* DESCRIPTION */}
       {hasValue(overview) && (
-        <div className="w-full min-w-0 shrink-0 flex flex-col gap-2">
+        <div className="w-full min-w-0 shrink-0 flex flex-col gap-2" data-pedal-specs={embedded ? "description" : undefined}>
           <div className="text-[15px] font-black">
             {t("pedal.description")}
           </div>
@@ -564,7 +565,7 @@ export default function PedalSpecs({
       )}
 
       {/* CARACTÉRISTIQUES */}
-      <div className="shrink-0 flex flex-col gap-2">
+      <div className="min-w-0 shrink-0 flex flex-col gap-2" data-pedal-specs={embedded ? "features" : undefined}>
         <div className="text-[15px] font-black">
           {t("pedal.features")}
         </div>
@@ -689,6 +690,7 @@ export default function PedalSpecs({
         </div>
       </div>
 
+      {embedded?.footer}
       {!embedded && <PedalRetailers selectedPedal={selectedPedal} buildThomannUrl={buildThomannUrl} t={t} />}
     </div>
   );

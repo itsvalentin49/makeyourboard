@@ -17,6 +17,8 @@
     "artists": "Artistas que usan el TU-3"
   },
   "gear": {
+    "showList": "Mostrar como lista",
+    "showGrid": "Mostrar como cuadrícula",
     "resultOne": "{count} resultado",
     "resultOther": "{count} resultados",
     "filters": "Filtros",
@@ -69,6 +71,7 @@
     "features": "Características",
     "description": "Descripción",
     "actions": {
+      "info": "Información",
       "title": "Acciones",
       "more": "Más acciones",
       "rotate": "Girar",

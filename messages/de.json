@@ -17,6 +17,8 @@
     "artists": "Künstler, die das TU-3 nutzen"
   },
   "gear": {
+    "showList": "Als Liste anzeigen",
+    "showGrid": "Als Raster anzeigen",
     "resultOne": "{count} Ergebnis",
     "resultOther": "{count} Ergebnisse",
     "filters": "Filter",
@@ -69,6 +71,7 @@
     "features": "Technische Daten",
     "description": "Beschreibung",
     "actions": {
+      "info": "Info",
       "title": "Aktionen",
       "more": "Weitere Aktionen",
       "rotate": "Drehen",

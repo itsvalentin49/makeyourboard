@@ -1,7 +1,7 @@
 "use client";
 
 import { useDeferredValue, useEffect, useLayoutEffect, useMemo, useRef, useState, type MouseEvent } from "react";
-import { ArrowRight, BookOpen, ChevronDown, LoaderCircle, Play, Plus, Search, X } from "lucide-react";
+import { ArrowRight, BookOpen, ChevronDown, Grid2X2, List, LoaderCircle, Play, Plus, Search, X } from "lucide-react";
 import type { AnyRow, BoardItem } from "@/types/project";
 import type { Language } from "@/utils/i18n";
 import { getCustomImageUrl } from "@/utils/customImageStore";
@@ -228,7 +228,6 @@ export default function GearCatalog({
   const search = useRef<HTMLInputElement>(null);
   const heading = useRef<HTMLHeadingElement>(null);
   const detailHeading = useRef<HTMLHeadingElement>(null);
-  const catalogHeader = useRef<HTMLDivElement>(null);
   const grid = useRef<HTMLDivElement>(null);
   const [coveredCards, setCoveredCards] = useState(0);
   const previousCard = useRef<string | null>(null);
@@ -238,8 +237,12 @@ export default function GearCatalog({
   const [typeSelection, setTypes] = useState<string[] | null>(null);
   const [selectedSpecs, setSelectedSpecs] = useState<SpecSelection>({});
   const [sort, setSort] = useState("recent");
+  const [catalogView, setCatalogView] = useState<"grid" | "list">("grid");
   const [limit, setLimit] = useState(PAGE_SIZE);
   const [selected, setSelected] = useState<AnyRow | null>(null);
+  const addLabel = t(replacement ? "replacement.previewAction" : "customPanel.addToBoard");
+  const viewLabel = t(catalogView === "grid" ? "gear.showList" : "gear.showGrid");
+  const ViewIcon = catalogView === "grid" ? List : Grid2X2;
   const deferredQuery = useDeferredValue(query);
   const hasReplacementType = splitTags(replacement?.pedal.type).length > 0;
   const showTu3Pilot = !replacement && selected &&
@@ -263,10 +266,7 @@ export default function GearCatalog({
     if (!scroller) return;
 
     if (selected) {
-      const header = catalogHeader.current;
-      if (header) {
-        scroller.scrollTop += header.getBoundingClientRect().top - scroller.getBoundingClientRect().top - 12;
-      }
+      scroller.scrollTop = 0;
       detailHeading.current?.focus({ preventScroll: true });
     } else if (previousCard.current) {
       scroller.scrollTop = catalogScroll.current;
@@ -280,6 +280,7 @@ export default function GearCatalog({
     const element = grid.current;
     if (!element || !selected) return;
     const update = () => {
+      if (!element.clientWidth) return;
       const columns = getComputedStyle(element).gridTemplateColumns.trim().split(/\s+/).length;
       setCoveredCards(columns * 2);
     };
@@ -287,7 +288,7 @@ export default function GearCatalog({
     const observer = new ResizeObserver(update);
     observer.observe(element);
     return () => observer.disconnect();
-  }, [selected]);
+  }, [selected, catalogView]);
 
   const catalog = useMemo(() => {
     return pedals.filter(isPedal).map((pedal): CatalogEntry => {
@@ -405,7 +406,7 @@ export default function GearCatalog({
   return (
     <dialog
       ref={dialog}
-      aria-labelledby="myb-gear-title"
+      aria-labelledby={selected ? "myb-gear-detail-title" : "myb-gear-title"}
       className={styles.dialog}
       onClick={(event) => event.stopPropagation()}
       onCancel={(event) => {
@@ -423,7 +424,7 @@ export default function GearCatalog({
         </div>
       </header>
       <div ref={content} className={styles.scroller}>
-        <div className={styles.content} data-library={!replacement ? "" : undefined}>
+        <div className={styles.content} data-library={!replacement ? "" : undefined} data-detail={selected ? "" : undefined}>
           <div className={styles.hero} data-variant={replacement ? "replace" : "library"}>
             <div className={styles.heroCopy}>
               <h1 id="myb-gear-title" ref={heading} tabIndex={-1}>{t(replacement ? "replacement.choose" : "gear.title")}</h1>
@@ -462,36 +463,46 @@ export default function GearCatalog({
               </div>
             )}
           </div>
-          <div ref={catalogHeader} className={styles.catalogHeader}>
+          <div className={styles.catalogHeader}>
             <h2 id="myb-gear-filters">{t("gear.filters")}</h2>
             <div className={styles.catalogControls}>
               {selected ? (
                 <div className={styles.detailActions}>
-                  <button type="button" className={styles.primary} onClick={() => onAdd(selected)}>
-                    <Plus size={16} aria-hidden="true" /> {t(replacement ? "replacement.previewAction" : "customPanel.addToBoard")}
+                  <button type="button" className={`${styles.primary} ${styles.desktopAdd}`} onClick={() => onAdd(selected)}>
+                    <Plus size={16} aria-hidden="true" /> {addLabel}
                   </button>
                   <button type="button" className={styles.detailClose} aria-label={t("gear.closeDetails")}
                     onClick={() => setSelected(null)}>
                     <X size={18} aria-hidden="true" />
                   </button>
                 </div>
-              ) : <span className={styles.resultCount} role="status">
-                {loading ? (
-                  <span className={styles.loading}>
-                    <LoaderCircle size={18} className="animate-spin" aria-hidden="true" />
-                    {t("pedalsMenu.loading")}
+              ) : (
+                <>
+                  <span className={styles.resultCount} role="status">
+                    {loading ? (
+                      <span className={styles.loading}>
+                        <LoaderCircle size={18} className="animate-spin" aria-hidden="true" />
+                        {t("pedalsMenu.loading")}
+                      </span>
+                    ) : isFiltered && !error &&
+                      t(new Intl.PluralRules(language).select(results.length) === "one" ? "gear.resultOne" : "gear.resultOther")
+                        .replace("{count}", results.length.toLocaleString(language))}
                   </span>
-                ) : isFiltered && !error &&
-                  t(new Intl.PluralRules(language).select(results.length) === "one" ? "gear.resultOne" : "gear.resultOther")
-                    .replace("{count}", results.length.toLocaleString(language))}
-              </span>}
-              <label className={styles.sort}>
-                {t("gear.sort")}
-                <select value={sort} onChange={(event) => { setSort(event.target.value); setLimit(PAGE_SIZE); }}>
-                  <option value="alphabetical">{t("gear.alphabetical")}</option>
-                  <option value="recent">{t("gear.newestFirst")}</option>
-                </select>
-              </label>
+                  <div className={styles.catalogOptions}>
+                    <label className={styles.sort}>
+                      {t("gear.sort")}
+                      <select value={sort} onChange={(event) => { setSort(event.target.value); setLimit(PAGE_SIZE); }}>
+                        <option value="alphabetical">{t("gear.alphabetical")}</option>
+                        <option value="recent">{t("gear.newestFirst")}</option>
+                      </select>
+                    </label>
+                    <button type="button" className={styles.viewToggle} aria-label={viewLabel} title={viewLabel}
+                      onClick={() => setCatalogView((view) => view === "grid" ? "list" : "grid")}>
+                      <ViewIcon size={18} aria-hidden="true" />
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           </div>
           <div className={styles.catalogLayout}>
@@ -514,56 +525,68 @@ export default function GearCatalog({
             </div>
             <section className={styles.results} aria-label={t("gear.catalog")}>
               {selected && (
-                <div className={styles.detail} data-tu3={showTu3Pilot ? "" : undefined} key={selected.id}>
+                <div className={styles.detail} key={selected.id}>
                   <div className={styles.detailImage} onContextMenu={blockImageMenu}>
                     <GearImage pedal={selected} detail />
+                    <button type="button" className={`${styles.primary} ${styles.mobileAdd}`} aria-label={addLabel}
+                      onClick={() => onAdd(selected)}>
+                      <Plus size={21} strokeWidth={2.5} aria-hidden="true" />
+                    </button>
                   </div>
-                  <div className={styles.detailText}>
-                    <header className={styles.detailHeader}>
-                      <p className={styles.eyebrow}>{selected.brand}</p>
-                      <h2 ref={detailHeading} tabIndex={-1}>{selected.name}</h2>
-                      {renderTypeBadges(selected)}
-                    </header>
-                    <PedalSpecs
-                      selectedPedal={selected} selectedInstanceId={null} units={units} language={language}
-                      t={t} isCustomPedal={false} isImportedPedal={false} isUSA={isUSA} isEurope={isEurope}
-                      buildThomannUrl={buildThomannUrl} embedded
-                    />
-                  </div>
-                  <div className={styles.detailRetailers}>
-                    <PedalRetailers
-                      selectedPedal={selected} buildThomannUrl={buildThomannUrl} t={t}
-                      detailed
-                    />
-                    {showTu3Pilot && <Tu3OfficialDemo t={t} />}
-                  </div>
-                  {showTu3Pilot && (
-                    <section className={styles.tu3Artists}>
-                      <h2 className={styles.storeTitle}>{t("gearTu3.artists")}</h2>
-                      <ul className={styles.tu3ArtistList} role="list">
-                        {TU3_ARTISTS.map((name) => <li key={name}>{name}</li>)}
-                        <li>…</li>
-                      </ul>
-                    </section>
-                  )}
+                  <PedalSpecs
+                    selectedPedal={selected} selectedInstanceId={null} units={units} language={language}
+                    t={t} isCustomPedal={false} isImportedPedal={false} isUSA={isUSA} isEurope={isEurope}
+                    buildThomannUrl={buildThomannUrl}
+                    embedded={{
+                      header: (
+                        <header className={styles.detailHeader}>
+                          <p className={styles.eyebrow}>{selected.brand}</p>
+                          <h2 id="myb-gear-detail-title" ref={detailHeading} tabIndex={-1}>{selected.name}</h2>
+                          {renderTypeBadges(selected)}
+                        </header>
+                      ),
+                      footer: (
+                        <div className={styles.detailRetailers}>
+                          <PedalRetailers
+                            selectedPedal={selected} buildThomannUrl={buildThomannUrl} t={t}
+                            detailed
+                          />
+                          {showTu3Pilot && (
+                            <>
+                              <Tu3OfficialDemo t={t} />
+                              <section className={styles.tu3Artists}>
+                                <h2 className={styles.storeTitle}>{t("gearTu3.artists")}</h2>
+                                <ul className={styles.tu3ArtistList} role="list">
+                                  {TU3_ARTISTS.map((name) => <li key={name}>{name}</li>)}
+                                  <li>…</li>
+                                </ul>
+                              </section>
+                            </>
+                          )}
+                        </div>
+                      ),
+                    }}
+                  />
                 </div>
               )}
-              {loading ? null : error ? (
-                <p className={styles.status} role="alert">{t("pedalsMenu.loadError")}</p>
-              ) : results.length === 0 ? (
-                <p className={styles.status} role="status">{t("gear.empty")}</p>
-              ) : (
-                <>
-                  <div ref={grid} className={styles.grid}>
-                    {results.slice(selected ? coveredCards : 0, limit).map(({ pedal }) => card(pedal))}
-                  </div>
-                  {limit < results.length && (
-                    <button type="button" className={styles.more} onClick={() => setLimit((value) => value + PAGE_SIZE)}>
-                      {t("gear.more")}
-                    </button>
-                  )}
-                </>
-              )}
+              <div className={styles.resultList}>
+                {loading ? null : error ? (
+                  <p className={styles.status} role="alert">{t("pedalsMenu.loadError")}</p>
+                ) : results.length === 0 ? (
+                  <p className={styles.status} role="status">{t("gear.empty")}</p>
+                ) : (
+                  <>
+                    <div ref={grid} className={styles.grid} data-view={catalogView}>
+                      {results.slice(selected ? coveredCards : 0, limit).map(({ pedal }) => card(pedal))}
+                    </div>
+                    {limit < results.length && (
+                      <button type="button" className={styles.more} onClick={() => setLimit((value) => value + PAGE_SIZE)}>
+                        {t("gear.more")}
+                      </button>
+                    )}
+                  </>
+                )}
+              </div>
             </section>
           </div>
         </div>
