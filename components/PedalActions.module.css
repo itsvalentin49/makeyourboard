@@ -1,0 +1,82 @@
+.quick, .menu {
+  position: absolute;
+  z-index: 80;
+  display: flex;
+  border: 1px solid var(--zinc-700);
+  border-radius: 11px;
+  background: var(--zinc-800);
+  color: var(--foreground);
+  box-shadow: 0 6px 22px rgb(0 0 0 / 14%);
+}
+
+.quick {
+  z-index: 81;
+  height: 38px;
+  gap: 2px;
+  padding: 3px;
+}
+
+.menu {
+  flex-direction: column;
+  gap: 1px;
+  overflow-y: auto;
+  padding: 5px;
+}
+
+.quickButton, .action {
+  display: flex;
+  align-items: center;
+  border-radius: 7px;
+  color: inherit;
+  cursor: pointer;
+}
+
+.quickButton { flex: 1; min-width: 0; justify-content: center; }
+.action {
+  flex: none;
+  gap: 7px;
+  min-height: 27px;
+  padding: 2px 6px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.3;
+  text-align: start;
+}
+
+.quickButton svg, .action svg { flex: none; }
+.action span { min-width: 0; overflow-wrap: anywhere; }
+.action kbd {
+  margin-inline-start: auto;
+  color: var(--zinc-400);
+  font: inherit;
+  font-size: 11px;
+  white-space: nowrap;
+}
+.quickButton:hover, .quickButton[aria-expanded="true"], .action:not(:disabled):hover { background: var(--zinc-900); }
+.quickButton:focus-visible, .action:focus-visible { outline: 2px solid var(--blue); outline-offset: -2px; }
+.action:disabled { opacity: .45; cursor: default; }
+.quickButton[data-danger], .action[data-danger] { color: var(--red); }
+
+.confirmDialog {
+  position: fixed;
+  inset: max(16px, env(safe-area-inset-top)) 0 auto;
+  width: min(420px, calc(100% - 24px));
+  margin: 0 auto;
+  padding: 16px;
+  border: 1px solid var(--zinc-700);
+  border-radius: 14px;
+  background: var(--zinc-900);
+  color: var(--foreground);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 20%);
+}
+
+.confirmDialog::backdrop { background: transparent; }
+.confirmDialog h2 { color: var(--zinc-400); font-size: 12px; font-weight: 700; }
+.confirmDialog p { margin-top: 4px; font-size: 15px; font-weight: 700; }
+.confirmButtons { display: flex; flex-wrap: wrap; justify-content: end; gap: 8px; margin-top: 14px; }
+.confirmButtons button { min-height: 36px; padding: 7px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; }
+.confirmButtons button:hover { background: var(--zinc-800); }
+.confirmButtons button:last-child { background: #2563eb; color: #fff; }
+.confirmButtons button:last-child:hover { background: #1d4ed8; }
+.confirmButtons button:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+.confirmButtons button:first-child:focus-visible { outline: 1px solid var(--zinc-600); outline-offset: 1px; }

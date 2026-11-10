@@ -27,6 +27,7 @@
 type AnyRow = Record<string, any>;
 
 export const JACK_CLEARANCE_MM = 10;
+export const CANVAS_JACK_CLEARANCE_MM = 13;
 export const MAX_BODY_OVERHANG_MM = 12;
 
 const EPSILON_MM = 0.001;
@@ -235,7 +236,8 @@ function normalizeAngle(
    ========================= */
 
 function getConnectorMargins(
-    item: AnyRow
+    item: AnyRow,
+    clearance = JACK_CLEARANCE_MM,
 ) {
     const jacks = String(
         item.jacksLocation ||
@@ -247,24 +249,24 @@ function getConnectorMargins(
         left:
             jacks.includes("left") ||
                 jacks.includes("side")
-                ? JACK_CLEARANCE_MM
+                ? clearance
                 : 0,
 
         right:
             jacks.includes("right") ||
                 jacks.includes("side")
-                ? JACK_CLEARANCE_MM
+                ? clearance
                 : 0,
 
         top:
             jacks.includes("top")
-                ? JACK_CLEARANCE_MM
+                ? clearance
                 : 0,
 
         bottom:
             jacks.includes("down") ||
                 jacks.includes("bottom")
-                ? JACK_CLEARANCE_MM
+                ? clearance
                 : 0,
     };
 }
@@ -276,7 +278,8 @@ function getConnectorMargins(
 function pedalBounds(
     item: AnyRow,
     includeClearance = true,
-    rotationOverride?: number
+    rotationOverride?: number,
+    jackClearance?: number,
 ): Bounds | null {
     const width = positive(item.width);
     const depth = positive(item.depth);
@@ -301,7 +304,7 @@ function pedalBounds(
     }
 
     const margins = includeClearance
-        ? getConnectorMargins(item)
+        ? getConnectorMargins(item, jackClearance)
         : {
             left: 0,
             right: 0,
@@ -407,6 +410,42 @@ function boundsOverlap(
         a.minY < b.maxY - EPSILON_MM &&
         b.minY < a.maxY - EPSILON_MM
     );
+}
+
+export type ReplacementFit = "fits" | "collision" | "outside" | "offBoard" | "noBoard" | "unknown";
+
+/** Estimate fit at the original coordinates, without repacking the board. */
+export function checkReplacementFit(
+    original: AnyRow,
+    candidate: AnyRow,
+    items: AnyRow[],
+    boards: AnyRow[],
+): ReplacementFit {
+    const clearance = pedalBounds(candidate, true, undefined, CANVAS_JACK_CLEARANCE_MM);
+    if (!clearance) return "unknown";
+
+    const hasJackData = (item: AnyRow) =>
+        /left|right|side|top|down|bottom/i.test(String(item.jacksLocation || item.jacks || ""));
+    let incomplete = !hasJackData(candidate);
+
+    for (const other of finderSurfaceItems(items, boards)) {
+        if (other.instanceId === original.instanceId) continue;
+        const bounds = pedalBounds(other, true, undefined, CANVAS_JACK_CLEARANCE_MM);
+        if (bounds && boundsOverlap(clearance, bounds)) return "collision";
+        if (!bounds || !hasJackData(other)) incomplete = true;
+    }
+
+    if (!boards.length) return "noBoard";
+    const boardBounds = boards.map((board) => pedalBounds(board, false));
+    const surfaces = boardBounds.filter((bounds): bounds is Bounds =>
+        bounds !== null && original.x >= bounds.minX && original.x <= bounds.maxX &&
+        original.y >= bounds.minY && original.y <= bounds.maxY);
+    if (!surfaces.length) return boardBounds.includes(null) ? "unknown" : "offBoard";
+    const inside = surfaces.some((surface) =>
+        clearance.minX >= surface.minX - EPSILON_MM && clearance.maxX <= surface.maxX + EPSILON_MM &&
+        clearance.minY >= surface.minY - EPSILON_MM && clearance.maxY <= surface.maxY + EPSILON_MM);
+    if (!inside) return "outside";
+    return incomplete ? "unknown" : "fits";
 }
 
 /* =========================

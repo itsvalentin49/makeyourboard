@@ -1,4 +1,41 @@
 {
+  "replacement": {
+    "duplicate": "复制",
+    "forward": "上移一层",
+    "back": "下移一层",
+    "replace": "替换",
+    "choose": "选择替换效果器",
+    "previewAction": "在效果器板上预览",
+    "review": "替换预览",
+    "cancel": "取消",
+    "confirm": "确认替换"
+  },
+  "gearTu3": {
+    "officialDemo": "官方演示",
+    "artists": "使用 TU-3 的艺人"
+  },
+  "gear": {
+    "resultOne": "{count} 个结果",
+    "resultOther": "{count} 个结果",
+    "filters": "筛选",
+    "anyValue": "不限",
+    "open": "打开效果器库",
+    "returnToBoard": "返回效果器板",
+    "back": "返回效果器库",
+    "title": "效果器库",
+    "subtitle": "探索效果器，把新发现加入你的效果器板。",
+    "search": "搜索效果器、品牌或效果…",
+    "catalog": "目录",
+    "brand": "品牌",
+    "allBrands": "所有品牌",
+    "allTypes": "所有类型",
+    "sort": "排序方式",
+    "alphabetical": "按品牌 A–Z",
+    "newestFirst": "最新发布优先",
+    "reset": "清除筛选",
+    "empty": "没有找到符合条件的效果器。",
+    "more": "显示更多效果器"
+  },
   "sidebar": {
     "searchPedal": "搜索效果器",
     "searchBoard": "搜索效果器板",
@@ -31,6 +68,7 @@
     "description": "描述",
     "actions": {
       "title": "操作",
+      "more": "更多操作",
       "rotate": "旋转",
       "delete": "删除",
       "moveFront": "置于顶层",
@@ -66,7 +104,6 @@
       "Drum Machine": "鼓机",
       "Enhancer": "激励器",
       "Envelope Filter": "包络滤波器",
-      "Equalizer": "均衡器",
       "EQ": "均衡器",
       "Expression": "表情踏板",
       "Filter": "滤波器",
@@ -101,7 +138,6 @@
       "Tremolo": "音量颤音",
       "Tuner": "调音器",
       "Uni-Vibe": "Uni-Vibe",
-      "Vibe": "Uni-Vibe",
       "Utility": "实用工具",
       "Vibrato": "音高颤音",
       "Vocal": "人声",
@@ -240,6 +276,7 @@
     }
   },
   "export": {
+    "singlePedal": "添加第二块效果器即可下载图片。",
     "button": "导出",
     "title": "导出效果器板",
     "name": "效果器板名称",

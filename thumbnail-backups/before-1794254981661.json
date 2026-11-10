@@ -1,0 +1,43 @@
+[
+  {
+    "table": "pedals",
+    "items": [
+      {
+        "id": 23954,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/vfe-tiamat-blue-v2.webp",
+        "thumbnail": null,
+        "width": 60,
+        "depth": 112
+      },
+      {
+        "id": 23955,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/vfe-tiamat-white-v2.webp",
+        "thumbnail": null,
+        "width": 60,
+        "depth": 112
+      },
+      {
+        "id": 23956,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/vfe-tiamat-green-v2.webp",
+        "thumbnail": null,
+        "width": 60,
+        "depth": 112
+      },
+      {
+        "id": 23957,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/vfe-tiamat-black-v2.webp",
+        "thumbnail": null,
+        "width": 60,
+        "depth": 112
+      }
+    ]
+  },
+  {
+    "table": "power",
+    "items": []
+  },
+  {
+    "table": "boards",
+    "items": []
+  }
+]

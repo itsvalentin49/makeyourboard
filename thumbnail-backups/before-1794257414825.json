@@ -1,0 +1,22 @@
+[
+  {
+    "table": "pedals",
+    "items": [
+      {
+        "id": 23958,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/walrus-monumental-limited-v2.webp",
+        "thumbnail": null,
+        "width": 119,
+        "depth": 94
+      }
+    ]
+  },
+  {
+    "table": "power",
+    "items": []
+  },
+  {
+    "table": "boards",
+    "items": []
+  }
+]

@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { getCustomImageUrl } from "@/utils/customImageStore";
+import { CANVAS_JACK_CLEARANCE_MM as MARGIN_SIZE } from "@/utils/boardFinder";
 import {
   Group,
   Rect,
@@ -9,7 +10,6 @@ import {
   Image as KonvaImage,
 } from "react-konva";
 
-const MARGIN_SIZE = 13;
 const ALPHA_THRESHOLD = 10;
 const MAX_ANALYSIS_SIZE = 420;
 const enclosureCache = new Map<string, EnclosureBounds | null>();
@@ -48,6 +48,7 @@ type PedalImageProps = {
   onImageReady?: () => void;
   hidePlaceholder?: boolean;
   outlineOpacity?: number;
+  onSelectedOutlineChange?: () => void;
 };
 
 type ImagePlacement = {
@@ -3939,6 +3940,7 @@ export default function PedalImage({
   onImageReady,
   hidePlaceholder = false,
   outlineOpacity,
+  onSelectedOutlineChange,
 }: PedalImageProps) {
   const [img, setImg] =
     useState<HTMLImageElement | null>(
@@ -4434,6 +4436,10 @@ export default function PedalImage({
     return { x: -scaledWidth / 2, y: -scaledHeight / 2, width: scaledWidth, height: scaledHeight };
   }, [outlineOpacity, img, imagePlacement, hidePlaceholder, scaledWidth, scaledHeight]);
 
+  useLayoutEffect(() => {
+    onSelectedOutlineChange?.();
+  }, [outlineBounds, onSelectedOutlineChange]);
+
   return (
     <Group>
       {/* MARGE JACKS */}
@@ -4531,6 +4537,7 @@ export default function PedalImage({
       {outlineBounds && (
         <Rect
           {...outlineBounds}
+          name={onSelectedOutlineChange ? "selected-item-outline" : undefined}
           stroke="white"
           strokeWidth={0.5}
           opacity={outlineOpacity}

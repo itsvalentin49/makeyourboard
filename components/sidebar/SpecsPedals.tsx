@@ -3,10 +3,12 @@
 import React from "react";
 import { ExternalLink } from "lucide-react";
 import { mmToIn, formatWeight } from "@/utils/units";
+import gearStyles from "./GearCatalog.module.css";
 import type { Language } from "@/utils/i18n";
 
 type Props = {
   selectedPedal: any;
+  embedded?: boolean;
   selectedInstanceId: number | null;
 
   units: "metric" | "imperial";
@@ -79,13 +81,16 @@ function getLocalizedOverview(
   return "";
 }
 
-function splitTags(value: any) {
+export function splitTags(value: any) {
   if (!hasValue(value)) return [];
 
+  // The slash in A/B Box belongs to the label. Other slashes separate tags.
   return String(value)
+    .replace(/\bA\s*\/\s*B(?=\s+Box\b)/gi, "AB")
     .split("/")
     .map((part) => part.trim())
-    .filter(Boolean);
+    .filter(Boolean)
+    .map((tag) => /^AB\s+Box$/i.test(tag) ? "A/B Box" : tag);
 }
 
 function safeTranslate(
@@ -134,8 +139,10 @@ function SpecRow({
 function StoreLogos({
   selectedPedal,
   buildThomannUrl,
+  detailed,
 }: {
   selectedPedal: any;
+  detailed: boolean;
   buildThomannUrl: (slug: string) => string;
 }) {
   const stores: {
@@ -185,28 +192,20 @@ function StoreLogos({
   });
 
   return (
-    <div className="flex items-center gap-3 flex-wrap">
+    <div className={detailed ? gearStyles.storeList : "flex items-center gap-3 flex-wrap"}>
       {stores.map((store) => (
         <a
           key={store.key}
           href={store.url}
           target="_blank"
           rel="noopener noreferrer"
-          title={store.label}
-          aria-label={store.label}
-          className="
-            inline-flex
-            items-center
-            justify-center
-            transition-transform
-            duration-150
-            hover:scale-110
-            active:scale-95
-          "
+          title={detailed ? undefined : store.label}
+          aria-label={detailed ? undefined : store.label}
+          className={detailed ? gearStyles.storeLink : "inline-flex items-center justify-center transition-transform duration-150 hover:scale-110 active:scale-95"}
         >
           <img
             src={store.logo}
-            alt={store.label}
+            alt={detailed ? "" : store.label}
             className="
               w-7
               h-7
@@ -216,6 +215,12 @@ function StoreLogos({
             loading="lazy"
             decoding="async"
           />
+          {detailed && (
+            <>
+              <span>{store.label}</span>
+              <ExternalLink size={13} aria-hidden="true" />
+            </>
+          )}
         </a>
       ))}
     </div>
@@ -223,7 +228,25 @@ function StoreLogos({
 }
 
 
-function getHeroImageCandidates(
+export function PedalRetailers({
+  selectedPedal,
+  buildThomannUrl,
+  t,
+  detailed = false,
+}: Pick<Props, "selectedPedal" | "buildThomannUrl" | "t"> & {
+  detailed?: boolean;
+}) {
+  return (
+    <section className="flex flex-col gap-2">
+      <h2 className={detailed ? gearStyles.storeTitle : "text-[15px] font-black"}>
+        {t("sidebar.buyOnline")}
+      </h2>
+      <StoreLogos selectedPedal={selectedPedal} buildThomannUrl={buildThomannUrl} detailed={detailed} />
+    </section>
+  );
+}
+
+export function getHeroImageCandidates(
   pedal: any
 ) {
   const candidates = [
@@ -339,6 +362,7 @@ function PedalHeroPreview({
 
 export default function PedalSpecs({
   selectedPedal,
+  embedded = false,
   selectedInstanceId,
   units,
   language,
@@ -456,7 +480,7 @@ export default function PedalSpecs({
 
   return (
     <div
-      className="
+      className={embedded ? "flex flex-col gap-5" : `
         h-full
         min-h-0
         overflow-y-auto
@@ -470,10 +494,10 @@ export default function PedalSpecs({
         [scrollbar-width:none]
         [-ms-overflow-style:none]
         [&::-webkit-scrollbar]:hidden
-      "
+      `}
     >
       {/* HERO PRODUIT */}
-      <div className="shrink-0 flex flex-col items-center pt-1">
+      {!embedded && <div className="shrink-0 flex flex-col items-center pt-1">
         <div className="w-full h-[170px] shrink-0 flex items-center justify-center mb-4">
           <PedalHeroPreview
             selectedPedal={selectedPedal}
@@ -524,7 +548,7 @@ export default function PedalSpecs({
             )}
           </div>
         </div>
-      </div>
+      </div>}
 
       {/* DESCRIPTION */}
       {hasValue(overview) && (
@@ -665,19 +689,7 @@ export default function PedalSpecs({
         </div>
       </div>
 
-      {/* ACHETER EN LIGNE */}
-      <div className="shrink-0 flex flex-col gap-2">
-        <div className="text-[15px] font-black">
-          {t("sidebar.buyOnline")}
-        </div>
-
-        <StoreLogos
-          selectedPedal={selectedPedal}
-          buildThomannUrl={
-            buildThomannUrl
-          }
-        />
-      </div>
+      {!embedded && <PedalRetailers selectedPedal={selectedPedal} buildThomannUrl={buildThomannUrl} t={t} />}
     </div>
   );
 }

@@ -1,4 +1,5 @@
 "use client";
+import { physicalPedals } from "@/utils/boardFinder";
 import { ENCLOSURE_SIZING_BRANDS } from "@/utils/enclosureSizing";
 import { useEffect, useRef, useState, } from "react";
 import { Check, Copy, Download, Share2, Upload, } from "lucide-react";
@@ -1867,6 +1868,7 @@ export default function ExportPanel({ isLightTheme, isMobile = false, boardPedal
     ? JSON.parse(localStorage.getItem("myb_settings") || "{}")?.language || "en"
     : "en";
   const t = getTranslator(language);
+  const singlePedal = physicalPedals(boardPedals).length === 1;
   /* =========================================================
      STATE
      ========================================================= */
@@ -2276,7 +2278,7 @@ export default function ExportPanel({ isLightTheme, isMobile = false, boardPedal
      DOWNLOAD IMAGE
      ========================================================= */
   const exportImage = async () => {
-    if (downloadLoading) {
+    if (singlePedal || downloadLoading) {
       return;
     }
     setDownloadLoading(true);
@@ -2480,7 +2482,10 @@ export default function ExportPanel({ isLightTheme, isMobile = false, boardPedal
       </label>
 
       <div className="w-full overflow-hidden flex justify-center">
-        <canvas ref={previewRef} className={isMobile
+        <canvas
+          ref={previewRef}
+          onContextMenu={(event) => { if (singlePedal) event.preventDefault(); }}
+          className={isMobile
           ? "block w-full h-auto rounded-md"
           : "block max-w-full max-h-40 rounded-md"} />
       </div>
@@ -2516,7 +2521,7 @@ export default function ExportPanel({ isLightTheme, isMobile = false, boardPedal
         </label>
       </div>
 
-      <button type="button" onClick={exportImage} disabled={downloadLoading} className="
+      <button type="button" onClick={exportImage} disabled={singlePedal || downloadLoading} aria-describedby={singlePedal ? "export-single-pedal" : undefined} className="
             w-full
             h-[35px]
             px-3
@@ -2542,6 +2547,11 @@ export default function ExportPanel({ isLightTheme, isMobile = false, boardPedal
           {t("export.download")}
         </>)}
       </button>
+      {singlePedal && (
+        <p id="export-single-pedal" className="text-[11px] leading-relaxed text-zinc-400">
+          {t("export.singlePedal")}
+        </p>
+      )}
     </div>
 
     {/* SHARE */}

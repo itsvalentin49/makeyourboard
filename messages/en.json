@@ -1,8 +1,45 @@
 {
+  "replacement": {
+    "duplicate": "Duplicate",
+    "forward": "Move forward",
+    "back": "Move back",
+    "replace": "Replace",
+    "choose": "Choose a replacement",
+    "previewAction": "Preview on board",
+    "review": "Replacement preview",
+    "cancel": "Cancel",
+    "confirm": "Confirm replacement"
+  },
+  "gearTu3": {
+    "officialDemo": "Official Demo",
+    "artists": "Artists who use the TU-3"
+  },
+  "gear": {
+    "resultOne": "{count} result",
+    "resultOther": "{count} results",
+    "filters": "Filters",
+    "anyValue": "Any",
+    "open": "Open the pedal library",
+    "returnToBoard": "Back to board",
+    "back": "Back to library",
+    "title": "Pedal Library",
+    "subtitle": "Explore effects and add your discoveries to your board.",
+    "search": "Search pedals, brands or effects…",
+    "catalog": "Catalog",
+    "brand": "Brand",
+    "allBrands": "All brands",
+    "allTypes": "All types",
+    "sort": "Sort by",
+    "alphabetical": "Brand A–Z",
+    "newestFirst": "Newest first",
+    "reset": "Clear filters",
+    "empty": "No pedals match your search.",
+    "more": "Show more pedals"
+  },
   "sidebar": {
     "searchPedal": "Search for a pedal",
     "searchBoard": "Search for a pedalboard",
-    "buyOnline": "Buy online",
+    "buyOnline": "Buy Online",
     "addPedal": "Add a pedal",
     "addBoard": "Add a pedalboard",
     "addPedalTitle": "Pedals",
@@ -31,6 +68,7 @@
     "description": "Description",
     "actions": {
       "title": "Actions",
+      "more": "More actions",
       "rotate": "Rotate",
       "delete": "Delete",
       "moveFront": "Bring to front",
@@ -46,7 +84,7 @@
     },
     "type": {
       "label": "Type",
-      "A/B Box": "A/B box",
+      "A/B Box": "A/B Box",
       "ABY Switcher": "ABY Switcher",
       "Accessory": "Accessory",
       "Acoustic": "Acoustic",
@@ -66,7 +104,6 @@
       "Drum Machine": "Drum Machine",
       "Enhancer": "Enhancer",
       "Envelope Filter": "Envelope Filter",
-      "Equalizer": "EQ",
       "EQ": "EQ",
       "Expression": "Expression",
       "Filter": "Filter",
@@ -101,7 +138,6 @@
       "Tremolo": "Tremolo",
       "Tuner": "Tuner",
       "Uni-Vibe": "Uni-Vibe",
-      "Vibe": "Uni-Vibe",
       "Utility": "Utility",
       "Vibrato": "Vibrato",
       "Vocal": "Vocal",
@@ -240,6 +276,7 @@
     }
   },
   "export": {
+    "singlePedal": "Add another pedal to download an image.",
     "button": "Export",
     "title": "Export pedalboard",
     "name": "Pedalboard name",

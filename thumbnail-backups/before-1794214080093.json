@@ -1,0 +1,155 @@
+[
+  {
+    "table": "pedals",
+    "items": [
+      {
+        "id": 23928,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/digitech-lyra-v2.webp",
+        "thumbnail": null,
+        "width": 75,
+        "depth": 133
+      },
+      {
+        "id": 23929,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/digitech-whammy2-v2.webp",
+        "thumbnail": null,
+        "width": 157,
+        "depth": 203
+      },
+      {
+        "id": 23930,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/digitech-cf7-v2.webp",
+        "thumbnail": null,
+        "width": 75,
+        "depth": 133
+      },
+      {
+        "id": 23931,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/digitech-hot-head-v2.webp",
+        "thumbnail": null,
+        "width": 75,
+        "depth": 133
+      },
+      {
+        "id": 23932,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/digitech-bp60-v2.webp",
+        "thumbnail": null,
+        "width": 127,
+        "depth": 152
+      },
+      {
+        "id": 23933,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/digitech-bp90-v2.webp",
+        "thumbnail": null,
+        "width": 216,
+        "depth": 165
+      },
+      {
+        "id": 23934,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/digitech-timebender-v2.webp",
+        "thumbnail": null,
+        "width": 170,
+        "depth": 142
+      },
+      {
+        "id": 23935,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/digitech-harmonyman-v2.webp",
+        "thumbnail": null,
+        "width": 170,
+        "depth": 142
+      },
+      {
+        "id": 23936,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/digitech-rp360xp-v2.webp",
+        "thumbnail": null,
+        "width": 292,
+        "depth": 216
+      },
+      {
+        "id": 23937,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/digitech-gnx3000-v2.webp",
+        "thumbnail": null,
+        "width": 470,
+        "depth": 267
+      },
+      {
+        "id": 23938,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/digitech-black13-v2.webp",
+        "thumbnail": null,
+        "width": 79,
+        "depth": 125
+      },
+      {
+        "id": 23939,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/digitech-bp200-v2.webp",
+        "thumbnail": null,
+        "width": 254,
+        "depth": 216
+      },
+      {
+        "id": 23940,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/digitech-element-v2.webp",
+        "thumbnail": null,
+        "width": 114,
+        "depth": 159
+      },
+      {
+        "id": 23941,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/digitech-rp1000-v2.webp",
+        "thumbnail": null,
+        "width": 495,
+        "depth": 273
+      },
+      {
+        "id": 23942,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/digitech-rp355-v2.webp",
+        "thumbnail": null,
+        "width": 444,
+        "depth": 222
+      },
+      {
+        "id": 23943,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/digitech-rp255-v2.webp",
+        "thumbnail": null,
+        "width": 368,
+        "depth": 222
+      },
+      {
+        "id": 23944,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/digitech-talker-v2.webp",
+        "thumbnail": null,
+        "width": 203,
+        "depth": 184
+      },
+      {
+        "id": 23945,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/digitech-rp55-v2.webp",
+        "thumbnail": null,
+        "width": 165,
+        "depth": 143
+      },
+      {
+        "id": 23946,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/digitech-rp500-v2.webp",
+        "thumbnail": null,
+        "width": 495,
+        "depth": 219
+      },
+      {
+        "id": 23947,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/digitech-istomp-v2.webp",
+        "thumbnail": null,
+        "width": 80,
+        "depth": 125
+      }
+    ]
+  },
+  {
+    "table": "power",
+    "items": []
+  },
+  {
+    "table": "boards",
+    "items": []
+  }
+]

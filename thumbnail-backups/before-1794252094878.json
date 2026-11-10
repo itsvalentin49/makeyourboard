@@ -1,0 +1,57 @@
+[
+  {
+    "table": "pedals",
+    "items": [
+      {
+        "id": 23948,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/silktone-expander-v2.webp",
+        "thumbnail": null,
+        "width": 87,
+        "depth": 141
+      },
+      {
+        "id": 23949,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/silktone-fuzz-v2.webp",
+        "thumbnail": null,
+        "width": 120,
+        "depth": 95
+      },
+      {
+        "id": 23950,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/silktone-fuzz-plus-v2.webp",
+        "thumbnail": null,
+        "width": 120,
+        "depth": 95
+      },
+      {
+        "id": 23951,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/silktone-fuzz-plus-teal-v2.webp",
+        "thumbnail": null,
+        "width": 120,
+        "depth": 95
+      },
+      {
+        "id": 23952,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/silktone-overdrive-plus-v2.webp",
+        "thumbnail": null,
+        "width": 120,
+        "depth": 95
+      },
+      {
+        "id": 23953,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/silktone-green-hell-v3.webp",
+        "thumbnail": null,
+        "width": 87,
+        "depth": 141
+      }
+    ]
+  },
+  {
+    "table": "power",
+    "items": []
+  },
+  {
+    "table": "boards",
+    "items": []
+  }
+]

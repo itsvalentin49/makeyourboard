@@ -1,10 +1,11 @@
 "use client";
 
 import { createPortal } from "react-dom";
-import React, { useRef, useLayoutEffect, useEffect, useState } from "react";
+import React, { useRef, useLayoutEffect, useEffect, useId, useState, useCallback } from "react";
 import { Stage, Layer, Group, Rect, Text, Circle as KonvaCircle, Image as KonvaImage, } from "react-konva";
-import { Zap, Weight, Minus, Cable, Plus, Check, Upload, AlertTriangle, RotateCw, Circle, Trash2, X, Share2, Info, List, Settings, PanelsTopLeft, Download, ArrowUp, ArrowDown, CircleHelp, ChevronsLeft, ChevronsRight } from "lucide-react";
+import { Zap, Weight, Minus, Cable, Plus, Check, Upload, AlertTriangle, RotateCw, Circle, Trash2, X, Share2, List, Settings, PanelsTopLeft, Download, ArrowUp, ArrowDown, CircleHelp, ChevronsLeft, ChevronsRight, Replace, CopyPlus, Ellipsis } from "lucide-react";
 import PedalImage from "@/components/PedalImage";
+import pedalActions from "./PedalActions.module.css";
 import { formatWeight } from "@/utils/units";
 import { getTranslator } from "@/utils/i18n";
 import useImage from "use-image";
@@ -18,6 +19,7 @@ import CablesPanel from "@/components/CablesPanel";
 import { HelpGuide } from "@/components/HelpGuide";
 import SignalPath, { SignalPoint } from "@/components/SignalPath";
 import type { Language } from "@/utils/i18n";
+import { isPowerSupply, type ReplacementFit } from "@/utils/boardFinder";
 import { ENCLOSURE_SIZING_BRANDS } from "@/utils/enclosureSizing";
 
 
@@ -80,8 +82,13 @@ type Props = {
 
   rotatePedal: (id: number) => void;
   deletePedal: (id: number) => void;
-  movePedalFront: (id: number) => void;
-  movePedalBack: (id: number) => void;
+  duplicateCanvasItem: (id: number, kind: "board" | "pedal") => void;
+  moveCanvasItemOneLayer?: (id: number, neighborId: number) => void;
+  replacePedal?: (id: number) => void;
+  replacementPreview?: {
+    pedal: AnyRow;
+    fit: ReplacementFit;
+  };
   rotateBoard: (id: number) => void;
   deleteBoard: (id: number) => void;
 
@@ -282,8 +289,10 @@ export default function BoardCanvas({
   openHelpRef,
   rotatePedal,
   deletePedal,
-  movePedalFront,
-  movePedalBack,
+  duplicateCanvasItem,
+  moveCanvasItemOneLayer,
+  replacePedal,
+  replacementPreview,
   rotateBoard,
   deleteBoard,
   onStageSizeChange,
@@ -311,6 +320,12 @@ export default function BoardCanvas({
   const t = getTranslator(language);
   const [desktopPanelHost, setDesktopPanelHost] = useState<HTMLDivElement | null>(null);
   const [railExpanded, setRailExpanded] = useState(false);
+  const [itemMenuExpanded, setItemMenuExpanded] = useState(false);
+  const itemActionsId = useId();
+  const moreActionsButton = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    setItemMenuExpanded(false);
+  }, [selectedInstanceId, selectedBoardInstanceId]);
   const railWidth = railExpanded ? 190 : 56;
   const railLabels: Record<Language, { expand: string; collapse: string }> = {
     fr: { expand: "Afficher les noms", collapse: "Masquer les noms" },
@@ -775,6 +790,7 @@ export default function BoardCanvas({
   const weightUnit = formattedWeight.match(/(kg|lb|oz|g)$/)?.[0] ?? "";
 
   const handleStageClick = (e: any) => {
+    if (replacementPreview) return;
     if (e.target === e.target.getStage()) {
       setSelectedInstanceId(null);
       setSelectedBoardInstanceId(null);
@@ -1039,10 +1055,8 @@ export default function BoardCanvas({
   const [overlayPosition, setOverlayPosition] = useState<{
     x: number;
     y: number;
-  } | null>(null);
-  const [infoPosition, setInfoPosition] = useState<{
-    x: number;
-    y: number;
+    halfWidth: number;
+    bottom: number;
   } | null>(null);
 
   // Quand on change de pedalboard, une sélection appartenant à l'ancien
@@ -1061,7 +1075,6 @@ export default function BoardCanvas({
     setSelectedInstanceId(null);
     setSelectedBoardInstanceId(null);
     setOverlayPosition(null);
-    setInfoPosition(null);
   }, [
     activeProjectId,
     setSelectedInstanceId,
@@ -1252,97 +1265,26 @@ export default function BoardCanvas({
 
   /* ================= OVERLAY POSITION ================= */
 
-  const updateOverlayPosition = () => {
-    const stage = stageRef.current;
-    if (!stage) return;
-
-    const scale = stage.scaleX();
-    const stageX = stage.x();
-    const stageY = stage.y();
-
-    // PÉDALE SÉLECTIONNÉE
-    if (selectedInstanceId !== null) {
-      const pedal = activeProject.boardPedals.find(
-        (p) => p.instanceId === selectedInstanceId
-      );
-
-      if (!pedal) return;
-
-      const size = displaySizes[selectedInstanceId];
-      if (!size) return;
-
-      const selectedPedalIsDragging =
-        isDragging &&
-        draggingPedalId.current === selectedInstanceId &&
-        lastRenderedPos.current !== null;
-
-      const currentX =
-        selectedPedalIsDragging
-          ? lastRenderedPos.current!.x
-          : pedal.x;
-
-      const currentY =
-        selectedPedalIsDragging
-          ? lastRenderedPos.current!.y
-          : pedal.y;
-
-      setOverlayPosition({
-        x: currentX * scale + stageX,
-        y:
-          currentY * scale +
-          stageY -
-          (size.h * scale) / 2 -
-          8,
-      });
-
-      if (isMobile) {
-        setInfoPosition({
-          x:
-            currentX * scale +
-            stageX +
-            (size.w * scale) / 2 +
-            10,
-          y:
-            currentY * scale +
-            stageY -
-            (size.h * scale) / 2 -
-            10,
-        });
-      }
-
+  const updateOverlayPosition = useCallback(() => {
+    const outline = stageRef.current?.findOne(".selected-item-outline");
+    if (!outline) {
+      setOverlayPosition(null);
       return;
     }
 
-    // BOARD SÉLECTIONNÉ
-    if (selectedBoardInstanceId !== null) {
-      const board = (activeProject.selectedBoards || []).find(
-        (b) => b.instanceId === selectedBoardInstanceId
-      );
+    const { x, y, width, height } = outline.getClientRect();
+    setOverlayPosition({
+      x: x + width / 2,
+      y,
+      halfWidth: width / 2,
+      bottom: y + height,
+    });
+  }, []);
 
-      if (!board) return;
-
-      const size = displaySizes[selectedBoardInstanceId];
-      if (!size) return;
-
-      setOverlayPosition({
-        x: board.x * scale + stageX,
-        y:
-          board.y * scale +
-          stageY -
-          (size.h * scale) / 2 -
-          8,
-      });
-
-      return;
-    }
-
-    setOverlayPosition(null);
-    setInfoPosition(null);
-  };
-
-  useEffect(() => {
+  useLayoutEffect(() => {
     updateOverlayPosition();
   }, [
+    updateOverlayPosition,
     selectedInstanceId,
     selectedBoardInstanceId,
     activeProject.boardPedals,
@@ -1351,43 +1293,9 @@ export default function BoardCanvas({
     currentZoom,
     activeProject.stageX,
     activeProject.stageY,
-  ]);
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      const target = e.target as HTMLElement;
-
-      if (
-        target.tagName === "INPUT" ||
-        target.tagName === "TEXTAREA" ||
-        target.isContentEditable
-      ) {
-        return;
-      }
-
-      if (e.key === "Backspace") {
-        if (selectedInstanceId !== null) {
-          deletePedal(selectedInstanceId);
-          return;
-        }
-
-        if (selectedBoardInstanceId !== null) {
-          deleteBoard(selectedBoardInstanceId);
-          return;
-        }
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [
-    selectedInstanceId,
-    selectedBoardInstanceId,
-    deletePedal,
-    deleteBoard,
+    stageSize.width,
+    stageSize.height,
+    isDragging,
   ]);
 
   const getVisibleBounds = () => {
@@ -1495,12 +1403,164 @@ export default function BoardCanvas({
       kind: "board",
     })),
     ...(activeProject.boardPedals || []).map((item: AnyRow) => ({
-      ...item,
+      ...(replacementPreview && replacementPreview.pedal.instanceId === item.instanceId ? replacementPreview.pedal : item),
       kind: "pedal",
     })),
   ].sort((a: AnyRow, b: AnyRow) => {
     return (Number(a.zIndex) || 0) - (Number(b.zIndex) || 0);
   });
+
+
+  const menuTarget = canvasItems.find((item) => item.kind === "board"
+    ? item.instanceId === selectedBoardInstanceId
+    : item.instanceId === selectedInstanceId);
+  const isBoardTarget = menuTarget?.kind === "board";
+  const canReplace = Boolean(menuTarget && !isBoardTarget && !isPowerSupply(menuTarget) && replacePedal);
+  const quickWidth = Math.max(0, Math.min(112, stageSize.width - 16));
+  const quickHeight = 38;
+  const menuWidth = Math.max(0, Math.min(192, stageSize.width - 16));
+  const menuHeight = canReplace ? 179 : 151;
+  const menuGap = 6;
+  const actionPositions = menuTarget && overlayPosition?.halfWidth !== undefined &&
+    overlayPosition.bottom !== undefined && overlayPosition.bottom >= 0 &&
+    overlayPosition.y < stageSize.height && quickWidth > 0 && stageSize.height >= quickHeight + 16 ? (() => {
+      const right = overlayPosition.x + overlayPosition.halfWidth;
+      const left = overlayPosition.x - overlayPosition.halfWidth;
+      if (right < 0 || left >= stageSize.width) return null;
+
+      const above = overlayPosition.y - menuGap - quickHeight;
+      const quickTop = Math.max(8, Math.min(above >= 8 ? above : overlayPosition.bottom + menuGap, stageSize.height - quickHeight - 8));
+      const quickLeft = Math.max(8, Math.min(overlayPosition.x - quickWidth / 2, stageSize.width - quickWidth - 8));
+      const rightMenuLeft = right + menuGap;
+      const leftMenuLeft = left - menuGap - menuWidth;
+      const fitsRight = rightMenuLeft + menuWidth <= stageSize.width - 8;
+      const fitsLeft = leftMenuLeft >= 8;
+      const maxHeight = Math.min(menuHeight, stageSize.height - 16);
+      const menuTop = Math.max(8, Math.min(overlayPosition.y, stageSize.height - 46));
+      const spaceBelow = stageSize.height - quickTop - quickHeight - menuGap - 8;
+      const spaceAbove = quickTop - menuGap - 8;
+      const side = fitsRight ? "right" : fitsLeft ? "left" : spaceBelow >= spaceAbove ? "below" : "above";
+      const menu = side === "right" || side === "left"
+        ? {
+            left: side === "right" ? rightMenuLeft : leftMenuLeft,
+            top: menuTop,
+            width: menuWidth,
+            maxHeight: Math.min(maxHeight, stageSize.height - menuTop - 8),
+          }
+        : {
+            left: Math.min(quickLeft, stageSize.width - menuWidth - 8),
+            top: side === "below" ? quickTop + quickHeight + menuGap : undefined,
+            bottom: side === "above" ? stageSize.height - quickTop + menuGap : undefined,
+            width: menuWidth,
+            maxHeight: Math.min(maxHeight, side === "below" ? spaceBelow : spaceAbove),
+          };
+
+      return { quick: { left: quickLeft, top: quickTop, width: quickWidth }, menu };
+    })() : null;
+
+  const selectedLayer = menuTarget
+    ? canvasItems.findIndex((item) => item.instanceId === menuTarget.instanceId) : -1;
+  const selectedSize = menuTarget && displaySizes[menuTarget.instanceId];
+  const selectedBox = menuTarget && selectedSize ? getOrientedBox(menuTarget, selectedSize) : null;
+
+  function overlappingLayer(direction: -1 | 1): number | undefined {
+    if (!selectedBox || selectedLayer < 0) return undefined;
+    for (let i = selectedLayer + direction; i >= 0 && i < canvasItems.length; i += direction) {
+      const item = canvasItems[i];
+      const size = displaySizes[item.instanceId];
+      if (size && (getSATOverlap(selectedBox, getOrientedBox(item, size))?.overlap ?? 0) > 0.001) {
+        return item.instanceId;
+      }
+    }
+    return undefined;
+  }
+
+  const forwardLayer = overlappingLayer(1);
+  const backLayer = overlappingLayer(-1);
+
+  const itemId = menuTarget?.instanceId;
+  const itemActions = itemId === undefined ? [] : [
+    { key: "pedal.actions.rotate", Icon: RotateCw, hint: "R", shortcut: "R", run: () => (isBoardTarget ? rotateBoard : rotatePedal)(itemId) },
+    { key: "replacement.duplicate", Icon: CopyPlus, hint: "D", shortcut: "D", run: () => duplicateCanvasItem(itemId, isBoardTarget ? "board" : "pedal") },
+    { key: "replacement.forward", Icon: ArrowUp, hint: "↑", shortcut: "ArrowUp",
+      run: moveCanvasItemOneLayer && forwardLayer !== undefined ? () => moveCanvasItemOneLayer(itemId, forwardLayer) : undefined },
+    { key: "replacement.back", Icon: ArrowDown, hint: "↓", shortcut: "ArrowDown",
+      run: moveCanvasItemOneLayer && backLayer !== undefined ? () => moveCanvasItemOneLayer(itemId, backLayer) : undefined },
+    ...(canReplace && replacePedal ? [
+      { key: "replacement.replace", Icon: Replace, hint: "⇧R", shortcut: "Shift+R",
+        run: () => replacePedal(itemId) },
+    ] : []),
+    { key: "pedal.actions.delete", Icon: Trash2, hint: "Del", shortcut: "Delete Backspace",
+      run: () => (isBoardTarget ? deleteBoard : deletePedal)(itemId) },
+  ];
+  const showItemMenu = !viewer && !replacementPreview && menuTarget && actionPositions &&
+    !isDragging && !isStageDragging && !isPinching &&
+    !(isMobile && (mobileSidebarOpen || mobileCanvasPanelOpen));
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (viewer || replacementPreview || event.defaultPrevented || event.isComposing || event.repeat ||
+        !containerRef.current?.getClientRects().length || document.querySelector("dialog[open]")) return;
+      const target = event.target;
+      if (target instanceof HTMLElement &&
+        (target.closest("input, textarea, select") || target.isContentEditable)) return;
+
+      const key = event.key;
+      const upperKey = key.toUpperCase();
+      if (showItemMenu) {
+        if (key === "Escape" && itemMenuExpanded) {
+          event.preventDefault();
+          setItemMenuExpanded(false);
+          moreActionsButton.current?.focus();
+          return;
+        }
+
+        const shortcut = [
+          event.metaKey && "Meta", event.ctrlKey && "Control", event.altKey && "Alt",
+          event.shiftKey && "Shift", key.length === 1 ? upperKey : key,
+        ].filter(Boolean).join("+");
+        const action = itemActions.find(({ shortcut: keys }) => keys.split(" ").includes(shortcut));
+        if (action?.run) {
+          event.preventDefault();
+          action.run();
+        }
+        return;
+      }
+
+      // Preserve Backspace for boards and power supplies when the menu is offscreen.
+      if (key === "Backspace" && !event.metaKey && !event.ctrlKey && !event.altKey && !event.shiftKey) {
+        if (selectedInstanceId !== null && menuTarget && isPowerSupply(menuTarget)) {
+          event.preventDefault();
+          deletePedal(selectedInstanceId);
+        } else if (selectedBoardInstanceId !== null) {
+          event.preventDefault();
+          deleteBoard(selectedBoardInstanceId);
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  });
+
+
+  function tapCanvasBoard(id: number) {
+    if (isMobile && selectedBoardInstanceId === id) {
+      setMobileCanvasPanelOpen?.(false);
+      setMobileSidebarOpen(true);
+    }
+    setSelectedBoardInstanceId(id);
+    setSelectedInstanceId(null);
+  }
+
+  function tapCanvasPedal(id: number) {
+    if (isMobile && selectedInstanceId === id && menuTarget?.instanceId === id) {
+      setMobileCanvasPanelOpen?.(false);
+      setMobileSidebarOpen(true);
+    }
+    setSelectedInstanceId(id);
+    setSelectedBoardInstanceId(null);
+  }
 
 
 
@@ -1702,402 +1762,50 @@ html.light .myb-tool-rail-button[data-active="true"] { background: var(--zinc-70
       )}
 
 
-      {!viewer &&
-        overlayPosition &&
-        !(isMobile && (mobileSidebarOpen || mobileCanvasPanelOpen)) &&
-        (selectedInstanceId !== null || selectedBoardInstanceId !== null) && (
-          <div
-            key={`actions-${selectedInstanceId ?? `board-${selectedBoardInstanceId}`}`}
-            className="
-        absolute
-        z-[80]
-        flex
-        items-center
-        gap-1
-      "
-            style={{
-              left: overlayPosition.x,
-              top: Math.max(8, overlayPosition.y - 44),
-              transform: "translateX(-50%)",
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* ROTATE */}
-            <div
-              className="relative w-10 h-10"
-              onMouseEnter={(e) => {
-                const button = e.currentTarget.querySelector("button");
-
-                if (button) {
-                  button.style.width = "40px";
-                  button.style.height = "40px";
-                }
-              }}
-              onMouseLeave={(e) => {
-                const button = e.currentTarget.querySelector("button");
-
-                if (button) {
-                  button.style.width = "36px";
-                  button.style.height = "36px";
-                }
-              }}
+      {showItemMenu && (
+        <div
+          role="group"
+          aria-label={t("pedal.actions.title")}
+          onClick={(event) => event.stopPropagation()}
+          onMouseDown={(event) => event.stopPropagation()}
+          onWheel={(event) => event.stopPropagation()}
+        >
+          <div className={pedalActions.quick} style={actionPositions.quick}>
+            {itemActions.filter(({ key }) => key === "pedal.actions.rotate" || key === "pedal.actions.delete")
+              .map(({ key, Icon, shortcut, run }) => (
+                <button key={key} type="button" className={pedalActions.quickButton} onClick={run}
+                  aria-label={t(key)} title={t(key)} aria-keyshortcuts={shortcut}
+                  data-danger={key === "pedal.actions.delete" || undefined}>
+                  <Icon size={17} aria-hidden="true" />
+                </button>
+              ))}
+            <button
+              ref={moreActionsButton}
+              type="button"
+              className={pedalActions.quickButton}
+              aria-label={t("pedal.actions.more")}
+              title={t("pedal.actions.more")}
+              aria-expanded={itemMenuExpanded}
+              aria-controls={itemMenuExpanded ? itemActionsId : undefined}
+              onClick={() => setItemMenuExpanded((expanded) => !expanded)}
             >
-              <button
-                type="button"
-                aria-label="Rotate"
-                onClick={() => {
-                  if (selectedInstanceId !== null) {
-                    rotatePedal(selectedInstanceId);
-                  } else if (selectedBoardInstanceId !== null) {
-                    rotateBoard(selectedBoardInstanceId);
-                  }
-                }}
-                style={{
-                  position: "absolute",
-                  left: "50%",
-                  top: "50%",
-                  width: "36px",
-                  height: "36px",
-                  transform: "translate(-50%, -50%)",
-                  transition: "width 140ms ease-out, height 140ms ease-out",
-                }}
-                className="
-            rounded-xl
-            border border-zinc-700
-            bg-zinc-950
-            shadow-lg
-            p-0
-          "
-              />
-
-              <RotateCw
-                strokeWidth={2}
-                style={{
-                  position: "absolute",
-                  left: "50%",
-                  top: "50%",
-                  width: "15px",
-                  height: "15px",
-                  transform: "translate(-50%, -50%)",
-                  pointerEvents: "none",
-                  display: "block",
-                }}
-              />
-            </div>
-
-            {/* DELETE */}
-            <div
-              className="relative w-10 h-10"
-              onMouseEnter={(e) => {
-                const button = e.currentTarget.querySelector("button");
-
-                if (button) {
-                  button.style.width = "40px";
-                  button.style.height = "40px";
-                }
-              }}
-              onMouseLeave={(e) => {
-                const button = e.currentTarget.querySelector("button");
-
-                if (button) {
-                  button.style.width = "36px";
-                  button.style.height = "36px";
-                }
-              }}
-            >
-              <button
-                type="button"
-                aria-label="Delete"
-                onClick={() => {
-                  if (selectedInstanceId !== null) {
-                    deletePedal(selectedInstanceId);
-                  } else if (selectedBoardInstanceId !== null) {
-                    deleteBoard(selectedBoardInstanceId);
-                  }
-                }}
-                style={{
-                  position: "absolute",
-                  left: "50%",
-                  top: "50%",
-                  width: "36px",
-                  height: "36px",
-                  transform: "translate(-50%, -50%)",
-                  transition: "width 140ms ease-out, height 140ms ease-out",
-                }}
-                className="
-            rounded-xl
-            border border-zinc-700
-            bg-zinc-950
-            shadow-lg
-            p-0
-          "
-              />
-
-              <Trash2
-                strokeWidth={2}
-                style={{
-                  position: "absolute",
-                  left: "50%",
-                  top: "50%",
-                  width: "15px",
-                  height: "15px",
-                  transform: "translate(-50%, -50%)",
-                  pointerEvents: "none",
-                  display: "block",
-                }}
-              />
-            </div>
-
-
-            {/* FRONT / BACK → DESKTOP UNIQUEMENT */}
-            {!isMobile && (
-              <>
-                {/* FRONT */}
-                <div
-                  className="relative w-10 h-10"
-                  onMouseEnter={(e) => {
-                    const button = e.currentTarget.querySelector("button");
-
-                    if (button) {
-                      button.style.width = "40px";
-                      button.style.height = "40px";
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    const button = e.currentTarget.querySelector("button");
-
-                    if (button) {
-                      button.style.width = "36px";
-                      button.style.height = "36px";
-                    }
-                  }}
-                >
-                  <button
-                    type="button"
-                    aria-label="Bring to front"
-                    onClick={() => {
-                      const maxZ = Math.max(
-                        0,
-                        ...activeProject.boardPedals.map(
-                          (p) => Number(p.zIndex) || 0
-                        ),
-                        ...(activeProject.selectedBoards || []).map(
-                          (b) => Number(b.zIndex) || 0
-                        )
-                      );
-
-                      if (selectedInstanceId !== null) {
-                        updateActiveProject({
-                          boardPedals: activeProject.boardPedals.map((p) =>
-                            p.instanceId === selectedInstanceId
-                              ? { ...p, zIndex: maxZ + 1 }
-                              : p
-                          ),
-                        });
-                      } else if (selectedBoardInstanceId !== null) {
-                        updateActiveProject({
-                          selectedBoards: (
-                            activeProject.selectedBoards || []
-                          ).map((b) =>
-                            b.instanceId === selectedBoardInstanceId
-                              ? { ...b, zIndex: maxZ + 1 }
-                              : b
-                          ),
-                        });
-                      }
-                    }}
-                    style={{
-                      position: "absolute",
-                      left: "50%",
-                      top: "50%",
-                      width: "36px",
-                      height: "36px",
-                      transform: "translate(-50%, -50%)",
-                      transition:
-                        "width 140ms ease-out, height 140ms ease-out",
-                    }}
-                    className="
-                      rounded-xl
-                      border border-zinc-700
-                      bg-zinc-950
-                      shadow-lg
-                      p-0
-                    "
-                  />
-
-                  <ArrowUp
-                    strokeWidth={2}
-                    style={{
-                      position: "absolute",
-                      left: "50%",
-                      top: "50%",
-                      width: "15px",
-                      height: "15px",
-                      transform: "translate(-50%, -50%)",
-                      pointerEvents: "none",
-                      display: "block",
-                    }}
-                  />
-                </div>
-
-                {/* BACK */}
-                <div
-                  className="relative w-10 h-10"
-                  onMouseEnter={(e) => {
-                    const button = e.currentTarget.querySelector("button");
-
-                    if (button) {
-                      button.style.width = "40px";
-                      button.style.height = "40px";
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    const button = e.currentTarget.querySelector("button");
-
-                    if (button) {
-                      button.style.width = "36px";
-                      button.style.height = "36px";
-                    }
-                  }}
-                >
-                  <button
-                    type="button"
-                    aria-label="Send to back"
-                    onClick={() => {
-                      const minZ = Math.min(
-                        0,
-                        ...activeProject.boardPedals.map(
-                          (p) => Number(p.zIndex) || 0
-                        ),
-                        ...(activeProject.selectedBoards || []).map(
-                          (b) => Number(b.zIndex) || 0
-                        )
-                      );
-
-                      if (selectedInstanceId !== null) {
-                        updateActiveProject({
-                          boardPedals: activeProject.boardPedals.map((p) =>
-                            p.instanceId === selectedInstanceId
-                              ? { ...p, zIndex: minZ - 1 }
-                              : p
-                          ),
-                        });
-                      } else if (selectedBoardInstanceId !== null) {
-                        updateActiveProject({
-                          selectedBoards: (
-                            activeProject.selectedBoards || []
-                          ).map((b) =>
-                            b.instanceId === selectedBoardInstanceId
-                              ? { ...b, zIndex: minZ - 1 }
-                              : b
-                          ),
-                        });
-                      }
-                    }}
-                    style={{
-                      position: "absolute",
-                      left: "50%",
-                      top: "50%",
-                      width: "36px",
-                      height: "36px",
-                      transform: "translate(-50%, -50%)",
-                      transition:
-                        "width 140ms ease-out, height 140ms ease-out",
-                    }}
-                    className="
-                      rounded-xl
-                      border border-zinc-700
-                      bg-zinc-950
-                      shadow-lg
-                      p-0
-                    "
-                  />
-
-                  <ArrowDown
-                    strokeWidth={2}
-                    style={{
-                      position: "absolute",
-                      left: "50%",
-                      top: "50%",
-                      width: "15px",
-                      height: "15px",
-                      transform: "translate(-50%, -50%)",
-                      pointerEvents: "none",
-                      display: "block",
-                    }}
-                  />
-                </div>
-              </>
-            )}
-
-            {/* INFO → MOBILE + PÉDALE UNIQUEMENT */}
-            {isMobile &&
-              (selectedInstanceId !== null || selectedBoardInstanceId !== null) && (
-                <div
-                  className="relative w-10 h-10"
-                  onMouseEnter={(e) => {
-                    const button = e.currentTarget.querySelector("button");
-
-                    if (button) {
-                      button.style.width = "40px";
-                      button.style.height = "40px";
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    const button = e.currentTarget.querySelector("button");
-
-                    if (button) {
-                      button.style.width = "36px";
-                      button.style.height = "36px";
-                    }
-                  }}
-                >
-                  <button
-                    type="button"
-                    aria-label="Informations"
-                    onClick={() => {
-                      setMobileCanvasPanelOpen?.(false);
-                      setMobileSidebarOpen(true);
-                    }}
-                    style={{
-                      position: "absolute",
-                      left: "50%",
-                      top: "50%",
-                      width: "36px",
-                      height: "36px",
-                      transform: "translate(-50%, -50%)",
-                      transition: "width 140ms ease-out, height 140ms ease-out",
-                    }}
-                    className="
-        rounded-xl
-        border border-zinc-700
-        bg-zinc-950
-        shadow-lg
-        p-0
-      "
-                  />
-
-                  <Info
-                    strokeWidth={2}
-                    style={{
-                      position: "absolute",
-                      left: "50%",
-                      top: "50%",
-                      width: "16px",
-                      height: "16px",
-                      transform: "translate(-50%, -50%)",
-                      pointerEvents: "none",
-                      display: "block",
-                    }}
-                  />
-                </div>
-              )}
-
+              <Ellipsis size={19} aria-hidden="true" />
+            </button>
           </div>
-        )}
-
-
-
+          {itemMenuExpanded && (
+            <div id={itemActionsId} className={pedalActions.menu} style={actionPositions.menu}>
+              {itemActions.map(({ key, Icon, hint, shortcut, run }) => (
+                <button key={key} type="button" onClick={run} disabled={!run} aria-keyshortcuts={shortcut}
+                  className={pedalActions.action} data-danger={key === "pedal.actions.delete" || undefined}>
+                  <Icon size={17} aria-hidden="true" />
+                  <span>{t(key)}</span>
+                  <kbd aria-hidden="true">{hint}</kbd>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* --- MODE EDITION (BAS GAUCHE & DROITE) --- */}
       {!viewer && !(isMobile && mobileSidebarOpen) && (
@@ -3082,8 +2790,9 @@ ${isMobile
           ref={stageRef}
           width={stageSize.width}
           height={stageSize.height}
-          draggable={!viewer && !isPinching}
-          onWheel={handleWheel}
+          draggable={!viewer && !isPinching && !replacementPreview}
+          listening={!replacementPreview}
+          onWheel={replacementPreview ? undefined : handleWheel}
 
           onDragStart={() => {
             setIsStageDragging(true);
@@ -3337,8 +3046,7 @@ ${isMobile
                       if (viewer) return;
                       e.cancelBubble = true;
 
-                      setSelectedBoardInstanceId(b.instanceId);
-                      setSelectedInstanceId(null);
+                      tapCanvasBoard(b.instanceId);
                     }}
 
                     onDragMove={(e) => {
@@ -3421,6 +3129,7 @@ ${isMobile
                       selectedBoardInstanceId === b.instanceId &&
                       displaySizes[b.instanceId] && (
                         <Rect
+                          name="selected-item-outline"
                           x={-displaySizes[b.instanceId].w / 2}
                           y={-displaySizes[b.instanceId].h / 2}
                           width={displaySizes[b.instanceId].w}
@@ -3441,6 +3150,8 @@ ${isMobile
               // =========================
 
               const p = item;
+              const isReplacement = replacementPreview && replacementPreview.pedal.instanceId === p.instanceId;
+              const imageUrl = p.image || p.image_url || p.photo || null;
 
               const pedalSize = displaySizes[p.instanceId];
               const outlineOpacity = selectedInstanceId === p.instanceId
@@ -3450,7 +3161,8 @@ ${isMobile
               return (
                 <Group
                   name="exportable"
-                  key={p.instanceId}
+                  key={`pedal-${p.instanceId}-${p.id ?? ""}-${p.imageId || imageUrl || ""}`}
+                  opacity={isReplacement ? 0.85 : 1}
                   x={p.x}
                   y={p.y}
                   rotation={p.rotation || 0}
@@ -3484,8 +3196,7 @@ ${isMobile
                   onTap={(e) => {
                     if (viewer) return;
                     e.cancelBubble = true;
-                    setSelectedInstanceId(p.instanceId);
-                    setSelectedBoardInstanceId(null);
+                    tapCanvasPedal(p.instanceId);
                   }}
 
                   onDragMove={(e) => {
@@ -3569,14 +3280,15 @@ ${isMobile
                   })()}
 
                   <PedalImage
-                    url={p.image || p.image_url || p.photo || null}
+                    url={imageUrl}
                     imageId={p.imageId || null}
                     outlineOpacity={p.slug === "custom" ? undefined : outlineOpacity}
+                    onSelectedOutlineChange={p.slug !== "custom" && outlineOpacity === 1 ? updateOverlayPosition : undefined}
                     width={p.width}
                     depth={p.depth}
                     color={p.color}
                     rotation={p.rotation || 0}
-                    showJacksMargin={showJacksMargin}
+                    showJacksMargin={isReplacement ? ["fits", "collision", "outside"].includes(replacementPreview.fit) : showJacksMargin}
                     jacksLocation={
                       p.jacksLocation || p.jacks || ""
                     }
@@ -3585,14 +3297,15 @@ ${isMobile
                         String(p.brand || "").trim()
                       )
                     }
-                    onSizeReady={(nw, nh) => handleSizeUpdate?.(p.instanceId, nw, nh)}
-                    marginRef={(node) => {
+                    onSizeReady={isReplacement ? undefined : (nw, nh) => handleSizeUpdate?.(p.instanceId, nw, nh)}
+                    marginRef={isReplacement ? undefined : (node) => {
                       if (node) {
                         marginRefs.current[p.instanceId] = node;
                       }
                     }}
                     isColliding={
-                      collisionReady &&
+                      isReplacement ? replacementPreview.fit === "collision" || replacementPreview.fit === "outside" :
+                      !replacementPreview && collisionReady &&
                       showJacksMargin &&
                       activeProject.boardPedals.some((other) => {
                         if (other.instanceId === p.instanceId) return false;
@@ -3659,6 +3372,7 @@ ${isMobile
 
                   {p.slug === "custom" && outlineOpacity !== undefined && pedalSize && (
                     <Rect
+                      name={outlineOpacity === 1 ? "selected-item-outline" : undefined}
                       x={-pedalSize.w / 2}
                       y={-pedalSize.h / 2}
                       width={pedalSize.w}
@@ -3766,8 +3480,7 @@ ${isMobile
                   onTap={(e) => {
                     if (viewer) return;
                     e.cancelBubble = true;
-                    setSelectedBoardInstanceId(b.instanceId);
-                    setSelectedInstanceId(null);
+                    tapCanvasBoard(b.instanceId);
                   }}
                   onDragStart={() => {
                     setIsDragging(true);
@@ -3845,8 +3558,7 @@ ${isMobile
                     onTap={(e) => {
                       if (viewer) return;
                       e.cancelBubble = true;
-                      setSelectedInstanceId(p.instanceId);
-                      setSelectedBoardInstanceId(null);
+                      tapCanvasPedal(p.instanceId);
                     }}
                     onDragStart={(e) => {
                       setIsDragging(true);

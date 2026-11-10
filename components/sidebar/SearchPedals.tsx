@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useDeferredValue, useMemo } from "react";
-import { LoaderCircle, Search, X } from "lucide-react";
+import { BookOpen, LoaderCircle, Search, X } from "lucide-react";
+import styles from "./GearCatalog.module.css";
 
 type AnyRow = Record<string, any>;
 
@@ -21,6 +22,7 @@ type Props = {
   setShowBoardResults: (v: boolean) => void;
 
   addPedal: (p: AnyRow) => void;
+  onOpenGear: () => void;
 
   pedalInputRef: React.RefObject<HTMLInputElement | null>;
 
@@ -74,6 +76,7 @@ export default function SearchPedals({
   setShowPedalResults,
   setShowBoardResults,
   addPedal,
+  onOpenGear,
   pedalInputRef,
   t,
 }: Props) {
@@ -256,80 +259,95 @@ export default function SearchPedals({
 
       {/* BARRE DE RECHERCHE */}
 
-      <div className="relative flex items-center mb-4 shrink-0">
-        <Search
-          size={15}
-          strokeWidth={2.5}
-          className="absolute left-4 text-[#6f6a5d]"
-        />
+      <div className="flex items-center gap-2 mb-4 shrink-0">
+        <div className="relative flex items-center flex-1 min-w-0">
+          <Search
+            size={15}
+            strokeWidth={2.5}
+            className="absolute left-4 text-[#6f6a5d]"
+          />
 
-        <input
-          ref={pedalInputRef}
-          type="text"
-          autoComplete="off"
-          autoCorrect="off"
-          autoCapitalize="off"
-          spellCheck={false}
-          placeholder={t(
-            "pedalsMenu.searchPlaceholder"
-          )}
-          className="
-            w-full
-            h-[30px]
-            bg-white
-            !text-black
-            placeholder:!text-zinc-500
-            rounded-md
-            pl-12
-            pr-11
-            text-[12px]
-            font-bold
-            outline-none
-          "
-          value={pedalSearch}
-          onClick={(event) => {
-            event.stopPropagation();
-
-            setShowBoardResults(false);
-            setShowPedalResults(true);
-          }}
-          onChange={(event) => {
-            setPedalSearch(
-              event.target.value
-            );
-
-            setShowPedalResults(true);
-          }}
-        />
-
-        {pedalSearch && (
-          <button
-            type="button"
+          <input
+            ref={pedalInputRef}
+            type="text"
+            autoComplete="off"
+            autoCorrect="off"
+            autoCapitalize="off"
+            spellCheck={false}
+            placeholder={t(
+              "pedalsMenu.searchPlaceholder"
+            )}
+            className="
+              w-full
+              h-[30px]
+              bg-white
+              !text-black
+              placeholder:!text-zinc-500
+              rounded-md
+              pl-12
+              pr-11
+              text-[12px]
+              font-bold
+              outline-none
+            "
+            value={pedalSearch}
             onClick={(event) => {
               event.stopPropagation();
 
-              setPedalSearch("");
-
-              pedalInputRef.current?.focus();
+              setShowBoardResults(false);
+              setShowPedalResults(true);
             }}
-            className="
-              absolute
-              right-4
-              flex
-              items-center
-              justify-center
-              text-[#6f6a5d]
-              hover:opacity-70
-              transition-opacity
-            "
-            aria-label="Effacer la recherche"
-          >
-            <X
-              size={15}
-              strokeWidth={3}
-            />
-          </button>
-        )}
+            onChange={(event) => {
+              setPedalSearch(
+                event.target.value
+              );
+
+              setShowPedalResults(true);
+            }}
+          />
+
+          {pedalSearch && (
+            <button
+              type="button"
+              onClick={(event) => {
+                event.stopPropagation();
+
+                setPedalSearch("");
+
+                pedalInputRef.current?.focus();
+              }}
+              className="
+                absolute
+                right-4
+                flex
+                items-center
+                justify-center
+                text-[#6f6a5d]
+                hover:opacity-70
+                transition-opacity
+              "
+              aria-label="Effacer la recherche"
+            >
+              <X
+                size={15}
+                strokeWidth={3}
+              />
+            </button>
+          )}
+        </div>
+        <button
+          type="button"
+          aria-label={t("gear.open")}
+          title={t("gear.open")}
+          aria-haspopup="dialog"
+          className={styles.shortcut}
+          onClick={(event) => {
+            event.stopPropagation();
+            onOpenGear();
+          }}
+        >
+          <BookOpen size={21} strokeWidth={2} aria-hidden="true" />
+        </button>
       </div>
 
       {/* NOMBRE DE RÉSULTATS */}

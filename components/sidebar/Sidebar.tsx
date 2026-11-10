@@ -1,6 +1,8 @@
 "use client";
 import React from "react";
+import { createPortal } from "react-dom";
 import { ArrowLeft, ChevronDown, ExternalLink, Mail, Plus, RotateCw, ShoppingCart, Trash2, } from "lucide-react";
+import type { BoardItem } from "@/types/project";
 import type { Language } from "@/utils/i18n";
 import BuyOnline from "@/components/sidebar/BuyOnline";
 import { mmToIn, formatWeight } from "@/utils/units";
@@ -8,6 +10,7 @@ import { getTranslator } from "@/utils/i18n";
 import SpecsPedal from "@/components/sidebar/SpecsPedals";
 import SpecsBoards from "@/components/sidebar/SpecsBoards";
 import SpecsPower from "@/components/sidebar/SpecsPower";
+import GearCatalog from "@/components/sidebar/GearCatalog";
 import SearchPedals from "@/components/sidebar/SearchPedals";
 import SearchBoards from "@/components/sidebar/SearchBoards";
 import CustomPanel from "@/components/sidebar/CustomPanel";
@@ -63,6 +66,7 @@ type Props = {
   setContactOpen: (v: boolean) => void;
   // Actions
   addPedal: (p: AnyRow) => void;
+  replacement?: { pedal: BoardItem; onChoose: (pedal: AnyRow) => void; onClose: () => void };
   selectBoard: (b: AnyRow) => void;
   selectSuggestedBoard?: (b: AnyRow) => boolean;
   finderPedals?: AnyRow[];
@@ -87,8 +91,9 @@ type Props = {
   isMobile?: boolean;
   hideLogo?: boolean;
 };
-export default function Sidebar({ pedalsLibrary, boardsLibrary, newPedals, newPedalsLoading, libraryLoading = false, libraryError = null, powerLibrary, boardsStatus, powerStatus, showPedalResults, setShowPedalResults, showBoardResults, setShowBoardResults, pedalSearch, setPedalSearch, boardSearch, setBoardSearch, selectedPedal, selectedBoardDetails, selectedInstanceId, selectedBoardInstanceId, setSelectedInstanceId, setSelectedBoardInstanceId, customName, setCustomName, customWidth, setCustomWidth, customDepth, setCustomDepth, customColor, setCustomColor, customType, setCustomType, addPedal, selectBoard, selectSuggestedBoard, finderPedals = [], existingBoards = [], addCustomItem, rotatePedal, deletePedal, rotateBoard, movePedalFront, movePedalBack, deleteBoard, moveBoardFront, moveBoardBack, canvasBg, setCanvasBg, language, setLanguage, units, setUnits, makeOpen, setMakeOpen, contactOpen, setContactOpen, isMobile = false, lastSelectedPedal, lastSelectedBoard, setLastSelectedPedal, lastSelectedPower, setLastSelectedPower, }: Props) {
-  const t = getTranslator(language);
+export default function Sidebar({ pedalsLibrary, boardsLibrary, newPedals, newPedalsLoading, libraryLoading = false, libraryError = null, powerLibrary, boardsStatus, powerStatus, showPedalResults, setShowPedalResults, showBoardResults, setShowBoardResults, pedalSearch, setPedalSearch, boardSearch, setBoardSearch, selectedPedal, selectedBoardDetails, selectedInstanceId, selectedBoardInstanceId, setSelectedInstanceId, setSelectedBoardInstanceId, customName, setCustomName, customWidth, setCustomWidth, customDepth, setCustomDepth, customColor, setCustomColor, customType, setCustomType, addPedal, replacement, selectBoard, selectSuggestedBoard, finderPedals = [], existingBoards = [], addCustomItem, rotatePedal, deletePedal, rotateBoard, movePedalFront, movePedalBack, deleteBoard, moveBoardFront, moveBoardBack, canvasBg, setCanvasBg, language, setLanguage, units, setUnits, makeOpen, setMakeOpen, contactOpen, setContactOpen, isMobile = false, lastSelectedPedal, lastSelectedBoard, setLastSelectedPedal, lastSelectedPower, setLastSelectedPower, }: Props) {
+  const t = React.useMemo(() => getTranslator(language), [language]);
+  const [gearOpen, setGearOpen] = React.useState(false);
   // Older saved projects may not contain the profile column. Recover it from
   // the current catalogue without replacing the board instance or its geometry.
   const powerFinderBoards = React.useMemo(() => existingBoards.map(board => {
@@ -526,13 +531,33 @@ export default function Sidebar({ pedalsLibrary, boardsLibrary, newPedals, newPe
         {activeSidebarTab === "pedals" && (<SearchPedals pedalsLibrary={pedalsLibrary} newPedals={newPedals} newPedalsLoading={newPedalsLoading} libraryLoading={libraryLoading} libraryError={libraryError} pedalSearch={pedalSearch} setPedalSearch={setPedalSearch} showPedalResults={showPedalResults} setShowPedalResults={setShowPedalResults} setShowBoardResults={setShowBoardResults} addPedal={(p) => {
           setLastSelectedPedal(p);
           addPedal(p);
-        }} pedalInputRef={pedalInputRef} t={t} groupItems={groupItems} />)}
+        }} pedalInputRef={pedalInputRef} t={t} groupItems={groupItems} onOpenGear={() => setGearOpen(true)} />)}
         {activeSidebarTab === "boards" && (<SearchBoards boardsLibrary={boardsLibrary} catalogStatus={boardsStatus} boardSearch={boardSearch} setBoardSearch={setBoardSearch} showBoardResults={showBoardResults} setShowBoardResults={setShowBoardResults} setShowPedalResults={setShowPedalResults} selectBoard={selectBoard} selectSuggestedBoard={selectSuggestedBoard} finderPedals={finderPedals} existingBoards={existingBoards} units={units} boardInputRef={boardInputRef} t={t} groupItems={groupItems} />)}
         {activeSidebarTab === "power" && (<SearchPower catalogStatus={powerStatus} pedalsLoading={libraryLoading} finderPedals={finderPedals} existingBoards={powerFinderBoards} pedalsLibrary={pedalsLibrary} powerLibrary={powerLibrary} powerSearch={powerSearch} setPowerSearch={setPowerSearch} showPowerResults={showPowerResults} setShowPowerResults={setShowPowerResults} setShowPedalResults={setShowPedalResults} setShowBoardResults={setShowBoardResults} addPower={(p) => {
           addPower(p);
         }} powerInputRef={powerInputRef} powerDropdownRef={powerDropdownRef} t={t} groupItems={groupItems} />)}
         {activeSidebarTab === "custom" && (<CustomPanel customType={customType} setCustomType={setCustomType} customName={customName} setCustomName={setCustomName} customColor={customColor} setCustomColor={setCustomColor} customWidth={customWidth} setCustomWidth={setCustomWidth} customDepth={customDepth} setCustomDepth={setCustomDepth} addCustomItem={addCustomItem} isPedalValid={isPedalValid} isBoardValid={isBoardValid} minValue={minValue} maxValue={maxValue} displayMin={displayMin} displayMax={displayMax} units={units} unitLabel={unitLabel} withUnit={withUnit} t={t} />)}
       </div>)}
+    {(gearOpen || replacement) && createPortal(
+      <GearCatalog
+        key={replacement ? "replace" : "library"}
+        replacement={replacement}
+        pedals={pedalsLibrary} loading={libraryLoading} error={libraryError}
+        initialQuery={replacement ? "" : pedalSearch} language={language} units={units} t={t}
+        isUSA={isUSA} isEurope={isEurope} buildThomannUrl={buildThomannUrl}
+        onClose={replacement?.onClose ?? (() => setGearOpen(false))}
+        onAdd={(pedal) => {
+          if (replacement) {
+            replacement.onChoose(pedal);
+            return;
+          }
+          setGearOpen(false);
+          setLastSelectedPedal(pedal);
+          addPedal(pedal);
+        }}
+      />,
+      document.body,
+    )}
     {/* PUSH TO BOTTOM (desktop only) */}
     {activeSidebarTab !== "custom" && <div className="mt-auto" />}
   </div>);

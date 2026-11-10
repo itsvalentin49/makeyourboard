@@ -1,4 +1,41 @@
 {
+  "replacement": {
+    "duplicate": "Duplizieren",
+    "forward": "Eine Ebene nach vorne",
+    "back": "Eine Ebene nach hinten",
+    "replace": "Ersetzen",
+    "choose": "Ersatzpedal auswählen",
+    "previewAction": "Vorschau auf dem Board",
+    "review": "Vorschau des Ersatzpedals",
+    "cancel": "Abbrechen",
+    "confirm": "Ersetzen bestätigen"
+  },
+  "gearTu3": {
+    "officialDemo": "Offizielle Demo",
+    "artists": "Künstler, die das TU-3 nutzen"
+  },
+  "gear": {
+    "resultOne": "{count} Ergebnis",
+    "resultOther": "{count} Ergebnisse",
+    "filters": "Filter",
+    "anyValue": "Beliebig",
+    "open": "Pedalbibliothek öffnen",
+    "returnToBoard": "Zurück zum Board",
+    "back": "Zurück zur Bibliothek",
+    "title": "Pedalbibliothek",
+    "subtitle": "Entdecke Effekte und füge deine Fundstücke deinem Board hinzu.",
+    "search": "Pedale, Marken oder Effekte suchen…",
+    "catalog": "Katalog",
+    "brand": "Marke",
+    "allBrands": "Alle Marken",
+    "allTypes": "Alle Typen",
+    "sort": "Sortieren nach",
+    "alphabetical": "Marke A–Z",
+    "newestFirst": "Neueste zuerst",
+    "reset": "Filter zurücksetzen",
+    "empty": "Keine Pedale entsprechen deiner Suche.",
+    "more": "Weitere Pedale anzeigen"
+  },
   "sidebar": {
     "searchPedal": "Pedal suchen",
     "searchBoard": "Pedalboard suchen",
@@ -31,6 +68,7 @@
     "description": "Beschreibung",
     "actions": {
       "title": "Aktionen",
+      "more": "Weitere Aktionen",
       "rotate": "Drehen",
       "delete": "Löschen",
       "moveFront": "In den Vordergrund",
@@ -66,7 +104,6 @@
       "Drum Machine": "Drumcomputer",
       "Enhancer": "Enhancer",
       "Envelope Filter": "Envelope-Filter",
-      "Equalizer": "EQ",
       "EQ": "EQ",
       "Expression": "Expression-Pedal",
       "Filter": "Filter",
@@ -101,7 +138,6 @@
       "Tremolo": "Tremolo",
       "Tuner": "Stimmgerät",
       "Uni-Vibe": "Uni-Vibe",
-      "Vibe": "Uni-Vibe",
       "Utility": "Utility",
       "Vibrato": "Vibrato",
       "Vocal": "Gesang",
@@ -240,6 +276,7 @@
     }
   },
   "export": {
+    "singlePedal": "Füge ein zweites Pedal hinzu, um ein Bild herunterzuladen.",
     "button": "Exportieren",
     "title": "Pedalboard exportieren",
     "name": "Name des Pedalboards",

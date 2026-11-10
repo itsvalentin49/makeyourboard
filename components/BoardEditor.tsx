@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useMemo, useState } from "react";
 
 import Sidebar from "@/components/sidebar/Sidebar";
 import BoardCanvas from "@/components/BoardCanvas";
@@ -12,10 +12,13 @@ import { getTranslator, type Language } from "@/utils/i18n";
 import { Settings, Plus, Minus, RotateCw, X, Trash2, Info } from "lucide-react";
 import { useRef } from "react";
 import SidebarLogo from "@/components/sidebar/SidebarLogo";
+import pedalActions from "./PedalActions.module.css";
 
 import {
+  checkReplacementFit,
   getFinderLayout,
   getBoardFitMode,
+  isPowerSupply,
 } from "@/utils/boardFinder";
 
 
@@ -308,6 +311,12 @@ export default function BoardEditor({
 
 
 
+  const replacementDialogRef = useRef<HTMLDialogElement>(null);
+  const [replacement, setReplacement] = useState<{
+    projectId: number | null;
+    targetId: number;
+    candidate?: AnyRow;
+  } | null>(null);
   const [selectedInstanceId, setSelectedInstanceId] = useState<number | null>(null);
   const [selectedBoardInstanceId, setSelectedBoardInstanceId] = useState<number | null>(null);
 
@@ -677,6 +686,68 @@ export default function BoardEditor({
    * Sélections (safe)
    */
   const selectedPedal = activeProject.boardPedals.find((p) => p.instanceId === selectedInstanceId);
+  const replacementTarget = replacement && replacement.projectId === activeProjectId
+    ? activeProject.boardPedals.find((pedal) => pedal.instanceId === replacement.targetId)
+    : undefined;
+  const replacementCandidate = replacementTarget ? replacement?.candidate : undefined;
+
+  useEffect(() => {
+    if (replacement && !replacementTarget) setReplacement(null);
+  }, [replacement, replacementTarget]);
+
+  const replacementReview = useMemo(() => {
+    if (!replacementTarget || !replacementCandidate) return undefined;
+    const pedal = makeCatalogPedal(replacementCandidate, {
+      instanceId: replacementTarget.instanceId,
+      x: replacementTarget.x,
+      y: replacementTarget.y,
+      rotation: replacementTarget.rotation,
+      zIndex: Number(replacementTarget.zIndex) || 0,
+    });
+    const items = activeProject.boardPedals;
+    const fit = checkReplacementFit(replacementTarget, pedal, items, activeProject.selectedBoards);
+    return { pedal, fit };
+  }, [replacementTarget, replacementCandidate, activeProject.boardPedals, activeProject.selectedBoards]);
+
+  const hasReplacementPreview = Boolean(replacementReview);
+  useLayoutEffect(() => {
+    if (!hasReplacementPreview) return;
+    const dialog = replacementDialogRef.current;
+    dialog?.showModal();
+    return () => dialog?.close();
+  }, [hasReplacementPreview]);
+
+  const startReplacement = (id: number) => {
+    setReplacement({ projectId: activeProjectId, targetId: id });
+    closeSearchMenus();
+  };
+
+  const confirmReplacement = () => {
+    if (!replacementReview || !replacementCandidate) return;
+    const { pedal } = replacementReview;
+    const replaceInProject = (project: Project) => ({
+      ...project,
+      boardPedals: project.boardPedals.map((item) => item.instanceId === pedal.instanceId ? {
+        ...pedal,
+        x: item.x,
+        y: item.y,
+        rotation: item.rotation,
+        zIndex: item.zIndex,
+      } : item),
+    });
+    if (activeProject === workingBoard) {
+      setWorkingBoard(replaceInProject);
+    } else {
+      setProjects((current) => current.map((project) =>
+        project.id === activeProject.id ? replaceInProject(project) : project));
+    }
+    handleSizeUpdate(pedal.instanceId, Number(replacementCandidate.width) || 80, Number(replacementCandidate.depth) || 120);
+    setLastSelectedPedal(replacementCandidate);
+    setSelectedInstanceId(pedal.instanceId);
+    setSelectedBoardInstanceId(null);
+    setReplacement(null);
+  };
+
   const selectedBoardDetails = activeProject.selectedBoards.find(
     (b) => b.instanceId === selectedBoardInstanceId
   );
@@ -788,6 +859,20 @@ export default function BoardEditor({
     setEditingProjectId(null);
   };
 
+  function makeCatalogPedal(pedal: AnyRow, placement: Pick<BoardItem, "instanceId" | "x" | "y" | "rotation"> & { zIndex: number }): BoardItem {
+    return {
+      ...pedal,
+      ...placement,
+      powerFinderElectrical: {
+        voltage: pedal.voltage, draw: pedal.draw, power: pedal.power, circuit: pedal.circuit,
+        current_type: pedal.current_type, polarity: pedal.polarity, connector: pedal.connector,
+        power_modes: pedal.power_modes, ground: pedal.ground, requires_isolation: pedal.requires_isolation,
+      },
+      draw: Number(pedal.draw) || 0,
+      weight: Number(pedal.weight) || 0,
+    };
+  }
+
   const addPedal = (pedal: AnyRow) => {
     const center = getCenterRef.current?.() ?? { x: 0, y: 0 };
 
@@ -849,17 +934,13 @@ export default function BoardEditor({
 
     const now = Date.now();
 
-    const newPedal: BoardItem = {
-      ...pedal,
-      ...{ powerFinderElectrical: { voltage: pedal.voltage, draw: pedal.draw, power: pedal.power, circuit: pedal.circuit, current_type: pedal.current_type, polarity: pedal.polarity, connector: pedal.connector, power_modes: pedal.power_modes, ground: pedal.ground, requires_isolation: pedal.requires_isolation } },
+    const newPedal = makeCatalogPedal(pedal, {
       instanceId: now,
       zIndex: now,
       x: newX,
       y: newY,
       rotation: 0,
-      draw: Number(pedal.draw) || 0,
-      weight: Number(pedal.weight) || 0,
-    };
+    });
 
     updateActiveProject({
       boardPedals: [...activeProject.boardPedals, newPedal],
@@ -1104,6 +1185,24 @@ export default function BoardEditor({
     setCustomName("");
   };
 
+  const duplicateCanvasItem = (id: number, kind: "board" | "pedal") => {
+    const isBoard = kind === "board";
+    const collection = isBoard ? "selectedBoards" : "boardPedals";
+    const source = activeProject[collection].find((item) => item.instanceId === id);
+    if (!source) return;
+
+    const items = [...activeProject.boardPedals, ...activeProject.selectedBoards];
+    let instanceId = Date.now();
+    while (items.some((item) => item.instanceId === instanceId)) instanceId++;
+    const zIndex = isBoard || isPowerSupply(source)
+      ? source.zIndex
+      : Math.max(0, ...items.map((item) => Number(item.zIndex) || 0)) + 1;
+    const copy = { ...source, instanceId, x: source.x + 24, y: source.y + 24, zIndex };
+    updateActiveProject({ [collection]: [...activeProject[collection], copy] });
+    setSelectedBoardInstanceId(isBoard ? instanceId : null);
+    setSelectedInstanceId(isBoard ? null : instanceId);
+  };
+
   const rotatePedal = (id: number) => {
     updateActiveProject({
       boardPedals: activeProject.boardPedals.map((p) =>
@@ -1149,6 +1248,35 @@ export default function BoardEditor({
           ? { ...p, zIndex: minZ - 1 }
           : p
       ),
+    });
+  };
+
+  const moveCanvasItemOneLayer = (id: number, neighborId: number) => {
+    const ordered = [...activeProject.selectedBoards, ...activeProject.boardPedals]
+      .sort((a, b) => (Number(a.zIndex) || 0) - (Number(b.zIndex) || 0));
+    const index = ordered.findIndex((item) => item.instanceId === id);
+    const neighbor = ordered.findIndex((item) => item.instanceId === neighborId);
+    if (index < 0 || neighbor < 0 || index === neighbor) return;
+
+    const ranks = ordered.map((item) => Number(item.zIndex) || 0);
+    // Preserve the existing ranks, breaking ties so the one-step move is visible.
+    for (let start = 0; start < ranks.length;) {
+      let end = start + 1;
+      while (end < ranks.length && ranks[end] === ranks[start]) end++;
+      const step = ((ranks[end] ?? ranks[start] + 1) - ranks[start]) / (end - start);
+      for (let i = start + 1; i < end; i++) ranks[i] = ranks[start] + (i - start) * step;
+      start = end;
+    }
+    const [pedal] = ordered.splice(index, 1);
+    ordered.splice(neighbor, 0, pedal);
+    const rankById = new Map(ordered.map((item, i) => [item.instanceId, ranks[i]]));
+    const withRank = (item: BoardItem) => {
+      const zIndex = rankById.get(item.instanceId);
+      return zIndex === (Number(item.zIndex) || 0) ? item : { ...item, zIndex };
+    };
+    updateActiveProject({
+      boardPedals: activeProject.boardPedals.map(withRank),
+      selectedBoards: activeProject.selectedBoards.map(withRank),
     });
   };
 
@@ -1226,6 +1354,11 @@ export default function BoardEditor({
               <div className="flex flex-1 min-h-0 flex-col">
                 <Sidebar
                   hideLogo
+                  replacement={replacementTarget && !replacementCandidate ? {
+                    pedal: replacementTarget,
+                    onChoose: (candidate) => setReplacement((session) => session && { ...session, candidate }),
+                    onClose: () => setReplacement(null),
+                  } : undefined}
                   pedalsLibrary={pedalsLibrary}
                   finderPedals={activeProject.boardPedals}
                   newPedals={newPedals}
@@ -1320,6 +1453,10 @@ export default function BoardEditor({
                 <BoardCanvas
                   desktopToolbarHost={desktopToolbarHost}
                   activeProject={activeProject}
+                  replacePedal={startReplacement}
+                  duplicateCanvasItem={duplicateCanvasItem}
+                  moveCanvasItemOneLayer={moveCanvasItemOneLayer}
+                  replacementPreview={replacementReview}
                   units={units}
                   language={language}
                   setMobileSidebarOpen={setMobileSidebarOpen}
@@ -1341,8 +1478,6 @@ export default function BoardEditor({
                   isMobile={isMobileDevice}
                   rotatePedal={rotatePedal}
                   deletePedal={deletePedal}
-                  movePedalFront={movePedalFront}
-                  movePedalBack={movePedalBack}
                   rotateBoard={rotateBoard}
                   deleteBoard={deleteBoard}
                   onStageSizeChange={setCanvasSize}
@@ -1484,6 +1619,10 @@ export default function BoardEditor({
           >
             <BoardCanvas
               activeProject={activeProject}
+              replacePedal={startReplacement}
+              duplicateCanvasItem={duplicateCanvasItem}
+              moveCanvasItemOneLayer={moveCanvasItemOneLayer}
+              replacementPreview={replacementReview}
               units={units}
               language={language}
               setMobileSidebarOpen={setMobileSidebarOpen}
@@ -1504,8 +1643,6 @@ export default function BoardEditor({
               showIntro={isFirstBoard && isBoardEmpty}
               rotatePedal={rotatePedal}
               deletePedal={deletePedal}
-              movePedalFront={movePedalFront}
-              movePedalBack={movePedalBack}
               rotateBoard={rotateBoard}
               deleteBoard={deleteBoard}
               isMobile
@@ -1851,6 +1988,26 @@ export default function BoardEditor({
             </div>
           </div>
         </>
+      )}
+
+      {replacementReview && (
+        <dialog
+          ref={replacementDialogRef}
+          className={pedalActions.confirmDialog}
+          aria-labelledby="replacement-preview-heading"
+          onClick={(event) => event.stopPropagation()}
+          onCancel={(event) => {
+            event.preventDefault();
+            setReplacement(null);
+          }}
+        >
+          <h2 id="replacement-preview-heading">{t("replacement.review")}</h2>
+          <p>{[replacementReview.pedal.brand, replacementReview.pedal.name].filter(Boolean).join(" ")}</p>
+          <div className={pedalActions.confirmButtons}>
+            <button type="button" onClick={() => setReplacement(null)}>{t("replacement.cancel")}</button>
+            <button type="button" onClick={confirmReplacement}>{t("replacement.confirm")}</button>
+          </div>
+        </dialog>
       )}
 
     </div>
