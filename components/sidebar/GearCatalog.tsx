@@ -1,7 +1,7 @@
 "use client";
 
 import { useDeferredValue, useEffect, useLayoutEffect, useMemo, useRef, useState, type MouseEvent } from "react";
-import { ArrowLeft, ArrowRight, BookOpen, ChevronDown, LoaderCircle, Play, Plus, Search, X } from "lucide-react";
+import { ArrowRight, BookOpen, ChevronDown, LoaderCircle, Play, Plus, Search, X } from "lucide-react";
 import type { AnyRow, BoardItem } from "@/types/project";
 import type { Language } from "@/utils/i18n";
 import { getCustomImageUrl } from "@/utils/customImageStore";
@@ -227,6 +227,10 @@ export default function GearCatalog({
   const content = useRef<HTMLDivElement>(null);
   const search = useRef<HTMLInputElement>(null);
   const heading = useRef<HTMLHeadingElement>(null);
+  const detailHeading = useRef<HTMLHeadingElement>(null);
+  const catalogHeader = useRef<HTMLDivElement>(null);
+  const grid = useRef<HTMLDivElement>(null);
+  const [coveredCards, setCoveredCards] = useState(0);
   const previousCard = useRef<string | null>(null);
   const catalogScroll = useRef(0);
   const [query, setQuery] = useState(initialQuery);
@@ -237,6 +241,7 @@ export default function GearCatalog({
   const [limit, setLimit] = useState(PAGE_SIZE);
   const [selected, setSelected] = useState<AnyRow | null>(null);
   const deferredQuery = useDeferredValue(query);
+  const hasReplacementType = splitTags(replacement?.pedal.type).length > 0;
   const showTu3Pilot = !replacement && selected &&
     normalize(String(selected.brand ?? "").trim()) === "boss" &&
     /^tu-3(?: chromatic tuner)?$/i.test(String(selected.name ?? "").trim());
@@ -254,14 +259,34 @@ export default function GearCatalog({
   }, []);
 
   useLayoutEffect(() => {
-    if (!content.current) return;
-    content.current.scrollTop = selected ? 0 : catalogScroll.current;
-    if (selected) heading.current?.focus({ preventScroll: true });
-    else if (previousCard.current) {
-      content.current.querySelector<HTMLButtonElement>(
+    const scroller = content.current;
+    if (!scroller) return;
+
+    if (selected) {
+      const header = catalogHeader.current;
+      if (header) {
+        scroller.scrollTop += header.getBoundingClientRect().top - scroller.getBoundingClientRect().top - 12;
+      }
+      detailHeading.current?.focus({ preventScroll: true });
+    } else if (previousCard.current) {
+      scroller.scrollTop = catalogScroll.current;
+      scroller.querySelector<HTMLButtonElement>(
         `[data-gear-card="${CSS.escape(previousCard.current)}"]`,
       )?.focus({ preventScroll: true });
     }
+  }, [selected]);
+
+  useLayoutEffect(() => {
+    const element = grid.current;
+    if (!element || !selected) return;
+    const update = () => {
+      const columns = getComputedStyle(element).gridTemplateColumns.trim().split(/\s+/).length;
+      setCoveredCards(columns * 2);
+    };
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(element);
+    return () => observer.disconnect();
   }, [selected]);
 
   const catalog = useMemo(() => {
@@ -392,140 +417,155 @@ export default function GearCatalog({
       <header className={styles.header}>
         <div className={styles.headerInner}>
           <div className={`${styles.headerLogo} font-sans`}><SidebarLogo /></div>
-          <button type="button" className={styles.close} onClick={selected ? () => setSelected(null) : onClose}>
-            {selected ? <ArrowLeft size={18} aria-hidden="true" /> : <X size={18} aria-hidden="true" />}
-            {t(selected ? "gear.back" : "gear.returnToBoard")}
+          <button type="button" className={styles.close} onClick={onClose} aria-label={t("gear.returnToBoard")}>
+            <X size={21} aria-hidden="true" />
           </button>
         </div>
       </header>
       <div ref={content} className={styles.scroller}>
-        <div className={styles.content} data-library={!selected && !replacement ? "" : undefined}>
-          {selected ? (
-            <div className={styles.detail} data-tu3={showTu3Pilot ? "" : undefined} key={selected.id}>
-              <div className={styles.detailImage} onContextMenu={blockImageMenu}>
-                <GearImage pedal={selected} detail />
-                <button type="button" className={styles.primary} onClick={() => onAdd(selected)}>
-                  <Plus size={16} aria-hidden="true" /> {t(replacement ? "replacement.previewAction" : "customPanel.addToBoard")}
-                </button>
-              </div>
-              <div className={styles.detailText}>
-                <header className={styles.detailHeader}>
-                  <p className={styles.eyebrow}>{selected.brand}</p>
-                  <h1 id="myb-gear-title" ref={heading} tabIndex={-1}>{selected.name}</h1>
-                  {renderTypeBadges(selected)}
-                </header>
-                <PedalSpecs
-                  selectedPedal={selected} selectedInstanceId={null} units={units} language={language}
-                  t={t} isCustomPedal={false} isImportedPedal={false} isUSA={isUSA} isEurope={isEurope}
-                  buildThomannUrl={buildThomannUrl} embedded
-                />
-              </div>
-              <div className={styles.detailRetailers}>
-                <PedalRetailers
-                  selectedPedal={selected} buildThomannUrl={buildThomannUrl} t={t}
-                  detailed
-                />
-                {showTu3Pilot && <Tu3OfficialDemo t={t} />}
-              </div>
-              {showTu3Pilot && (
-                <section className={styles.tu3Artists}>
-                  <h2 className={styles.storeTitle}>{t("gearTu3.artists")}</h2>
-                  <ul className={styles.tu3ArtistList} role="list">
-                    {TU3_ARTISTS.map((name) => <li key={name}>{name}</li>)}
-                    <li>…</li>
-                  </ul>
-                </section>
+        <div className={styles.content} data-library={!replacement ? "" : undefined}>
+          <div className={styles.hero} data-variant={replacement ? "replace" : "library"}>
+            <div className={styles.heroCopy}>
+              <h1 id="myb-gear-title" ref={heading} tabIndex={-1}>{t(replacement ? "replacement.choose" : "gear.title")}</h1>
+              {(!replacement || hasReplacementType) && (
+                <p className={styles.subtitle}>{t(replacement ? "replacement.subtitle" : "gear.subtitle")}</p>
               )}
-            </div>
-          ) : (
-            <>
-              <div className={styles.hero} data-variant={replacement ? "replace" : "library"}>
-                <div className={styles.heroCopy}>
-                  <h1 id="myb-gear-title" ref={heading} tabIndex={-1}>{t(replacement ? "replacement.choose" : "gear.title")}</h1>
-                  {!replacement && <p className={styles.subtitle}>{t("gear.subtitle")}</p>}
-                  <div className={styles.search}>
-                    <Search size={20} aria-hidden="true" />
-                    <input
-                      ref={search} type="search" value={query}
-                      aria-label={t("gear.search")} placeholder={t("gear.search")}
-                      onChange={(event) => { setQuery(event.target.value); setLimit(PAGE_SIZE); }}
-                    />
-                    {query && (
-                      <button type="button" aria-label={t("powerMenu.clearSearch")} onClick={() => {
-                        setQuery("");
-                        setLimit(PAGE_SIZE);
-                        search.current?.focus();
-                      }}><X size={17} aria-hidden="true" /></button>
-                    )}
-                  </div>
-                </div>
-                {replacement ? (
-                  <ReplacementArt key={replacement.pedal.instanceId} pedal={replacement.pedal} />
-                ) : (
-                  <div className={styles.libraryArt} aria-hidden="true" onContextMenu={blockImageMenu}>
-                    <img className={styles.gearPhoto} src="/images/gear-boss-board.jpg" alt="" draggable={false} />
-                  </div>
+              {hasReplacementType && (
+                <button type="button" className={styles.replacementScope} onClick={() => {
+                  setTypes(selectedTypes.length ? [] : null);
+                  setLimit(PAGE_SIZE);
+                }}>
+                  {t(selectedTypes.length ? "gear.allTypes" : "replacement.sameType")}
+                </button>
+              )}
+              <div className={styles.search}>
+                <Search size={20} aria-hidden="true" />
+                <input
+                  ref={search} type="search" value={query}
+                  aria-label={t("gear.search")} placeholder={t("gear.search")}
+                  onChange={(event) => { setQuery(event.target.value); setLimit(PAGE_SIZE); }}
+                />
+                {query && (
+                  <button type="button" aria-label={t("powerMenu.clearSearch")} onClick={() => {
+                    setQuery("");
+                    setLimit(PAGE_SIZE);
+                    search.current?.focus();
+                  }}><X size={17} aria-hidden="true" /></button>
                 )}
               </div>
-              <div className={styles.catalogHeader}>
-                <h2 id="myb-gear-filters">{t("gear.filters")}</h2>
-                <div className={styles.catalogControls}>
-                  <span className={styles.resultCount} role="status">
-                    {loading ? (
-                      <span className={styles.loading}>
-                        <LoaderCircle size={18} className="animate-spin" aria-hidden="true" />
-                        {t("pedalsMenu.loading")}
-                      </span>
-                    ) : isFiltered && !error &&
-                      t(new Intl.PluralRules(language).select(results.length) === "one" ? "gear.resultOne" : "gear.resultOther")
-                        .replace("{count}", results.length.toLocaleString(language))}
+            </div>
+            {replacement ? (
+              <ReplacementArt key={replacement.pedal.instanceId} pedal={replacement.pedal} />
+            ) : (
+              <div className={styles.libraryArt} aria-hidden="true" onContextMenu={blockImageMenu}>
+                <img className={styles.gearPhoto} src="/images/gear-boss-board.jpg" alt="" draggable={false} />
+              </div>
+            )}
+          </div>
+          <div ref={catalogHeader} className={styles.catalogHeader}>
+            <h2 id="myb-gear-filters">{t("gear.filters")}</h2>
+            <div className={styles.catalogControls}>
+              {selected ? (
+                <div className={styles.detailActions}>
+                  <button type="button" className={styles.primary} onClick={() => onAdd(selected)}>
+                    <Plus size={16} aria-hidden="true" /> {t(replacement ? "replacement.previewAction" : "customPanel.addToBoard")}
+                  </button>
+                  <button type="button" className={styles.detailClose} aria-label={t("gear.closeDetails")}
+                    onClick={() => setSelected(null)}>
+                    <X size={18} aria-hidden="true" />
+                  </button>
+                </div>
+              ) : <span className={styles.resultCount} role="status">
+                {loading ? (
+                  <span className={styles.loading}>
+                    <LoaderCircle size={18} className="animate-spin" aria-hidden="true" />
+                    {t("pedalsMenu.loading")}
                   </span>
-                  <label className={styles.sort}>
-                    {t("gear.sort")}
-                    <select value={sort} onChange={(event) => { setSort(event.target.value); setLimit(PAGE_SIZE); }}>
-                      <option value="alphabetical">{t("gear.alphabetical")}</option>
-                      <option value="recent">{t("gear.newestFirst")}</option>
-                    </select>
-                  </label>
-                </div>
-              </div>
-              <div className={styles.catalogLayout}>
-                <div className={styles.filters} role="group" aria-labelledby="myb-gear-filters">
-                  <MultiFilter label={t("gear.brand")} all={t("gear.allBrands")}
-                    options={brands} selected={selectedBrands} searchLabel={t("pedalsMenu.searchPlaceholder")}
-                    onChange={(values) => { setBrands(values); setLimit(PAGE_SIZE); }} />
-                  <MultiFilter label={t("pedal.type.label")} all={t("gear.allTypes")}
-                    options={types} selected={selectedTypes} searchLabel={t("pedalsMenu.searchPlaceholder")}
-                    onChange={(values) => { setTypes(values); setLimit(PAGE_SIZE); }} />
-                  {specOptions.map(({ field, label, options }) => (
-                    <MultiFilter key={field} label={label} all={t("gear.anyValue")}
-                      options={options} selected={selectedSpecs[field] ?? []} searchLabel={t("pedalsMenu.searchPlaceholder")}
-                      onChange={(values) => {
-                        setSelectedSpecs((current) => ({ ...current, [field]: values }));
-                        setLimit(PAGE_SIZE);
-                      }} />
-                  ))}
-                  {isFiltered && <button type="button" className={styles.reset} onClick={clearFilters}>{t("gear.reset")}</button>}
-                </div>
-                <section className={styles.results} aria-label={t("gear.catalog")}>
-                  {loading ? null : error ? (
-                    <p className={styles.status} role="alert">{t("pedalsMenu.loadError")}</p>
-                  ) : results.length === 0 ? (
-                    <p className={styles.status} role="status">{t("gear.empty")}</p>
-                  ) : (
-                    <>
-                      <div className={styles.grid}>{results.slice(0, limit).map(({ pedal }) => card(pedal))}</div>
-                      {limit < results.length && (
-                        <button type="button" className={styles.more} onClick={() => setLimit((value) => value + PAGE_SIZE)}>
-                          {t("gear.more")}
-                        </button>
-                      )}
-                    </>
+                ) : isFiltered && !error &&
+                  t(new Intl.PluralRules(language).select(results.length) === "one" ? "gear.resultOne" : "gear.resultOther")
+                    .replace("{count}", results.length.toLocaleString(language))}
+              </span>}
+              <label className={styles.sort}>
+                {t("gear.sort")}
+                <select value={sort} onChange={(event) => { setSort(event.target.value); setLimit(PAGE_SIZE); }}>
+                  <option value="alphabetical">{t("gear.alphabetical")}</option>
+                  <option value="recent">{t("gear.newestFirst")}</option>
+                </select>
+              </label>
+            </div>
+          </div>
+          <div className={styles.catalogLayout}>
+            <div className={styles.filters} role="group" aria-labelledby="myb-gear-filters">
+              <MultiFilter label={t("gear.brand")} all={t("gear.allBrands")}
+                options={brands} selected={selectedBrands} searchLabel={t("pedalsMenu.searchPlaceholder")}
+                onChange={(values) => { setBrands(values); setLimit(PAGE_SIZE); }} />
+              <MultiFilter label={t("pedal.type.label")} all={t("gear.allTypes")}
+                options={types} selected={selectedTypes} searchLabel={t("pedalsMenu.searchPlaceholder")}
+                onChange={(values) => { setTypes(values); setLimit(PAGE_SIZE); }} />
+              {specOptions.map(({ field, label, options }) => (
+                <MultiFilter key={field} label={label} all={t("gear.anyValue")}
+                  options={options} selected={selectedSpecs[field] ?? []} searchLabel={t("pedalsMenu.searchPlaceholder")}
+                  onChange={(values) => {
+                    setSelectedSpecs((current) => ({ ...current, [field]: values }));
+                    setLimit(PAGE_SIZE);
+                  }} />
+              ))}
+              {isFiltered && <button type="button" className={styles.reset} onClick={clearFilters}>{t("gear.reset")}</button>}
+            </div>
+            <section className={styles.results} aria-label={t("gear.catalog")}>
+              {selected && (
+                <div className={styles.detail} data-tu3={showTu3Pilot ? "" : undefined} key={selected.id}>
+                  <div className={styles.detailImage} onContextMenu={blockImageMenu}>
+                    <GearImage pedal={selected} detail />
+                  </div>
+                  <div className={styles.detailText}>
+                    <header className={styles.detailHeader}>
+                      <p className={styles.eyebrow}>{selected.brand}</p>
+                      <h2 ref={detailHeading} tabIndex={-1}>{selected.name}</h2>
+                      {renderTypeBadges(selected)}
+                    </header>
+                    <PedalSpecs
+                      selectedPedal={selected} selectedInstanceId={null} units={units} language={language}
+                      t={t} isCustomPedal={false} isImportedPedal={false} isUSA={isUSA} isEurope={isEurope}
+                      buildThomannUrl={buildThomannUrl} embedded
+                    />
+                  </div>
+                  <div className={styles.detailRetailers}>
+                    <PedalRetailers
+                      selectedPedal={selected} buildThomannUrl={buildThomannUrl} t={t}
+                      detailed
+                    />
+                    {showTu3Pilot && <Tu3OfficialDemo t={t} />}
+                  </div>
+                  {showTu3Pilot && (
+                    <section className={styles.tu3Artists}>
+                      <h2 className={styles.storeTitle}>{t("gearTu3.artists")}</h2>
+                      <ul className={styles.tu3ArtistList} role="list">
+                        {TU3_ARTISTS.map((name) => <li key={name}>{name}</li>)}
+                        <li>…</li>
+                      </ul>
+                    </section>
                   )}
-                </section>
-              </div>
-            </>
-          )}
+                </div>
+              )}
+              {loading ? null : error ? (
+                <p className={styles.status} role="alert">{t("pedalsMenu.loadError")}</p>
+              ) : results.length === 0 ? (
+                <p className={styles.status} role="status">{t("gear.empty")}</p>
+              ) : (
+                <>
+                  <div ref={grid} className={styles.grid}>
+                    {results.slice(selected ? coveredCards : 0, limit).map(({ pedal }) => card(pedal))}
+                  </div>
+                  {limit < results.length && (
+                    <button type="button" className={styles.more} onClick={() => setLimit((value) => value + PAGE_SIZE)}>
+                      {t("gear.more")}
+                    </button>
+                  )}
+                </>
+              )}
+            </section>
+          </div>
         </div>
       </div>
     </dialog>

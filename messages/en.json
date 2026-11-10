@@ -5,6 +5,8 @@
     "back": "Move back",
     "replace": "Replace",
     "choose": "Choose a replacement",
+    "subtitle": "Pedals are prefiltered by the effect type of the pedal you’re replacing, when available. You can also choose a different effect type.",
+    "sameType": "Same type",
     "previewAction": "Preview on board",
     "review": "Replacement preview",
     "cancel": "Cancel",
@@ -21,7 +23,7 @@
     "anyValue": "Any",
     "open": "Open the pedal library",
     "returnToBoard": "Back to board",
-    "back": "Back to library",
+    "closeDetails": "Close pedal details",
     "title": "Pedal Library",
     "subtitle": "Explore effects and add your discoveries to your board.",
     "search": "Search pedals, brands or effects…",
@@ -298,7 +300,7 @@
     "title": "Pedalboard"
   },
   "power": {
-    "button": "Power supply",
+    "button": "Power Supply",
     "check": "Check power supply",
     "features": "Specifications",
     "status": {
@@ -321,7 +323,7 @@
     "no": "No"
   },
   "powerSetup": {
-    "title": "Power supply",
+    "title": "Power Supply",
     "output": "Output",
     "outputs": "Outputs",
     "outputs_other": {
@@ -405,7 +407,7 @@
     "jacks": "Jacks",
     "cables": "Cables",
     "tools": "Tools",
-    "power": "Power supply"
+    "power": "Power Supply"
   },
   "cables": {
     "title": "Cables",

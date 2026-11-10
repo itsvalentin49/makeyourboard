@@ -224,7 +224,7 @@ export default function SearchPower({
             rounded-md
             pl-12
             pr-11
-            text-[12px]
+            text-[16px] lg:text-[12px]
             font-bold
             outline-none
           "

@@ -334,7 +334,7 @@ export default function SearchBoards({
                 spellCheck={false}
                 placeholder={t("boardsMenu.searchPlaceholder")}
                 aria-label={t("boardsMenu.searchPlaceholder")}
-                className="w-full h-[30px] bg-white !text-black placeholder:!text-zinc-500 rounded-md pl-12 pr-11 text-[12px] font-bold outline-none"
+                className="w-full h-[30px] bg-white !text-black placeholder:!text-zinc-500 rounded-md pl-12 pr-11 text-[16px] lg:text-[12px] font-bold outline-none"
                 value={boardSearch}
                 onClick={(event) => {
                   event.stopPropagation();

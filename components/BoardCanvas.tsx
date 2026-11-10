@@ -76,10 +76,6 @@ type Props = {
     (() => void) | null
   >;
 
-  openHelpRef?: React.MutableRefObject<
-    (() => void) | null
-  >;
-
   rotatePedal: (id: number) => void;
   deletePedal: (id: number) => void;
   duplicateCanvasItem: (id: number, kind: "board" | "pedal") => void;
@@ -286,7 +282,6 @@ export default function BoardCanvas({
   mobileSidebarOpen = false,
   setMobileCanvasPanelOpen,
   mobileCanvasPanelCloseRef,
-  openHelpRef,
   rotatePedal,
   deletePedal,
   duplicateCanvasItem,
@@ -357,19 +352,6 @@ export default function BoardCanvas({
   const boardIconSrc = isLightTheme ? "/images/tab-board-dark.webp" : "/images/tab-board-light.webp";
   const settingsIconSrc = isLightTheme ? "/images/tab-settings-dark.webp" : "/images/tab-settings-light.webp";
   const [helpOpen, setHelpOpen] = useState(false);
-
-  useEffect(() => {
-    if (!openHelpRef) return;
-    if (!HELP_ENABLED) { openHelpRef.current = null; return; }
-
-    openHelpRef.current = () => {
-      setHelpOpen((v) => !v);
-    };
-
-    return () => {
-      openHelpRef.current = null;
-    };
-  }, [openHelpRef]);
 
   useEffect(() => {
     if (!HELP_ENABLED || !showIntro) return;
@@ -1016,7 +998,7 @@ export default function BoardCanvas({
   fixed
   left-0
   right-0
-  bottom-0
+  bottom-[env(safe-area-inset-bottom)]
   top-[calc(64px+env(safe-area-inset-top))]
   overflow-y-auto
   overflow-x-hidden
@@ -1416,44 +1398,45 @@ export default function BoardCanvas({
     : item.instanceId === selectedInstanceId);
   const isBoardTarget = menuTarget?.kind === "board";
   const canReplace = Boolean(menuTarget && !isBoardTarget && !isPowerSupply(menuTarget) && replacePedal);
-  const quickWidth = Math.max(0, Math.min(112, stageSize.width - 16));
-  const quickHeight = 38;
+  const actionHeight = stageSize.height - (isMobile ? 68 : 0);
+  const quickWidth = Math.max(0, Math.min(isMobile ? 144 : 112, stageSize.width - 16));
+  const quickHeight = isMobile ? 44 : 38;
   const menuWidth = Math.max(0, Math.min(192, stageSize.width - 16));
-  const menuHeight = canReplace ? 179 : 151;
+  const menuHeight = isMobile ? (canReplace ? 233 : 196) : (canReplace ? 179 : 151);
   const menuGap = 6;
   const actionPositions = menuTarget && overlayPosition?.halfWidth !== undefined &&
     overlayPosition.bottom !== undefined && overlayPosition.bottom >= 0 &&
-    overlayPosition.y < stageSize.height && quickWidth > 0 && stageSize.height >= quickHeight + 16 ? (() => {
+    overlayPosition.y < actionHeight && quickWidth > 0 && actionHeight >= quickHeight + 16 ? (() => {
       const right = overlayPosition.x + overlayPosition.halfWidth;
       const left = overlayPosition.x - overlayPosition.halfWidth;
       if (right < 0 || left >= stageSize.width) return null;
 
       const above = overlayPosition.y - menuGap - quickHeight;
-      const quickTop = Math.max(8, Math.min(above >= 8 ? above : overlayPosition.bottom + menuGap, stageSize.height - quickHeight - 8));
+      const quickTop = Math.max(8, Math.min(above >= 8 ? above : overlayPosition.bottom + menuGap, actionHeight - quickHeight - 8));
       const quickLeft = Math.max(8, Math.min(overlayPosition.x - quickWidth / 2, stageSize.width - quickWidth - 8));
       const rightMenuLeft = right + menuGap;
       const leftMenuLeft = left - menuGap - menuWidth;
       const fitsRight = rightMenuLeft + menuWidth <= stageSize.width - 8;
       const fitsLeft = leftMenuLeft >= 8;
-      const maxHeight = Math.min(menuHeight, stageSize.height - 16);
-      const menuTop = Math.max(8, Math.min(overlayPosition.y, stageSize.height - 46));
-      const spaceBelow = stageSize.height - quickTop - quickHeight - menuGap - 8;
+      const maxHeight = Math.min(menuHeight, actionHeight - 16);
+      const menuTop = Math.max(8, Math.min(overlayPosition.y, actionHeight - 46));
+      const spaceBelow = actionHeight - quickTop - quickHeight - menuGap - 8;
       const spaceAbove = quickTop - menuGap - 8;
       const side = fitsRight ? "right" : fitsLeft ? "left" : spaceBelow >= spaceAbove ? "below" : "above";
       const menu = side === "right" || side === "left"
         ? {
-            left: side === "right" ? rightMenuLeft : leftMenuLeft,
-            top: menuTop,
-            width: menuWidth,
-            maxHeight: Math.min(maxHeight, stageSize.height - menuTop - 8),
-          }
+          left: side === "right" ? rightMenuLeft : leftMenuLeft,
+          top: menuTop,
+          width: menuWidth,
+          maxHeight: Math.min(maxHeight, actionHeight - menuTop - 8),
+        }
         : {
-            left: Math.min(quickLeft, stageSize.width - menuWidth - 8),
-            top: side === "below" ? quickTop + quickHeight + menuGap : undefined,
-            bottom: side === "above" ? stageSize.height - quickTop + menuGap : undefined,
-            width: menuWidth,
-            maxHeight: Math.min(maxHeight, side === "below" ? spaceBelow : spaceAbove),
-          };
+          left: Math.min(quickLeft, stageSize.width - menuWidth - 8),
+          top: side === "below" ? quickTop + quickHeight + menuGap : undefined,
+          bottom: side === "above" ? stageSize.height - quickTop + menuGap : undefined,
+          width: menuWidth,
+          maxHeight: Math.min(maxHeight, side === "below" ? spaceBelow : spaceAbove),
+        };
 
       return { quick: { left: quickLeft, top: quickTop, width: quickWidth }, menu };
     })() : null;
@@ -1482,16 +1465,24 @@ export default function BoardCanvas({
   const itemActions = itemId === undefined ? [] : [
     { key: "pedal.actions.rotate", Icon: RotateCw, hint: "R", shortcut: "R", run: () => (isBoardTarget ? rotateBoard : rotatePedal)(itemId) },
     { key: "replacement.duplicate", Icon: CopyPlus, hint: "D", shortcut: "D", run: () => duplicateCanvasItem(itemId, isBoardTarget ? "board" : "pedal") },
-    { key: "replacement.forward", Icon: ArrowUp, hint: "↑", shortcut: "ArrowUp",
-      run: moveCanvasItemOneLayer && forwardLayer !== undefined ? () => moveCanvasItemOneLayer(itemId, forwardLayer) : undefined },
-    { key: "replacement.back", Icon: ArrowDown, hint: "↓", shortcut: "ArrowDown",
-      run: moveCanvasItemOneLayer && backLayer !== undefined ? () => moveCanvasItemOneLayer(itemId, backLayer) : undefined },
+    {
+      key: "replacement.forward", Icon: ArrowUp, hint: "↑", shortcut: "ArrowUp",
+      run: moveCanvasItemOneLayer && forwardLayer !== undefined ? () => moveCanvasItemOneLayer(itemId, forwardLayer) : undefined
+    },
+    {
+      key: "replacement.back", Icon: ArrowDown, hint: "↓", shortcut: "ArrowDown",
+      run: moveCanvasItemOneLayer && backLayer !== undefined ? () => moveCanvasItemOneLayer(itemId, backLayer) : undefined
+    },
     ...(canReplace && replacePedal ? [
-      { key: "replacement.replace", Icon: Replace, hint: "⇧R", shortcut: "Shift+R",
-        run: () => replacePedal(itemId) },
+      {
+        key: "replacement.replace", Icon: Replace, hint: "⇧R", shortcut: "Shift+R",
+        run: () => replacePedal(itemId)
+      },
     ] : []),
-    { key: "pedal.actions.delete", Icon: Trash2, hint: "Del", shortcut: "Delete Backspace",
-      run: () => (isBoardTarget ? deleteBoard : deletePedal)(itemId) },
+    {
+      key: "pedal.actions.delete", Icon: Trash2, hint: "Del", shortcut: "Delete Backspace",
+      run: () => (isBoardTarget ? deleteBoard : deletePedal)(itemId)
+    },
   ];
   const showItemMenu = !viewer && !replacementPreview && menuTarget && actionPositions &&
     !isDragging && !isStageDragging && !isPinching &&
@@ -1543,6 +1534,37 @@ export default function BoardCanvas({
     return () => window.removeEventListener("keydown", handleKeyDown);
   });
 
+
+  const toolRailButtons = (
+    ([
+      { id: "boards", label: t("canvasControls.boards"), Icon: null, open: showBoardsMenu },
+      { id: "cables", label: t("cables.title"), Icon: Cable, open: showCableMenu },
+      { id: "power", label: t("canvasControls.power"), Icon: Zap, open: showPower },
+      { id: "export", label: t("export.button"), Icon: Upload, open: showExportPanel },
+      { id: "settings", label: t("settings.title"), Icon: null, open: showSettings },
+    ] as const).map(({ id, label, Icon, open }) => (
+      <React.Fragment key={id}>
+        <button type="button" className="myb-tool-rail-button"
+          aria-label={label} title={isMobile || railExpanded ? undefined : label} aria-expanded={open} data-active={open}
+          ref={id === "boards" ? boardsButtonRef : undefined}
+          onClick={() => toggleUnifiedPanel(id)}>
+          {Icon ? (
+            <Icon size={24} strokeWidth={2} aria-hidden="true" />
+          ) : (
+            <Image
+              src={id === "boards" ? boardIconSrc : settingsIconSrc}
+              alt=""
+              width={24}
+              height={24}
+              draggable={false}
+              className="size-6 shrink-0 object-contain"
+            />
+          )}
+          {!isMobile && railExpanded && <span className="myb-tool-rail-label">{label}</span>}
+        </button>
+      </React.Fragment>
+    ))
+  );
 
   function tapCanvasBoard(id: number) {
     if (isMobile && selectedBoardInstanceId === id) {
@@ -1601,7 +1623,7 @@ export default function BoardCanvas({
             position: "absolute", top: "50%", right: 12,
             transform: "translateY(-50%)", width: railWidth,
             pointerEvents: "auto", zIndex: 120,
-            background: "var(--zinc-800, #27272a)",
+            background: "var(--zinc-900)",
             color: "var(--foreground, #ededed)",
             border: "1px solid var(--zinc-700, #3f3f46)",
             borderRadius: 14, padding: 5, boxSizing: "border-box",
@@ -1623,7 +1645,7 @@ export default function BoardCanvas({
   padding: 5px;
   border: 1px solid var(--zinc-700);
   border-radius: 14px;
-  background: var(--zinc-800);
+  background: var(--zinc-900);
   color: var(--foreground);
   box-shadow: 0 6px 22px rgb(0 0 0 / 14%);
   max-height: calc(100% - 24px);
@@ -1651,12 +1673,20 @@ export default function BoardCanvas({
 .myb-tool-rail-header { display: flex; align-items: center; justify-content: space-between; height: 32px; margin-bottom: 5px; }
 .myb-tool-rail-title { padding-left: 10px; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--zinc-400); }
 .myb-tool-rail-toggle { justify-content: center; width: 44px; height: 32px; margin: 0; margin-left: auto; padding: 0; color: var(--zinc-400); }
-.myb-tool-rail-button:hover, .myb-tool-rail-toggle:hover { background: var(--zinc-900); }
+
+.myb-tool-rail-button:hover, .myb-tool-rail-toggle:hover { background: var(--zinc-700); }
+
 .myb-tool-rail-button[data-active="true"] { background: var(--zinc-700); border-color: var(--zinc-500); }
 .myb-tool-rail-button:focus-visible, .myb-tool-rail-toggle:focus-visible { outline: 2px solid var(--zinc-500); outline-offset: -2px; }
 .myb-tool-rail-label { font-size: 12px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .myb-tool-rail-divider { height: 1px; background: var(--zinc-700); margin: 5px 4px; }
 html.light .myb-tool-rail { box-shadow: 0 6px 22px rgb(0 0 0 / 8%); }
+
+html.light .myb-tool-rail-button:hover,
+html.light .myb-tool-rail-toggle:hover {
+  background: var(--zinc-200);
+}
+
 html.light .myb-tool-rail-button[data-active="true"] { background: var(--zinc-700); border-color: var(--zinc-500); }
 `}</style>
           <div className="myb-tool-rail-header">
@@ -1671,36 +1701,17 @@ html.light .myb-tool-rail-button[data-active="true"] { background: var(--zinc-70
             </button>
           </div>
           <div id="myb-tool-rail-actions" className="myb-tool-rail-actions">
-            {([
-              { id: "boards", label: t("canvasControls.boards"), Icon: null, open: showBoardsMenu },
-              { id: "cables", label: t("cables.title"), Icon: Cable, open: showCableMenu },
-              { id: "power", label: t("canvasControls.power"), Icon: Zap, open: showPower },
-              { id: "export", label: t("export.button"), Icon: Upload, open: showExportPanel },
-              { id: "settings", label: t("settings.title"), Icon: null, open: showSettings },
-            ] as const).map(({ id, label, Icon, open }) => (
-              <React.Fragment key={id}>
-                <button type="button" className="myb-tool-rail-button"
-                  aria-label={label} title={railExpanded ? undefined : label} aria-expanded={open} data-active={open}
-                  ref={id === "boards" ? boardsButtonRef : undefined}
-                  onClick={() => toggleUnifiedPanel(id)}>
-                  {Icon ? (
-                    <Icon size={24} strokeWidth={2} aria-hidden="true" />
-                  ) : (
-                    <Image
-                      src={id === "boards" ? boardIconSrc : settingsIconSrc}
-                      alt=""
-                      width={24}
-                      height={24}
-                      draggable={false}
-                      className="size-6 shrink-0 object-contain"
-                    />
-                  )}
-                  {railExpanded && <span className="myb-tool-rail-label">{label}</span>}
-                </button>
-              </React.Fragment>
-            ))}
+            {toolRailButtons}
           </div>
         </nav>, desktopToolbarHost
+      )}
+
+      {!viewer && isMobile && !mobileSidebarOpen && !mobileCanvasPanelOpen && (
+        <nav className={`myb-tool-rail ${pedalActions.mobileRail}`}
+          aria-label={t("canvasControls.tools")}
+          onClick={(event) => event.stopPropagation()}>
+          <div className="myb-tool-rail-actions">{toolRailButtons}</div>
+        </nav>
       )}
 
       {/* --- MODE VIEWER (CENTER BOTTOM) --- */}
@@ -1766,6 +1777,7 @@ html.light .myb-tool-rail-button[data-active="true"] { background: var(--zinc-70
         <div
           role="group"
           aria-label={t("pedal.actions.title")}
+          data-mobile={isMobile || undefined}
           onClick={(event) => event.stopPropagation()}
           onMouseDown={(event) => event.stopPropagation()}
           onWheel={(event) => event.stopPropagation()}
@@ -1814,7 +1826,7 @@ html.light .myb-tool-rail-button[data-active="true"] { background: var(--zinc-70
             className={!isMobile && desktopToolbarHost ? "contents" : "fixed bottom-6 left-0 right-0 lg:left-76 flex items-center justify-center gap-3 z-50 px-4"}
           >
 
-            {(isMobile || !desktopToolbarHost) && (
+            {!isMobile && !desktopToolbarHost && (
               <>
 
 
@@ -2420,7 +2432,7 @@ ${isMobile
             {/* BOARDS */}
             <div className="relative">
               <button
-                ref={desktopToolbarHost && !isMobile ? undefined : boardsButtonRef}
+                ref={!isMobile && !desktopToolbarHost ? boardsButtonRef : undefined}
                 onClick={() => {
                   setShowBoardsMenu((v) => !v);
                   setShowPower(false);
@@ -2567,7 +2579,7 @@ ${isMobile
                       className={
                         isMobile
                           ? `${mobileFullPanelClass}
-         overscroll-contain
+         p-6 overscroll-contain
          [scrollbar-width:none]
          [-ms-overflow-style:none]
          [&::-webkit-scrollbar]:hidden`
@@ -3305,20 +3317,20 @@ ${isMobile
                     }}
                     isColliding={
                       isReplacement ? replacementPreview.fit === "collision" || replacementPreview.fit === "outside" :
-                      !replacementPreview && collisionReady &&
-                      showJacksMargin &&
-                      activeProject.boardPedals.some((other) => {
-                        if (other.instanceId === p.instanceId) return false;
+                        !replacementPreview && collisionReady &&
+                        showJacksMargin &&
+                        activeProject.boardPedals.some((other) => {
+                          if (other.instanceId === p.instanceId) return false;
 
-                        // ✅ Si une alim est SOUS le board, elle ne gêne pas les pédales SUR le board
-                        const pIsUnderBoard = p.type === "power" && Number(p.zIndex || 0) < 0;
-                        const otherIsUnderBoard = other.type === "power" && Number(other.zIndex || 0) < 0;
+                          // ✅ Si une alim est SOUS le board, elle ne gêne pas les pédales SUR le board
+                          const pIsUnderBoard = p.type === "power" && Number(p.zIndex || 0) < 0;
+                          const otherIsUnderBoard = other.type === "power" && Number(other.zIndex || 0) < 0;
 
-                        if (pIsUnderBoard || otherIsUnderBoard) return false;
+                          if (pIsUnderBoard || otherIsUnderBoard) return false;
 
-                        // ✅ Sinon, alim + pédale peuvent bien entrer en collision
-                        return checkCollision(p.instanceId, other.instanceId);
-                      })
+                          // ✅ Sinon, alim + pédale peuvent bien entrer en collision
+                          return checkCollision(p.instanceId, other.instanceId);
+                        })
                     }
                   />
 

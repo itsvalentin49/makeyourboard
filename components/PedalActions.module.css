@@ -167,3 +167,40 @@
   outline: 1px solid var(--zinc-600);
   outline-offset: 1px;
 }
+
+[data-mobile="true"] > .quick { height: 44px; }
+[data-mobile="true"] .action { min-height: 36px; }
+
+.mobileRail:global(.myb-tool-rail) {
+  inset: auto 12px 12px;
+  width: auto;
+  transform: none;
+  z-index: 70;
+  background: var(--zinc-900);
+}
+
+.mobileRail :global(.myb-tool-rail-actions) {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.mobileRail :global(.myb-tool-rail-button) {
+  justify-content: center;
+  padding: 0;
+}
+
+@media (max-width: 1023px) {
+  :global(html):has(.editorViewport),
+  :global(body):has(.editorViewport) {
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
+
+  .editorViewport {
+    position: fixed;
+    inset: 0 0 auto;
+    height: 100vh;
+    height: 100dvh;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}

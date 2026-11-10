@@ -1,0 +1,29 @@
+[
+  {
+    "table": "pedals",
+    "items": [
+      {
+        "id": 23959,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/singular-sound-xpresso-v2.webp",
+        "thumbnail": null,
+        "width": 75,
+        "depth": 175
+      },
+      {
+        "id": 23960,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/keeley-halo-pink-v2.webp",
+        "thumbnail": null,
+        "width": 95,
+        "depth": 120
+      }
+    ]
+  },
+  {
+    "table": "power",
+    "items": []
+  },
+  {
+    "table": "boards",
+    "items": []
+  }
+]

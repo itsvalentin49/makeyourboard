@@ -201,7 +201,6 @@ export default function BoardEditor({
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   const [mobileCanvasPanelOpen, setMobileCanvasPanelOpen] = useState(false);
-  const mobileHelpOpenRef = useRef<(() => void) | null>(null);
 
   const mobileCanvasPanelCloseRef =
     useRef<(() => void) | null>(null);
@@ -1337,7 +1336,7 @@ export default function BoardEditor({
 
   return (
     <div
-      className="bg-[var(--background)] text-[var(--foreground)] font-sans select-none overflow-hidden h-screen"
+      className={`${pedalActions.editorViewport} bg-[var(--background)] text-[var(--foreground)] font-sans select-none overflow-hidden h-screen`}
       onClick={closeSearchMenus}
     >
 
@@ -1527,40 +1526,6 @@ export default function BoardEditor({
 
             <div className="ml-auto flex items-center gap-3">
 
-              {/* HELP / INFO */}
-              <button
-                type="button"
-                aria-label={t("help.title")}
-                onClick={(e) => {
-                  e.stopPropagation();
-
-                  setMobileSidebarOpen(false);
-                  setContactOpen(false);
-
-                  mobileHelpOpenRef.current?.();
-                }}
-                className="
-    w-[30px]
-    h-[30px]
-    shrink-0
-    rounded-full
-    bg-blue-600
-    !text-white
-    flex
-    items-center
-    justify-center
-    shadow-2xl
-    active:scale-95
-    transition-transform
-    touch-manipulation
-    [-webkit-tap-highlight-color:transparent]
-  "
-              >
-                <span className="text-[19px] font-bold leading-none -mt-[1px]">
-                  ?
-                </span>
-              </button>
-
               {/* PLUS / MOINS */}
               <button
                 type="button"
@@ -1615,7 +1580,7 @@ export default function BoardEditor({
           {/* CANVAS MOBILE */}
           <div
             ref={mobileCanvasRef}
-            className="flex-1 relative bg-[#323234] overflow-hidden"
+            className="flex-1 min-h-0 relative bg-[#323234] overflow-hidden"
           >
             <BoardCanvas
               activeProject={activeProject}
@@ -1663,7 +1628,6 @@ export default function BoardEditor({
               setSettingsOpen={setSettingsOpen}
               setLanguage={setLanguage}
               setUnits={setUnits}
-              openHelpRef={mobileHelpOpenRef}
             />
           </div>
 
@@ -1671,10 +1635,11 @@ export default function BoardEditor({
 
           {/* MOBILE SIDEBAR DRAWER */}
           <div
-            className={`absolute top-[calc(64px+env(safe-area-inset-top))] left-0 right-0 bottom-0 z-40 transition-opacity duration-300 ${mobileSidebarOpen
+            className={`absolute top-[calc(64px+env(safe-area-inset-top))] left-0 right-0 bottom-0 z-40 overflow-hidden transition-opacity duration-300 ${mobileSidebarOpen
               ? "opacity-100 pointer-events-auto"
               : "opacity-0 pointer-events-none"
               }`}
+            inert={!mobileSidebarOpen}
             onClick={() => setMobileSidebarOpen(false)}
           >
             <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
@@ -1696,7 +1661,7 @@ export default function BoardEditor({
 
 
                 {/* CONTENT */}
-                <div className="flex-1 overflow-y-auto px-2 pt-2 pb-2">
+                <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-2 pt-2 pb-2">
 
                   <Sidebar
                     pedalsLibrary={pedalsLibrary}
