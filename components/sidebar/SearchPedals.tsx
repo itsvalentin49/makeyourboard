@@ -286,7 +286,7 @@ export default function SearchPedals({
               rounded-md
               pl-12
               pr-11
-              text-[16px] lg:text-[12px]
+              text-[14px] lg:text-[10px]
               font-bold
               outline-none
             "
@@ -426,7 +426,7 @@ export default function SearchPedals({
                     w-full
                     min-h-[48px]
                     rounded-lg
-                    bg-zinc-800
+                    bg-zinc-900
                     hover:bg-zinc-700
                     pl-[72px]
                     pr-2

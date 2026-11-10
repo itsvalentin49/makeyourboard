@@ -321,7 +321,7 @@ export default function BoardCanvas({
   useEffect(() => {
     setItemMenuExpanded(false);
   }, [selectedInstanceId, selectedBoardInstanceId]);
-  const railWidth = railExpanded ? 190 : 56;
+  const railWidth = 56;
   const railLabels: Record<Language, { expand: string; collapse: string }> = {
     fr: { expand: "Afficher les noms", collapse: "Masquer les noms" },
     en: { expand: "Show labels", collapse: "Hide labels" },
@@ -1723,17 +1723,6 @@ html.light .myb-tool-rail-toggle:hover {
 
 html.light .myb-tool-rail-button[data-active="true"] { background: var(--zinc-700); border-color: var(--zinc-500); }
 `}</style>
-          <div className="myb-tool-rail-header">
-            {railExpanded && (
-              <span className="myb-tool-rail-title">{t("canvasControls.tools")}</span>
-            )}
-            <button type="button" className="myb-tool-rail-toggle"
-              aria-label={railExpanded ? railLabels[language].collapse : railLabels[language].expand}
-              aria-expanded={railExpanded} aria-controls="myb-tool-rail-actions"
-              onClick={toggleRail}>
-              {railExpanded ? <ChevronsRight size={20} /> : <ChevronsLeft size={20} />}
-            </button>
-          </div>
           <div id="myb-tool-rail-actions" className="myb-tool-rail-actions">
             {toolRailButtons}
           </div>
@@ -1741,9 +1730,12 @@ html.light .myb-tool-rail-button[data-active="true"] { background: var(--zinc-70
       )}
 
       {!viewer && isMobile && !mobileSidebarOpen && !mobileCanvasPanelOpen && (
-        <nav className={`myb-tool-rail ${pedalActions.mobileRail}`}
+        <nav
+          className={`myb-tool-rail ${pedalActions.mobileRail}`}
+          style={{ background: "var(--zinc-900)" }}
           aria-label={t("canvasControls.tools")}
-          onClick={(event) => event.stopPropagation()}>
+          onClick={(event) => event.stopPropagation()}
+        >
           <div className="myb-tool-rail-actions">{toolRailButtons}</div>
         </nav>
       )}

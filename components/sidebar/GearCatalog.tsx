@@ -1,8 +1,7 @@
 "use client";
 
 import { useDeferredValue, useEffect, useLayoutEffect, useMemo, useRef, useState, type MouseEvent } from "react";
-import { ArrowRight, BookOpen, ChevronDown, Grid2X2, List, LoaderCircle, Play, Plus, Search, X } from "lucide-react";
-import type { AnyRow, BoardItem } from "@/types/project";
+import { ArrowRight, BookOpen, ChevronDown, LoaderCircle, Play, Plus, Search, X } from "lucide-react"; import type { AnyRow, BoardItem } from "@/types/project";
 import type { Language } from "@/utils/i18n";
 import { getCustomImageUrl } from "@/utils/customImageStore";
 import { parsePedalJackLocations, resolveCustomPedalLayout } from "@/utils/customPedalLayout";
@@ -237,12 +236,9 @@ export default function GearCatalog({
   const [typeSelection, setTypes] = useState<string[] | null>(null);
   const [selectedSpecs, setSelectedSpecs] = useState<SpecSelection>({});
   const [sort, setSort] = useState("recent");
-  const [catalogView, setCatalogView] = useState<"grid" | "list">("grid");
   const [limit, setLimit] = useState(PAGE_SIZE);
   const [selected, setSelected] = useState<AnyRow | null>(null);
   const addLabel = t(replacement ? "replacement.previewAction" : "customPanel.addToBoard");
-  const viewLabel = t(catalogView === "grid" ? "gear.showList" : "gear.showGrid");
-  const ViewIcon = catalogView === "grid" ? List : Grid2X2;
   const deferredQuery = useDeferredValue(query);
   const hasReplacementType = splitTags(replacement?.pedal.type).length > 0;
   const showTu3Pilot = !replacement && selected &&
@@ -288,7 +284,7 @@ export default function GearCatalog({
     const observer = new ResizeObserver(update);
     observer.observe(element);
     return () => observer.disconnect();
-  }, [selected, catalogView]);
+  }, [selected]);
 
   const catalog = useMemo(() => {
     return pedals.filter(isPedal).map((pedal): CatalogEntry => {
@@ -485,8 +481,8 @@ export default function GearCatalog({
                         {t("pedalsMenu.loading")}
                       </span>
                     ) : isFiltered && !error &&
-                      t(new Intl.PluralRules(language).select(results.length) === "one" ? "gear.resultOne" : "gear.resultOther")
-                        .replace("{count}", results.length.toLocaleString(language))}
+                    t(new Intl.PluralRules(language).select(results.length) === "one" ? "gear.resultOne" : "gear.resultOther")
+                      .replace("{count}", results.length.toLocaleString(language))}
                   </span>
                   <div className={styles.catalogOptions}>
                     <label className={styles.sort}>
@@ -496,10 +492,6 @@ export default function GearCatalog({
                         <option value="recent">{t("gear.newestFirst")}</option>
                       </select>
                     </label>
-                    <button type="button" className={styles.viewToggle} aria-label={viewLabel} title={viewLabel}
-                      onClick={() => setCatalogView((view) => view === "grid" ? "list" : "grid")}>
-                      <ViewIcon size={18} aria-hidden="true" />
-                    </button>
                   </div>
                 </>
               )}
@@ -576,7 +568,7 @@ export default function GearCatalog({
                   <p className={styles.status} role="status">{t("gear.empty")}</p>
                 ) : (
                   <>
-                    <div ref={grid} className={styles.grid} data-view={catalogView}>
+                    <div ref={grid} className={styles.grid} data-view="grid">
                       {results.slice(selected ? coveredCards : 0, limit).map(({ pedal }) => card(pedal))}
                     </div>
                     {limit < results.length && (

@@ -468,7 +468,7 @@ export default function SearchPower({
                     w-full
                     min-h-[48px]
                     rounded-lg
-                    bg-zinc-800
+                    bg-zinc-900
                     hover:bg-zinc-700
                     pl-[72px]
                     pr-2

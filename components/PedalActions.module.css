@@ -77,6 +77,7 @@
 }
 
 @media (hover: hover) {
+
   .quickButton:hover,
   .action:not(:disabled):hover {
     background: var(--zinc-700);
@@ -168,16 +169,28 @@
   outline-offset: 1px;
 }
 
-[data-mobile="true"] > .quick { height: 44px; }
-[data-mobile="true"] .action { min-height: 36px; }
+[data-mobile="true"]>.quick {
+  height: 44px;
+}
+
+[data-mobile="true"] .action {
+  min-height: 36px;
+}
+
 
 .mobileRail:global(.myb-tool-rail) {
-  inset: auto 12px 12px;
-  width: auto;
+  inset: auto 0 12px;
+  width: calc(100% - 32px);
+  max-width: 420px;
+  height: 54px;
+  min-height: 54px;
+  margin-inline: auto;
+  padding: 4px 6px;
   transform: none;
   z-index: 70;
   background: var(--zinc-900);
 }
+
 
 .mobileRail :global(.myb-tool-rail-actions) {
   display: grid;
@@ -186,10 +199,13 @@
 
 .mobileRail :global(.myb-tool-rail-button) {
   justify-content: center;
+  height: 44px;
+  min-height: 0;
   padding: 0;
 }
 
 @media (max-width: 1023px) {
+
   :global(html):has(.editorViewport),
   :global(body):has(.editorViewport) {
     overflow: hidden;
@@ -206,11 +222,9 @@
 }
 
 .neutralGrid {
-  background-image: radial-gradient(
-    circle at 1px 1px,
-    color-mix(in srgb, var(--foreground) 17%, transparent) .65px,
-    transparent 1.15px
-  );
+  background-image: radial-gradient(circle at 1px 1px,
+      color-mix(in srgb, var(--foreground) 17%, transparent) .65px,
+      transparent 1.15px);
   background-size: var(--alignment-grid-step, 24px) var(--alignment-grid-step, 24px);
   background-position: var(--alignment-grid-x, 0) var(--alignment-grid-y, 0);
 }

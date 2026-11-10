@@ -541,7 +541,7 @@ export default function SearchBoards({
                   handleBoardLeave
                 }
 
-                className="relative w-full min-h-[48px] rounded-lg bg-zinc-800 hover:bg-zinc-700 pl-[72px] pr-[34px] py-1 flex items-center text-left transition-colors shrink-0 overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed"
+                className="relative w-full min-h-[48px] rounded-lg bg-zinc-900 hover:bg-zinc-700 pl-[72px] pr-[34px] py-1 flex items-center text-left transition-colors shrink-0 overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed"
               >
 
                 {/* BOARD IMAGE */}

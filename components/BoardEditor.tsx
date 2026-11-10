@@ -1346,7 +1346,7 @@ export default function BoardEditor({
         <div className="hidden lg:flex h-full flex-col">
           <div className="flex flex-1 min-h-0 min-w-0">
 
-            <div className="flex min-h-0 shrink-0 flex-col bg-zinc-800 w-76">
+            <div className="flex min-h-0 shrink-0 flex-col bg-zinc-900 w-76">
               <div className="shrink-0 px-6" style={{ paddingTop: 10, paddingBottom: 20 }}>
                 <SidebarLogo />
               </div>
@@ -1511,7 +1511,7 @@ export default function BoardEditor({
             className="
     relative
     z-50
-    bg-zinc-950
+    bg-zinc-900
     flex items-center
     justify-between
     px-4

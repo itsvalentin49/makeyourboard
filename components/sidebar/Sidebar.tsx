@@ -323,7 +323,7 @@ export default function Sidebar({ pedalsLibrary, boardsLibrary, newPedals, newPe
   };
   return (<div className={`
   relative z-40 w-full lg:w-76 shrink-0 min-h-0
-  bg-zinc-800
+  bg-zinc-900
   px-6 pt-3 pb-6 flex flex-col gap-4
   overflow-hidden touch-pan-y
   h-full
