@@ -214,15 +214,15 @@ function ClearanceExample({ ok, isLightTheme }: { ok: boolean; isLightTheme: boo
 
 function SignalChainExample({ t, isLightTheme }: { t: Props["t"]; isLightTheme: boolean }) {
     const items = [
-        translateExample(t, "exampleTuner", "Tuner"),
-        translateExample(t, "exampleDrive", "Drive"),
-        translateExample(t, "exampleDelay", "Delay"),
         translateExample(t, "exampleReverb", "Reverb"),
+        translateExample(t, "exampleDelay", "Delay"),
+        translateExample(t, "exampleDrive", "Drive"),
+        translateExample(t, "exampleTuner", "Tuner"),
     ];
     return (
         <div className="min-w-0" style={{ marginTop: 14 }}>
             <svg viewBox="0 0 280 70" style={{ display: "block", width: "100%", height: "auto" }} aria-hidden="true">
-                <path d="M35 35H245" fill="none" stroke="var(--zinc-500)" strokeWidth="1.5" strokeDasharray="4 4" />
+                <path d="M35 38H245" fill="none" stroke="var(--zinc-500)" strokeWidth="1.5" strokeDasharray="4 4" />
                 {items.map((_, index) => {
                     const x = 35 + index * 70;
                     return (
@@ -230,7 +230,7 @@ function SignalChainExample({ t, isLightTheme }: { t: Props["t"]; isLightTheme: 
                             <rect x={x - 21} y="8" width="42" height="60" rx="6" fill="var(--zinc-900)" />
                             <image href={isLightTheme ? "/images/tab-pedal2-dark.webp" : "/images/tab-pedal2-light.webp"} x={x - 20} y="14" width="40" height="48" preserveAspectRatio="xMidYMid meet" />
                             <circle cx={x + 17} cy="12" r="10" fill="var(--blue)" />
-                            <text x={x + 17} y="12" textAnchor="middle" dominantBaseline="central" fontSize="11" fontWeight="600" fill="white">{index + 1}</text>
+                            <text x={x + 17} y="12" textAnchor="middle" dominantBaseline="central" fontSize="11" fontWeight="600" fill="white">{items.length - index}</text>
                         </g>
                     );
                 })}

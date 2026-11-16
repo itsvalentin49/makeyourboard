@@ -134,7 +134,7 @@ export default function PowerSetup({
       </h2>
 
       {!plan.count ? (
-        <p className={`m-0 text-[11px] ${muted}`}>
+        <p className="m-0 text-[11px]">
           {tr("empty")}
         </p>
       ) : (
