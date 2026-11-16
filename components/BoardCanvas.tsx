@@ -1095,7 +1095,8 @@ export default function BoardCanvas({
   ]);
   const mobileFullPanelClass = `
   absolute inset-0 z-[100] w-full h-full min-h-0 box-border
-  bg-transparent border-0 rounded-none shadow-none
+  bg-transparent backdrop-blur-[12px]
+  border-0 rounded-none shadow-none
   overflow-y-auto overflow-x-hidden overscroll-contain
   pointer-events-auto touch-pan-y
   [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden
@@ -1649,10 +1650,6 @@ export default function BoardCanvas({
   );
 
   function tapCanvasBoard(id: number) {
-    if (isMobile && selectedBoardInstanceId === id) {
-      setMobileCanvasPanelOpen?.(false);
-      setMobileSidebarOpen(true);
-    }
     setSelectedBoardInstanceId(id);
     setSelectedInstanceId(null);
   }
@@ -1670,9 +1667,6 @@ export default function BoardCanvas({
   }
 
   function tapCanvasPedal(id: number) {
-    if (isMobile && selectedInstanceId === id && menuTarget?.instanceId === id) {
-      openMobileItemInfo();
-    }
     setSelectedInstanceId(id);
     setSelectedBoardInstanceId(null);
   }
@@ -3562,7 +3556,7 @@ ${isMobile
         </Stage>
       )}
 
-      {showScaleRuler && (
+      {showScaleRuler && !isMobile && (
         <div
           ref={scaleRuler}
           className={pedalActions.scaleRuler}
