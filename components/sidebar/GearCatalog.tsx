@@ -346,9 +346,19 @@ export default function GearCatalog({
   }, [selection, onCatalogPedalChange, desktopSidebarMode]);
   useEffect(() => {
     if (!detailBackRef) return;
-    detailBackRef.current = () => setSelected(null);
-    return () => { detailBackRef.current = null; };
-  }, [detailBackRef]);
+
+    detailBackRef.current = () => {
+      if (initialDetailItem) {
+        onClose();
+      } else {
+        setSelected(null);
+      }
+    };
+
+    return () => {
+      detailBackRef.current = null;
+    };
+  }, [detailBackRef, initialDetailItem, onClose]);
   useEffect(() => {
     onDetailChange?.(selection !== null);
   }, [selection, onDetailChange]);
@@ -1052,7 +1062,13 @@ export default function GearCatalog({
             <button
               type="button"
               className={styles.mobileDetailBack}
-              onClick={() => setSelected(null)}
+              onClick={() => {
+                if (initialDetailItem) {
+                  onClose();
+                } else {
+                  setSelected(null);
+                }
+              }}
               aria-label={t("gear.closeDetails")}
             >
               <ArrowLeft
