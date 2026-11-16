@@ -500,9 +500,17 @@
 
 }
 
-@media (max-width: 1023px) {
+/* Mobile — Portrait */
+@media (max-width: 1023px) and (orientation: portrait) {
   .grid:not([data-view="list"]) {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Mobile — Paysage */
+@media (max-width: 1023px) and (orientation: landscape) {
+  .grid:not([data-view="list"]) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
@@ -701,15 +709,15 @@
 }
 
 .brand {
-
   color: var(--gear-muted);
-
   font-size: 12px;
-
   line-height: 1.35;
-
   font-weight: 650;
-
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .tags {
