@@ -3,7 +3,7 @@
 import { createPortal } from "react-dom";
 import React, { useRef, useLayoutEffect, useEffect, useId, useState, useCallback } from "react";
 import { Stage, Layer, Group, Rect, Text, Circle as KonvaCircle, Image as KonvaImage, } from "react-konva";
-import { Zap, Weight, Minus, Cable, Plus, Check, Upload, AlertTriangle, RotateCw, Circle, Trash2, X, Share2, List, Settings, PanelsTopLeft, Download, ArrowUp, ArrowDown, CircleHelp, ChevronsLeft, ChevronsRight, Replace, CopyPlus, Ellipsis, Info } from "lucide-react";
+import { Zap, Weight, Minus, Cable, Plus, Check, Upload, AlertTriangle, RotateCw, Circle, Trash2, X, Share2, List, PanelsTopLeft, Download, ArrowUp, ArrowDown, CircleHelp, ChevronsLeft, ChevronsRight, Replace, CopyPlus, Ellipsis, Info } from "lucide-react";
 import PedalImage from "@/components/PedalImage";
 import pedalActions from "./PedalActions.module.css";
 import { formatWeight } from "@/utils/units";
@@ -12,12 +12,12 @@ import useImage from "use-image";
 import ExportPanel from "@/components/ExportPanel";
 import Image from "next/image";
 import type { Project } from "@/types/project";
-import SettingsPanel from "@/components/SettingsPanel";
+import SettingsMenu from "@/components/SettingsMenu";
 import PedalboardsPanel from "@/components/PedalboardsPanel";
 import PowerSetup from "@/components/PowerSetup";
 import CablesPanel from "@/components/CablesPanel";
 import { HelpGuide } from "@/components/HelpGuide";
-import SignalPath, { SignalPoint } from "@/components/SignalPath";
+import { AutomaticSignalCables } from "@/components/SignalPath";
 import type { Language } from "@/utils/i18n";
 import { isPowerSupply, type ReplacementFit } from "@/utils/boardFinder";
 import { ENCLOSURE_SIZING_BRANDS } from "@/utils/enclosureSizing";
@@ -26,7 +26,8 @@ import { ENCLOSURE_SIZING_BRANDS } from "@/utils/enclosureSizing";
 import { resolveCustomPedalLayout, getPedalHardwareGeometry, getPedalJackGeometry, parsePedalJackLocations } from "@/utils/customPedalLayout";
 
 const HELP_ENABLED = false;
-const SIGNAL_PATH_ENABLED = false;
+const SIGNAL_ROUTING_ENABLED =
+  process.env.NODE_ENV === "development";
 
 type AnyRow = Record<string, any>;
 
@@ -39,6 +40,9 @@ type Background = {
 
 type Props = {
   desktopToolbarHost?: HTMLDivElement | null;
+  desktopCatalogOpen?: boolean;
+  onDesktopRightPanelChange?: (open: boolean) => void;
+  mobileToolbarHost?: HTMLDivElement | null;
   viewer?: boolean;
 
   activeProject: {
@@ -59,10 +63,10 @@ type Props = {
   activeProjectId?: number | null;
   setActiveProjectId?: (id: number | null) => void;
   createNewProject?: () => void;
+  duplicateProject?: (id: number) => void;
 
   setMobileSidebarOpen: (v: boolean) => void;
   setSpecsOpen: (v: boolean) => void;
-  setSettingsOpen?: (v: boolean) => void;
   setLanguage?: (v: Language) => void;
   setUnits?: (v: "metric" | "imperial") => void;
 
@@ -70,6 +74,8 @@ type Props = {
   language: Language;
 
   mobileSidebarOpen?: boolean;
+  mobileCatalogOpen?: boolean;
+  onMobileItemInfo?: (item: AnyRow) => void;
   setMobileCanvasPanelOpen?: (v: boolean) => void;
 
   mobileCanvasPanelCloseRef?: React.MutableRefObject<
@@ -261,6 +267,9 @@ function CustomPedalTint({ color, width, height }: { color: string; width: numbe
 
 export default function BoardCanvas({
   desktopToolbarHost = null,
+  desktopCatalogOpen = false,
+  onDesktopRightPanelChange,
+  mobileToolbarHost = null,
   activeProject,
   units,
   language,
@@ -280,6 +289,8 @@ export default function BoardCanvas({
   showIntro,
   isMobile = false,
   mobileSidebarOpen = false,
+  mobileCatalogOpen = false,
+  onMobileItemInfo,
   setMobileCanvasPanelOpen,
   mobileCanvasPanelCloseRef,
   rotatePedal,
@@ -301,19 +312,20 @@ export default function BoardCanvas({
   activeProjectId,
   setActiveProjectId,
   createNewProject,
+  duplicateProject,
   deleteProject,
   startEditing,
   editingProjectId,
   tempName = "",
   setTempName,
   saveName,
-  setSettingsOpen,
   setLanguage,
   setUnits,
 }: Props) {
 
   const t = getTranslator(language);
-  const [desktopPanelHost, setDesktopPanelHost] = useState<HTMLDivElement | null>(null);
+  // Share the foreground layer with the toolbar so right panels stay above the catalog blur.
+  const desktopPanelHost = desktopToolbarHost;
   const [railExpanded, setRailExpanded] = useState(false);
   const [itemMenuExpanded, setItemMenuExpanded] = useState(false);
   const itemActionsId = useId();
@@ -321,7 +333,6 @@ export default function BoardCanvas({
   useEffect(() => {
     setItemMenuExpanded(false);
   }, [selectedInstanceId, selectedBoardInstanceId]);
-  const railWidth = 56;
   const railLabels: Record<Language, { expand: string; collapse: string }> = {
     fr: { expand: "Afficher les noms", collapse: "Masquer les noms" },
     en: { expand: "Show labels", collapse: "Hide labels" },
@@ -343,14 +354,10 @@ export default function BoardCanvas({
     });
   };
 
-  const [showSettings, setShowSettings] = useState(false);
-  const [settingsContactVisible, setSettingsContactVisible] = useState(false);
-  useEffect(() => { if (!showSettings) setSettingsContactVisible(false); }, [showSettings]);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [renderMobileMenu, setRenderMobileMenu] = useState(false);
   const [isLightTheme, setIsLightTheme] = useState(true);
   const boardIconSrc = isLightTheme ? "/images/tab-board-dark.webp" : "/images/tab-board-light.webp";
-  const settingsIconSrc = isLightTheme ? "/images/tab-settings-dark.webp" : "/images/tab-settings-light.webp";
   const [helpOpen, setHelpOpen] = useState(false);
 
   useEffect(() => {
@@ -388,22 +395,29 @@ export default function BoardCanvas({
     setShowCableMenu(false);
     setShowPower(false);
     setShowExportPanel(false);
-    setShowSettings(false);
     setShowList(false);
     setHelpOpen(false);
   };
-  const toggleUnifiedPanel = (panel: "boards" | "cables" | "power" | "settings" | "help" | "export") => {
+  useEffect(() => {
+    if (!desktopCatalogOpen) return;
+
+    setShowBoardsMenu(false);
+    setShowCableMenu(false);
+    setShowPower(false);
+    setShowExportPanel(false);
+    setShowList(false);
+    setHelpOpen(false);
+  }, [desktopCatalogOpen]);
+  const toggleUnifiedPanel = (panel: "boards" | "cables" | "power" | "help" | "export") => {
     const wasOpen = panel === "boards" ? showBoardsMenu
       : panel === "cables" ? showCableMenu
         : panel === "power" ? showPower
-          : panel === "settings" ? showSettings
-            : panel === "help" ? helpOpen : showExportPanel;
+          : panel === "help" ? helpOpen : showExportPanel;
     closeBottomPanels();
     if (wasOpen) return;
     if (panel === "boards") setShowBoardsMenu(true);
     else if (panel === "cables") setShowCableMenu(true);
     else if (panel === "power") setShowPower(true);
-    else if (panel === "settings") setShowSettings(true);
     else if (panel === "help") setHelpOpen(true);
     else setShowExportPanel(true);
   };
@@ -778,12 +792,13 @@ export default function BoardCanvas({
       setSelectedBoardInstanceId(null);
       closeSearchMenus();
       setContactOpen(false);
-      setShowPower(false);
-      setShowExportPanel(false);
-      setShowList(false);
-      setShowBoardsMenu(false);
-      setShowSettings(false);
-      setShowCableMenu(false);
+      if (isMobile) {
+        setShowPower(false);
+        setShowExportPanel(false);
+        setShowList(false);
+        setShowBoardsMenu(false);
+        setShowCableMenu(false);
+      }
     }
   };
 
@@ -823,6 +838,32 @@ export default function BoardCanvas({
   const pinchStartScale = useRef<number>(1);
   const [stageSize, setStageSize] = useState({ width: 0, height: 0 });
   const hasStage = stageSize.width > 0 && stageSize.height > 0;
+  const scaleRuler = useRef<HTMLDivElement>(null);
+  const showScaleRuler = hasStage && !viewer;
+
+  useLayoutEffect(() => {
+    const stage = stageRef.current;
+    const ruler = scaleRuler.current;
+    if (!showScaleRuler || !stage || !ruler) return;
+
+    const unit = units === "metric" ? "cm" : "in";
+    const mmPerUnit = units === "metric" ? 10 : 25.4;
+    const format = new Intl.NumberFormat(language, { maximumFractionDigits: 2 });
+    const update = () => {
+      const pixelsPerUnit = stage.scaleX() * mmPerUnit;
+      if (pixelsPerUnit <= 0) return;
+      const ideal = 85 / pixelsPerUnit;
+      const decade = 10 ** Math.floor(Math.log10(ideal));
+      const size = ([1, 2, 5, 10].find((step) => step * decade >= ideal) ?? 10) * decade;
+
+      ruler.style.width = `${size * pixelsPerUnit}px`;
+      ruler.textContent = `${format.format(size)} ${unit}`;
+    };
+
+    update();
+    stage.on("scaleXChange.scaleRuler", update);
+    return () => stage.off(".scaleRuler");
+  }, [showScaleRuler, units, language]);
   const showAlignmentGrid = !viewer && canvasBg === "neutral";
 
   useLayoutEffect(() => {
@@ -874,12 +915,112 @@ export default function BoardCanvas({
   const [showExportPanel, setShowExportPanel] = useState(false);
   const [showJacksMargin, setShowJacksMargin] = useState(false);
   const [showSignalChain, setShowSignalChain] = useState(false);
-  const [signalOrder, setSignalOrder] = useState<number[]>([]);
-  const [showSignalPath, setShowSignalPath] = useState(false);
+  const [showSignalCables, setShowSignalCables] = useState(false);
+  const signalOrderStorageKey =
+    activeProjectId != null
+      ? `make-your-board:signal-order:${activeProjectId}`
+      : null;
+
+  const [signalOrders, setSignalOrders] = useState<
+    Record<string, number[]>
+  >({});
+
+  const signalOrder = React.useMemo(
+    () =>
+      signalOrderStorageKey
+        ? signalOrders[signalOrderStorageKey] ?? []
+        : [],
+    [signalOrders, signalOrderStorageKey]
+  );
+
+  const [signalOrderLoadedKey, setSignalOrderLoadedKey] =
+    useState<string | null>(null);
+
+  useLayoutEffect(() => {
+    if (!signalOrderStorageKey || viewer) return;
+
+    let savedOrder: number[] = [];
+
+    try {
+      const saved = localStorage.getItem(signalOrderStorageKey);
+
+      if (saved) {
+        const parsed = JSON.parse(saved);
+
+        if (Array.isArray(parsed)) {
+          savedOrder = parsed.filter(
+            (id): id is number => typeof id === "number"
+          );
+        }
+      }
+    } catch {
+      // Ignore invalid localStorage data.
+    }
+
+    setSignalOrders((previous) => ({
+      ...previous,
+      [signalOrderStorageKey]: savedOrder,
+    }));
+
+    setSignalOrderLoadedKey(signalOrderStorageKey);
+  }, [signalOrderStorageKey, viewer]);
+
+  const setSignalOrder = React.useCallback(
+    (action: React.SetStateAction<number[]>) => {
+      if (
+        !signalOrderStorageKey ||
+        signalOrderLoadedKey !== signalOrderStorageKey ||
+        viewer
+      ) {
+        return;
+      }
+
+      setSignalOrders((previous) => {
+        const currentOrder =
+          previous[signalOrderStorageKey] ?? [];
+
+        const nextOrder =
+          typeof action === "function"
+            ? action(currentOrder)
+            : action;
+
+        return {
+          ...previous,
+          [signalOrderStorageKey]: nextOrder,
+        };
+      });
+    },
+    [signalOrderStorageKey, signalOrderLoadedKey, viewer]
+  );
+
+  useEffect(() => {
+    if (
+      !signalOrderStorageKey ||
+      signalOrderLoadedKey !== signalOrderStorageKey ||
+      viewer
+    ) {
+      return;
+    }
+
+    try {
+      localStorage.setItem(
+        signalOrderStorageKey,
+        JSON.stringify(signalOrder)
+      );
+    } catch {
+      // Ignore unavailable localStorage.
+    }
+  }, [
+    signalOrder,
+    signalOrderStorageKey,
+    signalOrderLoadedKey,
+    viewer,
+  ]);
+
   const [showCableMenu, setShowCableMenu] = useState(false);
   const [showBoardsMenu, setShowBoardsMenu] = useState(false);
   useEffect(() => {
-    if (!showBoardsMenu) return;
+    if (!isMobile || !showBoardsMenu) return;
 
     const handleClickOutsideBoards = (e: MouseEvent) => {
       const target = e.target as Node;
@@ -896,7 +1037,7 @@ export default function BoardCanvas({
     return () => {
       document.removeEventListener("mousedown", handleClickOutsideBoards);
     };
-  }, [showBoardsMenu, desktopToolbarHost]);
+  }, [isMobile, showBoardsMenu, desktopToolbarHost]);
 
 
 
@@ -913,75 +1054,12 @@ export default function BoardCanvas({
       showCableMenu ||
       showPower ||
       showExportPanel ||
-      showSettings ||
       (Boolean(desktopToolbarHost) && helpOpen)
     );
 
-  useEffect(() => {
-    if (!desktopRightPanelOpen) return;
-    const handleOutsidePanel = (event: PointerEvent) => {
-      const target = event.target;
-      if (!(target instanceof Node)) return;
-      if (rightSidebarRef.current?.contains(target)) return;
-      if (desktopPanelHost?.contains(target)) return;
-      setShowBoardsMenu(false);
-      setShowCableMenu(false);
-      setShowPower(false);
-      setShowExportPanel(false);
-      setShowSettings(false);
-      setShowList(false);
-      setHelpOpen(false);
-      setRailExpanded(false);
-      try { sessionStorage.setItem("myb-tool-rail-expanded", "false"); } catch { }
-    };
-    document.addEventListener("pointerdown", handleOutsidePanel, true);
-    return () => document.removeEventListener("pointerdown", handleOutsidePanel, true);
-  }, [desktopRightPanelOpen, desktopPanelHost]);
-
   useLayoutEffect(() => {
-    if (isMobile || !rightSidebarRef.current) return;
-
-    const sidebarOpen =
-      showBoardsMenu ||
-      showCableMenu ||
-      showPower ||
-      showExportPanel ||
-      showSettings ||
-      (Boolean(desktopToolbarHost) && helpOpen);
-
-    if (!sidebarOpen) return;
-
-    const sidebar = rightSidebarRef.current;
-
-    const animation = sidebar.animate(
-      [
-        {
-          transform: "translateX(100%)",
-        },
-        {
-          transform: "translateX(0)",
-        },
-      ],
-      {
-        duration: 550,
-        easing: "cubic-bezier(0.22, 1, 0.36, 1)",
-        fill: "both",
-      }
-    );
-
-    return () => {
-      animation.cancel();
-    };
-  }, [
-    isMobile,
-    showBoardsMenu,
-    showCableMenu,
-    showPower,
-    showExportPanel,
-    showSettings,
-    helpOpen,
-    desktopToolbarHost,
-  ]);
+    onDesktopRightPanelChange?.(desktopRightPanelOpen);
+  }, [desktopRightPanelOpen, onDesktopRightPanelChange]);
 
   const mobileCanvasPanelOpen =
     isMobile &&
@@ -990,7 +1068,6 @@ export default function BoardCanvas({
       showCableMenu ||
       showPower ||
       showExportPanel ||
-      showSettings ||
       helpOpen
     );
 
@@ -1017,15 +1094,11 @@ export default function BoardCanvas({
     mobileCanvasPanelCloseRef,
   ]);
   const mobileFullPanelClass = `
-  z-[100]
-  fixed
-  left-0
-  right-0
-  bottom-[env(safe-area-inset-bottom)]
-  top-[calc(64px+env(safe-area-inset-top))]
-  overflow-y-auto
-  overflow-x-hidden
-  bg-zinc-800
+  absolute inset-0 z-[100] w-full h-full min-h-0 box-border
+  bg-transparent border-0 rounded-none shadow-none
+  overflow-y-auto overflow-x-hidden overscroll-contain
+  pointer-events-auto touch-pan-y
+  [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden
 `;
   const desktopRightSidebarClass = `
   z-[100]
@@ -1035,7 +1108,7 @@ export default function BoardCanvas({
   bottom-0
   w-[272px]
   box-border
-  bg-zinc-800
+  bg-transparent
   overflow-y-auto
   overflow-x-hidden
   overscroll-contain
@@ -1045,7 +1118,6 @@ export default function BoardCanvas({
   [&::-webkit-scrollbar]:hidden
 `;
   const desktopRightSidebarStyle: React.CSSProperties = {
-    borderTop: "1px solid rgba(140, 140, 150, 0.3)",
     position: desktopToolbarHost ? "absolute" : "fixed",
     top: 0,
     bottom: 0,
@@ -1088,77 +1160,7 @@ export default function BoardCanvas({
 
   const [isDragging, setIsDragging] = useState(false);
   const [isStageDragging, setIsStageDragging] = useState(false);
-  const [localSignalPath, setLocalSignalPath] = useState<any[]>(
-    activeProject.signalPath || []
-  );
 
-  const [pendingSignalPoint, setPendingSignalPoint] =
-    useState<SignalPoint | null>(null);
-
-  useEffect(() => {
-    setLocalSignalPath(activeProject.signalPath || []);
-    setPendingSignalPoint(null);
-  }, [activeProjectId]);
-
-  const setSignalPath = (path: any[]) => {
-    setLocalSignalPath(path);
-
-    updateActiveProject({
-      signalPath: path,
-    });
-  };
-
-  useEffect(() => {
-    const existingPedalIds = new Set(
-      activeProject.boardPedals.map((p: AnyRow) => p.instanceId)
-    );
-
-    const cleanedSignalPath = localSignalPath.filter((c: any) => {
-      return existingPedalIds.has(c.from) && existingPedalIds.has(c.to);
-    });
-
-    if (cleanedSignalPath.length === localSignalPath.length) return;
-
-    setLocalSignalPath(cleanedSignalPath);
-    setPendingSignalPoint(null);
-
-    updateActiveProject({
-      signalPath: cleanedSignalPath,
-    } as any);
-  }, [activeProject.boardPedals, localSignalPath]);
-
-  const handleSignalPointClick = (point: SignalPoint) => {
-    if (pendingSignalPoint === null) {
-      setPendingSignalPoint(point);
-      return;
-    }
-
-    if (
-      pendingSignalPoint.id === point.id &&
-      pendingSignalPoint.kind === point.kind
-    ) {
-      setPendingSignalPoint(null);
-      return;
-    }
-
-    const newPath = [
-      ...localSignalPath,
-      {
-        id: `${pendingSignalPoint.id}-${point.id}-${Date.now()}`,
-        from: pendingSignalPoint.id,
-        to: point.id,
-        fromKind: pendingSignalPoint.kind,
-        toKind: point.kind,
-      },
-    ];
-
-    setSignalPath(newPath);
-    setPendingSignalPoint(null);
-  };
-
-  const removeSignalConnection = (id: string) => {
-    setSignalPath(localSignalPath.filter((c) => c.id !== id));
-  };
 
   /* ================= MEASURE STAGE ================= */
   useLayoutEffect(() => {
@@ -1420,14 +1422,19 @@ export default function BoardCanvas({
     ? item.instanceId === selectedBoardInstanceId
     : item.instanceId === selectedInstanceId);
   const isBoardTarget = menuTarget?.kind === "board";
-  const canReplace = Boolean(menuTarget && !isBoardTarget && !isPowerSupply(menuTarget) && replacePedal);
-  const canShowMobileInfo = isMobile && menuTarget && !isBoardTarget &&
-    !isPowerSupply(menuTarget) && menuTarget.brand !== "Custom" && menuTarget.slug !== "custom-upload";
+  const canShowMobileInfo = Boolean(
+    menuTarget &&
+    menuTarget.brand !== "Custom" &&
+    menuTarget.slug !== "custom" &&
+    menuTarget.slug !== "custom-upload"
+  );
   const actionHeight = stageSize.height - (isMobile ? 68 : 0);
   const quickWidth = Math.max(0, Math.min(isMobile ? 144 : 112, stageSize.width - 16));
   const quickHeight = isMobile ? 44 : 38;
   const menuWidth = Math.max(0, Math.min(isMobile ? 156 : 192, stageSize.width - 16));
-  const menuHeight = isMobile ? (canReplace ? 233 : 196) + (canShowMobileInfo ? 37 : 0) : (canReplace ? 179 : 151);
+  const menuHeight = isMobile
+    ? 196 + (canShowMobileInfo ? 37 : 0)
+    : 151 + (canShowMobileInfo ? 28 : 0);
   const menuGap = 6;
   const actionPositions = menuTarget && overlayPosition?.halfWidth !== undefined &&
     overlayPosition.bottom !== undefined && overlayPosition.bottom >= 0 &&
@@ -1490,7 +1497,7 @@ export default function BoardCanvas({
   const itemActions = itemId === undefined ? [] : [
     { key: "pedal.actions.rotate", Icon: RotateCw, hint: "R", shortcut: "R", run: () => (isBoardTarget ? rotateBoard : rotatePedal)(itemId) },
     ...(canShowMobileInfo ? [
-      { key: "pedal.actions.info", Icon: Info, run: () => openMobileItemInfo(), hint: "", shortcut: "" },
+      { key: "pedal.actions.info", Icon: Info, run: () => openMobileItemInfo(), hint: "I", shortcut: "I" },
     ] : []),
     { key: "replacement.duplicate", Icon: CopyPlus, hint: "D", shortcut: "D", run: () => duplicateCanvasItem(itemId, isBoardTarget ? "board" : "pedal") },
     {
@@ -1501,54 +1508,96 @@ export default function BoardCanvas({
       key: "replacement.back", Icon: ArrowDown, hint: "↓", shortcut: "ArrowDown",
       run: moveCanvasItemOneLayer && backLayer !== undefined ? () => moveCanvasItemOneLayer(itemId, backLayer) : undefined
     },
-    ...(canReplace && replacePedal ? [
-      {
-        key: "replacement.replace", Icon: Replace, hint: "⇧R", shortcut: "Shift+R",
-        run: () => replacePedal(itemId)
-      },
-    ] : []),
+
     {
       key: "pedal.actions.delete", Icon: Trash2, hint: "Del", shortcut: "Delete Backspace",
       run: () => (isBoardTarget ? deleteBoard : deletePedal)(itemId)
     },
   ];
   const showItemMenu = !viewer && !replacementPreview && menuTarget && actionPositions &&
+    !desktopCatalogOpen &&
     !isDragging && !isStageDragging && !isPinching &&
-    !(isMobile && (mobileSidebarOpen || mobileCanvasPanelOpen));
+    !(isMobile && (mobileSidebarOpen || mobileCatalogOpen || mobileCanvasPanelOpen));
+
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (viewer || replacementPreview || event.defaultPrevented || event.isComposing || event.repeat ||
-        !containerRef.current?.getClientRects().length || document.querySelector("dialog[open]")) return;
-      const target = event.target;
-      if (target instanceof HTMLElement &&
-        (target.closest("input, textarea, select") || target.isContentEditable)) return;
+      if (
+        viewer ||
+        replacementPreview ||
+        desktopCatalogOpen ||
+        mobileCatalogOpen ||
+        event.defaultPrevented ||
+        event.isComposing ||
+        event.repeat ||
+        !containerRef.current?.getClientRects().length
+      ) return;
 
-      const key = event.key;
-      const upperKey = key.toUpperCase();
+      const target = event.target;
+
+      if (
+        target instanceof HTMLElement &&
+        (target.closest("input, textarea, select") ||
+          target.isContentEditable)
+      ) return;
+
       if (showItemMenu) {
-        if (key === "Escape" && itemMenuExpanded) {
+        if (event.key === "Escape" && itemMenuExpanded) {
           event.preventDefault();
           setItemMenuExpanded(false);
           moreActionsButton.current?.focus();
           return;
         }
 
-        const shortcut = [
-          event.metaKey && "Meta", event.ctrlKey && "Control", event.altKey && "Alt",
-          event.shiftKey && "Shift", key.length === 1 ? upperKey : key,
-        ].filter(Boolean).join("+");
-        const action = itemActions.find(({ shortcut: keys }) => keys.split(" ").includes(shortcut));
-        if (action?.run) {
-          event.preventDefault();
-          action.run();
+        if (event.metaKey || event.ctrlKey || event.altKey) return;
+
+        let actionKey: string | null = null;
+
+        if (event.code === "KeyR") {
+          if (event.shiftKey) return;
+          actionKey = "pedal.actions.rotate";
+        } else if (!event.shiftKey) {
+          if (event.code === "KeyI") {
+            actionKey = "pedal.actions.info";
+          } else if (event.code === "KeyD") {
+            actionKey = "replacement.duplicate";
+          } else if (event.key === "ArrowUp") {
+            actionKey = "replacement.forward";
+          } else if (event.key === "ArrowDown") {
+            actionKey = "replacement.back";
+          } else if (
+            event.key === "Delete" ||
+            event.key === "Backspace"
+          ) {
+            actionKey = "pedal.actions.delete";
+          }
         }
+
+        if (!actionKey) return;
+
+        const action = itemActions.find(
+          (item) => item.key === actionKey
+        );
+
+        if (!action?.run) return;
+
+        event.preventDefault();
+        action.run();
         return;
       }
 
-      // Preserve Backspace for boards and power supplies when the menu is offscreen.
-      if (key === "Backspace" && !event.metaKey && !event.ctrlKey && !event.altKey && !event.shiftKey) {
-        if (selectedInstanceId !== null && menuTarget && isPowerSupply(menuTarget)) {
+      if (
+        event.key === "Backspace" &&
+        !event.metaKey &&
+        !event.ctrlKey &&
+        !event.altKey &&
+        !event.shiftKey
+      ) {
+        if (
+          selectedInstanceId !== null &&
+          menuTarget &&
+          isPowerSupply(menuTarget)
+        ) {
           event.preventDefault();
           deletePedal(selectedInstanceId);
         } else if (selectedBoardInstanceId !== null) {
@@ -1559,8 +1608,12 @@ export default function BoardCanvas({
     };
 
     window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
   });
+
 
 
   const toolRailButtons = (
@@ -1569,10 +1622,9 @@ export default function BoardCanvas({
       { id: "cables", label: t("cables.title"), Icon: Cable, open: showCableMenu },
       { id: "power", label: t("canvasControls.power"), Icon: Zap, open: showPower },
       { id: "export", label: t("export.button"), Icon: Upload, open: showExportPanel },
-      { id: "settings", label: t("settings.title"), Icon: null, open: showSettings },
     ] as const).map(({ id, label, Icon, open }) => (
       <React.Fragment key={id}>
-        <button type="button" className="myb-tool-rail-button"
+        <button type="button" data-tour={id} className="myb-tool-rail-button"
           aria-label={label} title={isMobile || railExpanded ? undefined : label} aria-expanded={open} data-active={open}
           ref={id === "boards" ? boardsButtonRef : undefined}
           onClick={() => toggleUnifiedPanel(id)}>
@@ -1580,7 +1632,7 @@ export default function BoardCanvas({
             <Icon size={24} strokeWidth={2} aria-hidden="true" />
           ) : (
             <Image
-              src={id === "boards" ? boardIconSrc : settingsIconSrc}
+              src={boardIconSrc}
               alt=""
               width={24}
               height={24}
@@ -1588,7 +1640,9 @@ export default function BoardCanvas({
               className="size-6 shrink-0 object-contain"
             />
           )}
-          {!isMobile && railExpanded && <span className="myb-tool-rail-label">{label}</span>}
+          {!isMobile && railExpanded && !desktopToolbarHost && (
+            <span className="myb-tool-rail-label">{label}</span>
+          )}
         </button>
       </React.Fragment>
     ))
@@ -1606,6 +1660,12 @@ export default function BoardCanvas({
   function openMobileItemInfo() {
     setItemMenuExpanded(false);
     setMobileCanvasPanelOpen?.(false);
+
+    if (menuTarget && onMobileItemInfo) {
+      onMobileItemInfo(menuTarget);
+      return;
+    }
+
     setMobileSidebarOpen(true);
   }
 
@@ -1619,9 +1679,22 @@ export default function BoardCanvas({
 
 
 
+  const cablePedals =
+    SIGNAL_ROUTING_ENABLED &&
+      showSignalCables &&
+      !replacementPreview
+      ? signalOrder.flatMap((id) => {
+        const pedal = activeProject.boardPedals.find((item) => item.instanceId === id);
+        if (!pedal || !displaySizes[id]) return [];
+        const dragPosition = draggingPedalId.current === id ? lastRenderedPos.current : null;
+        return [dragPosition ? { ...pedal, ...dragPosition } : pedal];
+      })
+      : [];
+
   return (
     <div
       ref={containerRef}
+      data-tour="canvas"
       className={`
   relative w-full h-full overflow-hidden
   ${isMobile ? "pb-6 touch-none" : desktopToolbarHost ? "" : "pb-20"}
@@ -1644,50 +1717,53 @@ export default function BoardCanvas({
 
 
 
-      {!viewer && !isMobile && desktopToolbarHost && (
-        <div ref={setDesktopPanelHost} className="absolute inset-0 z-[100] pointer-events-none" />
-      )}
 
-      {!viewer && !isMobile && desktopToolbarHost && !desktopRightPanelOpen && createPortal(
-        <nav
-          aria-label={t("canvasControls.boards")}
-          className="myb-tool-rail"
-          data-expanded={railExpanded}
-          style={{
-            position: "absolute", top: "50%", right: 12,
-            transform: "translateY(-50%)", width: railWidth,
-            pointerEvents: "auto", zIndex: 120,
-            background: "var(--zinc-900)",
-            color: "var(--foreground, #ededed)",
-            border: "1px solid var(--zinc-700, #3f3f46)",
-            borderRadius: 14, padding: 5, boxSizing: "border-box",
-            maxHeight: "calc(100% - 24px)", overflowY: "auto",
-            boxShadow: "0 6px 22px rgba(0,0,0,0.14)",
-          }}
-          onClick={(event) => event.stopPropagation()}
-          onMouseDown={(event) => event.stopPropagation()}
-          onWheel={(event) => event.stopPropagation()}
-        >
-          <style>{`
+      {!viewer && !isMobile && !desktopCatalogOpen && desktopToolbarHost && createPortal(<nav
+        aria-label={t("canvasControls.boards")}
+        className="myb-tool-rail"
+        data-tour="toolbar"
+        data-expanded={railExpanded}
+        style={{
+          position: "absolute",
+          top: "auto",
+          right: "auto",
+          bottom: 16,
+          left: "50%",
+          transform: "translateX(-50%)",
+          width: "max-content",
+          height: 56,
+          minHeight: 56,
+          maxHeight: 56,
+          overflow: "hidden",
+          maxWidth: "calc(100% - 32px)",
+          pointerEvents: "auto",
+          zIndex: 120,
+          background: "var(--zinc-950)",
+          color: "var(--foreground)",
+          border: "1px solid var(--zinc-700)",
+          borderRadius: 14,
+          padding: 5,
+          boxSizing: "border-box",
+          boxShadow: "0 6px 22px rgba(0,0,0,0.14)",
+        }}
+        onClick={(event) => event.stopPropagation()}
+        onMouseDown={(event) => event.stopPropagation()}
+        onWheel={(event) => event.stopPropagation()}
+      >
+        <style>{`
 .myb-tool-rail {
-  position: absolute;
-  top: 50%;
-  right: 12px;
-  transform: translateY(-50%);
   pointer-events: auto;
   box-sizing: border-box;
   padding: 5px;
   border: 1px solid var(--zinc-700);
   border-radius: 14px;
-  background: var(--zinc-900);
+  background: var(--zinc-950);
   color: var(--foreground);
   box-shadow: 0 6px 22px rgb(0 0 0 / 14%);
-  max-height: calc(100% - 24px);
-  overflow-y: auto;
   scrollbar-width: none;
 }
 .myb-tool-rail::-webkit-scrollbar { display: none; }
-.myb-tool-rail-actions { display: flex; flex-direction: column; gap: 4px; }
+.myb-tool-rail-actions { display: flex; flex-direction: row; gap: 4px; }
 .myb-tool-rail-button, .myb-tool-rail-toggle {
   display: flex;
   align-items: center;
@@ -1702,7 +1778,13 @@ export default function BoardCanvas({
   cursor: pointer;
   transition: background-color 140ms, border-color 140ms;
 }
-.myb-tool-rail-button { gap: 12px; padding: 0 9px; text-align: left; }
+.myb-tool-rail-button {
+  justify-content: center;
+  width: 52px;
+  gap: 0;
+  padding: 0;
+  text-align: center;
+}
 .myb-tool-rail-button svg, .myb-tool-rail-toggle svg { flex-shrink: 0; }
 .myb-tool-rail-header { display: flex; align-items: center; justify-content: space-between; height: 32px; margin-bottom: 5px; }
 .myb-tool-rail-title { padding-left: 10px; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--zinc-400); }
@@ -1723,21 +1805,26 @@ html.light .myb-tool-rail-toggle:hover {
 
 html.light .myb-tool-rail-button[data-active="true"] { background: var(--zinc-700); border-color: var(--zinc-500); }
 `}</style>
-          <div id="myb-tool-rail-actions" className="myb-tool-rail-actions">
-            {toolRailButtons}
-          </div>
-        </nav>, desktopToolbarHost
+        <div id="myb-tool-rail-actions" className="myb-tool-rail-actions">
+          {toolRailButtons}
+        </div>
+      </nav>, desktopToolbarHost
       )}
 
-      {!viewer && isMobile && !mobileSidebarOpen && !mobileCanvasPanelOpen && (
-        <nav
-          className={`myb-tool-rail ${pedalActions.mobileRail}`}
-          style={{ background: "var(--zinc-900)" }}
-          aria-label={t("canvasControls.tools")}
-          onClick={(event) => event.stopPropagation()}
-        >
-          <div className="myb-tool-rail-actions">{toolRailButtons}</div>
-        </nav>
+      {!viewer && isMobile && !mobileCatalogOpen && !mobileSidebarOpen && !mobileCanvasPanelOpen && (
+        <CanvasPanelsPortal host={mobileToolbarHost}>
+          <nav
+            className={`myb-tool-rail ${pedalActions.mobileRail}`}
+            data-tour="toolbar"
+            style={{ background: "var(--zinc-950)", pointerEvents: "auto", maxWidth: 240 }}
+            aria-label={t("canvasControls.tools")}
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="myb-tool-rail-actions" style={{ gridTemplateColumns: "repeat(4, minmax(0, 1fr))" }}>
+              {toolRailButtons}
+            </div>
+          </nav>
+        </CanvasPanelsPortal>
       )}
 
       {/* --- MODE VIEWER (CENTER BOTTOM) --- */}
@@ -1776,8 +1863,7 @@ html.light .myb-tool-rail-button[data-active="true"] { background: var(--zinc-70
               setShowBoardsMenu(false);
               setShowPower(false);
               setShowExportPanel(false);
-              setShowSettings(false);
-              setShowSignalPath(false);
+
             }} className="relative flex items-center justify-center gap-2 h-9 w-24 md:h-10 md:w-28 bg-zinc-900 border border-zinc-800 rounded-2xl text-[11px] font-mono font-bold uppercase transition-all hover:border-blue-500">
               <List size={16} className="text-blue-400" /> {t("canvasControls.setup")}
             </button>
@@ -1846,7 +1932,7 @@ html.light .myb-tool-rail-button[data-active="true"] { background: var(--zinc-70
       )}
 
       {/* --- MODE EDITION (BAS GAUCHE & DROITE) --- */}
-      {!viewer && !(isMobile && mobileSidebarOpen) && (
+      {!viewer && !(isMobile && (mobileSidebarOpen || mobileCatalogOpen)) && (
         <>
           <div
             className={!isMobile && desktopToolbarHost ? "contents" : "fixed bottom-6 left-0 right-0 lg:left-76 flex items-center justify-center gap-3 z-50 px-4"}
@@ -2352,97 +2438,7 @@ ${isMobile
 
 
 
-                      {/* PARAMÈTRES */}
-                      <div
-                        className={`
-  relative
-  h-9
-  shrink-0
-  flex
-  items-center
-  px-4
-  ${isMobile ? "w-full" : "w-auto"}
-`}
-                        style={{
-                          opacity: showMobileMenu ? 1 : 0,
-                          transform: showMobileMenu
-                            ? "translateX(0)"
-                            : isMobile
-                              ? "translateX(16px)"
-                              : "translateX(-24px)",
-                          transition: "opacity 180ms ease-out, transform 180ms ease-out",
-                          transitionDelay: isMobile
-                            ? showMobileMenu ? "0ms" : "200ms"
-                            : showMobileMenu ? "200ms" : "0ms",
-                          pointerEvents: showMobileMenu ? "auto" : "none",
-                        }}
-                        onMouseEnter={(e) => {
-                          const button = e.currentTarget.querySelector("button");
 
-                          if (button) {
-                            button.style.width = "calc(100% + 4px)";
-                            button.style.height = "36px";
-                          }
-                        }}
-                        onMouseLeave={(e) => {
-                          const button = e.currentTarget.querySelector("button");
-
-                          if (button) {
-                            button.style.width = "100%";
-                            button.style.height = "32px";
-                          }
-                        }}
-                      >
-                        <button
-                          type="button"
-                          onClick={() => {
-                            closeBottomPanels();
-                            setShowSettings(true);
-                          }}
-                          style={{
-                            position: "absolute",
-                            left: "50%",
-                            top: "50%",
-                            width: "100%",
-                            height: "32px",
-                            transform: "translate(-50%, -50%)",
-                            transition: "width 140ms ease-out, height 140ms ease-out",
-                          }}
-                          className="
-      bg-zinc-900
-      border border-zinc-800
-      rounded-2xl
-      p-0
-      cursor-pointer
-    "
-                        />
-
-                        <div
-                          className="
-      relative
-      z-10
-      flex
-      items-center
-      justify-center
-      gap-2
-      whitespace-nowrap
-      pointer-events-none
-      text-[10px]
-      font-bold
-      uppercase
-    "
-                        >
-                          <img
-                            src={settingsIconSrc}
-                            alt=""
-                            aria-hidden="true"
-                            draggable={false}
-                            className="w-[18px] h-[18px] object-contain shrink-0"
-                          />
-
-                          {t("settings.title")}
-                        </div>
-                      </div>
                     </div>
                   )}
 
@@ -2464,8 +2460,7 @@ ${isMobile
                   setShowPower(false);
                   setShowExportPanel(false);
                   setShowList(false);
-                  setShowSettings(false);
-                  setShowSignalPath(false);
+
                   setShowCableMenu(false);
                 }}
                 className={`
@@ -2489,7 +2484,7 @@ ${isMobile
 
               {showBoardsMenu && (
                 <>
-                  <CanvasPanelsPortal host={!isMobile && desktopToolbarHost ? desktopPanelHost : null}>
+                  <CanvasPanelsPortal host={isMobile ? mobileToolbarHost : desktopToolbarHost ? desktopPanelHost : null}>
                     <div
                       ref={(node) => {
                         boardsMenuRef.current = node;
@@ -2507,10 +2502,12 @@ ${isMobile
                       }
                     >
                       <PedalboardsPanel
+                        onClose={closeBottomPanels}
                         projects={projects}
                         activeProjectId={activeProjectId}
                         setActiveProjectId={setActiveProjectId}
                         createNewProject={createNewProject}
+                        duplicateProject={duplicateProject}
                         deleteProject={deleteProject}
                         startEditing={startEditing}
                         editingProjectId={editingProjectId}
@@ -2530,7 +2527,7 @@ ${isMobile
 
             {/* CABLES */}
             <CablesPanel
-              desktopPanelHost={desktopToolbarHost && !isMobile ? desktopPanelHost : null}
+              desktopPanelHost={isMobile ? mobileToolbarHost : desktopToolbarHost ? desktopPanelHost : null}
               t={t}
               isMobile={isMobile}
               isLightTheme={isLightTheme}
@@ -2541,10 +2538,10 @@ ${isMobile
                 setShowPower(false);
                 setShowExportPanel(false);
                 setShowList(false);
-                setShowSettings(false);
               }}
-              showSignalPath={SIGNAL_PATH_ENABLED && showSignalPath}
-              setShowSignalPath={setShowSignalPath}
+              signalRoutingEnabled={SIGNAL_ROUTING_ENABLED}
+              showSignalCables={showSignalCables}
+              setShowSignalCables={setShowSignalCables}
               showJacksMargin={showJacksMargin}
               setShowJacksMargin={setShowJacksMargin}
               showSignalChain={showSignalChain}
@@ -2573,7 +2570,6 @@ ${isMobile
                   setShowExportPanel(false);
                   setShowList(false);
                   setShowCableMenu(false);
-                  setShowSettings(false);
                 }}
                 className={`
   hidden
@@ -2599,7 +2595,7 @@ ${isMobile
                 <>
                   <div className="fixed inset-0 z-40 pointer-events-none" />
 
-                  <CanvasPanelsPortal host={!isMobile && desktopToolbarHost ? desktopPanelHost : null}>
+                  <CanvasPanelsPortal host={isMobile ? mobileToolbarHost : desktopToolbarHost ? desktopPanelHost : null}>
                     <div
                       ref={rightSidebarRef}
                       className={
@@ -2621,6 +2617,7 @@ ${isMobile
                       }}
                     >
                       <PowerSetup
+                        onClose={closeBottomPanels}
                         t={t}
                         isLightTheme={isLightTheme}
                         isMobile={isMobile}
@@ -2671,8 +2668,7 @@ ${isMobile
                       setShowBoardsMenu(false);
                       setShowPower(false);
                       setShowList(false);
-                      setShowSettings(false);
-                      setShowSignalPath(false);
+
                       setShowCableMenu(false);
                     }
 
@@ -2698,7 +2694,7 @@ ${isMobile
               {showExportPanel && (
                 <>
                   <div className="fixed inset-0 z-40 pointer-events-none" />
-                  <CanvasPanelsPortal host={!isMobile && desktopToolbarHost ? desktopPanelHost : null}>
+                  <CanvasPanelsPortal host={isMobile ? mobileToolbarHost : desktopToolbarHost ? desktopPanelHost : null}>
                     <div
                       ref={rightSidebarRef}
                       className={
@@ -2726,7 +2722,7 @@ ${isMobile
                         stageX={activeProject.stageX}
                         stageY={activeProject.stageY}
 
-                        onClose={() => setShowExportPanel(false)}
+                        onClose={closeBottomPanels}
                       />
                     </div>
                   </CanvasPanelsPortal>
@@ -2736,86 +2732,7 @@ ${isMobile
 
 
 
-            {/* SETTINGS */}
-            <div className="relative">
 
-              <button
-                type="button"
-                onClick={() => {
-                  setShowSettings((v) => !v);
-                  setShowBoardsMenu(false);
-                  setShowPower(false);
-                  setShowExportPanel(false);
-                  setShowList(false);
-                  setShowCableMenu(false);
-                }}
-                className={`
-  hidden
-  items-center justify-center gap-2
-  ${isMobile ? "h-8 w-20 text-[9px]" : "h-10 w-28 text-[11px]"}
-  bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl
-  font-mono font-bold uppercase
-  transition-all duration-200
-  hover:scale-105 hover:border-blue-500 active:scale-95
-  cursor-pointer
-`}
-              >
-                <Settings size={16} />
-                {t("settings.title")}
-              </button>
-
-              {showSettings && (
-                <>
-                  <div className="fixed inset-0 z-40 pointer-events-none" />
-
-                  <CanvasPanelsPortal host={!isMobile && desktopToolbarHost ? desktopPanelHost : null}>
-                    <div
-                      ref={rightSidebarRef}
-                      className={
-                        isMobile
-                          ? mobileFullPanelClass
-                          : desktopRightSidebarClass
-                      }
-                      style={
-                        isMobile
-                          ? undefined
-                          : desktopRightSidebarStyle
-                      }
-                    >
-                      <div
-                        className={
-                          isMobile
-                            ? "w-full min-h-full bg-zinc-800 border-0 rounded-none p-6"
-                            : "w-full bg-transparent border-0 rounded-none p-0"
-                        }
-                      >
-                        {!settingsContactVisible && (
-                          <div className="flex items-center gap-2 text-xs uppercase tracking-wider font-bold" style={{ marginBottom: 32, minHeight: 24 }}>
-                            <Image src={settingsIconSrc} alt="" width={18} height={18}
-                              draggable={false} className="size-[18px] shrink-0 object-contain" />
-                            {t("settings.title")}
-                          </div>
-                        )}
-
-                        <SettingsPanel
-                          t={t}
-                          canvasBg={canvasBg}
-                          setCanvasBg={setCanvasBg}
-                          language={language}
-                          setLanguage={setLanguage ?? (() => { })}
-                          units={units}
-                          setUnits={setUnits ?? (() => { })}
-                          backgrounds={BACKGROUNDS}
-                          setContactOpen={setContactOpen}
-                          onContactViewChange={setSettingsContactVisible}
-                          supportUrl="https://buy.stripe.com/14A8wPeGZ8uQ0tQ96I8Zq00"
-                        />
-                      </div>
-                    </div>
-                  </CanvasPanelsPortal>
-                </>
-              )}
-            </div>
           </div>
         </>
       )
@@ -2851,8 +2768,8 @@ ${isMobile
           onMouseDown={() => {
             if (viewer) return;
 
-            // ferme Export dès qu'on clique sur le canvas
-            if (showExportPanel) {
+            // Preserve the desktop right panel when the canvas is clicked.
+            if (isMobile && showExportPanel) {
               setShowExportPanel(false);
             }
           }}
@@ -3466,21 +3383,12 @@ ${isMobile
 
 
 
-          {SIGNAL_PATH_ENABLED && showSignalPath && (
-            <Layer listening={true}>
-              <SignalPath
-                mode="cables"
-                pedals={activeProject.boardPedals}
-                displaySizes={displaySizes}
-                signalPath={localSignalPath}
-                enabled={showSignalPath}
-                pendingPoint={pendingSignalPoint}
-                onPointClick={handleSignalPointClick}
-                onRemoveConnection={removeSignalConnection}
-                isDragging={isDragging || isStageDragging}
-              />
+          {cablePedals.length > 1 && (
+            <Layer listening={false}>
+              <AutomaticSignalCables pedals={cablePedals} displaySizes={displaySizes} />
             </Layer>
           )}
+
 
           <Layer listening={true}>
             {/* 1. HITBOX BOARDS EN PREMIER */}
@@ -3649,24 +3557,25 @@ ${isMobile
               })}
           </Layer>
 
-          {SIGNAL_PATH_ENABLED && showSignalPath && (
-            <Layer listening={true}>
-              <SignalPath
-                mode="points"
-                pedals={activeProject.boardPedals}
-                displaySizes={displaySizes}
-                signalPath={localSignalPath}
-                enabled={showSignalPath}
-                pendingPoint={pendingSignalPoint}
-                onPointClick={handleSignalPointClick}
-                onRemoveConnection={removeSignalConnection}
-                isDragging={isDragging || isStageDragging}
-              />
-            </Layer>
-          )}
+
 
         </Stage>
       )}
+
+      {showScaleRuler && (
+        <div
+          ref={scaleRuler}
+          className={pedalActions.scaleRuler}
+          style={{
+            position: "absolute",
+            left: "auto",
+            right: 16,
+            bottom: 16,
+          }}
+        />
+      )}
+
+
 
       {/* ================= INFO / HELP ================= */}
 

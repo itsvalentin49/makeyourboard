@@ -118,5 +118,14 @@ export const ENCLOSURE_SIZING_BRANDS = new Set([
     "SolidGoldFX",
     "DigiTech",
     "Silktone",
-    "VFE Pedals"
+    "VFE Pedals",
+    "Masatone",
+    "David Ross",
+    "Westminster Effects",
+    "Lusithand Devices",
+    "Rainger FX",
+    "Gigahearts",
+    "Poly Effects",
+    "Tone King",
+    "Mesatone"
 ]);

@@ -2,7 +2,8 @@
 import { physicalPedals } from "@/utils/boardFinder";
 import { ENCLOSURE_SIZING_BRANDS } from "@/utils/enclosureSizing";
 import { useEffect, useRef, useState, } from "react";
-import { Check, Copy, Download, Share2, Upload, } from "lucide-react";
+import { Check, Copy, Download, Link, Upload, X, ChevronDown } from "lucide-react";
+import pedalActions from "./PedalActions.module.css";
 import { getCustomImageUrl } from "@/utils/customImageStore";
 import { supabase } from "@/lib/supabase";
 import { getTranslator } from "@/utils/i18n";
@@ -1863,7 +1864,7 @@ function detectEnclosure(image: HTMLImageElement, detectHorizontal: boolean, det
     return null;
   }
 }
-export default function ExportPanel({ isLightTheme, isMobile = false, boardPedals, selectedBoards = [], displaySizes, boardName, canvasBg, signalPath = [], zoom = 200, stageX, stageY, currentBackground, }: Props) {
+export default function ExportPanel({ isLightTheme, isMobile = false, boardPedals, selectedBoards = [], displaySizes, boardName, canvasBg, signalPath = [], zoom = 200, stageX, stageY, currentBackground, onClose, }: Props) {
   const language = typeof window !== "undefined"
     ? JSON.parse(localStorage.getItem("myb_settings") || "{}")?.language || "en"
     : "en";
@@ -2442,204 +2443,111 @@ export default function ExportPanel({ isLightTheme, isMobile = false, boardPedal
   /* =========================================================
      UI
      ========================================================= */
-  return (<div ref={containerRef} className={isMobile
-    ? "w-full min-h-full bg-zinc-800 border-0 rounded-none shadow-none p-6 flex flex-col gap-6"
-    : "w-full bg-transparent border-0 rounded-none shadow-none p-0 flex flex-col gap-6"}>
-    {/* TITLE */}
+  const formats = [
+    { value: "current", key: "export.canvas" },
+    { value: "transparent", key: "export.transparent" },
+    { value: "white", key: "export.white" },
+  ] as const;
+  const fieldClass = `min-w-0 w-full rounded-lg px-3 py-2 text-inherit text-[12px] font-normal ${isLightTheme
+      ? "bg-zinc-200"
+      : "bg-zinc-700"
+    }`;
+  const actionClass = "flex min-w-0 items-center justify-center gap-2 rounded-lg border-0 bg-blue-600 px-2 py-2.5 text-[12px] font-medium text-white transition-colors hover:bg-blue-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-500 disabled:cursor-not-allowed disabled:opacity-40";
 
-    <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider">
-      <Upload size={18} strokeWidth={2} aria-hidden="true" className="shrink-0" />
-
-      {t("export.title")}
-    </div>
-
-    {/* NAME */}
-
-    <div className="flex flex-col gap-2">
-      <label className="text-[10px] uppercase tracking-wider font-bold">
-        {t("export.name")}
-      </label>
-
-      <input type="text" value={name} onChange={(e) => setName(e.target.value)} maxLength={120} className="
-            h-9
-            px-3
-            rounded-md
-            bg-zinc-950
-            border
-            border-zinc-700
-            text-[12px]
-            font-mono
-            outline-none
-            focus:border-blue-500
-          "/>
-    </div>
-
-    {/* PREVIEW */}
-
-    <div className="flex flex-col gap-2 -mt-2">
-      <label className="text-[10px] uppercase tracking-wider font-bold">
-        {t("export.preview")}
-      </label>
-
-      <div className="w-full overflow-hidden flex justify-center">
-        <canvas
-          ref={previewRef}
-          onContextMenu={(event) => { if (singlePedal) event.preventDefault(); }}
-          className={isMobile
-          ? "block w-full h-auto rounded-md"
-          : "block max-w-full max-h-40 rounded-md"} />
-      </div>
-    </div>
-
-    {/* DOWNLOAD */}
-
-    <div className="flex flex-col gap-3">
-      <label className="text-[10px] uppercase tracking-wider font-bold">
-        {t("export.downloadTitle")}
-      </label>
-
-      <div className="flex flex-col gap-1 text-xs">
-        <label className="flex items-center gap-2 cursor-pointer">
-          <input type="radio" checked={background ===
-            "current"} onChange={() => setBackground("current")} />
-
-          {t("export.canvas")}
-        </label>
-
-        <label className="flex items-center gap-2 cursor-pointer">
-          <input type="radio" checked={background ===
-            "transparent"} onChange={() => setBackground("transparent")} />
-
-          {t("export.transparent")}
-        </label>
-
-        <label className="flex items-center gap-2 cursor-pointer">
-          <input type="radio" checked={background ===
-            "white"} onChange={() => setBackground("white")} />
-
-          {t("export.white")}
-        </label>
+  return (
+    <div ref={containerRef} className={isMobile
+      ? "flex min-h-full w-full min-w-0 flex-col gap-3 rounded-none border-0 bg-transparent p-6 shadow-none"
+      : "flex w-full min-w-0 flex-col gap-3 rounded-none border-0 bg-transparent p-0 shadow-none"}>
+      <div className="relative flex items-center gap-2 text-[18px] font-bold uppercase tracking-wider">
+        <Upload size={20} strokeWidth={2} aria-hidden="true" className="shrink-0" />
+        {t("export.title")}
+        {isMobile && (
+          <button type="button" aria-label={t("gear.closeDetails")} onClick={(e) => { e.stopPropagation(); onClose(); }} className={pedalActions.mobilePanelClose}>
+            <X size={20} strokeWidth={2} aria-hidden="true" />
+          </button>
+        )}
       </div>
 
-      <button type="button" onClick={exportImage} disabled={singlePedal || downloadLoading} aria-describedby={singlePedal ? "export-single-pedal" : undefined} className="
-            w-full
-            h-[35px]
-            px-3
-            rounded-lg
-            border-0
-            bg-blue-600
-            !text-white
-            text-[10px]
-            font-black
-            uppercase
-            flex
-            items-center
-            justify-center
-            gap-2
-            transition-colors
-            hover:bg-blue-500
-            disabled:opacity-50
-            disabled:cursor-not-allowed
-          ">
-        {downloadLoading ? (<div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />) : (<>
-          <Download size={15} />
+      {/* FULL-WIDTH PREVIEW */}
+      <div className="flex w-full min-w-0 flex-col gap-3 rounded-xl bg-zinc-950 p-4">
 
-          {t("export.download")}
-        </>)}
-      </button>
-      {singlePedal && (
-        <p id="export-single-pedal" className="text-[11px] leading-relaxed text-zinc-400">
-          {t("export.singlePedal")}
-        </p>
-      )}
-    </div>
+        <h3 className="m-0 text-[14px] font-semibold">
+          {t("export.preview")}
+        </h3>
 
-    {/* SHARE */}
+        <div className="flex w-full min-w-0 items-center justify-center overflow-hidden rounded-lg">
+          <canvas
+            ref={previewRef}
+            onContextMenu={(event) => { if (singlePedal) event.preventDefault(); }}
+            className="block h-auto max-w-full rounded-lg object-contain"
+            style={{ width: "100%", height: "auto" }}
+          />
+        </div>
 
-    <div className="flex flex-col gap-3">
-      <div className="flex flex-col gap-2">
-        <label className="text-[10px] uppercase tracking-wider font-bold">
-          {t("export.shareTitle")}
-        </label>
-
-        <p className="text-[11px] leading-relaxed text-zinc-400 m-0">
-          {t("export.shareDescription")}
-        </p>
       </div>
 
-      {!shareUrl ? (<>
-        <button type="button" onClick={createShareLink} disabled={shareLoading} className="
-                w-full
-                h-[35px]
-                px-3
-                rounded-lg
-                border-0
-                bg-blue-600
-                !text-white
-                text-[10px]
-                font-black
-                uppercase
-                flex
-                items-center
-                justify-center
-                gap-2
-                transition-colors
-                hover:bg-blue-500
-                disabled:opacity-50
-                disabled:cursor-not-allowed
-              ">
-          {shareLoading ? (<div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />) : (<>
-            <Share2 size={15} />
+      <style jsx>{`
+  #export-board-name,
+  #export-background {
+    border: 1px solid transparent !important;
+    outline: none !important;
+    box-shadow: none !important;
+    transition: border-color 150ms ease;
+  }
 
-            {t("export.createLink")}
-          </>)}
-        </button>
-      </>) : (<>
-        {/* SHARE LINK */}
+  #export-board-name:hover,
+  #export-background:hover {
+    border-color: var(--zinc-400) !important;
+  }
 
-        <div className="flex flex-col gap-2">
-          <div className="flex gap-2">
-            <div className="
-                    min-w-0
-                    flex-1
-                    h-9
-                    px-3
-                    rounded-md
-                    bg-zinc-950
-                    border
-                    border-zinc-700
-                    flex
-                    items-center
-                    text-[11px]
-                    font-mono
-                    overflow-hidden
-                  ">
-              <span className="truncate">
-                {shareUrl}
-              </span>
-            </div>
+  #export-board-name:focus-visible,
+  #export-background:focus-visible {
+    border-color: var(--zinc-400) !important;
+  }
+`}</style>
 
-            <button type="button" onClick={copyShareLink} className="
-                    w-9
-                    h-9
-                    rounded-md
-                    bg-zinc-950
-                    border
-                    border-zinc-700
-                    flex
-                    items-center
-                    justify-center
-                    hover:border-blue-500
-                  ">
-              {copied ? (<Check size={15} className="text-green-500" />) : (<Copy size={15} />)}
-            </button>
+      {/* EXPORT IMAGE */}
+      <div className="flex min-w-0 flex-col gap-3 rounded-xl bg-zinc-950 p-4" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        <h3 className="m-0 text-[14px] font-semibold">{t("export.downloadTitle")}</h3>
+        <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1.65fr)", alignItems: "center", gap: 10 }}>
+          <label htmlFor="export-board-name" className="text-[12px] text-zinc-400">{t("customPanel.nameOptional")}</label>
+          <input id="export-board-name" type="text" value={name} onChange={(e) => setName(e.target.value)} maxLength={120} className={fieldClass} style={{ height: 36, width: "100%", boxSizing: "border-box", minWidth: 0, borderRadius: 8 }} />
+          <label htmlFor="export-background" className="text-[12px] text-zinc-400">{t("settings.background")}</label>
+          <div style={{ position: "relative", minWidth: 0 }}>
+            <select id="export-background" value={background} onChange={(e) => { const value = e.target.value; if (value === "current" || value === "transparent" || value === "white") setBackground(value); }} className={fieldClass} style={{ appearance: "none", WebkitAppearance: "none", height: 36, width: "100%", boxSizing: "border-box", minWidth: 0, borderRadius: 8, paddingRight: 26, cursor: "pointer" }}>
+              {formats.map(({ value, key }) => <option key={value} value={value}>{`${t(key).replace(/\s*\((?:PNG|JPE?G)\)\s*$/i, "")} (${value === "white" ? "JPG" : "PNG"})`}</option>)}
+            </select>
+            <ChevronDown size={14} aria-hidden="true" className="text-zinc-400" style={{ position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }} />
           </div>
         </div>
-
-        <div className="text-[11px] leading-relaxed text-zinc-400">
-          {t("export.ready")}
+        <div style={{ display: "flex", justifyContent: "flex-end" }}>
+          <button type="button" onClick={exportImage} disabled={singlePedal || downloadLoading} aria-describedby={singlePedal ? "export-single-pedal" : undefined} aria-busy={downloadLoading} className={actionClass} style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: 36, padding: "0 12px", borderRadius: 8, gap: 8 }}>
+            {downloadLoading ? <span className="h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-current border-t-transparent" /> : <Download size={14} className="shrink-0" aria-hidden="true" />}
+            <span>{t("export.download")}</span>
+          </button>
         </div>
-      </>)}
+        {singlePedal && <p id="export-single-pedal" className="m-0 text-[11px] leading-relaxed text-zinc-400">{t("export.singlePedal")}</p>}
+      </div>
+
+      {/* SHARE PROJECT */}
+      <div className="flex min-w-0 flex-col gap-3 rounded-xl bg-zinc-950 p-4" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        <h3 className="m-0 text-[14px] font-semibold">{t("export.shareTitle")}</h3>
+        <p className="m-0 text-[12px] leading-relaxed text-zinc-400" style={{ marginTop: -8 }}>{t("export.shareDescription")}</p>
+        {shareUrl && (
+          <div style={{ display: "flex", minWidth: 0, alignItems: "center", gap: 8 }}>
+            <input type="url" readOnly value={shareUrl} aria-label={t("export.shareTitle")} onFocus={(e) => e.target.select()} className="rounded-lg border-0 bg-zinc-800 px-2 text-[11px] outline-none" style={{ flex: 1, minWidth: 0, height: 36 }} />
+            <button type="button" onClick={copyShareLink} aria-label={t("export.copy")} className="rounded-lg border-0 bg-zinc-800 hover:bg-zinc-700" style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 36, height: 36, flexShrink: 0 }}>
+              {copied ? <Check size={15} className="text-green-500" /> : <Copy size={15} />}
+            </button>
+          </div>
+        )}
+        {!shareUrl && <div style={{ display: "flex", justifyContent: "flex-end" }}>
+          <button type="button" onClick={createShareLink} disabled={shareLoading} aria-busy={shareLoading} className={actionClass} style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: 36, padding: "0 12px", borderRadius: 8, gap: 8 }}>
+            {shareLoading ? <span className="h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-current border-t-transparent" /> : <Link size={14} className="shrink-0" aria-hidden="true" />}
+            <span>{t("export.createLink")}</span>
+          </button>
+        </div>}
+      </div>
     </div>
-  </div>);
+  );
 }

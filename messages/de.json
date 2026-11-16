@@ -12,11 +12,19 @@
     "cancel": "Abbrechen",
     "confirm": "Ersetzen bestätigen"
   },
-  "gearTu3": {
-    "officialDemo": "Offizielle Demo",
-    "artists": "Künstler, die das TU-3 nutzen"
-  },
   "gear": {
+    "label": "Equipment",
+    "allGear": "Gesamtes Equipment",
+    "moreAll": "Mehr anzeigen…",
+    "subtitleAll": "Entdecke Pedale, Pedalboards und Netzteile für dein Setup.",
+    "searchAll": "Suchen…",
+    "openAll": "Equipment-Bibliothek öffnen",
+    "category": "Kategorie",
+    "allCategories": "Alle",
+    "loadingAll": "Equipment-Bibliothek wird geladen…",
+    "loadError": "Ein Teil des Equipments konnte nicht geladen werden.",
+    "emptyAll": "Kein Equipment entspricht deiner Suche.",
+    "powerFinder": "Netzteil-Finder",
     "showList": "Als Liste anzeigen",
     "showGrid": "Als Raster anzeigen",
     "resultOne": "{count} Ergebnis",
@@ -25,7 +33,7 @@
     "anyValue": "Beliebig",
     "open": "Pedalbibliothek öffnen",
     "returnToBoard": "Zurück zum Board",
-    "closeDetails": "Pedaldetails schließen",
+    "closeDetails": "Details schließen",
     "title": "Pedalbibliothek",
     "subtitle": "Entdecke Effekte und füge deine Fundstücke deinem Board hinzu.",
     "search": "Pedale, Marken oder Effekte suchen…",
@@ -38,7 +46,12 @@
     "newestFirst": "Neueste zuerst",
     "reset": "Filter zurücksetzen",
     "empty": "Keine Pedale entsprechen deiner Suche.",
-    "more": "Weitere Pedale anzeigen"
+    "more": "Weitere Pedale anzeigen",
+    "moreTypeFromBrand": "Weitere {type}-Pedale von {brand}",
+    "moreFromBrand": "Weitere Pedale von {brand}",
+    "moreTypeFromOtherBrands": "Weitere {type}-Pedale anderer Marken",
+    "didYouMean": "Meintest du",
+    "moreResults": "Mehr Ergebnisse anzeigen"
   },
   "sidebar": {
     "searchPedal": "Pedal suchen",
@@ -215,7 +228,8 @@
     },
     "dimensions": "Abmessungen",
     "weight": "Gewicht",
-    "origin": "Herkunft"
+    "origin": "Herkunft",
+    "similarBoards": "Ähnliche Pedalboards"
   },
   "settings": {
     "title": "Einstellungen",
@@ -283,7 +297,7 @@
   "export": {
     "singlePedal": "Füge ein zweites Pedal hinzu, um ein Bild herunterzuladen.",
     "button": "Exportieren",
-    "title": "Pedalboard exportieren",
+    "title": "Exportieren",
     "name": "Name des Pedalboards",
     "preview": "Vorschau",
     "downloadTitle": "Bild herunterladen",
@@ -413,6 +427,7 @@
     "power": "Stromversorgung"
   },
   "cables": {
+    "showSignalCables": "Signalkabel anzeigen",
     "title": "Kabel",
     "clearance": "Kabelabstand",
     "signalPath": "Signalverlauf",
@@ -421,6 +436,11 @@
     "signalChainDescription": "Eine empfohlene Reihenfolge als Ausgangspunkt. Passe sie an und experimentiere, um deinen Sound zu finden.",
     "recommendedOrder": "Empfohlene Reihenfolge",
     "reset": "Zurücksetzen",
+    "pedalOrder": "Pedalreihenfolge",
+    "signalRouting": "Signalführung",
+    "enoughSpace": "Genug Platz",
+    "tooClose": "Zu nah",
+    "signalRoutingDescription": "Visualisiere den Audiosignalweg zwischen deinen Pedalen.",
     "empty": "Füge Pedale zum Pedalboard hinzu, um die Signalkette anzuzeigen."
   },
   "help": {
@@ -436,7 +456,7 @@
     "shareTitle": "Lade dein Pedalboard herunter",
     "shareText": "Exportiere dein Pedalboard als PNG, um es zu speichern oder zu teilen.",
     "ok": "OK",
-    "documentation": "Dokumentation",
+    "documentation": "Doku",
     "dontShowAgain": "Nicht mehr anzeigen",
     "welcomeTitle": "Willkommen bei MakeYourBoard!",
     "welcomeText": "MakeYourBoard ist ein kostenloses Tool zum Planen deines idealen Pedalboards. Füge dein Board, deine Pedale und dein Netzteil hinzu, ordne dein Setup nach deinen Wünschen an und sieh dir das Ergebnis mit wenigen Klicks an. Für Pedal-Fans entwickelt – ich hoffe, das Tool hilft dir und macht Spaß.",
@@ -469,6 +489,8 @@
     "aluminium": "Aluminium"
   },
   "boardFinder": {
+    "powerUnderBoard": "Netzteil unter dem Pedalboard",
+    "allowRearrangement": "Anordnung der Pedale ändern erlauben",
     "button": "Pedalboard-Finder",
     "subtitle": "Finde das ideale Pedalboard.",
     "back": "Zurück",
@@ -610,5 +632,43 @@
     "limited": "Suchlimit erreicht: Der Plan kann verbessert werden.",
     "success": "Deine Pedale sind bestens versorgt. Let’s Rock!",
     "failure": "Nutze ein leistungsstärkeres Netzteil, eines mit mehr Ausgängen oder ein zweites Netzteil."
+  },
+  "onboarding": {
+    "label": "MakeYourBoard-Tutorial",
+    "replay": "Tutorial erneut anzeigen",
+    "skip": "Überspringen",
+    "back": "Zurück",
+    "next": "Weiter",
+    "start": "Entdecken",
+    "finish": "Los geht’s!",
+    "close": "Schließen",
+    "welcome": {
+      "title": "Willkommen bei MakeYourBoard 2.0!",
+      "description": "Ein neues Design und eine noch flüssigere Bedienung. Alles, was du brauchst, um dein ideales Pedalboard zu erstellen, zu organisieren und zu teilen."
+    },
+    "catalogue": {
+      "title": "Entdecke den Katalog",
+      "description": "Entdecke Pedale, Pedalboards und Netzteile. Durchsuche den Katalog oder erstelle dein eigenes individuelles Equipment."
+    },
+    "canvas": {
+      "title": "Erstelle dein Pedalboard",
+      "description": "Ordne dein Equipment per Drag-and-drop an. Wähle ein Element aus, um seine technischen Daten anzusehen, es zu drehen, zu duplizieren oder zu entfernen."
+    },
+    "boards": {
+      "title": "Verwalte deine Pedalboards",
+      "description": "Erstelle mehrere Pedalboards, benenne sie um, dupliziere sie und wechsle einfach zwischen ihnen."
+    },
+    "cables": {
+      "title": "Plane deine Verbindungen",
+      "description": "Überprüfe den Platz für Kabel, organisiere die Reihenfolge deiner Pedale und visualisiere den Signalweg."
+    },
+    "power": {
+      "title": "Versorge deine Pedale mit Strom",
+      "description": "Überprüfe Spannung und Strombedarf, finde heraus, wie du jedes Pedal mit Strom versorgst, und stelle sicher, dass dein Netzteil geeignet ist."
+    },
+    "share": {
+      "title": "Exportieren und teilen",
+      "description": "Exportiere dein Pedalboard als Bild oder teile eine bearbeitbare Kopie deines Projekts über einen Link."
+    }
   }
 }

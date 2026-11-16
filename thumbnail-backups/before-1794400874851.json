@@ -1,0 +1,85 @@
+[
+  {
+    "table": "pedals",
+    "items": [
+      {
+        "id": 23961,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/masatone-hard-rock-machine-mk2-v2.webp",
+        "thumbnail": null,
+        "width": 66,
+        "depth": 122
+      },
+      {
+        "id": 23962,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/masatone-blues-rock-machine-v2.webp",
+        "thumbnail": null,
+        "width": 70,
+        "depth": 122
+      },
+      {
+        "id": 23963,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/masatone-hard-rock-machine-mk1-black-v2.webp",
+        "thumbnail": null,
+        "width": 66,
+        "depth": 122
+      },
+      {
+        "id": 23964,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/masatone-hard-rock-machine-mk1-white-v2.webp",
+        "thumbnail": null,
+        "width": 66,
+        "depth": 122
+      },
+      {
+        "id": 23965,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/masatone-sunny-prex-v2.webp",
+        "thumbnail": null,
+        "width": 60,
+        "depth": 51
+      },
+      {
+        "id": 23966,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/masatone-caesar-x-v2.webp",
+        "thumbnail": null,
+        "width": 130,
+        "depth": 95
+      },
+      {
+        "id": 23967,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/david-ross-submersion-v2.webp",
+        "thumbnail": null,
+        "width": 66,
+        "depth": 122
+      },
+      {
+        "id": 23968,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/david-ross-summer-heat-v2.webp",
+        "thumbnail": null,
+        "width": 66,
+        "depth": 122
+      },
+      {
+        "id": 23969,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/david-ross-spellbook-v2.webp",
+        "thumbnail": null,
+        "width": 66,
+        "depth": 122
+      },
+      {
+        "id": 23970,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/david-ross-winter-storm-v2.webp",
+        "thumbnail": null,
+        "width": 66,
+        "depth": 122
+      }
+    ]
+  },
+  {
+    "table": "power",
+    "items": []
+  },
+  {
+    "table": "boards",
+    "items": []
+  }
+]

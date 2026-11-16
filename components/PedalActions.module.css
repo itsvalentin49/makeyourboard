@@ -188,7 +188,7 @@
   padding: 4px 6px;
   transform: none;
   z-index: 70;
-  background: var(--zinc-900);
+  background: var(--zinc-950);
 }
 
 
@@ -227,4 +227,63 @@
       transparent 1.15px);
   background-size: var(--alignment-grid-step, 24px) var(--alignment-grid-step, 24px);
   background-position: var(--alignment-grid-x, 0) var(--alignment-grid-y, 0);
+}
+
+.scaleRuler {
+  position: absolute;
+  inset: auto auto 14px 14px;
+  min-width: 1px;
+  padding-bottom: 3px;
+  border-bottom: 1px solid currentColor;
+  color: var(--foreground);
+  opacity: .75;
+  font-size: 11px;
+  font-weight: 650;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.scaleRuler::before,
+.scaleRuler::after {
+  position: absolute;
+  bottom: 0;
+  height: 4px;
+  border-inline-start: 1px solid currentColor;
+  content: "";
+}
+
+.scaleRuler::before {
+  left: 0;
+}
+
+.scaleRuler::after {
+  right: 0;
+}
+
+.mobilePanelClose {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-left: auto;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--zinc-950);
+  color: inherit;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mobilePanelClose:hover {
+  background: var(--zinc-800);
+}
+
+.mobilePanelClose svg {
+  width: 14px;
+  height: 14px;
 }

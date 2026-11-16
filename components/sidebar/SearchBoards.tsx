@@ -21,6 +21,7 @@ import {
 
 import {
   findCompatibleBoards,
+  findCanvasCompatibleBoards,
   getFinderLayout,
   physicalPedals,
 } from "@/utils/boardFinder";
@@ -30,6 +31,8 @@ import type { CatalogStatus } from "@/hooks/useLibrary";
 type AnyRow = Record<string, any>;
 
 type Props = {
+  finderRearrangement?: boolean;
+  powerUnderBoard?: boolean;
   boardsLibrary: AnyRow[];
   catalogStatus: CatalogStatus;
 
@@ -56,7 +59,9 @@ type Props = {
   existingBoards?: AnyRow[];
 
   selectSuggestedBoard?: (
-    board: AnyRow
+    board: AnyRow,
+    allowRearrangement?: boolean,
+    powerUnderBoard?: boolean,
   ) => boolean;
 
   units?: "metric" | "imperial";
@@ -87,6 +92,8 @@ function normalize(value: any) {
 }
 
 export default function SearchBoards({
+  finderRearrangement,
+  powerUnderBoard,
   boardsLibrary,
   catalogStatus,
   boardSearch,
@@ -106,8 +113,8 @@ export default function SearchBoards({
      FINDER STATE
      ========================= */
 
-  const [finderOpen, setFinderOpen] =
-    useState(false);
+  const embeddedFinder = finderRearrangement !== undefined;
+  const [finderOpen, setFinderOpen] = useState(false);
 
   const [isLightTheme, setIsLightTheme] =
     useState(true);
@@ -150,14 +157,13 @@ export default function SearchBoards({
     pedalCount >= 2 &&
     Boolean(selectSuggestedBoard);
 
-  const isFinder =
-    finderOpen && canOpenFinder;
+  const isFinder = embeddedFinder || (finderOpen && canOpenFinder);
 
   useEffect(() => {
-    if (!canOpenFinder) {
+    if (!canOpenFinder && !embeddedFinder) {
       setFinderOpen(false);
     }
-  }, [canOpenFinder]);
+  }, [canOpenFinder, embeddedFinder]);
 
   /* =========================
      FINDER CALCULATIONS
@@ -167,19 +173,21 @@ export default function SearchBoards({
     () =>
       getFinderLayout(
         finderPedals,
-        existingBoards
+        existingBoards,
+        powerUnderBoard,
       ),
-    [finderPedals, existingBoards]
+    [finderPedals, existingBoards, powerUnderBoard]
   );
 
   const matches = useMemo(
-    () =>
-      findCompatibleBoards(
-        layout,
-        boardsLibrary
-      ),
-    [layout, boardsLibrary]
+    () => finderRearrangement !== undefined
+      ? findCanvasCompatibleBoards(layout, boardsLibrary, finderRearrangement)
+      : findCompatibleBoards(layout, boardsLibrary),
+    [layout, boardsLibrary, finderRearrangement],
   );
+  const rearrangedBoards = useMemo(() => new Set(
+    matches.filter((match) => match.requiresRearrangement).map((match) => match.board),
+  ), [matches]);
 
   const matchCount = matches.length;
 
@@ -299,99 +307,108 @@ export default function SearchBoards({
      ========================= */
 
   return (
-    <div className="flex flex-col mt-4 h-full min-h-0">
-
-      <div className="mb-2 shrink-0">
-        <div className="min-w-0 text-[11px] font-black uppercase tracking-wide">
-          {t("boardsMenu.title")}
-        </div>
-      </div>
-
-      <div className="flex items-center gap-2 mb-4 shrink-0">
-        <div className="relative flex items-center flex-1 min-w-0">
-          {isFinder ? (
-            <div
-              className="w-full h-[30px] rounded-md flex items-center gap-2 min-w-0 px-3 text-[10px] font-black uppercase"
-              style={{ height: 30, minHeight: 30, backgroundColor: "#e5f8ec", color: "#14532d", fontSize: 10 }}
-              role="status"
-              aria-live="polite"
-              title={resultLabel}
-            >
-              {matchCount > 0 && (
-                <CheckCircle2 size={16} strokeWidth={2.4} className="shrink-0" aria-hidden="true" style={{ color: "#16a34a", stroke: "#16a34a" }} />
-              )}
-              <span className="truncate">{resultLabel}</span>
+    <div className={embeddedFinder ? "mt-4 flex min-h-0 flex-1 flex-col pt-[6px]" : "flex flex-col mt-4 h-full min-h-0"}>
+      {embeddedFinder && (
+        <p className="mb-2 shrink-0 text-[11px] font-bold" role="status">
+          {t(matchCount === 1 ? "boardsMenu.result" : "boardsMenu.results").replace("{count}", String(matchCount))}
+        </p>
+      )}
+      {!embeddedFinder && (
+        <>
+          <div className="mb-2 shrink-0">
+            <div className="min-w-0 text-[11px] font-black uppercase tracking-wide">
+              {t("boardsMenu.title")}
             </div>
-          ) : (
-            <>
-              <Search size={15} strokeWidth={2.5} className="absolute left-4 text-[#6f6a5d]" aria-hidden="true" />
-              <input
-                ref={boardInputRef}
-                type="text"
-                autoComplete="off"
-                autoCorrect="off"
-                autoCapitalize="off"
-                spellCheck={false}
-                placeholder={t("boardsMenu.searchPlaceholder")}
-                aria-label={t("boardsMenu.searchPlaceholder")}
-                className="w-full h-[30px] bg-white !text-black placeholder:!text-zinc-500 rounded-md pl-12 pr-11 text-[16px] lg:text-[12px] font-bold outline-none"
-                value={boardSearch}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  setShowPedalResults(false);
-                  setShowBoardResults(true);
-                }}
-                onChange={(event) => {
-                  setBoardSearch(event.target.value);
-                  setShowBoardResults(true);
-                }}
-              />
-              {boardSearch && (
-                <button type="button" onClick={(event) => {
-                  event.stopPropagation();
-                  setBoardSearch("");
-                  boardInputRef.current?.focus();
-                }} className="absolute right-4 flex items-center justify-center text-[#6f6a5d] hover:opacity-70 transition-opacity"
-                  aria-label={t("powerMenu.clearSearch")}>
-                  <X size={15} strokeWidth={3} />
-                </button>
-              )}
-            </>
-          )}
-        </div>
+          </div>
 
-        <button
-          type="button"
-          disabled={!isFinder && !canOpenFinder}
-          aria-label={t(isFinder ? "sidebar.back" : "boardFinder.button")}
-          title={t(isFinder ? "sidebar.back" : "boardFinder.button")}
-          onClick={(event) => {
-            event.stopPropagation();
-            if (isFinder) closeFinder();
-            else if (canOpenFinder) openFinder();
-          }}
-          onMouseEnter={(event) => {
-            event.currentTarget.style.setProperty("background-color", "#1d4ed8", "important");
-          }}
-          onMouseLeave={(event) => {
-            event.currentTarget.style.setProperty("background-color", "#2563eb", "important");
-          }}
-          ref={(element) => {
-            if (element) {
-              element.style.setProperty("background-color", "#2563eb", "important");
-              element.style.setProperty("color", "#ffffff", "important");
-            }
-          }}
-          className="shrink-0 flex items-center justify-center rounded-md cursor-pointer transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-          style={{ width: 30, minWidth: 30, height: 30, minHeight: 30, padding: 0, border: "none", backgroundColor: "#2563eb", color: "#ffffff" }}
-        >
-          {isFinder ? (
-            <ArrowLeft size={22} strokeWidth={2} aria-hidden="true" style={{ color: "#ffffff", stroke: "#ffffff" }} />
-          ) : (
-            <WandSparkles size={22} strokeWidth={2} aria-hidden="true" style={{ color: "#ffffff", stroke: "#ffffff" }} />
-          )}
-        </button>
-      </div>
+          <div className="flex items-center gap-2 mb-4 shrink-0">
+            <div className="relative flex items-center flex-1 min-w-0">
+              {isFinder ? (
+                <div
+                  className="w-full h-[30px] rounded-md flex items-center gap-2 min-w-0 px-3 text-[10px] font-black uppercase"
+                  style={{ height: 30, minHeight: 30, backgroundColor: "#e5f8ec", color: "#14532d", fontSize: 10 }}
+                  role="status"
+                  aria-live="polite"
+                  title={resultLabel}
+                >
+                  {matchCount > 0 && (
+                    <CheckCircle2 size={16} strokeWidth={2.4} className="shrink-0" aria-hidden="true" style={{ color: "#16a34a", stroke: "#16a34a" }} />
+                  )}
+                  <span className="truncate">{resultLabel}</span>
+                </div>
+              ) : (
+                <>
+                  <Search size={15} strokeWidth={2.5} className="absolute left-4 text-[#6f6a5d]" aria-hidden="true" />
+                  <input
+                    ref={boardInputRef}
+                    type="text"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck={false}
+                    placeholder={t("boardsMenu.searchPlaceholder")}
+                    aria-label={t("boardsMenu.searchPlaceholder")}
+                    className="w-full h-[30px] bg-white !text-black placeholder:!text-zinc-500 rounded-md pl-12 pr-11 text-[16px] lg:text-[12px] font-bold outline-none"
+                    value={boardSearch}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      setShowPedalResults(false);
+                      setShowBoardResults(true);
+                    }}
+                    onChange={(event) => {
+                      setBoardSearch(event.target.value);
+                      setShowBoardResults(true);
+                    }}
+                  />
+                  {boardSearch && (
+                    <button type="button" onClick={(event) => {
+                      event.stopPropagation();
+                      setBoardSearch("");
+                      boardInputRef.current?.focus();
+                    }} className="absolute right-4 flex items-center justify-center text-[#6f6a5d] hover:opacity-70 transition-opacity"
+                      aria-label={t("powerMenu.clearSearch")}>
+                      <X size={15} strokeWidth={3} />
+                    </button>
+                  )}
+                </>
+              )}
+            </div>
+
+            <button
+              type="button"
+              disabled={!isFinder && !canOpenFinder}
+              aria-label={t(isFinder ? "sidebar.back" : "boardFinder.button")}
+              title={t(isFinder ? "sidebar.back" : "boardFinder.button")}
+              onClick={(event) => {
+                event.stopPropagation();
+                if (isFinder) closeFinder();
+                else if (canOpenFinder) openFinder();
+              }}
+              onMouseEnter={(event) => {
+                event.currentTarget.style.setProperty("background-color", "#1d4ed8", "important");
+              }}
+              onMouseLeave={(event) => {
+                event.currentTarget.style.setProperty("background-color", "#2563eb", "important");
+              }}
+              ref={(element) => {
+                if (element) {
+                  element.style.setProperty("background-color", "#2563eb", "important");
+                  element.style.setProperty("color", "#ffffff", "important");
+                }
+              }}
+              className="shrink-0 flex items-center justify-center rounded-md cursor-pointer transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              style={{ width: 30, minWidth: 30, height: 30, minHeight: 30, padding: 0, border: "none", backgroundColor: "#2563eb", color: "#ffffff" }}
+            >
+              {isFinder ? (
+                <ArrowLeft size={22} strokeWidth={2} aria-hidden="true" style={{ color: "#ffffff", stroke: "#ffffff" }} />
+              ) : (
+                <WandSparkles size={22} strokeWidth={2} aria-hidden="true" style={{ color: "#ffffff", stroke: "#ffffff" }} />
+              )}
+            </button>
+          </div>
+
+        </>
+      )}
 
       {catalogStatus !== "ready" && (
         <div
@@ -426,7 +443,6 @@ export default function SearchBoards({
 
       {isFinder && (
         <div className="flex shrink-0 flex-col">
-
           {layout.status === "ready" && matchCount === 0 && (
             <div className="mb-4 flex items-start gap-2 text-[11px] leading-relaxed" role="status">
               <CircleX size={16} className="shrink-0 text-red-500" />
@@ -522,7 +538,7 @@ export default function SearchBoards({
 
                   if (isFinder) {
                     const success =
-                      selectSuggestedBoard?.(board);
+                      selectSuggestedBoard?.(board, finderRearrangement, powerUnderBoard);
 
                     if (success) {
                       setShowBoardResults(false);
@@ -599,6 +615,9 @@ export default function SearchBoards({
                       )}
                     </div>
 
+                    {embeddedFinder && rearrangedBoards.has(board) && (
+                      <div className="mt-1 text-[10px]">{t("boardFinder.rearrange")}</div>
+                    )}
                     {hasBoardDimensions && (
                       <div className="mt-1 text-[9px] tabular-nums text-zinc-400">
 

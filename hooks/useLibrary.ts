@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -11,6 +12,8 @@ type NormalizedErr = {
   meta?: Record<string, unknown>;
 };
 
+type GearTable = "pedals" | "boards" | "power";
+
 function normalizeSupabaseError(err: unknown): NormalizedErr {
   if (err instanceof Error) {
     return {
@@ -19,18 +22,20 @@ function normalizeSupabaseError(err: unknown): NormalizedErr {
     };
   }
 
-  if (typeof err === "string") return { message: err };
+  if (typeof err === "string") {
+    return { message: err };
+  }
 
   if (err && typeof err === "object") {
-    const e = err as any;
-    const message =
-      e.message ??
-      e.error_description ??
-      e.msg ??
-      "Unknown error (object)";
+    const e = err as Record<string, unknown>;
 
     return {
-      message: String(message),
+      message: String(
+        e.message ??
+        e.error_description ??
+        e.msg ??
+        "Unknown error (object)"
+      ),
       meta: {
         code: e.code,
         details: e.details,
@@ -43,45 +48,50 @@ function normalizeSupabaseError(err: unknown): NormalizedErr {
   return { message: "Unknown error" };
 }
 
-async function fetchTable(table: string, orderCols: string[] = []) {
+async function fetchTable(
+  table: GearTable,
+  orderCols: string[] = []
+): Promise<AnyRow[]> {
   const PAGE_SIZE = 100;
-  let allRows: AnyRow[] = [];
+  const allRows: AnyRow[] = [];
   let from = 0;
+  let useOrdering = orderCols.length > 0;
 
   while (true) {
-    let q = supabase
+    let query = supabase
       .from(table)
       .select("*")
       .range(from, from + PAGE_SIZE - 1);
 
-    for (const col of orderCols) {
-      q = q.order(col, { ascending: true });
+    if (useOrdering) {
+      for (const col of orderCols) {
+        query = query.order(col, { ascending: true });
+      }
     }
 
-    const { data, error } = await q;
+    let { data, error } = await query;
 
-    if (error) {
-      const msg = String((error as any)?.message ?? "").toLowerCase();
-      if (msg.includes("column") && msg.includes("does not exist")) {
+    if (error && useOrdering) {
+      const message = String(error.message ?? "").toLowerCase();
+
+      if (
+        message.includes("column") &&
+        message.includes("does not exist")
+      ) {
+        useOrdering = false;
+
         const retry = await supabase
           .from(table)
           .select("*")
           .range(from, from + PAGE_SIZE - 1);
 
-        if (retry.error) throw retry.error;
-        if (!retry.data || retry.data.length === 0) break;
-
-        allRows.push(...retry.data);
-        if (retry.data.length < PAGE_SIZE) break;
-
-        from += PAGE_SIZE;
-        continue;
+        data = retry.data;
+        error = retry.error;
       }
-
-      throw error;
     }
 
-    if (!data || data.length === 0) break;
+    if (error) throw error;
+    if (!data?.length) break;
 
     allRows.push(...data);
 
@@ -93,23 +103,25 @@ async function fetchTable(table: string, orderCols: string[] = []) {
   return allRows;
 }
 
-async function fetchNewPedals(): Promise<AnyRow[]> {
+function formatDate(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
+async function fetchRecentTable(
+  table: GearTable
+): Promise<AnyRow[]> {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
   const limitDate = new Date(today);
-  limitDate.setDate(today.getDate() - 30);
-
-  const formatDate = (date: Date) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-
-    return `${year}-${month}-${day}`;
-  };
+  limitDate.setDate(limitDate.getDate() - 30);
 
   const { data, error } = await supabase
-    .from("pedals")
+    .from(table)
     .select("*")
     .gte("year", formatDate(limitDate))
     .lte("year", formatDate(today))
@@ -121,62 +133,158 @@ async function fetchNewPedals(): Promise<AnyRow[]> {
 }
 
 export function useLibrary() {
-  const [pedalsLibrary, setPedalsLibrary] = useState<AnyRow[]>([]);
-  const [boardsLibrary, setBoardsLibrary] = useState<AnyRow[]>([]);
-  const [powerLibrary, setPowerLibrary] = useState<AnyRow[]>([]);
-  const [boardsStatus, setBoardsStatus] = useState<CatalogStatus>("loading");
-  const [powerStatus, setPowerStatus] = useState<CatalogStatus>("loading");
-  const [newPedals, setNewPedals] = useState<AnyRow[]>([]);
-  const [newPedalsLoading, setNewPedalsLoading] = useState(true);
-  const [libraryError, setLibraryError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [pedalsLibrary, setPedalsLibrary] =
+    useState<AnyRow[]>([]);
+
+  const [boardsLibrary, setBoardsLibrary] =
+    useState<AnyRow[]>([]);
+
+  const [powerLibrary, setPowerLibrary] =
+    useState<AnyRow[]>([]);
+
+  const [boardsStatus, setBoardsStatus] =
+    useState<CatalogStatus>("loading");
+
+  const [powerStatus, setPowerStatus] =
+    useState<CatalogStatus>("loading");
+
+  const [newPedals, setNewPedals] =
+    useState<AnyRow[]>([]);
+
+  const [newBoards, setNewBoards] =
+    useState<AnyRow[]>([]);
+
+  const [newPower, setNewPower] =
+    useState<AnyRow[]>([]);
+
+  const [newPedalsLoading, setNewPedalsLoading] =
+    useState(true);
+
+  const [newGearLoading, setNewGearLoading] =
+    useState(true);
+
+  const [libraryError, setLibraryError] =
+    useState<string | null>(null);
+
+  const [loading, setLoading] =
+    useState(true);
 
   useEffect(() => {
     let cancelled = false;
 
-    fetchNewPedals()
-      .then((pedals) => {
-        if (!cancelled) {
-          setNewPedals(pedals);
+    // Load recent products from all three categories first.
+    // Each request is independent: one failure does not
+    // prevent the other categories from being displayed.
+
+    const recentRequests = [
+      fetchRecentTable("pedals"),
+      fetchRecentTable("boards"),
+      fetchRecentTable("power"),
+    ] as const;
+
+    void Promise.allSettled(recentRequests)
+      .then((results) => {
+        if (cancelled) return;
+
+        const [pedalsResult, boardsResult, powerResult] =
+          results;
+
+        if (pedalsResult.status === "fulfilled") {
+          setNewPedals(pedalsResult.value);
+        } else {
+          console.error(
+            "[Supabase] Failed to load new pedals:",
+            pedalsResult.reason
+          );
         }
-      })
-      .catch((err) => {
-        console.error("[Supabase] Failed to load new pedals:", err);
+
+        if (boardsResult.status === "fulfilled") {
+          setNewBoards(boardsResult.value);
+        } else {
+          console.error(
+            "[Supabase] Failed to load new boards:",
+            boardsResult.reason
+          );
+        }
+
+        if (powerResult.status === "fulfilled") {
+          setNewPower(powerResult.value);
+        } else {
+          console.error(
+            "[Supabase] Failed to load new power supplies:",
+            powerResult.reason
+          );
+        }
       })
       .finally(() => {
-        if (!cancelled) {
-          setNewPedalsLoading(false);
-        }
+        if (cancelled) return;
+
+        setNewPedalsLoading(false);
+        setNewGearLoading(false);
       });
 
+    // Full catalogs continue loading in parallel.
+
     async function loadCatalog(
-      table: "pedals" | "boards" | "power",
+      table: GearTable,
       setRows: (rows: AnyRow[]) => void,
-      settle: (error: string | null) => void,
+      settle: (error: string | null) => void
     ) {
       try {
-        const rows = await fetchTable(table, ["brand", "name"]);
+        const rows = await fetchTable(table, [
+          "brand",
+          "name",
+        ]);
+
         if (cancelled) return;
+
         setRows(rows);
         settle(null);
       } catch (err) {
         if (cancelled) return;
-        const { message, meta } = normalizeSupabaseError(err);
-        console.error(`[Supabase] Failed to load ${table}:`, message, meta, err);
+
+        const { message, meta } =
+          normalizeSupabaseError(err);
+
+        console.error(
+          `[Supabase] Failed to load ${table}:`,
+          message,
+          meta,
+          err
+        );
+
         settle(message || "Failed to load library");
       }
     }
 
-    void loadCatalog("pedals", setPedalsLibrary, (error) => {
-      setLibraryError(error);
-      setLoading(false);
-    });
-    void loadCatalog("boards", setBoardsLibrary, (error) => {
-      setBoardsStatus(error ? "error" : "ready");
-    });
-    void loadCatalog("power", setPowerLibrary, (error) => {
-      setPowerStatus(error ? "error" : "ready");
-    });
+    void loadCatalog(
+      "pedals",
+      setPedalsLibrary,
+      (error) => {
+        setLibraryError(error);
+        setLoading(false);
+      }
+    );
+
+    void loadCatalog(
+      "boards",
+      setBoardsLibrary,
+      (error) => {
+        setBoardsStatus(
+          error ? "error" : "ready"
+        );
+      }
+    );
+
+    void loadCatalog(
+      "power",
+      setPowerLibrary,
+      (error) => {
+        setPowerStatus(
+          error ? "error" : "ready"
+        );
+      }
+    );
 
     return () => {
       cancelled = true;
@@ -187,10 +295,17 @@ export function useLibrary() {
     pedalsLibrary,
     boardsLibrary,
     powerLibrary,
+
     boardsStatus,
     powerStatus,
+
     newPedals,
+    newBoards,
+    newPower,
+
     newPedalsLoading,
+    newGearLoading,
+
     libraryError,
     loading,
   };

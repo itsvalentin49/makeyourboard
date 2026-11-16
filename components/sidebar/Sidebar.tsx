@@ -4,17 +4,15 @@ import { createPortal } from "react-dom";
 import { ArrowLeft, ChevronDown, ExternalLink, Mail, Plus, RotateCw, ShoppingCart, Trash2, } from "lucide-react";
 import type { BoardItem } from "@/types/project";
 import type { Language } from "@/utils/i18n";
-import BuyOnline from "@/components/sidebar/BuyOnline";
 import { mmToIn, formatWeight } from "@/utils/units";
 import { getTranslator } from "@/utils/i18n";
 import SpecsPedal from "@/components/sidebar/SpecsPedals";
 import SpecsBoards from "@/components/sidebar/SpecsBoards";
 import SpecsPower from "@/components/sidebar/SpecsPower";
 import GearCatalog from "@/components/sidebar/GearCatalog";
-import SearchPedals from "@/components/sidebar/SearchPedals";
-import SearchBoards from "@/components/sidebar/SearchBoards";
+import SearchAllGear from "@/components/sidebar/SearchAllGear";
+import type { GearCategory, GearKind } from "@/utils/gearCatalog";
 import CustomPanel from "@/components/sidebar/CustomPanel";
-import SearchPower from "@/components/sidebar/SearchPower";
 import type { CatalogStatus } from "@/hooks/useLibrary";
 type AnyRow = Record<string, any>;
 type Props = {
@@ -25,6 +23,9 @@ type Props = {
   boardsStatus: CatalogStatus;
   powerStatus: CatalogStatus;
   newPedals: AnyRow[];
+  newBoards: AnyRow[];
+  newPower: AnyRow[];
+  newGearLoading: boolean;
   newPedalsLoading: boolean;
   libraryLoading?: boolean;
   libraryError?: string | null;
@@ -68,7 +69,7 @@ type Props = {
   addPedal: (p: AnyRow) => void;
   replacement?: { pedal: BoardItem; onChoose: (pedal: AnyRow) => void; onClose: () => void };
   selectBoard: (b: AnyRow) => void;
-  selectSuggestedBoard?: (b: AnyRow) => boolean;
+  selectSuggestedBoard?: (b: AnyRow, allowRearrangement?: boolean, powerUnderBoard?: boolean) => boolean;
   finderPedals?: AnyRow[];
   existingBoards?: AnyRow[];
   addCustomItem: (item: AnyRow) => void;
@@ -90,10 +91,11 @@ type Props = {
   // NEW
   isMobile?: boolean;
   hideLogo?: boolean;
+  onReturnToCanvas?: () => void;
 };
-export default function Sidebar({ pedalsLibrary, boardsLibrary, newPedals, newPedalsLoading, libraryLoading = false, libraryError = null, powerLibrary, boardsStatus, powerStatus, showPedalResults, setShowPedalResults, showBoardResults, setShowBoardResults, pedalSearch, setPedalSearch, boardSearch, setBoardSearch, selectedPedal, selectedBoardDetails, selectedInstanceId, selectedBoardInstanceId, setSelectedInstanceId, setSelectedBoardInstanceId, customName, setCustomName, customWidth, setCustomWidth, customDepth, setCustomDepth, customColor, setCustomColor, customType, setCustomType, addPedal, replacement, selectBoard, selectSuggestedBoard, finderPedals = [], existingBoards = [], addCustomItem, rotatePedal, deletePedal, rotateBoard, movePedalFront, movePedalBack, deleteBoard, moveBoardFront, moveBoardBack, canvasBg, setCanvasBg, language, setLanguage, units, setUnits, makeOpen, setMakeOpen, contactOpen, setContactOpen, isMobile = false, lastSelectedPedal, lastSelectedBoard, setLastSelectedPedal, lastSelectedPower, setLastSelectedPower, }: Props) {
+export default function Sidebar({ pedalsLibrary, boardsLibrary, newPedals, newBoards, newPower, newGearLoading, newPedalsLoading, libraryLoading = false, libraryError = null, powerLibrary, boardsStatus, powerStatus, showPedalResults, setShowPedalResults, showBoardResults, setShowBoardResults, pedalSearch, setPedalSearch, boardSearch, setBoardSearch, selectedPedal, selectedBoardDetails, selectedInstanceId, selectedBoardInstanceId, setSelectedInstanceId, setSelectedBoardInstanceId, customName, setCustomName, customWidth, setCustomWidth, customDepth, setCustomDepth, customColor, setCustomColor, customType, setCustomType, addPedal, replacement, selectBoard, selectSuggestedBoard, finderPedals = [], existingBoards = [], addCustomItem, rotatePedal, deletePedal, rotateBoard, movePedalFront, movePedalBack, deleteBoard, moveBoardFront, moveBoardBack, canvasBg, setCanvasBg, language, setLanguage, units, setUnits, makeOpen, setMakeOpen, contactOpen, setContactOpen, onReturnToCanvas, isMobile = false, lastSelectedPedal, lastSelectedBoard, setLastSelectedPedal, lastSelectedPower, setLastSelectedPower, }: Props) {
   const t = React.useMemo(() => getTranslator(language), [language]);
-  const [gearOpen, setGearOpen] = React.useState(false);
+  const [gearView, setGearView] = React.useState<{ query: string; category: GearCategory } | null>(null);
   // Older saved projects may not contain the profile column. Recover it from
   // the current catalogue without replacing the board instance or its geometry.
   const powerFinderBoards = React.useMemo(() => existingBoards.map(board => {
@@ -124,25 +126,6 @@ export default function Sidebar({ pedalsLibrary, boardsLibrary, newPedals, newPe
     : Math.round(mmToIn(maxMm) * 10) / 10;
   const minValue = units === "metric" ? minMm : mmToIn(minMm);
   const maxValue = units === "metric" ? maxMm : mmToIn(maxMm);
-  const [activeSidebarTab, setActiveSidebarTab] = React.useState<"pedals" | "boards" | "power" | "custom">("pedals");
-  const [isLightTheme, setIsLightTheme] = React.useState(true);
-  React.useEffect(() => {
-    const html = document.documentElement;
-    const updateTheme = () => {
-      setIsLightTheme(html.classList.contains("light"));
-    };
-    // Vérification initiale
-    updateTheme();
-    // Surveillance des changements de classe sur <html>
-    const observer = new MutationObserver(updateTheme);
-    observer.observe(html, {
-      attributes: true,
-      attributeFilter: ["class"],
-    });
-    return () => {
-      observer.disconnect();
-    };
-  }, []);
   // Convert UI values to mm for validation
   const widthMm = units === "metric"
     ? Number(customWidth)
@@ -181,16 +164,6 @@ export default function Sidebar({ pedalsLibrary, boardsLibrary, newPedals, newPe
   const [langOpen, setLangOpen] = React.useState(false);
   const langRef = React.useRef<HTMLDivElement>(null);
   const [settingsOpen, setSettingsOpen] = React.useState(false);
-  const pedalDropdownRef = React.useRef<HTMLDivElement>(null);
-  const boardDropdownRef = React.useRef<HTMLDivElement>(null);
-  const powerDropdownRef = React.useRef<HTMLDivElement>(null);
-  const pedalInputRef = React.useRef<HTMLInputElement>(null);
-  const boardInputRef = React.useRef<HTMLInputElement>(null);
-  const [mobileOpen, setMobileOpen] = React.useState(false);
-  const [powerSearch, setPowerSearch] = React.useState("");
-  const [showPowerResults, setShowPowerResults] = React.useState(false);
-  const powerInputRef = React.useRef<HTMLInputElement>(null);
-  const [formatOpen, setFormatOpen] = React.useState(false);
   const [contactEmail, setContactEmail] = React.useState("");
   const [contactType, setContactType] = React.useState("question");
   const [contactTypeOpen, setContactTypeOpen] = React.useState(false);
@@ -261,16 +234,6 @@ export default function Sidebar({ pedalsLibrary, boardsLibrary, newPedals, newPe
     return `https://www.${domain}/${slug}`;
   };
   React.useEffect(() => {
-    if (showPedalResults) {
-      pedalInputRef.current?.focus();
-    }
-  }, [showPedalResults]);
-  React.useEffect(() => {
-    if (showBoardResults) {
-      boardInputRef.current?.focus();
-    }
-  }, [showBoardResults]);
-  React.useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       const target = e.target as Node;
       if (bgRef.current && !bgRef.current.contains(target)) {
@@ -281,9 +244,6 @@ export default function Sidebar({ pedalsLibrary, boardsLibrary, newPedals, newPe
       }
       if (contactTypeRef.current && !contactTypeRef.current.contains(target)) {
         setContactTypeOpen(false);
-      }
-      if (powerDropdownRef.current && !powerDropdownRef.current.contains(target)) {
-        setShowPowerResults(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -299,6 +259,14 @@ export default function Sidebar({ pedalsLibrary, boardsLibrary, newPedals, newPe
     // On restaure immédiatement la pédale pour que le bouton bleu Pedal ne change pas
     if (currentLastPedal) {
       setTimeout(() => setLastSelectedPedal(currentLastPedal), 0);
+    }
+  };
+  const addGear = (kind: GearKind, item: AnyRow) => {
+    if (kind === "boards") selectBoard(item);
+    else if (kind === "power") addPower(item);
+    else {
+      setLastSelectedPedal(item);
+      addPedal(item);
     }
   };
   const groupItems = (items: AnyRow[], filter: string) => {
@@ -327,7 +295,7 @@ export default function Sidebar({ pedalsLibrary, boardsLibrary, newPedals, newPe
   px-6 pt-3 pb-6 flex flex-col gap-4
   overflow-hidden touch-pan-y
   h-full
-`} style={{ WebkitOverflowScrolling: "touch", boxSizing: "border-box", paddingBottom: activeSidebarTab === "custom" && !contactOpen ? 8 : undefined }} onClick={(e) => {
+`} style={{ WebkitOverflowScrolling: "touch", boxSizing: "border-box" }} onClick={(e) => {
       e.stopPropagation();
       setShowPedalResults(false);
       setShowBoardResults(false);
@@ -435,130 +403,44 @@ export default function Sidebar({ pedalsLibrary, boardsLibrary, newPedals, newPe
         </button>
       </>
     </div>) : selectedPedal && (selectedPedal.type === "power" || selectedPedal.capacity) ? (<SpecsPower selectedPower={selectedPedal} units={units} language={language} t={t} isUSA={isUSA} isEurope={isEurope} buildThomannUrl={buildThomannUrl} selectedInstanceId={selectedInstanceId} rotatePedal={rotatePedal} movePedalFront={movePedalFront} movePedalBack={movePedalBack} deletePedal={deletePedal} />) : selectedPedal ? (<SpecsPedal selectedPedal={selectedPedal} selectedInstanceId={selectedInstanceId} units={units} language={language} t={t} isCustomPedal={isCustomPedal} isImportedPedal={isImportedPedal} isUSA={isUSA} isEurope={isEurope} buildThomannUrl={buildThomannUrl} />) : selectedBoardDetails ? (<SpecsBoards selectedBoardDetails={selectedBoardDetails} units={units} language={language} t={t} isCustomBoard={isCustomBoard} buildThomannUrl={buildThomannUrl} getStoresForCountry={getStoresForCountry} hasBoardCommercialLinks={hasBoardCommercialLinks} selectedBoardInstanceId={selectedBoardInstanceId} rotateBoard={rotateBoard} moveBoardFront={moveBoardFront} moveBoardBack={moveBoardBack} deleteBoard={deleteBoard} isUSA={isUSA} isEurope={isEurope} />) : (
-      // LIBRARY (default view)
-      <div className="px-1 mt-0 flex flex-col flex-1 min-h-0 overflow-visible" style={{ gap: 20, overflow: activeSidebarTab === "custom" ? "hidden" : "visible" }}>
-        <div className="shrink-0" style={{ paddingTop: 8 }}>
-          <div
-            className="w-full overflow-visible"
-            style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0, 1fr))", gap: 8, alignItems: "start" }}
-          >
-            {[
-              {
-                key: "pedals",
-                label: t("sidebar.pedals"),
-                lightImage: "/images/tab-pedal2-light.webp",
-                darkImage: "/images/tab-pedal2-dark.webp",
-              },
-              {
-                key: "boards",
-                label: t("sidebar.boards"),
-                lightImage: "/images/tab-board-light.webp",
-                darkImage: "/images/tab-board-dark.webp",
-              },
-              {
-                key: "power",
-                label: t("sidebar.power"),
-                lightImage: "/images/tab-power2-light.webp",
-                darkImage: "/images/tab-power2-dark.webp",
-              },
-              {
-                key: "custom",
-                label: t("sidebar.custom"),
-                lightImage: "/images/tab-custom-light-v3.webp",
-                darkImage: "/images/tab-custom-dark-v3.webp",
-              },
-            ]
-              .map((tab) => {
-                const active = activeSidebarTab === tab.key;
-                const tabStyle: Record<string, {
-                  background: string;
-                }> = {
-                  pedals: {
-                    background: "#F4F2FF",
-                  },
-                  boards: {
-                    background: "#F2F7FC",
-                  },
-                  power: {
-                    background: "#FFF7DC",
-                  },
-                  custom: {
-                    background: "#FFF0E7",
-                  },
-                };
-                const style = tabStyle[tab.key];
-                return (<button key={tab.key} type="button" aria-pressed={active} onClick={() => {
-                  setActiveSidebarTab(tab.key as any);
-                  setShowPedalResults(false);
-                  setShowBoardResults(false);
-                  setShowPowerResults(false);
-                }} style={{
-                  width: "95%",
-                  maxWidth: isMobile ? 58 : undefined,
-                  height: "auto",
-                  aspectRatio: "1 / 1",
-                  justifySelf: "center",
-                  borderRadius: "14px",
-                  background: style.background,
-                  border: "1px solid rgba(0,0,0,0.035)",
-                  boxShadow: "none",
-                  transform: "scale(1)",
-                  transition: "transform 140ms ease-out, border-color 140ms ease-out, box-shadow 140ms ease-out",
-                }} onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = "scale(1.05)";
-                }} onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = "scale(1)";
-                }} className="
-        min-w-0
-        flex
-        items-center
-        justify-center
-        select-none
-        touch-manipulation
-        [-webkit-tap-highlight-color:transparent]
-      ">
-                  <img src={tab.darkImage} alt="" aria-hidden="true" draggable={false} className="
-          w-[28px]
-          h-[28px]
-          object-contain
-          pointer-events-none
-          select-none
-        "/>
-                </button>);
-              })}
-          </div>
-        </div>
-        {activeSidebarTab === "pedals" && (<SearchPedals pedalsLibrary={pedalsLibrary} newPedals={newPedals} newPedalsLoading={newPedalsLoading} libraryLoading={libraryLoading} libraryError={libraryError} pedalSearch={pedalSearch} setPedalSearch={setPedalSearch} showPedalResults={showPedalResults} setShowPedalResults={setShowPedalResults} setShowBoardResults={setShowBoardResults} addPedal={(p) => {
-          setLastSelectedPedal(p);
-          addPedal(p);
-        }} pedalInputRef={pedalInputRef} t={t} groupItems={groupItems} onOpenGear={() => setGearOpen(true)} />)}
-        {activeSidebarTab === "boards" && (<SearchBoards boardsLibrary={boardsLibrary} catalogStatus={boardsStatus} boardSearch={boardSearch} setBoardSearch={setBoardSearch} showBoardResults={showBoardResults} setShowBoardResults={setShowBoardResults} setShowPedalResults={setShowPedalResults} selectBoard={selectBoard} selectSuggestedBoard={selectSuggestedBoard} finderPedals={finderPedals} existingBoards={existingBoards} units={units} boardInputRef={boardInputRef} t={t} groupItems={groupItems} />)}
-        {activeSidebarTab === "power" && (<SearchPower catalogStatus={powerStatus} pedalsLoading={libraryLoading} finderPedals={finderPedals} existingBoards={powerFinderBoards} pedalsLibrary={pedalsLibrary} powerLibrary={powerLibrary} powerSearch={powerSearch} setPowerSearch={setPowerSearch} showPowerResults={showPowerResults} setShowPowerResults={setShowPowerResults} setShowPedalResults={setShowPedalResults} setShowBoardResults={setShowBoardResults} addPower={(p) => {
-          addPower(p);
-        }} powerInputRef={powerInputRef} powerDropdownRef={powerDropdownRef} t={t} groupItems={groupItems} />)}
-        {activeSidebarTab === "custom" && (<CustomPanel customType={customType} setCustomType={setCustomType} customName={customName} setCustomName={setCustomName} customColor={customColor} setCustomColor={setCustomColor} customWidth={customWidth} setCustomWidth={setCustomWidth} customDepth={customDepth} setCustomDepth={setCustomDepth} addCustomItem={addCustomItem} isPedalValid={isPedalValid} isBoardValid={isBoardValid} minValue={minValue} maxValue={maxValue} displayMin={displayMin} displayMax={displayMax} units={units} unitLabel={unitLabel} withUnit={withUnit} t={t} />)}
-      </div>)}
-    {(gearOpen || replacement) && createPortal(
+      <SearchAllGear
+        pedalsLibrary={pedalsLibrary} boardsLibrary={boardsLibrary} powerLibrary={powerLibrary}
+        newPedals={newPedals} newBoards={newBoards} newPower={newPower} newGearLoading={newGearLoading}
+        libraryLoading={libraryLoading} libraryError={libraryError} boardsStatus={boardsStatus} powerStatus={powerStatus}
+        finderPedals={finderPedals} existingBoards={existingBoards} powerFinderBoards={powerFinderBoards}
+        selectSuggestedBoard={selectSuggestedBoard}
+        addItem={addGear}
+        onOpenGear={(query, category) => setGearView({ query, category })}
+        units={units} t={t} groupItems={groupItems}
+        customPanel={<CustomPanel customType={customType} setCustomType={setCustomType} customName={customName} setCustomName={setCustomName} customColor={customColor} setCustomColor={setCustomColor} customWidth={customWidth} setCustomWidth={setCustomWidth} customDepth={customDepth} setCustomDepth={setCustomDepth} addCustomItem={addCustomItem} isPedalValid={isPedalValid} isBoardValid={isBoardValid} minValue={minValue} maxValue={maxValue} displayMin={displayMin} displayMax={displayMax} units={units} unitLabel={unitLabel} withUnit={withUnit} t={t} />}
+      />)}
+    {(gearView || replacement) && createPortal(
       <GearCatalog
         key={replacement ? "replace" : "library"}
         replacement={replacement}
-        pedals={pedalsLibrary} loading={libraryLoading} error={libraryError}
-        initialQuery={replacement ? "" : pedalSearch} language={language} units={units} t={t}
+        pedals={pedalsLibrary} boards={boardsLibrary} power={powerLibrary}
+        newPedals={newPedals}
+        newBoards={newBoards}
+        newPower={newPower}
+        newGearLoading={newGearLoading}
+        loading={libraryLoading} error={libraryError} boardsStatus={boardsStatus} powerStatus={powerStatus}
+        initialQuery={replacement ? "" : gearView?.query ?? ""} initialCategory={gearView?.category}
+        language={language} units={units} t={t}
         isUSA={isUSA} isEurope={isEurope} buildThomannUrl={buildThomannUrl}
-        onClose={replacement?.onClose ?? (() => setGearOpen(false))}
-        onAdd={(pedal) => {
+        onClose={replacement?.onClose ?? (() => {
+          setGearView(null);
+          onReturnToCanvas?.();
+        })}
+        onAdd={(kind, item) => {
           if (replacement) {
-            replacement.onChoose(pedal);
+            replacement.onChoose(item);
             return;
           }
-          setGearOpen(false);
-          setLastSelectedPedal(pedal);
-          addPedal(pedal);
+          setGearView(null);
+          addGear(kind, item);
         }}
       />,
       document.body,
     )}
-    {/* PUSH TO BOTTOM (desktop only) */}
-    {activeSidebarTab !== "custom" && <div className="mt-auto" />}
   </div>);
 }

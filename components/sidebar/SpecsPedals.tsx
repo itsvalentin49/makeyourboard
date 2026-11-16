@@ -1,46 +1,35 @@
 "use client";
-
 import React from "react";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, Plus } from "lucide-react";
 import { mmToIn, formatWeight } from "@/utils/units";
 import gearStyles from "./GearCatalog.module.css";
 import type { Language } from "@/utils/i18n";
-
 type Props = {
   selectedPedal: any;
+  onAddToBoard?: (pedal: any) => void;
   embedded?: { header: React.ReactNode; footer: React.ReactNode };
   selectedInstanceId: number | null;
-
   units: "metric" | "imperial";
   language: Language;
   t: (key: string) => string;
-
   isCustomPedal: boolean;
   isImportedPedal: boolean;
-
   isUSA: boolean;
   isEurope: boolean;
-
   buildThomannUrl: (slug: string) => string;
 };
-
 function hasValue(value: any) {
   if (value == null) return false;
-
   const normalizedValue = String(value).trim();
-
   return (
     normalizedValue !== "" &&
     normalizedValue.toUpperCase() !== "N/A"
   );
 }
-
 function formatYear(value: any) {
   if (!hasValue(value)) return null;
-
   return String(value).split("-")[0];
 }
-
 function getLocalizedOverview(
   item: any,
   language: Language
@@ -57,33 +46,25 @@ function getLocalizedOverview(
     pt: "overview_pt",
     zh: "overview_zh",
   };
-
   const fieldName =
     overviewByLanguage[language] ||
     "overview";
-
   if (hasValue(item?.[fieldName])) {
     return item[fieldName];
   }
-
   if (hasValue(item?.overview)) {
     return item.overview;
   }
-
   if (hasValue(item?.description)) {
     return item.description;
   }
-
   if (hasValue(item?.desc)) {
     return item.desc;
   }
-
   return "";
 }
-
 export function splitTags(value: any) {
   if (!hasValue(value)) return [];
-
   // The slash in A/B Box belongs to the label. Other slashes separate tags.
   return String(value)
     .replace(/\bA\s*\/\s*B(?=\s+Box\b)/gi, "AB")
@@ -92,19 +73,15 @@ export function splitTags(value: any) {
     .filter(Boolean)
     .map((tag) => /^AB\s+Box$/i.test(tag) ? "A/B Box" : tag);
 }
-
 function safeTranslate(
   key: string,
   value: any,
   t: (key: string) => string
 ) {
   if (!hasValue(value)) return null;
-
   const translated = t(`${key}.${value}`);
-
   return translated || String(value);
 }
-
 function SpecRow({
   label,
   value,
@@ -120,22 +97,18 @@ function SpecRow({
   ) {
     return null;
   }
-
   return (
     <div className="flex items-center py-[1px]">
-      <span className="text-[12px]">
+      <span className="text-[14px]">
         {label}
       </span>
-
       <div className="flex-1 border-b border-dotted border-zinc-600 mx-2 translate-y-[3.5px]" />
-
-      <span className="text-[12px] leading-relaxed font-normal text-zinc-300 whitespace-nowrap">
+      <span className="text-[14px] leading-relaxed font-normal text-zinc-300 whitespace-nowrap">
         {value}
       </span>
     </div>
   );
 }
-
 function StoreLogos({
   selectedPedal,
   buildThomannUrl,
@@ -151,7 +124,6 @@ function StoreLogos({
     logo: string;
     url: string;
   }[] = [];
-
   if (selectedPedal?.thomann) {
     stores.push({
       key: "thomann",
@@ -162,7 +134,6 @@ function StoreLogos({
       ),
     });
   }
-
   if (selectedPedal?.sweetwater) {
     stores.push({
       key: "sweetwater",
@@ -171,7 +142,6 @@ function StoreLogos({
       url: selectedPedal.sweetwater,
     });
   }
-
   if (selectedPedal?.woodbrass) {
     stores.push({
       key: "woodbrass",
@@ -180,7 +150,6 @@ function StoreLogos({
       url: selectedPedal.woodbrass,
     });
   }
-
   stores.push({
     key: "reverb",
     label: "Reverb",
@@ -190,7 +159,6 @@ function StoreLogos({
       }`
     )}`,
   });
-
   return (
     <div className={detailed ? gearStyles.storeList : "flex items-center gap-3 flex-wrap"}>
       {stores.map((store) => (
@@ -218,7 +186,7 @@ function StoreLogos({
           {detailed && (
             <>
               <span>{store.label}</span>
-              <ExternalLink size={13} aria-hidden="true" />
+              <ExternalLink size={13} className="text-blue-500" aria-hidden="true" />
             </>
           )}
         </a>
@@ -226,8 +194,6 @@ function StoreLogos({
     </div>
   );
 }
-
-
 export function PedalRetailers({
   selectedPedal,
   buildThomannUrl,
@@ -238,14 +204,13 @@ export function PedalRetailers({
 }) {
   return (
     <section className="flex flex-col gap-2">
-      <h2 className={detailed ? gearStyles.storeTitle : "text-[15px] font-black"}>
+      <h2 className={detailed ? gearStyles.storeTitle : "text-[18px] font-black"}>
         {t("sidebar.buyOnline")}
       </h2>
       <StoreLogos selectedPedal={selectedPedal} buildThomannUrl={buildThomannUrl} detailed={detailed} />
     </section>
   );
 }
-
 export function getHeroImageCandidates(
   pedal: any
 ) {
@@ -258,31 +223,26 @@ export function getHeroImageCandidates(
     .map((value) =>
       String(value).trim()
     );
-
   return candidates.filter(
     (value, index) =>
       candidates.indexOf(value) ===
       index
   );
 }
-
 function PedalHeroPreview({
   selectedPedal,
+  compact = false,
 }: {
   selectedPedal: any;
   selectedInstanceId: number | null;
+  compact?: boolean;
 }) {
   const imageCandidates =
     getHeroImageCandidates(
       selectedPedal
     );
-
   const image =
     imageCandidates[0] || null;
-
-  const HERO_WIDTH = 200;
-  const HERO_HEIGHT = 170;
-
   const pedalWidth =
     Number(selectedPedal?.width) || 0;
 
@@ -292,11 +252,19 @@ function PedalHeroPreview({
   const isHorizontalPedal =
     pedalWidth > pedalDepth;
 
-  const imageBoxWidth =
-    isHorizontalPedal ? 180 : 140;
+  const HERO_WIDTH = compact ? 140 : 200;
 
-  const imageBoxHeight = 140;
+  const HERO_HEIGHT = compact
+    ? isHorizontalPedal
+      ? Math.min(160, 140 * (pedalDepth / pedalWidth))
+      : 160
+    : 170;
 
+  const imageBoxWidth = compact
+    ? 140
+    : (isHorizontalPedal ? 180 : 140);
+
+  const imageBoxHeight = compact ? HERO_HEIGHT : 140;
   return (
     <div
       className="relative flex items-center justify-center overflow-hidden"
@@ -332,22 +300,18 @@ function PedalHeroPreview({
             onError={(event) => {
               const element =
                 event.currentTarget;
-
               const nextIndex =
                 Number(
                   element.dataset
                     .fallbackIndex || "1"
                 );
-
               const nextImage =
                 imageCandidates[nextIndex];
-
               if (!nextImage) {
                 element.style.display =
                   "none";
                 return;
               }
-
               element.dataset.fallbackIndex =
                 String(nextIndex + 1);
               element.src = nextImage;
@@ -358,10 +322,9 @@ function PedalHeroPreview({
     </div>
   );
 }
-
-
 export default function PedalSpecs({
   selectedPedal,
+  onAddToBoard,
   embedded,
   selectedInstanceId,
   units,
@@ -374,7 +337,6 @@ export default function PedalSpecs({
   /*
     Les pédales Custom et Import sont uniquement
     manipulées depuis les boutons d’action du canvas.
-
     Aucun contenu de caractéristiques n’est affiché
     dans la sidebar pour ces éléments.
   */
@@ -385,72 +347,57 @@ export default function PedalSpecs({
   ) {
     return null;
   }
-
   const brand =
     selectedPedal.brand || "";
-
   const name =
     selectedPedal.name || "";
-
   const year = formatYear(
     selectedPedal.year
   );
-
   const typeTags = splitTags(
     selectedPedal.type
   );
-
   const circuit = safeTranslate(
     "pedal.circuit",
     selectedPedal.circuit,
     t
   );
-
   const bypass = safeTranslate(
     "pedal.bypass",
     selectedPedal.bypass,
     t
   );
-
   const power = safeTranslate(
     "pedal.power",
     selectedPedal.power,
     t
   );
-
   const status = hasValue(
     selectedPedal.status
   )
     ? String(selectedPedal.status)
     : null;
-
   const normalizedStatus =
     status?.toLowerCase() || "";
-
   const isActive =
     normalizedStatus.includes("active") ||
     normalizedStatus.includes(
       "production"
     );
-
   const translatedStatus = status
     ? t(
       `pedal.status.${normalizedStatus}`
     )
     : null;
-
   const overview =
     getLocalizedOverview(
       selectedPedal,
       language
     );
-
   const width =
     Number(selectedPedal.width) || 0;
-
   const depth =
     Number(selectedPedal.depth) || 0;
-
   const dimensions =
     units === "metric"
       ? `${width} x ${depth} mm`
@@ -459,7 +406,6 @@ export default function PedalSpecs({
       )} x ${mmToIn(depth).toFixed(
         2
       )} in`;
-
   const draw = hasValue(
     selectedPedal.draw
   )
@@ -467,7 +413,6 @@ export default function PedalSpecs({
       selectedPedal.draw
     )} mA`
     : null;
-
   const weight = hasValue(
     selectedPedal.weight
   )
@@ -477,110 +422,176 @@ export default function PedalSpecs({
       language
     )
     : null;
-
+  const sidebarCardStyle: React.CSSProperties = {
+    background: "var(--zinc-950)",
+    border: "none",
+    borderRadius: 26,
+    padding: 24,
+    boxSizing: "border-box",
+    minWidth: 0,
+  };
   return (
     <div
-      className={embedded ? gearStyles.detailText : `
-        h-full
-        min-h-0
-        overflow-y-auto
-        overflow-x-hidden
-        flex
-        flex-col
-        gap-5
-        px-1
-        pb-0
-
-        [scrollbar-width:none]
-        [-ms-overflow-style:none]
-        [&::-webkit-scrollbar]:hidden
-      `}
+      className={embedded ? gearStyles.detailText : "w-full min-w-0 flex flex-col gap-5 px-1 pb-0"}
     >
       {embedded?.header}
       {/* HERO PRODUIT */}
-      {!embedded && <div className="shrink-0 flex flex-col items-center pt-1">
-        <div className="w-full h-[170px] shrink-0 flex items-center justify-center mb-4">
-          <PedalHeroPreview
-            selectedPedal={selectedPedal}
-            selectedInstanceId={selectedInstanceId}
-          />
-        </div>
 
-        <div className="w-full min-w-0">
-          <div className="flex flex-col gap-0.5 min-w-0">
-            {/* MARQUE */}
+      {!embedded && (
+        <div
+          className="w-full min-w-0 shrink-0"
+          style={{
+            display: "flex",
+            alignItems: "flex-start",
+            justifyContent: "space-between",
+            gap: 12,
+          }}
+        >
+          {/* Same identity presentation on desktop as on mobile.
+            Explicit sizes prevent desktop/global CSS overrides. */}
+          <div
+            className="w-full min-w-0"
+            style={{ display: "flex", flex: "1 1 0", flexDirection: "column", alignItems: "flex-start", minWidth: 0 }}
+          >
             {brand && (
-              <div className="text-[15px] font-black truncate">
+              <p
+                style={{
+                  margin: 0,
+                  maxWidth: "100%",
+                  color: "var(--foreground)",
+                  fontSize: 12,
+                  fontWeight: 700,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.1em",
+                  lineHeight: 1.5,
+                  overflowWrap: "anywhere",
+                }}
+              >
                 {brand}
-              </div>
+              </p>
             )}
-
-            {/* NOM */}
             {name && (
-              <div className="text-[12px] truncate">
+              <h2
+                style={{
+                  margin: "4px 0 0",
+                  width: "100%",
+                  minWidth: 0,
+                  color: "var(--foreground)",
+                  fontSize: 34,
+                  fontWeight: 900,
+                  lineHeight: 1.08,
+                  letterSpacing: "-0.035em",
+                  whiteSpace: "normal",
+                  overflowWrap: "anywhere",
+                }}
+              >
                 {name}
-              </div>
+              </h2>
             )}
-
-            {/* TYPES */}
             {typeTags.length > 0 && (
-              <div className="flex items-center gap-1.5 flex-wrap mt-2">
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  flexWrap: "wrap",
+                  gap: 8,
+                  marginTop: 12,
+                  width: "100%",
+                }}
+              >
                 {typeTags.map((tag) => (
                   <span
                     key={tag}
-                    className="
-                      px-2.5
-                      py-1
-                      rounded-full
-                      bg-white
-                      text-zinc-950
-                      text-[9px]
-                      font-black
-                      leading-none
-                      whitespace-nowrap
-                    "
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      width: "max-content",
+                      maxWidth: "100%",
+                      padding: "3px 10px",
+                      borderRadius: 9999,
+                      backgroundColor: "#ffffff",
+                      color: "#09090b",
+                      fontSize: 11,
+                      fontWeight: 900,
+                      lineHeight: 1.2,
+                      whiteSpace: "nowrap",
+                      boxSizing: "border-box",
+                    }}
                   >
-                    {t(
-                      `pedal.type.${tag}`
-                    )}
+                    {t(`pedal.type.${tag}`)}
                   </span>
                 ))}
               </div>
             )}
+            {onAddToBoard && (
+              <button
+                type="button"
+                onClick={() => onAddToBoard(selectedPedal)}
+                className={`${gearStyles.addToBoardHover} focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white`} style={{
+                  display: "inline-flex",
+                  flex: "0 0 auto",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  alignSelf: "flex-start",
+                  gap: 6,
+                  width: "max-content",
+                  minWidth: "max-content",
+                  minHeight: 34,
+                  marginTop: 16,
+                  padding: "7px 11px",
+                  border: 0,
+                  borderRadius: 9,
+                  color: "#ffffff",
+                  fontSize: 12,
+                  fontWeight: 700,
+                  lineHeight: "20px",
+                  whiteSpace: "nowrap",
+                  cursor: "pointer",
+                  boxSizing: "border-box",
+                }}
+              >
+                <Plus size={15} strokeWidth={2.5} aria-hidden="true" style={{ flexShrink: 0 }} />
+                <span style={{ whiteSpace: "nowrap" }}>{t("customPanel.addToBoard")}</span>
+              </button>
+            )}
+          </div>
+          <div
+            className="shrink-0 flex items-center justify-end"
+            style={{ width: 140, maxWidth: "38%", background: "transparent", minWidth: 0 }}
+          >
+            <PedalHeroPreview
+              selectedPedal={selectedPedal}
+              selectedInstanceId={selectedInstanceId}
+              compact
+            />
           </div>
         </div>
-      </div>}
-
+      )}
       {/* DESCRIPTION */}
       {hasValue(overview) && (
-        <div className="w-full min-w-0 shrink-0 flex flex-col gap-2" data-pedal-specs={embedded ? "description" : undefined}>
-          <div className="text-[15px] font-black">
+        <div className={embedded ? "w-full min-w-0 shrink-0 flex flex-col gap-2" : "w-full min-w-0 shrink-0 flex flex-col gap-3 rounded-[26px] border-0 bg-zinc-950 p-5"} data-pedal-specs={embedded ? "description" : undefined} style={embedded ? undefined : sidebarCardStyle}>
+          <div className="text-[18px] font-black">
             {t("pedal.description")}
           </div>
-
-          <p className="w-full max-w-none text-[12px] leading-relaxed whitespace-normal break-words">
+          <p className="w-full max-w-none text-[14px] leading-relaxed whitespace-normal break-words">
             {overview}
           </p>
         </div>
       )}
-
       {/* CARACTÉRISTIQUES */}
-      <div className="min-w-0 shrink-0 flex flex-col gap-2" data-pedal-specs={embedded ? "features" : undefined}>
-        <div className="text-[15px] font-black">
+      <div className={embedded ? "min-w-0 shrink-0 flex flex-col gap-2" : "min-w-0 shrink-0 flex flex-col gap-3 rounded-[26px] border-0 bg-zinc-950 p-5"} data-pedal-specs={embedded ? "features" : undefined} style={embedded ? undefined : sidebarCardStyle}>
+        <div className="text-[18px] font-black">
           {t("pedal.features")}
         </div>
-
         <div>
           {status && (
             <div className="flex items-center py-[1px]">
-              <span className="text-[12px]">
+              <span className="text-[14px]">
                 {t(
                   "pedal.status.label"
                 )}
               </span>
-
               <div className="flex-1 border-b border-dotted border-zinc-600 mx-2 translate-y-[3.5px]" />
-
               <span
                 className={`
                   text-[9px]
@@ -599,50 +610,42 @@ export default function PedalSpecs({
               </span>
             </div>
           )}
-
           <SpecRow
             label={t("pedal.year")}
             value={year}
           />
-
           <SpecRow
             label={t(
               "pedal.circuit.label"
             )}
             value={circuit}
           />
-
           <SpecRow
             label={t(
               "pedal.bypass.label"
             )}
             value={bypass}
           />
-
           <SpecRow
             label={t(
               "pedal.power.label"
             )}
             value={power}
           />
-
           <SpecRow
             label={t("pedal.draw")}
             value={draw}
           />
-
           <SpecRow
             label={t(
               "pedal.dimensions"
             )}
             value={dimensions}
           />
-
           <SpecRow
             label={t("pedal.weight")}
             value={weight}
           />
-
           <SpecRow
             label={t("pedal.origin")}
             value={
@@ -653,34 +656,21 @@ export default function PedalSpecs({
                 : null
             }
           />
-
           {hasValue(
             selectedPedal.manual
           ) && (
               <div className="flex items-center py-[1px]">
-                <span className="text-[12px]">
+                <span className="text-[14px]">
                   {t("pedal.manual")}
                 </span>
-
                 <div className="flex-1 border-b border-dotted border-zinc-600 mx-2 translate-y-[3.5px]" />
-
                 <a
                   href={
                     selectedPedal.manual
                   }
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="
-                  text-[12px]
-                  leading-relaxed
-                  font-bold
-                  text-blue-400
-                  hover:text-blue-300
-                  transition-colors
-                  flex
-                  items-center
-                  gap-1
-                "
+                  className={gearStyles.pdfLink}
                 >
                   PDF
                   <ExternalLink size={10} />
@@ -689,9 +679,16 @@ export default function PedalSpecs({
             )}
         </div>
       </div>
-
       {embedded?.footer}
-      {!embedded && <PedalRetailers selectedPedal={selectedPedal} buildThomannUrl={buildThomannUrl} t={t} />}
+      {!embedded && (
+        <div
+          className={`w-full min-w-0 shrink-0 ${gearStyles.retailersCard}`}
+          style={sidebarCardStyle}
+          data-pedal-specs="retailers"
+        >
+          <PedalRetailers selectedPedal={selectedPedal} buildThomannUrl={buildThomannUrl} t={t} detailed />
+        </div>
+      )}
     </div>
   );
 }

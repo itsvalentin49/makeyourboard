@@ -3,21 +3,30 @@
 import React, { useEffect, useLayoutEffect, useMemo, useState } from "react";
 
 import Sidebar from "@/components/sidebar/Sidebar";
+import SidebarFilter from "@/components/sidebar/SidebarFilter";
 import BoardCanvas from "@/components/BoardCanvas";
 import { resolveCustomPedalLayout } from "@/utils/customPedalLayout";
-import SettingsPanel from "@/components/SettingsPanel";
+import SettingsMenu from "@/components/SettingsMenu";
+import { Plus, Minus } from "lucide-react";
 import { useLibrary } from "@/hooks/useLibrary";
 import type { AnyRow, BoardItem, Project } from "@/types/project";
 import { getTranslator, type Language } from "@/utils/i18n";
-import { Settings, Plus, Minus, RotateCw, X, Trash2, Info } from "lucide-react";
 import { useRef } from "react";
 import SidebarLogo from "@/components/sidebar/SidebarLogo";
+import CatalogBanner from "@/components/CatalogBanner";
+import OnboardingTour from "@/components/OnboardingTour";
+import GearCatalog from "@/components/sidebar/GearCatalog";
+import { splitTags } from "@/components/sidebar/SpecsPedals";
+import CustomPanel from "@/components/sidebar/CustomPanel";
+import { mmToIn } from "@/utils/units";
 import pedalActions from "./PedalActions.module.css";
+
 
 import {
   checkReplacementFit,
   getFinderLayout,
   getBoardFitMode,
+  getCanvasBoardFit,
   isPowerSupply,
 } from "@/utils/boardFinder";
 
@@ -35,6 +44,7 @@ const LANGUAGE_TO_LOCALE: Record<string, "en" | "fr" | "es" | "de" | "it" | "pt"
 
 
 const MAX_PROJECTS = 7;
+const DESKTOP_SIDEBAR_WIDTH = 450;
 const STORAGE_KEY = "guitar-sandbox-data";
 const SETTINGS_STORAGE_KEY = "myb_settings";
 const SHARED_IMPORT_KEY = "myb_shared_board_import";
@@ -141,6 +151,7 @@ export default function BoardEditor({
   const desktopCanvasRef = useRef<HTMLDivElement | null>(null);
   const mobileCanvasRef = useRef<HTMLDivElement | null>(null);
   const canvasContainerRef = useRef<HTMLDivElement | null>(null);
+
   const {
     pedalsLibrary,
     boardsLibrary,
@@ -148,10 +159,14 @@ export default function BoardEditor({
     boardsStatus,
     powerStatus,
     newPedals,
+    newBoards,
+    newPower,
+    newGearLoading,
     newPedalsLoading,
     loading: libraryLoading,
     libraryError,
   } = useLibrary();
+
   const [projects, setProjects] = useState<Project[]>([]);
   const [activeProjectId, setActiveProjectId] = useState<number | null>(null);
   const [workingBoard, setWorkingBoard] = useState<Project>(DEFAULT_WORKING_BOARD);
@@ -192,13 +207,52 @@ export default function BoardEditor({
     getLanguageFromCountry(initialCountry)
   );
 
-  const t = getTranslator(language);
+  const t = useMemo(() => getTranslator(language), [language]);
+  const country =
+    typeof window !== "undefined"
+      ? (window as any).__MYB_COUNTRY__ || "FR"
+      : "FR";
+
+  const isUSA = country.toUpperCase() === "US";
+
+  const isEurope = [
+    "FR", "DE", "NL", "ES", "IT", "PT", "BE", "AT",
+    "DK", "SE", "NO", "FI", "PL", "CZ", "SK",
+    "HU", "RO", "BG", "HR", "SI", "EE", "LV",
+    "LT", "LU", "IE", "GR",
+  ].includes(country.toUpperCase());
+
+  const buildThomannUrl = (slug: string) => {
+    const domains: Record<string, string> = {
+      FR: "thomann.fr",
+      NL: "thomann.nl",
+      DE: "thomann.de",
+      ES: "thomann.es",
+      IT: "thomann.it",
+      PT: "thomann.pt",
+    };
+
+    const domain = domains[country.toUpperCase()] || "thomann.de";
+
+    return `https://www.${domain}/${slug}`;
+  };
 
   const [settingsLoaded, setSettingsLoaded] = useState(false);
   const [units, setUnits] = useState<Units>(() =>
     getUnitsFromCountry(initialCountry)
   );
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [catalogOpen, setCatalogOpen] = useState(false);
+  const [desktopInfoOpen, setDesktopInfoOpen] = useState(false);
+  const [desktopRightPanelOpen, setDesktopRightPanelOpen] = useState(false);
+  const [catalogSelectedPedal, setCatalogSelectedPedal] = useState<AnyRow | null>(null);
+  const [catalogSelectedKind, setCatalogSelectedKind] = useState<"pedals" | "boards" | "power">("pedals");
+  const [catalogRecommendationsHost, setCatalogRecommendationsHost] = useState<HTMLDivElement | null>(null);
+  const [mobileCatalogOpen, setMobileCatalogOpen] = useState(false);
+  const [customCatalogOpen, setCustomCatalogOpen] = useState(false);
+  const [mobileInfoPedal, setMobileInfoPedal] = useState<AnyRow | null>(null);
+  const [mobileDetailOpen, setMobileDetailOpen] = useState(false);
+  const mobileDetailBackRef = useRef<(() => void) | null>(null);
 
   const [mobileCanvasPanelOpen, setMobileCanvasPanelOpen] = useState(false);
 
@@ -206,7 +260,6 @@ export default function BoardEditor({
     useRef<(() => void) | null>(null);
 
   const [specsOpen, setSpecsOpen] = useState(false);
-  const [settingsOpen, setSettingsOpen] = useState(false);
   const [canvasSize, setCanvasSize] = useState({
     width: 0,
     height: 0,
@@ -368,11 +421,125 @@ export default function BoardEditor({
 
   const [customType, setCustomType] = useState<"pedal" | "board" | null>("pedal");
 
+  const customMinMm = customType === "board" ? 100 : 30;
+  const customMaxMm = customType === "board" ? 1000 : 300;
+  const customUnitLabel = units === "metric" ? "mm" : "in";
+  const customMinValue = units === "metric" ? customMinMm : mmToIn(customMinMm);
+  const customMaxValue = units === "metric" ? customMaxMm : mmToIn(customMaxMm);
+  const customDisplayMin = units === "metric" ? customMinMm : Math.round(mmToIn(customMinMm) * 10) / 10;
+  const customDisplayMax = units === "metric" ? customMaxMm : Math.round(mmToIn(customMaxMm) * 10) / 10;
+  const customWidthMm = units === "metric" ? Number(customWidth) : Number(customWidth) * 25.4;
+  const customDepthMm = units === "metric" ? Number(customDepth) : Number(customDepth) * 25.4;
+  const customPedalValid = customWidthMm >= 30 && customWidthMm <= 300 && customDepthMm >= 30 && customDepthMm <= 300;
+  const customBoardValid = customWidthMm >= 100 && customWidthMm <= 1000 && customDepthMm >= 100 && customDepthMm <= 1000;
+
+
 
 
   /**
    * Active project (toujours un Project valide)
    */
+
+
+  /* ================= CONNECTORS SYNC ================= */
+
+  const connectorsLibrary = useMemo(() => {
+    const map = new Map<string, AnyRow>();
+
+    pedalsLibrary.forEach(pedal => {
+      if (pedal.id != null) {
+        map.set(String(pedal.id), pedal);
+      }
+    });
+
+    return map;
+  }, [pedalsLibrary]);
+
+  useEffect(() => {
+    if (!hydrated || libraryLoading || libraryError) {
+      return;
+    }
+
+    if (connectorsLibrary.size === 0) {
+      return;
+    }
+
+    const syncProject = (project: Project): Project => {
+      let changed = false;
+
+      const boardPedals = project.boardPedals.map(pedal => {
+        if (
+          isPowerSupply(pedal) ||
+          pedal.slug === "custom" ||
+          pedal.slug === "custom-upload"
+        ) {
+          return pedal;
+        }
+
+        if (pedal.id == null) {
+          return pedal;
+        }
+
+        const source = connectorsLibrary.get(
+          String(pedal.id)
+        );
+
+        if (!source) {
+          return pedal;
+        }
+
+        const connectors = source.connectors ?? null;
+
+        const verified =
+          source.connectors_verified === true;
+
+        const sameConnectors =
+          JSON.stringify(pedal.connectors ?? null) ===
+          JSON.stringify(connectors);
+
+        const sameVerified =
+          (pedal.connectors_verified === true) ===
+          verified;
+
+        if (sameConnectors && sameVerified) {
+          return pedal;
+        }
+
+        changed = true;
+
+        return {
+          ...pedal,
+          connectors,
+          connectors_verified: verified,
+        };
+      });
+
+      return changed
+        ? { ...project, boardPedals }
+        : project;
+    };
+
+    setProjects(previous => {
+      const next = previous.map(syncProject);
+
+      return next.some(
+        (project, index) => project !== previous[index]
+      )
+        ? next
+        : previous;
+    });
+
+    setWorkingBoard(syncProject);
+
+  }, [
+    hydrated,
+    libraryLoading,
+    libraryError,
+    connectorsLibrary,
+    projects,
+    workingBoard,
+  ]);
+
   const activeProject: Project = projects.find((p) => p.id === activeProjectId) ?? workingBoard;
   const isFirstBoard = projects.findIndex(p => p.id === activeProjectId) === 0;
 
@@ -384,6 +551,7 @@ export default function BoardEditor({
    * Helpers
    */
   const [desktopToolbarHost, setDesktopToolbarHost] = useState<HTMLDivElement | null>(null);
+  const [mobileToolbarHost, setMobileToolbarHost] = useState<HTMLDivElement | null>(null);
 
   const closeSearchMenus = () => {
     setShowPedalResults(false);
@@ -685,10 +853,49 @@ export default function BoardEditor({
    * Sélections (safe)
    */
   const selectedPedal = activeProject.boardPedals.find((p) => p.instanceId === selectedInstanceId);
+  // A catalog/recommendation choice is a product to inspect, not a canvas instance.
+  // In the absence of such a choice, keep the canvas selection visible.
+  const sidebarPedal = catalogSelectedPedal
+    ? catalogSelectedKind === "boards" ? undefined : catalogSelectedKind === "power"
+      ? { ...catalogSelectedPedal, type: "power" } : catalogSelectedPedal
+    : selectedPedal;
+
+  const handleCanvasPedalSelection = React.useCallback((id: number | null) => {
+    setDesktopInfoOpen(false);
+    setCatalogSelectedPedal(null);
+    setSelectedInstanceId(id);
+  }, []);
+  const handleCanvasBoardSelection = React.useCallback((id: number | null) => {
+    setDesktopInfoOpen(false);
+    setCatalogSelectedPedal(null);
+    setSelectedBoardInstanceId(id);
+  }, []);
+  const handleCatalogSelection = React.useCallback((item: AnyRow | null, kind: "pedals" | "boards" | "power" = "pedals") => {
+    setCatalogSelectedKind(kind);
+    setCatalogSelectedPedal(item);
+    // Do not keep actions for an unrelated canvas instance visible.
+    if (item) {
+      setSelectedInstanceId(null);
+      setSelectedBoardInstanceId(null);
+    }
+  }, []);
+  const handleFirstCatalogPedal = React.useCallback((pedal: AnyRow) => {
+    handleCatalogSelection(pedal, "pedals");
+  }, [handleCatalogSelection]);
   const replacementTarget = replacement && replacement.projectId === activeProjectId
     ? activeProject.boardPedals.find((pedal) => pedal.instanceId === replacement.targetId)
     : undefined;
   const replacementCandidate = replacementTarget ? replacement?.candidate : undefined;
+  const replacementCatalog = useMemo(() =>
+    replacementTarget && !replacementCandidate ? { pedal: replacementTarget } : undefined,
+    [replacementTarget, replacementCandidate]);
+  const replacementQuery = useMemo(() => {
+    const tag = splitTags(replacementTarget?.type)[0];
+    if (!tag || !replacementCatalog) return "";
+    const key = `pedal.type.${tag}`;
+    const label = t(key);
+    return label && label !== key ? label : tag;
+  }, [replacementTarget?.type, replacementCatalog, t]);
 
   useEffect(() => {
     if (replacement && !replacementTarget) setReplacement(null);
@@ -717,8 +924,35 @@ export default function BoardEditor({
   }, [hasReplacementPreview]);
 
   const startReplacement = (id: number) => {
+    const target = activeProject.boardPedals.find((pedal) => pedal.instanceId === id);
+    if (!target || isPowerSupply(target)) return;
+    setCatalogSelectedPedal(null);
+    setSelectedInstanceId(id);
+    setSelectedBoardInstanceId(null);
     setReplacement({ projectId: activeProjectId, targetId: id });
+    setCustomCatalogOpen(false);
     closeSearchMenus();
+    if (isMobileDevice) {
+      setMobileSidebarOpen(false);
+      setMobileInfoPedal(null);
+      setMobileDetailOpen(false);
+      setMobileCatalogOpen(true);
+    } else {
+      setCatalogOpen(true);
+    }
+  };
+
+  const chooseReplacementCandidate = (item: AnyRow) => {
+    if (!replacementTarget || !replacement || replacementCandidate) return;
+    setReplacement({ ...replacement, candidate: item });
+    setCatalogOpen(false);
+    setMobileCatalogOpen(false);
+    setMobileInfoPedal(null);
+    setMobileDetailOpen(false);
+    setCustomCatalogOpen(false);
+    setCatalogSelectedPedal(null);
+    setSelectedInstanceId(replacementTarget.instanceId);
+    setSelectedBoardInstanceId(null);
   };
 
   const confirmReplacement = () => {
@@ -751,6 +985,42 @@ export default function BoardEditor({
     (b) => b.instanceId === selectedBoardInstanceId
   );
 
+
+  const sidebarBoard = catalogSelectedPedal
+    ? catalogSelectedKind === "boards" ? catalogSelectedPedal : undefined
+    : selectedBoardDetails;
+
+  const closeDesktopCatalog = () => {
+    setCatalogOpen(false);
+    setCatalogSelectedPedal(null);
+    setCustomCatalogOpen(false);
+    if (replacementCatalog) setReplacement(null);
+  };
+
+  const addCatalogItem = (kind: "pedals" | "boards" | "power", item: AnyRow, mobile = false) => {
+    if (replacementCatalog) {
+      if (kind === "pedals") chooseReplacementCandidate(item);
+      return;
+    }
+    if (kind === "boards") {
+      selectBoard(item);
+    } else if (kind === "power") {
+      const powerItem = { ...item, type: "power" };
+      setLastSelectedPower(powerItem);
+      addPedal(powerItem);
+    } else {
+      addPedal(item);
+    }
+    if (mobile) {
+      setMobileCatalogOpen(false);
+      return;
+    }
+    setCatalogOpen(false);
+    setCustomCatalogOpen(false);
+    setCatalogSelectedPedal(null);
+    setSelectedInstanceId(null);
+    setSelectedBoardInstanceId(null);
+  };
 
   const isCustomPedal =
     selectedPedal?.slug === "custom";
@@ -815,6 +1085,36 @@ export default function BoardEditor({
     });
 
     setEditingProjectId(null);
+    setActiveProjectId(newId);
+  };
+
+  const duplicateProject = (id: number) => {
+    if (projects.length >= MAX_PROJECTS) return;
+
+    const source = projects.find((p) => p.id === id);
+
+    if (!source) return;
+
+    const newId = Math.max(
+      Date.now(),
+      ...projects.map((p) => p.id + 1)
+    );
+
+    const newProject: Project = {
+      ...structuredClone(source),
+      id: newId,
+      name: `${source.name} (Copy)`,
+    };
+
+    setProjects((prev) => {
+      if (prev.length >= MAX_PROJECTS) return prev;
+
+      return [...prev, newProject];
+    });
+
+    setEditingProjectId(null);
+    setSelectedInstanceId(null);
+    setSelectedBoardInstanceId(null);
     setActiveProjectId(newId);
   };
 
@@ -981,7 +1281,11 @@ export default function BoardEditor({
 
 
 
-  const selectSuggestedBoard = (board: AnyRow): boolean => {
+  const selectSuggestedBoard = (
+    board: AnyRow,
+    allowRearrangement?: boolean,
+    powerUnderBoard?: boolean,
+  ): boolean => {
     const existingBoards =
       activeProject.selectedBoards || [];
 
@@ -992,17 +1296,12 @@ export default function BoardEditor({
 
     const layout = getFinderLayout(
       originalItems,
-      existingBoards
+      existingBoards,
+      powerUnderBoard,
     );
 
-    // Use the same compatibility rules as the Finder.
-    const mode = getBoardFitMode(
-      layout,
-      board,
-      true
-    );
-
-    if (!mode) return false;
+    const fit = allowRearrangement === undefined ? null : getCanvasBoardFit(layout, board, allowRearrangement);
+    if (allowRearrangement === undefined ? !getBoardFitMode(layout, board) : !fit) return false;
 
     const now = Date.now();
 
@@ -1025,19 +1324,24 @@ export default function BoardEditor({
 
       instanceId: now,
 
-      x: layout.centerX,
-      y: layout.centerY,
+      x: fit?.centerX ?? layout.centerX,
+      y: fit?.centerY ?? layout.centerY,
 
       rotation: 0,
 
       zIndex: boardZIndex,
     };
 
-    // Never move or rotate the pedals automatically.
-    // The user remains free to arrange them manually.
     updateActiveProject({
       selectedBoards: [newBoard],
-      boardPedals: originalItems,
+      boardPedals: originalItems.map((item) => {
+        const position = fit?.placements?.get(item.instanceId);
+        const zIndex = Number(item.zIndex ?? 0);
+        if (powerUnderBoard !== undefined && isPowerSupply(item) && (zIndex < boardZIndex) !== powerUnderBoard) {
+          return { ...item, ...position, zIndex: powerUnderBoard ? boardZIndex - 1 : Math.max(0, boardZIndex + 1) };
+        }
+        return position ? { ...item, ...position } : item;
+      }),
     });
 
     setLastSelectedBoard(board);
@@ -1334,6 +1638,43 @@ export default function BoardEditor({
   };
 
 
+  const customCatalogPanel = (mobile: boolean) => (
+    <CustomPanel
+      embeddedCatalog
+      customType={customType}
+      setCustomType={setCustomType}
+      customName={customName}
+      setCustomName={setCustomName}
+      customWidth={customWidth}
+      setCustomWidth={setCustomWidth}
+      customDepth={customDepth}
+      setCustomDepth={setCustomDepth}
+      customColor={customColor}
+      setCustomColor={setCustomColor}
+      addCustomItem={(item) => {
+        addCustomItem(item);
+        setCustomCatalogOpen(false);
+        if (mobile) {
+          setMobileCatalogOpen(false);
+          setMobileInfoPedal(null);
+          setMobileDetailOpen(false);
+        } else {
+          closeDesktopCatalog();
+        }
+      }}
+      isPedalValid={customPedalValid}
+      isBoardValid={customBoardValid}
+      minValue={customMinValue}
+      maxValue={customMaxValue}
+      displayMin={customDisplayMin}
+      displayMax={customDisplayMax}
+      units={units}
+      unitLabel={customUnitLabel}
+      withUnit={(label) => `${label} (${customUnitLabel})`}
+      t={t}
+    />
+  );
+
   return (
     <div
       className={`${pedalActions.editorViewport} bg-[var(--background)] text-[var(--foreground)] font-sans select-none overflow-hidden h-screen`}
@@ -1342,160 +1683,222 @@ export default function BoardEditor({
 
       <div className="h-full w-full">
 
+        <OnboardingTour t={t} />
+
         {/* ================= DESKTOP ≥1024 ================= */}
         <div className="hidden lg:flex h-full flex-col">
+          <CatalogBanner actions={
+            <>
+              <button
+                type="button"
+                aria-label={t("gear.allGear")}
+                title={t("gear.allGear")}
+                aria-expanded={catalogOpen}
+                onClick={() => {
+                  if (catalogOpen) {
+                    closeDesktopCatalog();
+                    return;
+                  }
+                  // Keep the currently displayed canvas product; only an empty
+                  // sidebar needs the newest database pedal as a fallback.
+                  setCatalogOpen(true);
+                }}
+                data-tour="catalogue"
+                className="myb-catalog-trigger flex h-9 w-9 shrink-0 items-center justify-center rounded-lg cursor-pointer"
+              >
+                <span
+                  className="flex items-center justify-center rounded-full bg-blue-600 text-white"
+                  style={{
+                    width: 24,
+                    height: 24,
+                    minWidth: 24,
+                    minHeight: 24,
+                    flexShrink: 0,
+                    aspectRatio: "1 / 1",
+                  }}
+                >
+                  {catalogOpen ? (
+                    <Minus size={18} strokeWidth={2.5} aria-hidden="true" />
+                  ) : (
+                    <Plus size={18} strokeWidth={2.5} aria-hidden="true" />
+                  )}
+                </span>
+              </button>
+
+              <SettingsMenu
+                t={t}
+                canvasBg={canvasBg}
+                setCanvasBg={setCanvasBg}
+                language={language}
+                setLanguage={setLanguage}
+                units={units}
+                setUnits={setUnits}
+                backgrounds={BACKGROUNDS}
+                placement="top"
+              />
+            </>
+          } />
           <div className="flex flex-1 min-h-0 min-w-0">
-
-            <div className="flex min-h-0 shrink-0 flex-col bg-zinc-900 w-76">
-              <div className="shrink-0 px-6" style={{ paddingTop: 10, paddingBottom: 20 }}>
-                <SidebarLogo />
-              </div>
-              <div className="flex flex-1 min-h-0 flex-col">
-                <Sidebar
-                  hideLogo
-                  replacement={replacementTarget && !replacementCandidate ? {
-                    pedal: replacementTarget,
-                    onChoose: (candidate) => setReplacement((session) => session && { ...session, candidate }),
-                    onClose: () => setReplacement(null),
-                  } : undefined}
-                  pedalsLibrary={pedalsLibrary}
-                  finderPedals={activeProject.boardPedals}
-                  newPedals={newPedals}
-                  newPedalsLoading={newPedalsLoading}
-                  libraryLoading={libraryLoading}
-                  libraryError={libraryError}
-                  boardsLibrary={boardsLibrary}
-                  powerLibrary={powerLibrary}
-                  boardsStatus={boardsStatus}
-                  powerStatus={powerStatus}
-                  setLastSelectedPedal={setLastSelectedPedal}
-                  lastSelectedPower={lastSelectedPower}
-                  setLastSelectedPower={setLastSelectedPower}
-                  showPedalResults={showPedalResults}
-                  setShowPedalResults={setShowPedalResults}
-                  showBoardResults={showBoardResults}
-                  setShowBoardResults={setShowBoardResults}
-                  pedalSearch={pedalSearch}
-                  setPedalSearch={setPedalSearch}
-                  boardSearch={boardSearch}
-                  setBoardSearch={setBoardSearch}
-                  selectedPedal={
-                    isUserCreatedPedal
-                      ? undefined
-                      : selectedPedal
-                  }
-
-                  selectedBoardDetails={
-                    isCustomBoard
-                      ? undefined
-                      : selectedBoardDetails
-                  }
-
-                  selectedInstanceId={
-                    isUserCreatedPedal
-                      ? null
-                      : selectedInstanceId
-                  }
-
-                  selectedBoardInstanceId={
-                    isCustomBoard
-                      ? null
-                      : selectedBoardInstanceId
-                  }
-                  lastSelectedPedal={lastSelectedPedal}
-                  lastSelectedBoard={lastSelectedBoard}
-                  setSelectedInstanceId={setSelectedInstanceId}
-                  setSelectedBoardInstanceId={setSelectedBoardInstanceId}
-                  customName={customName}
-                  setCustomName={setCustomName}
-                  customWidth={customWidth}
-                  setCustomWidth={setCustomWidth}
-                  customDepth={customDepth}
-                  setCustomDepth={setCustomDepth}
-                  customColor={customColor}
-                  setCustomColor={setCustomColor}
-                  addPedal={addPedal}
-                  selectBoard={selectBoard}
-                  selectSuggestedBoard={selectSuggestedBoard}
-                  existingBoards={activeProject.selectedBoards || []}
-                  addCustomItem={addCustomItem}
-                  rotatePedal={rotatePedal}
-                  movePedalFront={movePedalFront}
-                  movePedalBack={movePedalBack}
-                  moveBoardFront={moveBoardFront}
-                  moveBoardBack={moveBoardBack}
-                  deletePedal={deletePedal}
-                  rotateBoard={rotateBoard}
-                  deleteBoard={deleteBoard}
-                  canvasBg={canvasBg}
-                  setCanvasBg={setCanvasBg}
-                  language={language}
-                  setLanguage={setLanguage}
-                  units={units}
-                  setUnits={setUnits}
-                  customType={customType}
-                  setCustomType={setCustomType}
-                  makeOpen={makeOpen}
-                  setMakeOpen={setMakeOpen}
-                  contactOpen={contactOpen}
-                  setContactOpen={setContactOpen}
-                />
-              </div>
-            </div>
 
             <div
               ref={desktopCanvasRef}
-              className="flex-1 min-w-0 bg-[#323234] flex flex-col overflow-hidden"
+              className={`flex-1 min-w-0 flex flex-col overflow-hidden ${catalogOpen ? "bg-transparent" : "bg-[#323234]"
+                }`}
             >
               <div className="flex-1 min-h-0 relative overflow-hidden">
-                <div ref={setDesktopToolbarHost} className="absolute inset-0 z-[110] pointer-events-none" />
-                <BoardCanvas
-                  desktopToolbarHost={desktopToolbarHost}
-                  activeProject={activeProject}
-                  replacePedal={startReplacement}
-                  duplicateCanvasItem={duplicateCanvasItem}
-                  moveCanvasItemOneLayer={moveCanvasItemOneLayer}
-                  replacementPreview={replacementReview}
-                  units={units}
-                  language={language}
-                  setMobileSidebarOpen={setMobileSidebarOpen}
-                  setSpecsOpen={setSpecsOpen}
-                  selectedInstanceId={selectedInstanceId}
-                  setSelectedInstanceId={setSelectedInstanceId}
-                  selectedBoardInstanceId={selectedBoardInstanceId}
-                  setSelectedBoardInstanceId={setSelectedBoardInstanceId}
-                  displaySizes={displaySizes}
-                  handleSizeUpdate={handleSizeUpdate}
-                  updateActiveProject={updateActiveProject}
-                  closeSearchMenus={closeSearchMenus}
-                  setContactOpen={setContactOpen}
-                  BACKGROUNDS={BACKGROUNDS}
-                  canvasBg={canvasBg}
-                  selectedBackgroundSrc={selectedBackgroundSrc}
-                  setCanvasBg={setCanvasBg}
-                  showIntro={isFirstBoard && isBoardEmpty}
-                  isMobile={isMobileDevice}
-                  rotatePedal={rotatePedal}
-                  deletePedal={deletePedal}
-                  rotateBoard={rotateBoard}
-                  deleteBoard={deleteBoard}
-                  onStageSizeChange={setCanvasSize}
-                  getCenterRef={getCenterRef}
-                  projects={projects}
-                  activeProjectId={activeProjectId}
-                  setActiveProjectId={setActiveProjectId}
-                  createNewProject={createNewProject}
-                  deleteProject={deleteProject}
-                  startEditing={startEditing}
-                  editingProjectId={editingProjectId}
-                  tempName={tempName}
-                  setTempName={updateProjectName}
-                  saveName={saveName}
-                  setSettingsOpen={setSettingsOpen}
-                  setLanguage={setLanguage}
-                  setUnits={setUnits}
+                {/* One continuous blur for catalog and sidebar: no seam or doubled blur. */}
+                {catalogOpen && (
+                  <div aria-hidden="true" className="absolute inset-0 z-[110] pointer-events-none backdrop-blur-[12px]" />
+                )}
+                <div
+                  className={`absolute inset-0 ${catalogOpen ? "pointer-events-none" : ""
+                    }`}
+                >
+                  <div
+                    ref={setDesktopToolbarHost}
+                    className="absolute inset-0 z-[130] pointer-events-none"
+                  />
+                  <BoardCanvas
+                    desktopToolbarHost={desktopToolbarHost}
+                    desktopCatalogOpen={catalogOpen}
+                    onMobileItemInfo={() => {
+                      setCatalogOpen(false);
+                      setCustomCatalogOpen(false);
+                      setDesktopInfoOpen(true);
+                    }}
+                    onDesktopRightPanelChange={setDesktopRightPanelOpen}
+                    activeProject={activeProject}
+                    duplicateCanvasItem={duplicateCanvasItem}
+                    moveCanvasItemOneLayer={moveCanvasItemOneLayer}
+                    replacementPreview={replacementReview}
+                    units={units}
+                    language={language}
+                    setMobileSidebarOpen={setMobileSidebarOpen}
+                    setSpecsOpen={setSpecsOpen}
+                    selectedInstanceId={selectedInstanceId}
+                    setSelectedInstanceId={handleCanvasPedalSelection}
+                    selectedBoardInstanceId={selectedBoardInstanceId}
+                    setSelectedBoardInstanceId={handleCanvasBoardSelection}
+                    displaySizes={displaySizes}
+                    handleSizeUpdate={handleSizeUpdate}
+                    updateActiveProject={updateActiveProject}
+                    closeSearchMenus={closeSearchMenus}
+                    setContactOpen={setContactOpen}
+                    BACKGROUNDS={BACKGROUNDS}
+                    canvasBg={canvasBg}
+                    selectedBackgroundSrc={selectedBackgroundSrc}
+                    setCanvasBg={setCanvasBg}
+                    showIntro={isFirstBoard && isBoardEmpty}
+                    isMobile={isMobileDevice}
+                    rotatePedal={rotatePedal}
+                    deletePedal={deletePedal}
+                    rotateBoard={rotateBoard}
+                    deleteBoard={deleteBoard}
+                    onStageSizeChange={setCanvasSize}
+                    getCenterRef={getCenterRef}
+                    projects={projects}
+                    activeProjectId={activeProjectId}
+                    setActiveProjectId={setActiveProjectId}
+                    createNewProject={createNewProject}
+                    duplicateProject={duplicateProject}
+                    deleteProject={deleteProject}
+                    startEditing={startEditing}
+                    editingProjectId={editingProjectId}
+                    tempName={tempName}
+                    setTempName={updateProjectName}
+                    saveName={saveName}
 
-                />
+                    setLanguage={setLanguage}
+                    setUnits={setUnits}
+
+                  />
+                </div>
+
+                {catalogOpen && (
+                  <div
+                    className="absolute top-0 bottom-0 z-[120] min-h-0 min-w-0 overflow-hidden"
+                    style={{
+                      left: 0,
+                      right: 0,
+                      visibility: catalogOpen ? "visible" : "hidden",
+                      pointerEvents: catalogOpen ? "auto" : "none",
+                    }}
+                  >
+                    <GearCatalog
+                      compactPedalDetails
+                      desktopSidebarMode
+                      catalogVisible={catalogOpen}
+                      embedded
+                      pedals={pedalsLibrary}
+                      boards={boardsLibrary}
+                      power={powerLibrary}
+                      newPedals={newPedals}
+                      newBoards={newBoards}
+                      newPower={newPower}
+                      newGearLoading={newGearLoading}
+                      boardsStatus={boardsStatus}
+                      powerStatus={powerStatus}
+                      loading={libraryLoading}
+                      error={libraryError}
+                      initialCategory="all"
+                      initialQuery={replacementQuery}
+                      replacement={replacementCatalog}
+                      language={language}
+                      units={units}
+                      isUSA={isUSA}
+                      isEurope={isEurope}
+                      buildThomannUrl={buildThomannUrl}
+                      t={t}
+                      onClose={closeDesktopCatalog}
+                      onOpenCustom={() => setCustomCatalogOpen(open => !open)}
+                      customOpen={customCatalogOpen}
+                      customPanel={customCatalogOpen ? customCatalogPanel(false) : undefined}
+                      onAdd={addCatalogItem}
+                    />
+                  </div>
+                )}
+                {!catalogOpen && desktopInfoOpen && (sidebarPedal || sidebarBoard) && (
+                  <aside
+                    className="absolute top-0 left-0 bottom-0 z-[130] isolate overflow-hidden bg-transparent"
+                    style={{
+                      width: DESKTOP_SIDEBAR_WIDTH,
+                      minWidth: DESKTOP_SIDEBAR_WIDTH,
+                      maxWidth: DESKTOP_SIDEBAR_WIDTH,
+                      right: "auto",
+                      boxSizing: "border-box",
+                    }}
+                  >
+                    <div className="relative z-10 h-full min-h-0">
+                      <SidebarFilter
+                        boardsLibrary={boardsLibrary}
+                        onSelectBoard={(board) => handleCatalogSelection(board, "boards")}
+                        onRecommendationsHostChange={setCatalogRecommendationsHost}
+                        selectedPedal={sidebarPedal ?? undefined}
+                        replacementMode={Boolean(replacementCatalog)}
+                        onAddToBoard={replacementCatalog && !catalogSelectedPedal ? undefined : (item) => {
+                          const kind = sidebarBoard ? "boards" : sidebarPedal && isPowerSupply(sidebarPedal) ? "power" : "pedals";
+                          addCatalogItem(kind, item);
+                        }}
+                        selectedBoardDetails={sidebarBoard}
+                        selectedInstanceId={catalogSelectedPedal ? null : selectedInstanceId}
+                        selectedBoardInstanceId={catalogSelectedPedal ? null : selectedBoardInstanceId}
+                        language={language}
+                        units={units}
+                        country={country}
+                        isUSA={isUSA}
+                        isEurope={isEurope}
+                        rotatePedal={rotatePedal}
+                        movePedalFront={movePedalFront}
+                        movePedalBack={movePedalBack}
+                        deletePedal={deletePedal}
+                        rotateBoard={rotateBoard}
+                        moveBoardFront={moveBoardFront}
+                        moveBoardBack={moveBoardBack}
+                        deleteBoard={deleteBoard}
+                      />
+                    </div>
+                  </aside>
+                )}
               </div>
             </div>
 
@@ -1506,76 +1909,50 @@ export default function BoardEditor({
         {/* ================= MOBILE <1024 ================= */}
         <div className="flex lg:hidden flex-col h-full relative">
 
-          {/* HEADER MOBILE */}
-          <div
-            className="
-    relative
-    z-50
-    bg-zinc-900
-    flex items-center
-    justify-between
-    px-4
-    shrink-0
-  "
-            style={{
-              paddingTop: "env(safe-area-inset-top)",
-              height: "calc(64px + env(safe-area-inset-top))",
-            }}
-          >
-            <SidebarLogo compact />
-
-            <div className="ml-auto flex items-center gap-3">
-
-              {/* PLUS / MOINS */}
-              <button
-                type="button"
-                onClick={() => {
-                  if (mobileCanvasPanelOpen) {
-                    mobileCanvasPanelCloseRef.current?.();
-                    setMobileCanvasPanelOpen(false);
-                    return;
-                  }
-
-                  if (mobileSidebarOpen) {
-                    setMobileSidebarOpen(false);
-                    return;
-                  }
-
-                  setSelectedInstanceId(null);
-                  setSelectedBoardInstanceId(null);
-                  setMobileSidebarOpen(true);
-                }}
-                className="
-      w-[30px]
-      h-[30px]
-      shrink-0
-      rounded-full
-      bg-blue-600
-      !text-white
-      flex
-      items-center
-      justify-center
-      shadow-2xl
-      active:scale-95
-      transition-transform
-      touch-manipulation
-      [-webkit-tap-highlight-color:transparent]
-    "
-                aria-label={
-                  mobileSidebarOpen || mobileCanvasPanelOpen
-                    ? "Fermer le panneau"
-                    : "Ouvrir la bibliothèque"
+          <CatalogBanner actions={<>
+            <button
+              type="button"
+              data-tour="catalogue"
+              aria-label={t("gear.allGear")}
+              title={t("gear.allGear")}
+              aria-expanded={mobileCatalogOpen}
+              onClick={() => {
+                if (mobileCanvasPanelOpen) {
+                  mobileCanvasPanelCloseRef.current?.();
+                  setMobileCanvasPanelOpen(false);
                 }
+                setMobileSidebarOpen(false);
+                setMobileInfoPedal(null);
+                setMobileDetailOpen(false);
+                setCustomCatalogOpen(false);
+                if (mobileCatalogOpen && replacementCatalog) setReplacement(null);
+                setMobileCatalogOpen((open) => !open);
+              }}
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg cursor-pointer transition-colors duration-150 hover:bg-zinc-800"
+            >
+              <span
+                className="flex items-center justify-center rounded-full bg-blue-600 text-white transition-colors hover:bg-blue-700"
+                style={{
+                  width: 24,
+                  height: 24,
+                  minWidth: 24,
+                  minHeight: 24,
+                  flexShrink: 0,
+                  aspectRatio: "1 / 1",
+                }}
               >
-                {mobileSidebarOpen || mobileCanvasPanelOpen ? (
-                  <Minus size={22} strokeWidth={2.4} />
+                {mobileCatalogOpen ? (
+                  <Minus size={18} strokeWidth={2.5} aria-hidden="true" />
                 ) : (
-                  <Plus size={22} strokeWidth={2.4} />
+                  <Plus size={18} strokeWidth={2.5} aria-hidden="true" />
                 )}
-              </button>
+              </span>
+            </button>
+            <SettingsMenu t={t} canvasBg={canvasBg} setCanvasBg={setCanvasBg}
+              language={language} setLanguage={setLanguage} units={units} setUnits={setUnits}
+              backgrounds={BACKGROUNDS} placement="top" />
+          </>} />
 
-            </div>
-          </div>
 
           {/* CANVAS MOBILE */}
           <div
@@ -1584,7 +1961,20 @@ export default function BoardEditor({
           >
             <BoardCanvas
               activeProject={activeProject}
-              replacePedal={startReplacement}
+              mobileCatalogOpen={mobileCatalogOpen}
+              mobileToolbarHost={mobileToolbarHost}
+              onMobileItemInfo={(item) => {
+                if (item.kind === "board" || isPowerSupply(item)) {
+                  setMobileInfoPedal(null);
+                  setMobileCatalogOpen(false);
+                  setMobileSidebarOpen(true);
+                  return;
+                }
+
+                setMobileInfoPedal(item);
+                setMobileSidebarOpen(false);
+                setMobileCatalogOpen(true);
+              }}
               duplicateCanvasItem={duplicateCanvasItem}
               moveCanvasItemOneLayer={moveCanvasItemOneLayer}
               replacementPreview={replacementReview}
@@ -1593,9 +1983,9 @@ export default function BoardEditor({
               setMobileSidebarOpen={setMobileSidebarOpen}
               setSpecsOpen={setSpecsOpen}
               selectedInstanceId={selectedInstanceId}
-              setSelectedInstanceId={setSelectedInstanceId}
+              setSelectedInstanceId={handleCanvasPedalSelection}
               selectedBoardInstanceId={selectedBoardInstanceId}
-              setSelectedBoardInstanceId={setSelectedBoardInstanceId}
+              setSelectedBoardInstanceId={handleCanvasBoardSelection}
               displaySizes={displaySizes}
               handleSizeUpdate={handleSizeUpdate}
               updateActiveProject={updateActiveProject}
@@ -1619,19 +2009,63 @@ export default function BoardEditor({
               activeProjectId={activeProjectId}
               setActiveProjectId={setActiveProjectId}
               createNewProject={createNewProject}
+              duplicateProject={duplicateProject}
               deleteProject={deleteProject}
               startEditing={startEditing}
               editingProjectId={editingProjectId}
               tempName={tempName}
               setTempName={updateProjectName}
               saveName={saveName}
-              setSettingsOpen={setSettingsOpen}
+
               setLanguage={setLanguage}
               setUnits={setUnits}
             />
+
+            <div ref={setMobileToolbarHost} className="absolute inset-0 z-[130] pointer-events-none" />
+
+            {mobileCatalogOpen && (
+              <div className="absolute inset-0 z-[120] min-h-0 min-w-0 overflow-hidden bg-transparent backdrop-blur-xl">
+                <GearCatalog
+                  embedded
+                  initialDetailItem={mobileInfoPedal}
+                  pedals={pedalsLibrary}
+                  boards={boardsLibrary}
+                  power={powerLibrary}
+                  newPedals={newPedals}
+                  newBoards={newBoards}
+                  newPower={newPower}
+                  newGearLoading={newGearLoading}
+                  boardsStatus={boardsStatus}
+                  powerStatus={powerStatus}
+                  onDetailChange={setMobileDetailOpen}
+                  detailBackRef={mobileDetailBackRef}
+                  loading={libraryLoading}
+                  error={libraryError}
+                  initialCategory="all"
+                  initialQuery={replacementQuery}
+                  replacement={replacementCatalog}
+                  language={language}
+
+                  units={units}
+                  isUSA={isUSA}
+                  isEurope={isEurope}
+                  buildThomannUrl={buildThomannUrl}
+                  t={t}
+                  onOpenCustom={() => setCustomCatalogOpen(open => !open)}
+                  customOpen={customCatalogOpen}
+                  customPanel={customCatalogOpen ? customCatalogPanel(true) : undefined}
+                  onClose={() => {
+                    setCustomCatalogOpen(false);
+                    setMobileCatalogOpen(false);
+                    setMobileInfoPedal(null);
+                    setMobileDetailOpen(false);
+                    if (replacementCatalog) setReplacement(null);
+                  }}
+                  onAdd={(kind, item) => addCatalogItem(kind, item, true)}
+                />
+              </div>
+            )}
           </div>
-
-
 
           {/* MOBILE SIDEBAR DRAWER */}
           <div
@@ -1667,6 +2101,11 @@ export default function BoardEditor({
                     pedalsLibrary={pedalsLibrary}
                     finderPedals={activeProject.boardPedals}
                     newPedals={newPedals}
+
+                    newBoards={newBoards}
+                    newPower={newPower}
+                    newGearLoading={newGearLoading}
+
                     newPedalsLoading={newPedalsLoading}
                     libraryLoading={libraryLoading}
                     libraryError={libraryError}
@@ -1737,6 +2176,7 @@ export default function BoardEditor({
                     setMakeOpen={setMakeOpen}
                     contactOpen={contactOpen}
                     setContactOpen={setContactOpen}
+                    onReturnToCanvas={() => setMobileSidebarOpen(false)}
                     hideLogo
                     isMobile
                   />
@@ -1785,6 +2225,11 @@ export default function BoardEditor({
                 pedalsLibrary={pedalsLibrary}
                 finderPedals={activeProject.boardPedals}
                 newPedals={newPedals}
+
+                newBoards={newBoards}
+                newPower={newPower}
+                newGearLoading={newGearLoading}
+
                 newPedalsLoading={newPedalsLoading}
                 libraryLoading={libraryLoading}
                 libraryError={libraryError}
@@ -1863,96 +2308,6 @@ export default function BoardEditor({
 
           </div>
         </div>
-      )}
-
-      {/* SETTINGS DRAWER */}
-      {settingsOpen && (
-        <>
-          {/* ================= DESKTOP ================= */}
-          <div className="hidden lg:flex fixed inset-0 z-[200]">
-            <div
-              className="flex-1 bg-black/40 backdrop-blur-sm"
-              onClick={() => setSettingsOpen(false)}
-            />
-            <div className="w-[85%] max-w-[420px] bg-zinc-900 border-l border-zinc-800 p-6 shadow-2xl overflow-y-auto">
-              <div className="flex items-center justify-between mb-8">
-                <h2 className="text-[16px] font-black uppercase tracking-wider text-white">
-                  {t("settings.title")}
-                </h2>
-                <button onClick={() => setSettingsOpen(false)} className="p-1">
-                  <X
-                    size={18}
-                    style={{ color: "#71717a", cursor: "pointer" }}
-                    onMouseEnter={(e) => (e.currentTarget.style.color = "#ffffff")}
-                    onMouseLeave={(e) => (e.currentTarget.style.color = "#71717a")}
-                  />
-                </button>
-              </div>
-
-              <SettingsPanel
-                t={t}
-                canvasBg={canvasBg}
-                setCanvasBg={setCanvasBg}
-                language={language}
-                setLanguage={setLanguage}
-                units={units}
-                setUnits={setUnits}
-                backgrounds={BACKGROUNDS}
-                setContactOpen={setContactOpen}
-              />
-            </div>
-          </div>
-
-          {/* ================= MOBILE ================= */}
-          <div className="lg:hidden fixed inset-0 z-[200]">
-            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
-
-            <div className="absolute inset-0 bg-zinc-950 flex flex-col animate-in slide-in-from-bottom duration-300">
-
-              {/* HEADER */}
-              <div
-                className="flex items-center justify-between px-6"
-                style={{
-                  paddingTop: "env(safe-area-inset-top)",
-                  height: "calc(60px + env(safe-area-inset-top))",
-                }}
-              >
-                <h2 className="text-[18px] font-black uppercase tracking-wider">
-                  {t("settings.title")}
-                </h2>
-
-                <button onClick={() => setSettingsOpen(false)} className="p-1">
-                  <X
-                    size={18}
-                    style={{ color: "#71717a", cursor: "pointer" }}
-                    onMouseEnter={(e) => (e.currentTarget.style.color = "#ffffff")}
-                    onMouseLeave={(e) => (e.currentTarget.style.color = "#71717a")}
-                  />
-                </button>
-              </div>
-
-              {/* CONTENT */}
-              <div
-                className="flex-1 overflow-y-auto p-6"
-                style={{
-                  paddingBottom: "env(safe-area-inset-bottom)",
-                }}
-              >
-                <SettingsPanel
-                  t={t}
-                  canvasBg={canvasBg}
-                  setCanvasBg={setCanvasBg}
-                  language={language}
-                  setLanguage={setLanguage}
-                  units={units}
-                  setUnits={setUnits}
-                  backgrounds={BACKGROUNDS}
-                  setContactOpen={setContactOpen}
-                />
-              </div>
-            </div>
-          </div>
-        </>
       )}
 
       {replacementReview && (

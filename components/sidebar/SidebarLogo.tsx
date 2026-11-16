@@ -5,14 +5,10 @@ type Props = {
 };
 
 export default function SidebarLogo({ compact = false }: Props) {
+  const subtitle = "GUITAR PEDALBOARD PLANNER";
+
   return (
-    <div
-      className={
-        compact
-          ? "select-none inline-flex flex-col"
-          : "px-1 pb-0 pt-2 select-none inline-flex flex-col"
-      }
-    >
+    <div className="px-1 select-none inline-flex flex-col w-fit">
       <div
         className={
           compact
@@ -42,36 +38,28 @@ export default function SidebarLogo({ compact = false }: Props) {
       </div>
 
       <div
-        className={
-          compact
-            ? "w-full mt-1 flex items-center justify-between text-[7px] font-bold uppercase leading-none whitespace-nowrap"
-            : "w-full mt-1 flex items-center justify-between text-[10px] font-bold uppercase leading-none whitespace-nowrap"
-        }
+        aria-label={subtitle}
+        className="flex w-full justify-between font-medium"
+        style={{
+          fontSize: compact ? 7 : 10,
+          lineHeight: 1,
+          marginTop: 3,
+        }}
       >
-        <span
-          style={{
-            letterSpacing: compact ? "1.7px" : "3.3px",
-          }}
-        >
-          GUITAR
-        </span>
-
-        <span
-          style={{
-            letterSpacing: compact ? "1.7px" : "3.3px",
-          }}
-        >
-          PEDALBOARD
-        </span>
-
-        <span
-          style={{
-            letterSpacing: compact ? "1.7px" : "3.3px",
-            marginRight: compact ? "-1.7px" : "-3.3px",
-          }}
-        >
-          PLANNER
-        </span>
+        {subtitle.split("").map((char, index) => (
+          <span
+            key={index}
+            aria-hidden="true"
+            style={{
+              fontSize: "inherit",
+              display: "inline-block",
+              transform: "scale(0.8)",
+              transformOrigin: "center",
+            }}
+          >
+            {char === " " ? "\u00A0" : char}
+          </span>
+        ))}
       </div>
     </div>
   );

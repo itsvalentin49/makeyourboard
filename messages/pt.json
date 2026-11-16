@@ -12,11 +12,19 @@
     "cancel": "Cancelar",
     "confirm": "Confirmar substituição"
   },
-  "gearTu3": {
-    "officialDemo": "Demonstração oficial",
-    "artists": "Artistas que usam o TU-3"
-  },
   "gear": {
+    "label": "Equipamento",
+    "allGear": "Todo o equipamento",
+    "moreAll": "Mostrar mais…",
+    "subtitleAll": "Explora pedais, pedalboards e fontes de alimentação para o teu setup.",
+    "searchAll": "Pesquisar…",
+    "openAll": "Abrir a biblioteca de equipamento",
+    "category": "Categoria",
+    "allCategories": "Tudo",
+    "loadingAll": "A carregar a biblioteca de equipamento…",
+    "loadError": "Não foi possível carregar parte do equipamento.",
+    "emptyAll": "Nenhum equipamento corresponde à pesquisa.",
+    "powerFinder": "Encontrar uma fonte de alimentação",
     "showList": "Mostrar em lista",
     "showGrid": "Mostrar em grelha",
     "resultOne": "{count} resultado",
@@ -25,7 +33,7 @@
     "anyValue": "Qualquer",
     "open": "Abrir a biblioteca de pedais",
     "returnToBoard": "Voltar ao pedalboard",
-    "closeDetails": "Fechar detalhes do pedal",
+    "closeDetails": "Fechar a ficha",
     "title": "Biblioteca de pedais",
     "subtitle": "Explora os efeitos e adiciona as tuas descobertas ao pedalboard.",
     "search": "Pesquisar pedais, marcas ou efeitos…",
@@ -38,7 +46,12 @@
     "newestFirst": "Mais recentes primeiro",
     "reset": "Limpar filtros",
     "empty": "Nenhum pedal corresponde à pesquisa.",
-    "more": "Mostrar mais pedais"
+    "more": "Mostrar mais pedais",
+    "moreTypeFromBrand": "Mais pedais de {type} da {brand}",
+    "moreFromBrand": "Mais pedais da {brand}",
+    "moreTypeFromOtherBrands": "Mais pedais de {type} de outras marcas",
+    "didYouMean": "Você quis dizer",
+    "moreResults": "Mostrar mais resultados"
   },
   "sidebar": {
     "searchPedal": "Procurar um pedal",
@@ -215,7 +228,8 @@
     },
     "dimensions": "Dimensões",
     "weight": "Peso",
-    "origin": "Origem"
+    "origin": "Origem",
+    "similarBoards": "Pedalboards semelhantes"
   },
   "settings": {
     "title": "Definições",
@@ -283,7 +297,7 @@
   "export": {
     "singlePedal": "Adiciona um segundo pedal para transferir uma imagem.",
     "button": "Exportar",
-    "title": "Exportar a pedaleira",
+    "title": "Exportar",
     "name": "Nome da pedaleira",
     "preview": "Pré-visualização",
     "downloadTitle": "Transferir a imagem",
@@ -413,6 +427,7 @@
     "power": "Alimentação"
   },
   "cables": {
+    "showSignalCables": "Mostrar os cabos de sinal",
     "title": "Cabos",
     "clearance": "Espaço para cabos",
     "signalPath": "Percurso do sinal",
@@ -421,6 +436,11 @@
     "signalChainDescription": "Uma ordem recomendada para começar. Podes adaptá-la e experimentar até encontrares o teu som.",
     "recommendedOrder": "Ordem recomendada",
     "reset": "Repor",
+    "pedalOrder": "Ordem dos pedais",
+    "signalRouting": "Roteamento do sinal",
+    "enoughSpace": "Espaço suficiente",
+    "tooClose": "Demasiado próximas",
+    "signalRoutingDescription": "Visualize o percurso do sinal de áudio entre os seus pedais.",
     "empty": "Adiciona pedais à pedaleira para ver a cadeia de sinal."
   },
   "help": {
@@ -436,7 +456,7 @@
     "shareTitle": "Transfere a tua pedaleira",
     "shareText": "Exporta a tua pedaleira em PNG para a guardar ou partilhar.",
     "ok": "OK",
-    "documentation": "Documentação",
+    "documentation": "Docs",
     "dontShowAgain": "Não voltar a mostrar",
     "welcomeTitle": "Bem-vindo ao MakeYourBoard!",
     "welcomeText": "O MakeYourBoard é uma ferramenta gratuita para criar a tua pedaleira ideal. Adiciona a pedaleira, os pedais e a fonte de alimentação, organiza a configuração como quiseres e vê o resultado em poucos cliques. Criado para entusiastas de pedais, espero que seja útil e divertido de usar.",
@@ -469,6 +489,8 @@
     "aluminium": "Alumínio"
   },
   "boardFinder": {
+    "powerUnderBoard": "Fonte de alimentação por baixo da pedaleira",
+    "allowRearrangement": "Permitir reposicionar os pedais",
     "button": "Encontrar pedaleira",
     "subtitle": "Encontra a pedaleira ideal.",
     "back": "Voltar",
@@ -610,5 +632,43 @@
     "limited": "Limite de pesquisa atingido: o plano pode ser melhorado.",
     "success": "Os teus pedais estão devidamente alimentados. Let’s Rock!",
     "failure": "Usa uma fonte mais potente ou com mais saídas, ou adiciona uma segunda."
+  },
+  "onboarding": {
+    "label": "Tutorial do MakeYourBoard",
+    "replay": "Rever o tutorial",
+    "skip": "Ignorar",
+    "back": "Anterior",
+    "next": "Seguinte",
+    "start": "Descobrir",
+    "finish": "Vamos começar!",
+    "close": "Fechar",
+    "welcome": {
+      "title": "Bem-vindo ao MakeYourBoard 2.0!",
+      "description": "Um novo design e uma experiência mais fluida. Tudo o que precisas para criar, organizar e partilhar o teu pedalboard ideal."
+    },
+    "catalogue": {
+      "title": "Explora o catálogo",
+      "description": "Descobre pedais, pedalboards e fontes de alimentação. Explora o catálogo ou cria o teu próprio equipamento personalizado."
+    },
+    "canvas": {
+      "title": "Cria o teu pedalboard",
+      "description": "Arrasta o equipamento para organizar o teu pedalboard. Seleciona qualquer elemento para consultar as especificações, rodá-lo, duplicá-lo ou removê-lo."
+    },
+    "boards": {
+      "title": "Gere os teus pedalboards",
+      "description": "Cria vários pedalboards, muda os seus nomes, duplica-os e alterna facilmente entre eles."
+    },
+    "cables": {
+      "title": "Organiza as tuas ligações",
+      "description": "Verifica o espaço disponível para os cabos, organiza a ordem dos pedais e visualiza o percurso do sinal."
+    },
+    "power": {
+      "title": "Alimenta os teus pedais",
+      "description": "Verifica a tensão e o consumo de corrente, descobre como alimentar cada pedal e certifica-te de que a tua fonte de alimentação é adequada."
+    },
+    "share": {
+      "title": "Exporta e partilha",
+      "description": "Exporta o teu pedalboard como imagem ou partilha uma cópia editável do projeto através de uma ligação."
+    }
   }
 }

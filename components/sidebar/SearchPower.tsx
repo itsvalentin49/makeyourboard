@@ -10,6 +10,7 @@ import type { CatalogStatus } from "@/hooks/useLibrary";
 type AnyRow = Record<string, any>;
 
 type Props = {
+  embeddedFinder?: boolean;
   powerLibrary: AnyRow[];
   catalogStatus: CatalogStatus;
   pedalsLoading: boolean;
@@ -89,6 +90,7 @@ function releaseSortKey(power: AnyRow, today: Date): number | null {
 }
 
 export default function SearchPower({
+  embeddedFinder = false,
   finderPedals,
   existingBoards = [],
   pedalsLibrary,
@@ -105,6 +107,7 @@ export default function SearchPower({
   t,
 }: Props) {
   const [finderOpen, setFinderOpen] = useState(false);
+  const isFinder = embeddedFinder || finderOpen;
   const search =
     powerSearch.trim().toLowerCase();
 
@@ -162,164 +165,177 @@ export default function SearchPower({
   };
 
   const finder = useMemo(() => {
-    if (!finderOpen) return null;
+    if (!isFinder) return null;
     const analysis = findPowerSupplies(hydratePedals(finderPedals, pedalsLibrary), powerLibrary, 60000, t);
     return { analysis, matches: recommendPower(analysis.results, existingBoards) };
-  }, [finderOpen, finderPedals, pedalsLibrary, powerLibrary, existingBoards, t]);
+  }, [isFinder, finderPedals, pedalsLibrary, powerLibrary, existingBoards, t]);
 
   const resultLabel = t((finder?.matches.length ?? 0) === 0 ? "powerFinder.noResults" : finder?.matches.length === 1 ? "powerFinder.result" : "powerFinder.results")
     .replace("{count}", String(finder?.matches.length ?? 0));
 
   return (
-    <div className="flex flex-col mt-4 h-full min-h-0">
-      {/* TITLE */}
+    <div className={embeddedFinder ? "mt-4 flex min-h-0 flex-1 flex-col pt-[6px]" : "flex flex-col mt-4 h-full min-h-0"}>
+      {embeddedFinder && catalogStatus === "ready" && finder && (
+        <p className="mb-2 shrink-0 text-[11px] font-bold" role="status">
+          {t(finder.matches.length === 1 ? "boardsMenu.result" : "boardsMenu.results")
+            .replace("{count}", String(finder.matches.length))}
+        </p>
+      )}
+      {!embeddedFinder && (
+        <>
+          {/* TITLE */}
 
-      <div className="mb-2 shrink-0">
-        <div className="min-w-0 text-[11px] font-black uppercase tracking-wide">
-          {t("powerMenu.title")}
-        </div>
-      </div>
-
-      {/* BARRE DE RECHERCHE */}
-
-      <div className="flex items-center gap-2 mb-4 shrink-0">
-        <div className="relative flex items-center flex-1 min-w-0">
-          {finderOpen ? (
-            <div
-              className="w-full h-[30px] rounded-md flex items-center gap-2 min-w-0 px-3 text-[10px] font-black uppercase"
-              style={{ height: 30, minHeight: 30, backgroundColor: "#e5f8ec", color: "#14532d", fontSize: 10 }}
-              role="status"
-              aria-live="polite"
-              title={resultLabel}
-            >
-              {(finder?.matches.length ?? 0) > 0 && (
-                <CheckCircle2 size={16} strokeWidth={2.4} className="shrink-0" aria-hidden="true" style={{ color: "#16a34a", stroke: "#16a34a" }} />
-              )}
-              <span className="truncate">{resultLabel}</span>
+          <div className="mb-2 shrink-0">
+            <div className="min-w-0 text-[11px] font-black uppercase tracking-wide">
+              {t("powerMenu.title")}
             </div>
-          ) : (
-            <>
-              <Search
-                size={15}
-                strokeWidth={2.5}
-                className="absolute left-4 text-[#6f6a5d]"
-              />
+          </div>
 
-              <input
-                ref={powerInputRef}
-                type="text"
-                autoComplete="off"
-                autoCorrect="off"
-                autoCapitalize="off"
-                spellCheck={false}
-                placeholder={t(
-                  "powerMenu.searchPlaceholder"
-                )}
-                className="
-            w-full
-            h-[30px]
-            bg-white
-            !text-black
-            placeholder:!text-zinc-500
-            rounded-md
-            pl-12
-            pr-11
-            text-[16px] lg:text-[12px]
-            font-bold
-            outline-none
-          "
-                value={powerSearch}
-                onClick={(event) => {
-                  event.stopPropagation();
+          {/* BARRE DE RECHERCHE */}
 
-                  setShowPedalResults(false);
-                  setShowBoardResults(false);
-                  setShowPowerResults(true);
-                }}
-                onChange={(event) => {
-                  setPowerSearch(
-                    event.target.value
-                  );
-
-                  setShowPowerResults(true);
-                }}
-              />
-
-              {powerSearch && (
-                <button
-                  type="button"
-                  onClick={(event) => {
-                    event.stopPropagation();
-
-                    setPowerSearch("");
-
-                    powerInputRef.current?.focus();
-                  }}
-                  className="
-              absolute
-              right-4
-              flex
-              items-center
-              justify-center
-              text-[#6f6a5d]
-              hover:opacity-70
-              transition-opacity
-            "
-                  aria-label={t("powerMenu.clearSearch")}
+          <div className="flex items-center gap-2 mb-4 shrink-0">
+            <div className="relative flex items-center flex-1 min-w-0">
+              {finderOpen ? (
+                <div
+                  className="w-full h-[30px] rounded-md flex items-center gap-2 min-w-0 px-3 text-[10px] font-black uppercase"
+                  style={{ height: 30, minHeight: 30, backgroundColor: "#e5f8ec", color: "#14532d", fontSize: 10 }}
+                  role="status"
+                  aria-live="polite"
+                  title={resultLabel}
                 >
-                  <X
+                  {(finder?.matches.length ?? 0) > 0 && (
+                    <CheckCircle2 size={16} strokeWidth={2.4} className="shrink-0" aria-hidden="true" style={{ color: "#16a34a", stroke: "#16a34a" }} />
+                  )}
+                  <span className="truncate">{resultLabel}</span>
+                </div>
+              ) : (
+                <>
+                  <Search
                     size={15}
-                    strokeWidth={3}
+                    strokeWidth={2.5}
+                    className="absolute left-4 text-[#6f6a5d]"
                   />
-                </button>
-              )}
-            </>
-          )}
-        </div>
 
-        <button
-          type="button"
-          disabled={catalogStatus !== "ready" || pedalsLoading}
-          aria-label={t(finderOpen ? "sidebar.back" : "powerFinder.open")}
-          title={t(finderOpen ? "sidebar.back" : "powerFinder.open")}
-          onClick={(event) => {
-            event.stopPropagation();
-            setShowPedalResults(false);
-            setShowBoardResults(false);
-            setShowPowerResults(false);
-            setFinderOpen(open => !open);
-          }}
-          onMouseEnter={(event) => {
-            event.currentTarget.style.setProperty("background-color", "#1d4ed8", "important");
-          }}
-          onMouseLeave={(event) => {
-            event.currentTarget.style.setProperty("background-color", "#2563eb", "important");
-          }}
-          ref={(element) => {
-            if (element) {
-              element.style.setProperty("background-color", "#2563eb", "important");
-              element.style.setProperty("color", "#ffffff", "important");
-            }
-          }}
-          className="shrink-0 flex items-center justify-center rounded-md cursor-pointer transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-          style={{
-            width: 30,
-            minWidth: 30,
-            height: 30,
-            minHeight: 30,
-            padding: 0,
-            border: "none",
-            backgroundColor: "#2563eb",
-            color: "#ffffff",
-          }}
-        >
-          {finderOpen ? (
-            <ArrowLeft size={22} strokeWidth={2} aria-hidden="true" style={{ color: "#ffffff", stroke: "#ffffff" }} />
-          ) : (
-            <WandSparkles size={22} strokeWidth={2} aria-hidden="true" style={{ color: "#ffffff", stroke: "#ffffff" }} />
-          )}
-        </button>
-      </div>
+                  <input
+                    ref={powerInputRef}
+                    type="text"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck={false}
+                    placeholder={t(
+                      "powerMenu.searchPlaceholder"
+                    )}
+                    className="
+                w-full
+                h-[30px]
+                bg-white
+                !text-black
+                placeholder:!text-zinc-500
+                rounded-md
+                pl-12
+                pr-11
+                text-[16px] lg:text-[12px]
+                font-bold
+                outline-none
+              "
+                    value={powerSearch}
+                    onClick={(event) => {
+                      event.stopPropagation();
+
+                      setShowPedalResults(false);
+                      setShowBoardResults(false);
+                      setShowPowerResults(true);
+                    }}
+                    onChange={(event) => {
+                      setPowerSearch(
+                        event.target.value
+                      );
+
+                      setShowPowerResults(true);
+                    }}
+                  />
+
+                  {powerSearch && (
+                    <button
+                      type="button"
+                      onClick={(event) => {
+                        event.stopPropagation();
+
+                        setPowerSearch("");
+
+                        powerInputRef.current?.focus();
+                      }}
+                      className="
+                  absolute
+                  right-4
+                  flex
+                  items-center
+                  justify-center
+                  text-[#6f6a5d]
+                  hover:opacity-70
+                  transition-opacity
+                "
+                      aria-label={t("powerMenu.clearSearch")}
+                    >
+                      <X
+                        size={15}
+                        strokeWidth={3}
+                      />
+                    </button>
+                  )}
+                </>
+              )}
+            </div>
+
+            <button
+              type="button"
+              disabled={catalogStatus !== "ready" || pedalsLoading}
+              aria-label={t(finderOpen ? "sidebar.back" : "powerFinder.open")}
+              title={t(finderOpen ? "sidebar.back" : "powerFinder.open")}
+              onClick={(event) => {
+                event.stopPropagation();
+                setShowPedalResults(false);
+                setShowBoardResults(false);
+                setShowPowerResults(false);
+
+                setFinderOpen(open => !open);
+
+              }}
+              onMouseEnter={(event) => {
+                event.currentTarget.style.setProperty("background-color", "#1d4ed8", "important");
+              }}
+              onMouseLeave={(event) => {
+                event.currentTarget.style.setProperty("background-color", "#2563eb", "important");
+              }}
+              ref={(element) => {
+                if (element) {
+                  element.style.setProperty("background-color", "#2563eb", "important");
+                  element.style.setProperty("color", "#ffffff", "important");
+                }
+              }}
+              className="shrink-0 flex items-center justify-center rounded-md cursor-pointer transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              style={{
+                width: 30,
+                minWidth: 30,
+                height: 30,
+                minHeight: 30,
+                padding: 0,
+                border: "none",
+                backgroundColor: "#2563eb",
+                color: "#ffffff",
+              }}
+            >
+              {finderOpen ? (
+                <ArrowLeft size={22} strokeWidth={2} aria-hidden="true" style={{ color: "#ffffff", stroke: "#ffffff" }} />
+              ) : (
+                <WandSparkles size={22} strokeWidth={2} aria-hidden="true" style={{ color: "#ffffff", stroke: "#ffffff" }} />
+              )}
+            </button>
+          </div>
+
+        </>
+      )}
 
       {catalogStatus !== "ready" ? (
         <div
@@ -340,7 +356,7 @@ export default function SearchPower({
             t("pedalsMenu.loadError")
           )}
         </div>
-      ) : finderOpen && finder ? (
+      ) : isFinder && finder ? (
         <div className="flex flex-col min-h-0 flex-1 overflow-hidden">
           {finder.matches.length === 0 && (
             <p className="mb-4 text-[11px] text-zinc-400" role="status">
@@ -366,7 +382,7 @@ export default function SearchPower({
                     }}
                     onMouseEnter={handlePowerHover}
                     onMouseLeave={handlePowerLeave}
-                    className="relative w-full min-h-[48px] rounded-lg bg-zinc-800 hover:bg-zinc-700 pl-[72px] pr-[34px] py-1 flex items-center text-left transition-colors shrink-0 overflow-hidden"
+                    className={`relative w-full min-h-[48px] rounded-lg ${embeddedFinder ? "bg-zinc-900" : "bg-zinc-800"} hover:bg-zinc-700 pl-[72px] pr-[34px] py-1 flex items-center text-left transition-colors shrink-0 overflow-hidden`}
                     aria-label={t("powerFinder.addSupply").replace("{name}", label(power) === "powerFinder.unnamed" ? t("powerFinder.unnamed") : label(power))}
                   >
                     <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[64px] h-[42px] flex items-center justify-center pointer-events-none">

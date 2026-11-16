@@ -12,11 +12,19 @@
     "cancel": "Annuler",
     "confirm": "Confirmer le remplacement"
   },
-  "gearTu3": {
-    "officialDemo": "Démo officielle",
-    "artists": "Artistes qui utilisent la TU-3"
-  },
   "gear": {
+    "label": "Matériel",
+    "allGear": "Tout le matériel",
+    "moreAll": "Afficher plus…",
+    "subtitleAll": "Explore les pédales, pedalboards et alimentations pour ton installation.",
+    "searchAll": "Rechercher…",
+    "openAll": "Ouvrir la bibliothèque de matériel",
+    "category": "Catégorie",
+    "allCategories": "Tout",
+    "loadingAll": "Chargement de la bibliothèque…",
+    "loadError": "Une partie du matériel n’a pas pu être chargée.",
+    "emptyAll": "Aucun matériel ne correspond à ta recherche.",
+    "powerFinder": "Trouver une alimentation",
     "showList": "Afficher en liste",
     "showGrid": "Afficher en grille",
     "resultOne": "{count} résultat",
@@ -35,10 +43,15 @@
     "allTypes": "Tous les types",
     "sort": "Trier par",
     "alphabetical": "Marque A–Z",
-    "newestFirst": "Plus récentes d’abord",
+    "newestFirst": "Nouveautés",
     "reset": "Effacer les filtres",
     "empty": "Aucune pédale ne correspond à ta recherche.",
-    "more": "Afficher plus de pédales"
+    "more": "Afficher plus de pédales",
+    "moreTypeFromBrand": "Autres pédales {type} de {brand}",
+    "moreFromBrand": "Autres pédales de {brand}",
+    "moreTypeFromOtherBrands": "Autres pédales {type} d'autres marques",
+    "didYouMean": "Vouliez-vous dire",
+    "moreResults": "Afficher plus de résultats"
   },
   "sidebar": {
     "searchPedal": "Rechercher une pédale",
@@ -216,7 +229,8 @@
     },
     "dimensions": "Dimensions",
     "weight": "Poids",
-    "origin": "Origine"
+    "origin": "Origine",
+    "similarBoards": "Pedalboards similaires"
   },
   "settings": {
     "title": "Paramètres",
@@ -284,7 +298,7 @@
   "export": {
     "singlePedal": "Ajoute une deuxième pédale pour télécharger une image.",
     "button": "Exporter",
-    "title": "Exporter le pedalboard",
+    "title": "Exporter",
     "name": "Nom du pedalboard",
     "preview": "Aperçu",
     "downloadTitle": "Télécharger l’image",
@@ -414,6 +428,7 @@
     "power": "Alimentation"
   },
   "cables": {
+    "showSignalCables": "Afficher les câbles du signal",
     "title": "Câbles",
     "clearance": "Passage des câbles",
     "signalPath": "Chemin du signal",
@@ -422,6 +437,11 @@
     "signalChainDescription": "Un ordre recommandé pour partir sur de bonnes bases. Libre à vous de l’adapter et d’expérimenter pour trouver votre son.",
     "recommendedOrder": "Ordre conseillé",
     "reset": "Réinitialiser",
+    "pedalOrder": "Ordre des pédales",
+    "signalRouting": "Routage du signal",
+    "enoughSpace": "Espace suffisant",
+    "tooClose": "Trop proches",
+    "signalRoutingDescription": "Visualisez le trajet du signal audio entre vos pédales.",
     "empty": "Ajoutez des pédales au pedalboard pour afficher la chaîne du signal."
   },
   "help": {
@@ -437,7 +457,7 @@
     "shareTitle": "Téléchargez votre Pedalboard",
     "shareText": "Exportez votre pedalboard en PNG pour le sauvegarder ou le partager.",
     "ok": "OK",
-    "documentation": "Documentation",
+    "documentation": "Docs",
     "dontShowAgain": "Ne plus afficher",
     "welcomeTitle": "Bienvenue sur MakeYourBoard !",
     "welcomeText": "MakeYourBoard est un outil gratuit pour concevoir votre pedalboard idéal. Ajoutez votre board, vos pédales et votre alimentation, organisez votre setup comme vous le souhaitez et visualisez le résultat en quelques clics. Pensé pour les passionnés de pédales, j’espère que cet outil vous sera utile et fun à utiliser.",
@@ -470,6 +490,8 @@
     "aluminium": "Aluminium"
   },
   "boardFinder": {
+    "powerUnderBoard": "Alimentation sous le pedalboard",
+    "allowRearrangement": "Autoriser le repositionnement des pédales",
     "button": "Pedalboard Finder",
     "subtitle": "Trouvez le pedalboard idéal.",
     "back": "Retour",
@@ -588,5 +610,43 @@
     "limited": "Calcul interrompu : ce plan peut être amélioré.",
     "success": "Vos pédales sont parfaitement alimentées. Let’s Rock !",
     "failure": "Utilisez une alimentation plus puissante ou avec plus de sorties, ou ajoutez-en une deuxième."
+  },
+  "onboarding": {
+    "label": "Tutoriel MakeYourBoard",
+    "replay": "Revoir le tutoriel",
+    "skip": "Passer",
+    "back": "Précédent",
+    "next": "Suivant",
+    "start": "Découvrir",
+    "finish": "C’est parti !",
+    "close": "Fermer",
+    "welcome": {
+      "title": "Bienvenue sur MakeYourBoard 2.0 !",
+      "description": "Un nouveau design, une expérience plus fluide. Tout ce dont vous avez besoin pour créer, organiser et partager votre pedalboard idéal."
+    },
+    "catalogue": {
+      "title": "Explorez le catalogue",
+      "description": "Découvrez des pédales, des pedalboards et des alimentations. Explorez le catalogue ou créez votre propre matériel personnalisé."
+    },
+    "canvas": {
+      "title": "Créez votre pedalboard",
+      "description": "Déplacez votre matériel librement. Sélectionnez un élément pour consulter ses caractéristiques, le faire pivoter, le dupliquer ou le supprimer."
+    },
+    "boards": {
+      "title": "Gérez vos pedalboards",
+      "description": "Créez plusieurs pedalboards, renommez-les, dupliquez-les et passez facilement de l’un à l’autre."
+    },
+    "cables": {
+      "title": "Organisez vos connexions",
+      "description": "Vérifiez l’espace disponible pour les câbles, organisez l’ordre de vos pédales et visualisez le trajet du signal."
+    },
+    "power": {
+      "title": "Alimentez vos pédales",
+      "description": "Vérifiez les tensions et les consommations électriques, découvrez comment alimenter chaque pédale et assurez-vous que votre alimentation est adaptée."
+    },
+    "share": {
+      "title": "Exportez et partagez",
+      "description": "Exportez votre pedalboard en image ou partagez une copie modifiable de votre projet grâce à un lien."
+    }
   }
 }

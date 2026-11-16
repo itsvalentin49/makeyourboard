@@ -2,9 +2,8 @@
 
 import { createPortal } from "react-dom";
 import React, { useEffect, useRef, useState } from "react";
-import { Cable, GripVertical } from "lucide-react";
-
-const SIGNAL_PATH_ENABLED = false;
+import { Cable, X, CheckCircle2, XCircle } from "lucide-react";
+import pedalActions from "./PedalActions.module.css";
 
 type AnyRow = Record<string, any>;
 
@@ -18,8 +17,9 @@ type Props = {
     showCableMenu: boolean;
     onToggleCableMenu: () => void;
 
-    showSignalPath?: boolean;
-    setShowSignalPath?: React.Dispatch<React.SetStateAction<boolean>>;
+    signalRoutingEnabled: boolean;
+    showSignalCables: boolean;
+    setShowSignalCables: (visible: boolean) => void;
 
     showJacksMargin: boolean;
     setShowJacksMargin: React.Dispatch<
@@ -183,6 +183,65 @@ function getRecommendedSignalOrder(
    COMPONENT
 ========================================================= */
 
+function translateExample(t: Props["t"], key: string, fallback: string) {
+    const fullKey = `cables.${key}`;
+    const value = t(fullKey);
+    return !value || value === fullKey || value === key ? fallback : value;
+}
+
+function PanelSwitch({ checked }: { checked: boolean }) {
+    return (
+        <span aria-hidden="true" style={{ position: "relative", display: "block", width: 40, height: 22, flexShrink: 0, borderRadius: 999, background: checked ? "var(--color-blue-600, #2563eb)" : "var(--zinc-700)", transition: "background-color 150ms ease" }}>
+            <span style={{ position: "absolute", top: 3, left: checked ? 21 : 3, width: 16, height: 16, borderRadius: "50%", background: "white", transition: "left 150ms ease" }} />
+        </span>
+    );
+}
+
+function ClearanceExample({ ok, isLightTheme }: { ok: boolean; isLightTheme: boolean }) {
+    const positions = ok ? [5, 75] : [20, 65];
+    const stroke = ok ? "#22c55e" : "#ef4444";
+    return (
+        <svg viewBox="0 0 136 86" className="block h-auto w-full max-w-[180px]" aria-hidden="true">
+            {positions.map((x, index) => (
+                <image key={index} href={isLightTheme ? "/images/tab-pedal2-dark.webp" : "/images/tab-pedal2-light.webp"} x={x + 10} y="17" width="38" height="48" preserveAspectRatio="xMidYMid meet" />
+            ))}
+            {positions.map(x => (
+                <rect key={x} x={x} y="5" width="56" height="76" rx="10" fill="none" stroke={stroke} strokeWidth="1.5" strokeDasharray="4 3" />
+            ))}
+        </svg>
+    );
+}
+
+function SignalChainExample({ t, isLightTheme }: { t: Props["t"]; isLightTheme: boolean }) {
+    const items = [
+        translateExample(t, "exampleTuner", "Tuner"),
+        translateExample(t, "exampleDrive", "Drive"),
+        translateExample(t, "exampleDelay", "Delay"),
+        translateExample(t, "exampleReverb", "Reverb"),
+    ];
+    return (
+        <div className="min-w-0" style={{ marginTop: 14 }}>
+            <svg viewBox="0 0 280 70" style={{ display: "block", width: "100%", height: "auto" }} aria-hidden="true">
+                <path d="M35 35H245" fill="none" stroke="var(--zinc-500)" strokeWidth="1.5" strokeDasharray="4 4" />
+                {items.map((_, index) => {
+                    const x = 35 + index * 70;
+                    return (
+                        <g key={index}>
+                            <rect x={x - 21} y="8" width="42" height="60" rx="6" fill="var(--zinc-900)" />
+                            <image href={isLightTheme ? "/images/tab-pedal2-dark.webp" : "/images/tab-pedal2-light.webp"} x={x - 20} y="14" width="40" height="48" preserveAspectRatio="xMidYMid meet" />
+                            <circle cx={x + 17} cy="12" r="10" fill="var(--blue)" />
+                            <text x={x + 17} y="12" textAnchor="middle" dominantBaseline="central" fontSize="11" fontWeight="600" fill="white">{index + 1}</text>
+                        </g>
+                    );
+                })}
+            </svg>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0, 1fr))", marginTop: 5, textAlign: "center", fontSize: 10, lineHeight: 1.3 }} className="text-zinc-400">
+                {items.map((item, i) => <span key={i} style={{ minWidth: 0, overflowWrap: "anywhere" }}>{item}</span>)}
+            </div>
+        </div>
+    );
+}
+
 export default function CablesPanel({
     desktopPanelHost = null,
     t,
@@ -192,8 +251,9 @@ export default function CablesPanel({
     showCableMenu,
     onToggleCableMenu,
 
-    showSignalPath = false,
-    setShowSignalPath,
+    signalRoutingEnabled,
+    showSignalCables,
+    setShowSignalCables,
     showJacksMargin,
     setShowJacksMargin,
 
@@ -301,106 +361,110 @@ export default function CablesPanel({
         );
     };
 
-    const [draggedPedalId, setDraggedPedalId] =
-        useState<number | null>(null);
-
-    const [signalDropIndex, setSignalDropIndex] =
-        useState<number | null>(null);
-
-    const signalDropIndexRef =
-        useRef<number | null>(null);
-
-    const draggedPedalIdRef =
-        useRef<number | null>(null);
-
-    const signalListRef =
-        useRef<HTMLDivElement | null>(null);
-
-    const setSignalDropTarget = (
-        index: number | null
-    ) => {
-        signalDropIndexRef.current = index;
-        setSignalDropIndex(index);
+    // Same sortable interaction as PedalboardsPanel.
+    type Drag = {
+        id: number; pointerId: number; startY: number; startX: number;
+        from: number; to: number; delta: number; rects: DOMRect[];
+        ids: number[]; mode: "pending" | "drag" | "scroll";
+        started: number; scrollHost: HTMLElement | null; lastY: number;
     };
+    const signalListRef = useRef<HTMLDivElement>(null);
+    const dragRef = useRef<Drag | null>(null);
+    const [dragView, setDragView] = useState<{
+        id: number; from: number; to: number; delta: number; rects: DOMRect[];
+    } | null>(null);
 
+    useEffect(() => {
+        dragRef.current = null;
+        setDragView(null);
+    }, [showCableMenu, showSignalChain, signalOrder.join(",")]);
 
-    const moveSignalPedal = (
-        draggedId: number,
-        dropIndex: number
-    ) => {
-        setSignalOrder((currentOrder) => {
-            const fromIndex =
-                currentOrder.indexOf(draggedId);
-
-            if (fromIndex === -1) {
-                return currentOrder;
-            }
-
-            const nextOrder = [...currentOrder];
-
-            nextOrder.splice(fromIndex, 1);
-
-            let insertIndex = dropIndex;
-
-            // La suppression de la pédale décale les positions
-            // situées après son emplacement d'origine.
-            if (fromIndex < dropIndex) {
-                insertIndex -= 1;
-            }
-
-            insertIndex = Math.max(
-                0,
-                Math.min(insertIndex, nextOrder.length)
-            );
-
-            nextOrder.splice(
-                insertIndex,
-                0,
-                draggedId
-            );
-
-            return nextOrder;
-        });
-    };
-
-
-    const getSignalDropIndex = (
-        clientY: number
-    ): number | null => {
-        const list = signalListRef.current;
-
-        if (!list) {
-            return null;
+    function scrollParent(element: HTMLElement): HTMLElement | null {
+        for (let node = element.parentElement; node; node = node.parentElement) {
+            if (/(auto|scroll)/.test(getComputedStyle(node).overflowY) && node.scrollHeight > node.clientHeight) return node;
         }
+        return null;
+    }
 
-        const cards = Array.from(
-            list.querySelectorAll<HTMLElement>(
-                "[data-signal-card]"
-            )
-        );
+    function beginDrag(e: React.PointerEvent<HTMLDivElement>, id: number, index: number) {
+        if (e.button !== 0 || !e.isPrimary || dragRef.current) return;
+        const cards = Array.from(signalListRef.current?.querySelectorAll<HTMLElement>("[data-signal-card]") ?? []);
+        if (cards.length < 2) return;
+        e.currentTarget.setPointerCapture(e.pointerId);
+        dragRef.current = {
+            id, pointerId: e.pointerId, startY: e.clientY, startX: e.clientX,
+            from: index, to: index, delta: 0, rects: cards.map(card => card.getBoundingClientRect()),
+            ids: orderedPedals.map(pedal => pedal.instanceId),
+            mode: "pending", started: Date.now(), scrollHost: scrollParent(e.currentTarget), lastY: e.clientY,
+        };
+    }
 
-        for (
-            let index = 0;
-            index < cards.length;
-            index += 1
-        ) {
-            const rect =
-                cards[index].getBoundingClientRect();
-
-            const middle =
-                rect.top + rect.height / 2;
-
-            if (clientY < middle) {
-                return index;
-            }
+    function updateDrag(e: React.PointerEvent<HTMLDivElement>) {
+        const d = dragRef.current;
+        if (!d || d.pointerId !== e.pointerId) return;
+        const movement = e.clientY - d.startY;
+        if (d.mode === "pending") {
+            if (Math.hypot(e.clientX - d.startX, movement) < 6) return;
+            d.mode = e.pointerType === "touch" && Date.now() - d.started < 220 ? "scroll" : "drag";
         }
+        if (d.mode === "scroll") {
+            if (d.scrollHost) d.scrollHost.scrollTop -= e.clientY - d.lastY;
+            d.lastY = e.clientY;
+            return;
+        }
+        e.preventDefault();
+        const rect = d.rects[d.from];
+        d.delta = Math.max(d.rects[0].top - rect.top, Math.min(movement, d.rects[d.rects.length - 1].bottom - rect.bottom));
+        const center = rect.top + rect.height / 2 + d.delta;
+        d.to = d.from;
+        for (let i = d.from + 1; i < d.rects.length; i++) {
+            if (center > d.rects[i].top + d.rects[i].height / 2) d.to = i;
+        }
+        for (let i = d.from - 1; i >= 0; i--) {
+            if (center < d.rects[i].top + d.rects[i].height / 2) d.to = i;
+        }
+        setDragView({ id: d.id, from: d.from, to: d.to, delta: d.delta, rects: d.rects });
+    }
 
-        return cards.length;
-    };
+    function finishDrag(e: React.PointerEvent<HTMLDivElement>, cancelled = false) {
+        const d = dragRef.current;
+        if (!d || d.pointerId !== e.pointerId) return;
+        dragRef.current = null;
+        if (!cancelled && d.mode === "drag" && d.from !== d.to) {
+            setSignalOrder(order => {
+                const result = [...order];
+                const from = result.indexOf(d.id);
+                const target = result.indexOf(d.ids[d.to]);
+                if (from < 0 || target < 0) return order;
+                result.splice(from, 1);
+                result.splice(target, 0, d.id);
+                return result;
+            });
+        }
+        setDragView(null);
+        if (e.currentTarget.hasPointerCapture(e.pointerId)) e.currentTarget.releasePointerCapture(e.pointerId);
+    }
 
+    function cardOffset(index: number) {
+        if (!dragView) return 0;
+        const { from, to, rects, delta } = dragView;
+        if (index === from) return delta;
+        if (from < to && index > from && index <= to) return rects[index - 1].top - rects[index].top;
+        if (from > to && index < from && index >= to) return rects[index + 1].top - rects[index].top;
+        return 0;
+    }
+
+    function displayIndex(index: number) {
+        if (!dragView) return index;
+        const { from, to } = dragView;
+        if (index === from) return to;
+        if (from < to && index > from && index <= to) return index - 1;
+        if (from > to && index < from && index >= to) return index + 1;
+        return index;
+    }
 
     const renderPanel = (content: React.ReactNode) =>
-        !isMobile && desktopPanelHost ? createPortal(content, desktopPanelHost) : content;
+        desktopPanelHost ? createPortal(content, desktopPanelHost) : content;
 
     return (
         <div className="relative">
@@ -468,7 +532,7 @@ export default function CablesPanel({
                     <div
                         className={
                             isMobile
-                                ? "relative w-full min-h-full bg-zinc-800 border-0 rounded-none p-6"
+                                ? "relative w-full min-h-full bg-transparent border-0 rounded-none p-6"
                                 : "relative w-full bg-transparent border-0 rounded-none p-0"
                         }
                         onClick={(e) =>
@@ -480,387 +544,89 @@ export default function CablesPanel({
                 TITLE
             ============================================= */}
 
-                        <div className="flex items-center gap-2 text-xs uppercase tracking-wider font-bold mb-6">
+                        <div className="flex items-center gap-2 text-[18px] uppercase tracking-wider font-bold mb-3">
 
-                            <Cable size={18} strokeWidth={2} aria-hidden="true" className="shrink-0" />
+                            <Cable size={20} strokeWidth={2} aria-hidden="true" className="shrink-0" />
 
                             {t("cables.title")}
+                            {isMobile && (
+                                <button type="button" aria-label={t("gear.closeDetails")} onClick={(e) => { e.stopPropagation(); onToggleCableMenu(); }} className={pedalActions.mobilePanelClose}>
+                                    <X size={20} strokeWidth={2} aria-hidden="true" />
+                                </button>
+                            )}
 
                         </div>
 
 
-                        {SIGNAL_PATH_ENABLED && setShowSignalPath && (
-                            <label className="mb-6 flex items-center justify-between gap-4 text-[10px] font-bold uppercase tracking-wide">
-                                {t("cables.signalPath")}
-                                <input type="checkbox" checked={showSignalPath} onChange={(event) => setShowSignalPath(event.target.checked)} className="h-4 w-4 accent-blue-600" />
-                            </label>
-                        )}
+                        <style>{`
+                            [data-signal-card].myb-signal-card {
+                                border: 0 !important;
+                                outline: none !important;
+                                box-shadow: none !important;
+                            }
+                            @media (hover: hover) {
+                                [data-signal-card].myb-signal-card:hover {
+                                    box-shadow: inset 0 0 0 1px var(--color-zinc-500, var(--zinc-500, #71717a)) !important;
+                                }
+                            }
+                        `}</style>
 
-                        {/* =============================================
-                CABLE CLEARANCE
-            ============================================= */}
-
-                        <div className="relative">
-
+                        {/* CABLE CLEARANCE */}
+                        <section className="mb-4 min-w-0 rounded-xl bg-zinc-950 p-3">
                             <button
                                 type="button"
-                                onClick={() =>
-                                    setShowJacksMargin(
-                                        (v) => !v
-                                    )
-                                }
-                                className="
-                  w-full
-                  text-left
-                  pr-14
-                "
+                                role="switch"
+                                aria-checked={showJacksMargin}
+                                onClick={() => setShowJacksMargin(v => !v)}
+                                className="flex w-full cursor-pointer items-center justify-between gap-3 rounded-lg text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-500"
                             >
-                                <div className="text-[10px] font-bold uppercase tracking-wide">
-                                    {t(
-                                        "cables.clearance"
-                                    )}
-                                </div>
-
-                                <div className="text-[10px] font-medium mt-0.5 text-zinc-500 leading-snug">
-                                    {t(
-                                        "cables.clearanceDescription"
-                                    )}
-                                </div>
+                                <span className="min-w-0 text-[14px] font-semibold normal-case">{t("cables.clearance")}</span>
+                                <PanelSwitch checked={showJacksMargin} />
                             </button>
-
-                            <div
-                                className={`
-                  absolute
-                  top-0
-                  right-0
-                  w-10
-                  h-5
-                  rounded-full
-                  transition-colors
-                  duration-200
-                  pointer-events-none
-                  ${showJacksMargin
-                                        ? "bg-blue-600"
-                                        : "bg-zinc-700"
-                                    }
-                `}
-                            >
-                                <div
-                                    className={`
-                    absolute
-                    top-0.5
-                    left-0.5
-                    w-4
-                    h-4
-                    rounded-full
-                    bg-white
-                    transition-transform
-                    duration-200
-                    ${showJacksMargin
-                                            ? "translate-x-5"
-                                            : "translate-x-0"
-                                        }
-                  `}
-                                />
-                            </div>
-                        </div>
-
-                        {/* CABLE CLEARANCE EXAMPLE */}
-
-                        <div
-                            className="mt-4 flex items-start justify-center"
-                            style={{ gap: "48px" }}
-                        >
-                            {/* OK */}
-                            <div className="flex flex-col items-center gap-2">
-
-                                <div
-                                    className="flex"
-                                    style={{ gap: "12px" }}
-                                >
-                                    {[0, 1].map((item) => (
-                                        <div
-                                            key={item}
-                                            className="
-                        relative
-                        flex
-                        items-center
-                        justify-center
-                    "
-                                            style={{
-                                                width: "56px",
-                                                height: "64px",
-                                            }}
-                                        >
-                                            <svg
-                                                className="absolute inset-0 pointer-events-none"
-                                                style={{
-                                                    width: "56px",
-                                                    height: "64px",
-                                                }}
-                                                viewBox="0 0 56 64"
-                                                aria-hidden="true"
-                                            >
-                                                <rect
-                                                    x="1"
-                                                    y="1"
-                                                    width="54"
-                                                    height="62"
-                                                    rx="8"
-                                                    fill="none"
-                                                    stroke="#22c55e"
-                                                    strokeWidth="1.25"
-                                                    strokeDasharray="4 3"
-                                                />
-                                            </svg>
-
-                                            <img
-                                                src={
-                                                    isLightTheme
-                                                        ? "/images/tab-pedal2-dark.webp"
-                                                        : "/images/tab-pedal2-light.webp"
-                                                }
-                                                alt=""
-                                                aria-hidden="true"
-                                                draggable={false}
-                                                className="
-                            w-10
-                            h-10
-                            object-contain
-                            pointer-events-none
-                            select-none
-                        "
-                                            />
+                            <p className="mt-1 text-[12px] leading-relaxed text-zinc-400">
+                                {t("cables.clearanceDescription")}
+                            </p>
+                            <div className="grid min-w-0 grid-cols-2 gap-2" style={{ marginTop: 16 }}>
+                                {[true, false].map(ok => (
+                                    <div key={String(ok)} className="flex min-w-0 flex-col items-center gap-2 rounded-xl bg-zinc-900 p-2">
+                                        <ClearanceExample ok={ok} isLightTheme={isLightTheme} />
+                                        <div className={`flex items-center justify-center gap-1 text-center text-[10px] font-medium ${ok ? "text-green-500" : "text-red-500"}`}>
+                                            {ok ? <CheckCircle2 size={12} className="shrink-0" /> : <XCircle size={12} className="shrink-0" />}
+                                            <span>{translateExample(t, ok ? "enoughSpace" : "tooClose", ok ? "Enough space" : "Too close")}</span>
                                         </div>
-                                    ))}
-                                </div>
-
-                                <div
-                                    className="text-[10px] font-bold"
-                                    style={{ color: "#22c55e" }}
-                                >
-                                    OK
-                                </div>
-
-                            </div>
-
-
-                            {/* KO */}
-                            <div className="flex flex-col items-center gap-2">
-
-                                <div
-                                    className="relative"
-                                    style={{
-                                        width: "102px",
-                                        height: "64px",
-                                    }}
-                                >
-                                    {/* PEDAL 1 */}
-                                    <div
-                                        className="
-                    absolute
-                    top-0
-                    left-0
-                    flex
-                    items-center
-                    justify-center
-                "
-                                        style={{
-                                            width: "56px",
-                                            height: "64px",
-                                        }}
-                                    >
-                                        <img
-                                            src={
-                                                isLightTheme
-                                                    ? "/images/tab-pedal2-dark.webp"
-                                                    : "/images/tab-pedal2-light.webp"
-                                            }
-                                            alt=""
-                                            aria-hidden="true"
-                                            draggable={false}
-                                            className="
-                        w-10
-                        h-10
-                        object-contain
-                        pointer-events-none
-                        select-none
-                    "
-                                        />
                                     </div>
-
-                                    {/* PEDAL 2 */}
-                                    <div
-                                        className="
-                    absolute
-                    top-0
-                    flex
-                    items-center
-                    justify-center
-                "
-                                        style={{
-                                            left: "46px",
-                                            width: "56px",
-                                            height: "64px",
-                                        }}
-                                    >
-                                        <img
-                                            src={
-                                                isLightTheme
-                                                    ? "/images/tab-pedal2-dark.webp"
-                                                    : "/images/tab-pedal2-light.webp"
-                                            }
-                                            alt=""
-                                            aria-hidden="true"
-                                            draggable={false}
-                                            className="
-                        w-10
-                        h-10
-                        object-contain
-                        pointer-events-none
-                        select-none
-                    "
-                                        />
-                                    </div>
-
-                                    {/* RED OUTLINES — AU-DESSUS DES DEUX PÉDALES */}
-                                    <svg
-                                        className="absolute inset-0 pointer-events-none"
-                                        style={{
-                                            width: "102px",
-                                            height: "64px",
-                                            zIndex: 20,
-                                        }}
-                                        viewBox="0 0 102 64"
-                                        aria-hidden="true"
-                                    >
-                                        <rect
-                                            x="1"
-                                            y="1"
-                                            width="54"
-                                            height="62"
-                                            rx="8"
-                                            fill="none"
-                                            stroke="#ef4444"
-                                            strokeWidth="1.25"
-                                            strokeDasharray="4 3"
-                                        />
-
-                                        <rect
-                                            x="47"
-                                            y="1"
-                                            width="54"
-                                            height="62"
-                                            rx="8"
-                                            fill="none"
-                                            stroke="#ef4444"
-                                            strokeWidth="1.25"
-                                            strokeDasharray="4 3"
-                                        />
-                                    </svg>
-                                </div>
-
-                                <div
-                                    className="text-[10px] font-bold"
-                                    style={{ color: "#ef4444" }}
-                                >
-                                    KO
-                                </div>
-
+                                ))}
                             </div>
-                        </div>
+                        </section>
 
-                        {/* =============================================
-                SIGNAL CHAIN SWITCH
-            ============================================= */}
-
-                        <div className="relative pt-5 pb-2">
-
+                        {/* PEDAL ORDER */}
+                        <section className="mb-4 min-w-0 rounded-xl bg-zinc-950 p-3">
                             <button
                                 type="button"
-                                onClick={() =>
-                                    setShowSignalChain(
-                                        (v) => !v
-                                    )
-                                }
-                                className="
-                  w-full
-                  text-left
-                  pr-14
-                "
+                                role="switch"
+                                aria-checked={showSignalChain}
+                                onClick={() => setShowSignalChain(v => !v)}
+                                className="flex w-full cursor-pointer items-center justify-between gap-3 rounded-lg text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-500"
                             >
-                                <div className="text-[10px] font-bold uppercase tracking-wide">
-                                    {t("cables.signalChain")}
-                                </div>
-
-                                <div className="text-[10px] font-medium mt-0.5 text-zinc-500 leading-snug">
-                                    {t("cables.signalChainDescription")}
-                                </div>
+                                <span className="min-w-0 text-[14px] font-semibold normal-case">{t("cables.pedalOrder")}</span>
+                                <PanelSwitch checked={showSignalChain} />
                             </button>
+                            <p className="mt-1 text-[12px] leading-relaxed text-zinc-400">{t("cables.signalChainDescription")}</p>
+                            {!showSignalChain && <SignalChainExample t={t} isLightTheme={isLightTheme} />}
 
-                            <div
-                                className={`
-                  absolute
-                  top-4
-                  right-0
-                  w-10
-                  h-5
-                  rounded-full
-                  transition-colors
-                  duration-200
-                  pointer-events-none
-                  ${showSignalChain
-                                        ? "bg-blue-600"
-                                        : "bg-zinc-700"
-                                    }
-                `}
-                            >
-                                <div
-                                    className={`
-                    absolute
-                    top-0.5
-                    left-0.5
-                    w-4
-                    h-4
-                    rounded-full
-                    bg-white
-                    transition-transform
-                    duration-200
-                    ${showSignalChain
-                                            ? "translate-x-5"
-                                            : "translate-x-0"
-                                        }
-                  `}
-                                />
-                            </div>
-
-                        </div>
-
-
-                        {/* =============================================
-                SIGNAL CHAIN LIST
-            ============================================= */}
-
-                        {showSignalChain && (
-                            <div className="space-y-1">
-
-                                {orderedPedals.length > 1 && (
-                                    <button
-                                        type="button"
-                                        onClick={resetRecommendedOrder}
-                                        onMouseEnter={(e) => {
-                                            e.currentTarget.style.setProperty(
-                                                "color",
-                                                "var(--foreground)",
-                                                "important"
-                                            );
-                                        }}
-                                        onMouseLeave={(e) => {
-                                            e.currentTarget.style.removeProperty(
-                                                "color"
-                                            );
-                                        }}
-                                        className="
+                            {showSignalChain && (
+                                <div className="mt-4 space-y-1">
+                                    {orderedPedals.length > 1 && (
+                                        <button
+                                            type="button"
+                                            onClick={resetRecommendedOrder}
+                                            onMouseEnter={(e) => {
+                                                e.currentTarget.style.setProperty("color", "var(--foreground)", "important");
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                e.currentTarget.style.removeProperty("color");
+                                            }}
+                                            className="
             text-[9px]
             font-bold
             uppercase
@@ -868,309 +634,84 @@ export default function CablesPanel({
             transition-colors
             duration-150
         "
-                                    >
-                                        {t("cables.reset")}
-                                    </button>
-                                )}
+                                        >
+                                            {t("cables.reset")}
+                                        </button>
+                                    )}
 
 
-                                {orderedPedals.length === 0 ? (
+                                    {orderedPedals.length === 0 ? (
 
-                                    <div className="text-[10px] font-medium leading-snug">
-                                        {t("cables.empty")}
-                                    </div>
+                                        <div className="text-[10px] font-medium leading-snug">
+                                            {t("cables.empty")}
+                                        </div>
 
-                                ) : (
+                                    ) : (
 
-                                    <div ref={signalListRef}>
-
-                                        {orderedPedals.map(
-                                            (pedal, index) => (
-
-                                                <React.Fragment key={pedal.instanceId}>
-
-                                                    {/* INSERTION LINE BEFORE THIS CARD */}
+                                        <div ref={signalListRef} className="flex flex-col" style={{ gap: 6 }}>
+                                            {orderedPedals.map((pedal, index) => {
+                                                const dragging = dragView?.id === pedal.instanceId;
+                                                return (
                                                     <div
-                                                        className="relative"
-                                                        style={{ height: 6 }}
-                                                    >
-                                                        {signalDropIndex === index &&
-                                                            draggedPedalId !== null && (
-                                                                <div
-                                                                    className="
-                                                                        pointer-events-none
-                                                                        absolute
-                                                                        top-1/2
-                                                                        left-2
-                                                                        right-2
-                                                                        h-[2px]
-                                                                        -translate-y-1/2
-                                                                        rounded-full
-                                                                        z-20
-                                                                    "
-                                                                    style={{
-                                                                        backgroundColor:
-                                                                            "var(--foreground)",
-                                                                    }}
-                                                                />
-                                                            )}
-                                                    </div>
-
-                                                    <div
+                                                        key={pedal.instanceId}
                                                         data-signal-card
-                                                        onPointerDown={(e) => {
-                                                            if (e.button !== 0) {
-                                                                return;
-                                                            }
-
-                                                            e.preventDefault();
-
-                                                            draggedPedalIdRef.current =
-                                                                pedal.instanceId;
-
-                                                            setDraggedPedalId(
-                                                                pedal.instanceId
-                                                            );
-
-                                                            setSignalDropTarget(null);
-
-                                                            e.currentTarget.setPointerCapture(
-                                                                e.pointerId
-                                                            );
-
-                                                            // Rend uniquement la carte déplacée semi-transparente
-                                                            e.currentTarget.style.opacity = "0.4";
+                                                        onPointerDown={e => beginDrag(e, pedal.instanceId, index)}
+                                                        onPointerMove={updateDrag}
+                                                        onPointerUp={e => finishDrag(e)}
+                                                        onPointerCancel={e => finishDrag(e, true)}
+                                                        onLostPointerCapture={e => finishDrag(e, true)}
+                                                        onDragStart={e => e.preventDefault()}
+                                                        className={`myb-signal-card relative flex items-center gap-2 min-h-[42px] px-3 py-1 rounded-lg bg-zinc-800 ${dragging ? "cursor-grabbing" : "cursor-grab"}`}
+                                                        style={{
+                                                            transform: `translateY(${cardOffset(index)}px)`,
+                                                            transition: dragging ? "none" : dragView ? "transform 180ms ease, box-shadow 150ms ease" : "box-shadow 150ms ease",
+                                                            zIndex: dragging ? 60 : undefined,
+                                                            touchAction: orderedPedals.length > 1 ? "none" : "auto",
+                                                            userSelect: "none",
                                                         }}
-                                                        onPointerMove={(e) => {
-                                                            if (
-                                                                draggedPedalIdRef.current !==
-                                                                pedal.instanceId
-                                                            ) {
-                                                                return;
-                                                            }
-
-                                                            const nextDropIndex =
-                                                                getSignalDropIndex(
-                                                                    e.clientY
-                                                                );
-
-                                                            if (nextDropIndex !== null) {
-                                                                setSignalDropTarget(
-                                                                    nextDropIndex
-                                                                );
-                                                            }
-                                                        }}
-                                                        onPointerUp={(e) => {
-                                                            if (
-                                                                draggedPedalIdRef.current !==
-                                                                pedal.instanceId
-                                                            ) {
-                                                                return;
-                                                            }
-
-                                                            e.currentTarget.style.opacity = "";
-
-                                                            const dropIndex =
-                                                                signalDropIndexRef.current;
-
-                                                            draggedPedalIdRef.current = null;
-
-                                                            if (
-                                                                e.currentTarget.hasPointerCapture(
-                                                                    e.pointerId
-                                                                )
-                                                            ) {
-                                                                e.currentTarget.releasePointerCapture(
-                                                                    e.pointerId
-                                                                );
-                                                            }
-
-                                                            if (dropIndex !== null) {
-                                                                moveSignalPedal(
-                                                                    pedal.instanceId,
-                                                                    dropIndex
-                                                                );
-                                                            }
-
-                                                            setDraggedPedalId(null);
-                                                            setSignalDropTarget(null);
-                                                        }}
-                                                        onPointerCancel={(e) => {
-                                                            e.currentTarget.style.opacity = "";
-
-                                                            draggedPedalIdRef.current = null;
-
-                                                            if (
-                                                                e.currentTarget.hasPointerCapture(
-                                                                    e.pointerId
-                                                                )
-                                                            ) {
-                                                                e.currentTarget.releasePointerCapture(
-                                                                    e.pointerId
-                                                                );
-                                                            }
-
-                                                            setDraggedPedalId(null);
-                                                            setSignalDropTarget(null);
-                                                        }}
-                                                        onMouseEnter={(e) => {
-                                                            const grip = e.currentTarget.querySelector(
-                                                                "[data-signal-grip]"
-                                                            ) as SVGElement | null;
-
-                                                            grip?.style.setProperty(
-                                                                "color",
-                                                                "var(--zinc-300)",
-                                                                "important"
-                                                            );
-                                                        }}
-                                                        onMouseLeave={(e) => {
-                                                            const grip = e.currentTarget.querySelector(
-                                                                "[data-signal-grip]"
-                                                            ) as SVGElement | null;
-
-                                                            grip?.style.removeProperty("color");
-                                                        }}
-                                                        className={`
-        relative
-        flex
-        items-center
-        gap-2
-        min-h-[42px]
-        px-3
-        py-1
-        rounded-lg
-        border
-        bg-zinc-950
-        cursor-grab
-        active:cursor-grabbing
-        transition-all
-        duration-150
-border-zinc-700
-    `}
                                                     >
-
-                                                        {/* DRAG HANDLE */}
-
-                                                        <GripVertical
-                                                            data-signal-grip
-                                                            size={14}
-                                                            className="
-        shrink-0
-        text-zinc-600
-        transition-colors
-        duration-150
-        cursor-grab
-    "
-                                                        />
-
-
-                                                        {/* NUMBER */}
-
-                                                        <div
-                                                            className="
-                              shrink-0
-                              w-6
-                              h-6
-                              rounded-full
-                              bg-blue-600
-                              text-white
-                              flex
-                              items-center
-                              justify-center
-                              text-[10px]
-                              font-bold
-                            "
-                                                        >
-                                                            {index + 1}
+                                                        <div className="shrink-0 w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px] font-bold">
+                                                            {displayIndex(index) + 1}
                                                         </div>
-
-
-                                                        {/* PEDAL */}
-
                                                         <div className="min-w-0 flex-1 flex items-center justify-between gap-3">
-                                                            {/* BRAND + NAME */}
-                                                            <div
-                                                                className="min-w-0"
-                                                                style={{ position: "relative", left: "5px" }}
-                                                            >
-
-                                                                <div
-                                                                    className="
-                text-[10px]
-                uppercase
-                font-bold
-                truncate
-            "
-                                                                >
-                                                                    {pedal.brand || ""}
-                                                                </div>
-
-                                                                <div
-                                                                    className="
-                text-[10px]
-                font-bold
-                truncate
-            "
-                                                                >
-                                                                    {pedal.name || "Pedal"}
-                                                                </div>
-
+                                                            <div className="min-w-0" style={{ position: "relative", left: "5px" }}>
+                                                                <div className="text-[10px] uppercase font-bold truncate">{pedal.brand || ""}</div>
+                                                                <div className="text-[10px] font-bold truncate">{pedal.name || "Pedal"}</div>
                                                             </div>
-
-                                                            {/* TYPE */}
-                                                            <div
-                                                                className="
-            shrink-0
-            text-[10px]
-            text-zinc-500
-            text-right
-            whitespace-nowrap
-        "
-                                                            >
-                                                                {pedal.type || ""}
-                                                            </div>
-
+                                                            <div className="shrink-0 text-[10px] text-right whitespace-nowrap">{pedal.type || ""}</div>
                                                         </div>
                                                     </div>
+                                                );
+                                            })}
+                                        </div>
 
-                                                    {index === orderedPedals.length - 1 && (
-                                                        <div
-                                                            className="relative"
-                                                        >
-                                                            {signalDropIndex === orderedPedals.length &&
-                                                                draggedPedalId !== null && (
-                                                                    <div
-                                                                        className="
-                                                                        pointer-events-none
-                                                                        absolute
-                                                                        top-1/2
-                                                                        left-2
-                                                                        right-2
-                                                                        h-[2px]
-                                                                        -translate-y-1/2
-                                                                        rounded-full
-                                                                        z-20
-                                                                    "
-                                                                        style={{
-                                                                            backgroundColor:
-                                                                                "var(--foreground)",
-                                                                        }}
-                                                                    />
-                                                                )}
-                                                        </div>
-                                                    )}
+                                    )}
 
-                                                </React.Fragment>
+                                </div>
+                            )}
+                        </section>
 
-                                            )
-                                        )}
+                        {/* SIGNAL ROUTING */}
+                        {signalRoutingEnabled && (
+                            <section className="min-w-0 rounded-xl bg-zinc-950 p-3">
+                                <button
+                                    type="button"
+                                    role="switch"
+                                    aria-checked={showSignalCables}
+                                    onClick={() => setShowSignalCables(!showSignalCables)}
+                                    className="flex w-full cursor-pointer items-center justify-between gap-3 rounded-lg text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-500"
+                                >
+                                    <span className="min-w-0 text-[14px] font-semibold normal-case">
+                                        {t("cables.signalRouting")}
+                                    </span>
 
-                                    </div>
+                                    <PanelSwitch checked={showSignalCables} />
+                                </button>
 
-                                )}
-
-                            </div>
+                                <p className="mt-1 text-[12px] leading-relaxed text-zinc-400">
+                                    {t("cables.signalRoutingDescription")}
+                                </p>
+                            </section>
                         )}
 
                     </div>

@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
-import { Check, ChevronDown, ChevronLeft, ChevronRight, Import as ImportIcon, X } from "lucide-react";
+import { Check, ChevronDown, Import as ImportIcon, X, Plus } from "lucide-react";
 import { saveCustomImage } from "@/utils/customImageStore";
 type AnyRow = Record<string, any>;
 
@@ -29,7 +29,7 @@ function DimensionField({ label, unit, ...props }: React.InputHTMLAttributes<HTM
     </label>;
 }
 function CurrentField({ label, ...props }: React.InputHTMLAttributes<HTMLInputElement> & { label: string }) {
-    return <label className="flex min-w-0 flex-col gap-1 text-[10px] font-medium">
+    return <label className="flex min-w-0 flex-col gap-1 text-[12px] font-medium">
         <span className="myb-field-heading">{withoutUnit(label)}</span>
         <span className="myb-inline-field">
             <input {...props} type="number" aria-label={`${withoutUnit(label)} (mA)`} />
@@ -61,13 +61,13 @@ function VoltageDropdown({ label, values, setValues, open, setOpen, onOpen }: {
         document.addEventListener("mousedown", outside);
         return () => document.removeEventListener("mousedown", outside);
     }, [open, setOpen]);
-    return <div className="flex min-w-0 flex-col gap-1 text-[10px] font-medium">
+    return <div className="flex min-w-0 flex-col gap-1 text-[12px] font-medium">
         <span className="myb-field-heading">{withoutUnit(label)}</span>
-        <div ref={ref} className="relative h-[34px]" onKeyDown={event => {
+        <div ref={ref} className="relative h-[40px]" onKeyDown={event => {
             if (event.key === "Escape") { event.preventDefault(); setOpen(false); ref.current?.querySelector<HTMLButtonElement>("button")?.focus(); }
         }}>
             <button type="button" aria-label={withoutUnit(label)} aria-expanded={open} aria-controls={id}
-                className="flex h-[34px] w-full min-w-0 items-center justify-between rounded-md border border-zinc-800 bg-zinc-950 px-3 text-left text-[10px]"
+                className="flex h-[40px] w-full min-w-0 items-center justify-between rounded-md border border-zinc-800 bg-zinc-950 px-3 text-left text-[12px]"
                 onClick={() => { const next = !open; if (next) onOpen?.(); setOpen(next); }}>
                 <span className="truncate">{formatVoltageSelection(values)}</span>
                 <ChevronDown size={14} className="ml-2 shrink-0 text-zinc-500" style={{ transform: open ? "rotate(180deg)" : undefined }} />
@@ -114,7 +114,7 @@ function ImportBuilder({ addCustomItem, units, t }: ImportBuilderProps) {
     const isUploadValid = Boolean(uploadImage && uploadImageId) && dimensionsValid && drawValid && !imageLoading;
     const min = units === "metric" ? 30 : 30 / 25.4;
     const max = units === "metric" ? 500 : 500 / 25.4;
-    const fieldClass = "h-[34px] w-full min-w-0 rounded-md border border-zinc-800 bg-zinc-950 px-3 text-[10px]";
+    const fieldClass = "h-[40px] w-full min-w-0 rounded-md border border-zinc-800 bg-zinc-950 px-3 text-[12px]";
     const removeImage = () => {
         imageRequest.current += 1;
         setUploadImage(null);
@@ -182,53 +182,57 @@ function ImportBuilder({ addCustomItem, units, t }: ImportBuilderProps) {
         setUploadVoltageOpen(false);
         setUploadDraw("100");
     };
-    return (<form onSubmit={submit} className="mt-2 flex flex-col gap-2 pb-4">
-        <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr)", gap: 8, alignItems: "start" }}>
-            <div className="flex min-w-0 flex-col gap-1">
+    return (<form onSubmit={submit} className="myb-custom-pedal-form flex flex-col mt-2 pb-4">
+        <div className="myb-configurator-card"><div className="myb-configurator-grid">
+            <div className="myb-preview-section myb-import-preview flex min-w-0 flex-col gap-2">
                 <label htmlFor={`${id}-image`} className="myb-field-heading text-[11px] font-medium">{t("customPanel.chooseImage")}</label>
                 <input ref={fileInputRef} id={`${id}-image`} type="file" disabled={Boolean(uploadImage) || imageLoading} accept="image/png,image/jpeg,image/webp" className="hidden" onChange={event => {
                     void handleLocalImageUpload(event.target.files?.[0] || null);
                     event.target.value = "";
                 }} />
-                <div className={`myb-upload-slot${uploadImage ? " myb-upload-loaded" : ""}`}>
-                    {uploadImage ? <div className="myb-upload-button rounded-lg bg-zinc-950">
-                        <img src={uploadImage} alt={uploadModel || t("customPanel.chooseImage")} draggable={false} className="myb-upload-thumbnail" />
-                    </div> : <button type="button" aria-label={t("customPanel.chooseImage")}
-                        aria-busy={imageLoading} onClick={() => fileInputRef.current?.click()} disabled={imageLoading}
-                        className="myb-import-image myb-upload-button rounded-lg bg-zinc-950 disabled:opacity-50">
-                        <ImportIcon size={28} strokeWidth={2} className="myb-upload-icon" aria-hidden="true" />
-                    </button>}
-                    {uploadImage && <button type="button" onClick={removeImage}
-                        aria-label={t("customPanel.removeImage")} title={t("customPanel.removeImage")}
-                        className="myb-remove-upload"><X size={14} /></button>}
+                <div className="myb-import-image-card">
+                    <div className={`myb-upload-slot${uploadImage ? " myb-upload-loaded" : ""}`}>
+                        {uploadImage ? <div className="myb-upload-button rounded-lg bg-zinc-950">
+                            <img src={uploadImage} alt={uploadModel || t("customPanel.chooseImage")} draggable={false} className="myb-upload-thumbnail" />
+                        </div> : <button type="button" aria-label={t("customPanel.chooseImage")}
+                            aria-busy={imageLoading} onClick={() => fileInputRef.current?.click()} disabled={imageLoading}
+                            className="myb-import-image myb-upload-button rounded-lg bg-zinc-950 disabled:opacity-50">
+                            <ImportIcon size={28} strokeWidth={2} className="myb-upload-icon" aria-hidden="true" />
+                        </button>}
+                        {uploadImage && <button type="button" onClick={removeImage}
+                            aria-label={t("customPanel.removeImage")} title={t("customPanel.removeImage")}
+                            className="myb-remove-upload"><X size={14} /></button>}
+                    </div>
+                    <p className="myb-image-hint text-[9px] leading-relaxed" style={{ margin: "-4px 0 0" }}>{t("customPanel.imageHint")}</p>
                 </div>
-                <p className="myb-image-hint text-[9px] leading-relaxed" style={{ margin: "-4px 0 0" }}>{t("customPanel.imageHint")}</p>
             </div>
-            <label className="flex min-w-0 flex-col gap-1 text-[10px] font-medium">
-                <span className="myb-field-heading">{t("customPanel.namePlaceholder")}</span>
-                <input type="text" placeholder={getNameExample(t)} aria-label={t("customPanel.namePlaceholder")} value={uploadModel} onChange={event => setUploadModel(event.target.value)} className={`myb-name-field ${fieldClass}`} />
-            </label>
-        </div>
-        {imageError && <p role="alert" className="text-[10px] text-red-400">{imageError}</p>}
-        <DimensionsGroup title={t("customPanel.enterDimensions").replace(/\s*\([^)]*\)\s*$/, "")}>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 8 }}>
-                <DimensionField label={t("customPanel.width")} unit={units === "metric" ? "mm" : "in"} required min={min} max={max} step="any" inputMode="decimal" value={uploadWidth} onChange={event => setUploadWidth(event.target.value)} />
-                <DimensionField label={(t("customPanel.height") === "customPanel.height" ? t("customPanel.depth") : t("customPanel.height"))} unit={units === "metric" ? "mm" : "in"} required min={min} max={max} step="any" inputMode="decimal" value={uploadDepth} onChange={event => setUploadDepth(event.target.value)} />
+            <div className="myb-configurator-fields">
+                <label className="flex min-w-0 flex-col gap-1 text-[12px] font-medium">
+                    <span className="myb-field-heading">{t("customPanel.namePlaceholder")}</span>
+                    <input type="text" placeholder={getNameExample(t)} aria-label={t("customPanel.namePlaceholder")} value={uploadModel} onChange={event => setUploadModel(event.target.value)} className={`myb-name-field ${fieldClass}`} />
+                </label>
+                {imageError && <p role="alert" className="text-[12px] text-red-400">{imageError}</p>}
+                <DimensionsGroup title={t("customPanel.enterDimensions").replace(/\s*\([^)]*\)\s*$/, "")}>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 8 }}>
+                        <DimensionField label={t("customPanel.width")} unit={units === "metric" ? "mm" : "in"} required min={min} max={max} step="any" inputMode="decimal" value={uploadWidth} onChange={event => setUploadWidth(event.target.value)} />
+                        <DimensionField label={(t("customPanel.height") === "customPanel.height" ? t("customPanel.depth") : t("customPanel.height"))} unit={units === "metric" ? "mm" : "in"} required min={min} max={max} step="any" inputMode="decimal" value={uploadDepth} onChange={event => setUploadDepth(event.target.value)} />
+                    </div>
+                    <p className="myb-image-hint text-[9px] leading-relaxed" style={{ margin: "-4px 0 0" }}>
+                        {t("customPanel.enclosureDimensions")
+                            .replaceAll("{min}", String(Number(min.toFixed(2))))
+                            .replaceAll("{max}", String(Number(max.toFixed(2))))
+                            .replaceAll("{unit}", units === "metric" ? "mm" : "in")}
+                    </p>
+                </DimensionsGroup>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 8 }}>
+                    <VoltageDropdown label={t("customPanel.voltage")} values={uploadVoltage} setValues={setUploadVoltage} open={uploadVoltageOpen} setOpen={setUploadVoltageOpen} />
+                    <CurrentField label={t("customPanel.consumption")} min={0} step="any" inputMode="decimal" value={uploadDraw} onChange={event => setUploadDraw(event.target.value)} />
+                </div>
+                <button type="submit" disabled={!isUploadValid} className="myb-configurator-add bg-blue-600 hover:bg-blue-500 !text-white disabled:cursor-not-allowed">
+                    <Plus size={16} /> {t("customPanel.addToBoard")}
+                </button>
             </div>
-            <p className="myb-image-hint text-[9px] leading-relaxed" style={{ margin: "-4px 0 0" }}>
-                {t("customPanel.enclosureDimensions")
-                    .replaceAll("{min}", String(Number(min.toFixed(2))))
-                    .replaceAll("{max}", String(Number(max.toFixed(2))))
-                    .replaceAll("{unit}", units === "metric" ? "mm" : "in")}
-            </p>
-        </DimensionsGroup>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 8 }}>
-            <VoltageDropdown label={t("customPanel.voltage")} values={uploadVoltage} setValues={setUploadVoltage} open={uploadVoltageOpen} setOpen={setUploadVoltageOpen} />
-            <CurrentField label={t("customPanel.consumption")} min={0} step="any" inputMode="decimal" value={uploadDraw} onChange={event => setUploadDraw(event.target.value)} />
-        </div>
-        <button type="submit" disabled={!isUploadValid} className="mt-1 flex h-[34px] w-full items-center justify-center rounded-md myb-add-button bg-blue-600 text-[10px] font-black uppercase !text-white hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-40">
-            {t("customPanel.add")}
-        </button>
+        </div></div>
     </form>);
 }
 type CustomBuilderProps = {
@@ -315,10 +319,9 @@ export function CustomPedalVisual({ widthMm, depthMm, scale, customColor, custom
         </div>
     </div>;
 }
-export function getPedalPreviewScale(widthMm: number, depthMm: number, containerWidth: number) {
+export function getPedalPreviewScale(widthMm: number, depthMm: number, containerWidth: number, availableHeight = 114, maxScale = 1) {
     const availableWidth = Math.max(1, containerWidth - 26);
-    const availableHeight = 114;
-    const commonScale = Math.min(availableWidth / 190, availableHeight / 150, 1);
+    const commonScale = Math.min(availableWidth / 190, availableHeight / 150, maxScale);
     return Math.min(commonScale, availableWidth / (widthMm + 16), availableHeight / (depthMm + 16));
 }
 function useContainerWidth(ref: React.RefObject<HTMLDivElement | null>, fallback: number, enabled: boolean) {
@@ -369,8 +372,9 @@ function CustomBuilder({ customType, customName, setCustomName, customWidth, set
     const previewAreaRef = useRef<HTMLDivElement>(null);
     const [selectedFormatId, setSelectedFormatId] = useState<string | null>(null);
     const formatsWidth = useContainerWidth(formatsRef, 260, customType === "pedal");
-    const previewAreaWidth = useContainerWidth(previewAreaRef, 260, customType === "pedal");
-    const thumbnailScale = Math.max(0.1, Math.min((formatsWidth / 3 - 22) / 190, 0.28));
+    const previewAreaWidth = useContainerWidth(previewAreaRef, 260, customType === "pedal" || customType === "board");
+    const visibleFormats = formatsWidth >= 900 ? 6 : formatsWidth >= 580 ? 4 : 3;
+    const thumbnailScale = Math.max(0.1, Math.min((formatsWidth / visibleFormats - 22) / 190, 0.5));
     const activeFormat = PEDAL_FORMATS.find(format => format.id === selectedFormatId)
         || PEDAL_FORMATS.find(format => Math.abs(Number(customWidth) * (units === "metric" ? 1 : 25.4) - format.width) < 0.02
             && Math.abs(Number(customDepth) * (units === "metric" ? 1 : 25.4) - format.depth) < 0.02)
@@ -391,12 +395,6 @@ function CustomBuilder({ customType, customName, setCustomName, customWidth, set
         return () => { images.length = 0; };
     }, []);
     const formatsId = React.useId();
-    const scrollFormats = (direction: -1 | 1) => {
-        const element = formatsRef.current;
-        if (element) element.scrollBy({ left: direction * (element.clientWidth + 8), behavior: "smooth" });
-    };
-    const previousFormats = t("customPanel.previousFormats");
-    const nextFormats = t("customPanel.nextFormats");
     const PRESET_COLORS: PresetColor[] = [
         { value: "", label: t("colors.aluminium") },
         { value: "#111111", label: t("colors.black") },
@@ -509,18 +507,25 @@ function CustomBuilder({ customType, customName, setCustomName, customWidth, set
         ? enteredDepthMm > 0 ? enteredDepthMm : defaultPreviewDepthMm
         : !customDepth.trim() ? defaultPreviewDepthMm : validDepth ? enteredDepthMm : lastPedalDimensions.current.depth;
     /*
-      Le board utilise une largeur maximale plus petite
-      afin de conserver davantage de marge sur les côtés.
-    */
-    const previewMaxWidth = customType === "board" ? 215 : 170;
-    const previewMaxHeight = 100;
-    // Pedals share a fixed scale for the available viewport; their dimensions never set the zoom.
+   Aperçu proportionnel du board en desktop et mobile.
+ */
+    const previewMaxWidth = customType === "board"
+        ? Math.max(1, Math.min(previewAreaWidth * 0.8, 400, previewAreaWidth - 32))
+        : 170;
+
+    const previewMaxHeight = customType === "board" ? 200 : 100;
+
     const previewScale = customType === "board"
-        ? Math.min(previewMaxWidth / previewWidthMm, previewMaxHeight / previewDepthMm)
-        : getPedalPreviewScale(previewWidthMm, previewDepthMm, previewAreaWidth);
+        ? Math.min(
+            previewMaxWidth / previewWidthMm,
+            previewMaxHeight / previewDepthMm
+        )
+        : getPedalPreviewScale(previewWidthMm, previewDepthMm, previewAreaWidth, 252, 1.85);
+
     const effectiveLayout = getSizedPedalLayout(activeFormat.layout, activeFormat.width, activeFormat.depth, previewWidthMm, previewDepthMm);
-    const previewWidthPx = Math.max(customType === "board" ? 80 : 38, previewWidthMm * previewScale);
-    const previewHeightPx = Math.max(customType === "board" ? 36 : 55, previewDepthMm * previewScale);
+
+    const previewWidthPx = previewWidthMm * previewScale;
+    const previewHeightPx = previewDepthMm * previewScale;
     return (<div className="
         flex
         flex-col
@@ -529,16 +534,15 @@ function CustomBuilder({ customType, customName, setCustomName, customWidth, set
       ">
         <div className="flex flex-col gap-0">
             {/* FORMULAIRE PÉDALE */}
-            {customType === "pedal" && (<div className="flex flex-col gap-2 mt-2">
+            {customType === "pedal" && (<div className="myb-custom-pedal-form flex flex-col mt-2">
                 <div className="myb-field-group">
-                    <div className="myb-field-heading text-[11px] font-medium">{t("customPanel.format") === "customPanel.format" ? "Format" : t("customPanel.format")}</div>
+                    <div className="myb-format-header">
+                        <div className="myb-field-heading text-[11px] font-medium">{t("customPanel.format") === "customPanel.format" ? "Format" : t("customPanel.format")}</div>
+                    </div>
                     <div className="myb-formats-carousel">
-                        <button type="button" className="myb-carousel-arrow myb-carousel-previous"
-                            aria-label={previousFormats === "customPanel.previousFormats" ? "Previous formats" : previousFormats}
-                            aria-controls={formatsId} onClick={() => scrollFormats(-1)}><ChevronLeft size={16} /></button>
                         <div ref={formatsRef} id={formatsId} role="group" tabIndex={0}
                             aria-label={`${withUnit(t("customPanel.width"))} / ${withUnit(t("customPanel.depth"))}`}
-                            className="myb-formats-track">
+                            className="myb-formats-track" style={{ gridTemplateColumns: `repeat(${visibleFormats}, minmax(0, 1fr))` }}>
                             {PEDAL_FORMATS.map(format => {
                                 const { width, depth, jackLocations: formatJackLocations } = format;
                                 const name = formatLabel(format);
@@ -574,127 +578,16 @@ function CustomBuilder({ customType, customName, setCustomName, customWidth, set
                                 );
                             })}
                         </div>
-                        <button type="button" className="myb-carousel-arrow myb-carousel-next"
-                            aria-label={nextFormats === "customPanel.nextFormats" ? "Next formats" : nextFormats}
-                            aria-controls={formatsId} onClick={() => scrollFormats(1)}><ChevronRight size={16} /></button>
                     </div>
                 </div>
-                {/* COULEUR */}
-                <div className="flex min-w-0 flex-col gap-2">
-
-                    <div className="flex w-full min-w-0 flex-col gap-1 text-[10px] font-medium">
-                        <span className="myb-field-heading">{t("customPanel.color")}</span>
-                        <div role="group" aria-label={t("customPanel.color")} className="myb-color-row">
-                            {PRESET_COLORS.map(color => (
-                                <button key={color.value || "aluminium"} type="button"
-                                    aria-label={color.label} title={color.label}
-                                    aria-pressed={hasSelectedColor && customColor === color.value}
-                                    onClick={() => {
-                                        closeAllMenus();
-                                        setCustomColor(color.value);
-                                        setHasSelectedColor(true);
-                                    }}
-                                    className="myb-color-swatch"
-                                    style={{
-                                        background: color.value || "linear-gradient(135deg, #eeeeee, #999999, #eeeeee)"
-                                    }}
-                                >
-                                    {hasSelectedColor && customColor === color.value && <Check size={14} strokeWidth={3} aria-hidden="true" style={{ color: ["#111111", "#b91c1c", "#1e3a8a", "#065f46"].includes(color.value) ? "#ffffff" : "#111111" }} />}
-                                </button>
-                            ))}
-                            <label className="myb-color-swatch myb-custom-color" title={customColorLabel}>
-                                <input type="color" aria-label={customColorLabel}
-                                    value={isCustomColorSelected ? customColor : pickedColor}
-                                    onChange={event => {
-                                        closeAllMenus();
-                                        setPickedColor(event.target.value);
-                                        setCustomColor(event.target.value);
-                                        setHasSelectedColor(true);
-                                    }} />
-                                {isCustomColorSelected && <Check size={14} strokeWidth={3} aria-hidden="true" style={{ color: "#111111", pointerEvents: "none" }} />}
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                {/* DIMENSIONS */}
-                <DimensionsGroup title={t("customPanel.enterDimensions").replace(/\s*\([^)]*\)\s*$/, "")}>
-                    <div className="min-w-0" style={{ display: "grid", gridTemplateColumns: "repeat(2,minmax(0,1fr))", gap: 8 }}>
-                        <DimensionField label={t("customPanel.width")} unit={units === "metric" ? "mm" : "in"} min={minValue} max={maxValue} step={units === "metric"
-                            ? 1
-                            : 0.1} value={customWidth} onChange={(event) => setCustomWidth(event.target.value)} />
-                        <DimensionField label={(t("customPanel.height") === "customPanel.height" ? t("customPanel.depth") : t("customPanel.height"))} unit={units === "metric" ? "mm" : "in"} min={minValue} max={maxValue} step={units === "metric"
-                            ? 1
-                            : 0.1} value={customDepth} onChange={(event) => setCustomDepth(event.target.value)} />
-                    </div>
-                    <p className="myb-image-hint text-[9px] leading-relaxed" style={{ margin: "-4px 0 0" }}>
-                        {t("customPanel.enclosureDimensions")
-                            .replaceAll("{min}", String(displayMin))
-                            .replaceAll("{max}", String(displayMax))
-                            .replaceAll("{unit}", unitLabel)}
-                    </p>
-                </DimensionsGroup>
-                {/* NOM + POSITION DES JACKS */}
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(2,minmax(0,1fr))", gap: 8, alignItems: "start" }}>
-                    <label className="flex min-w-0 flex-col gap-1 text-[10px] font-medium"><span className="myb-field-heading">{t("customPanel.namePlaceholder")}</span><input type="text" placeholder={getNameExample(t)} aria-label={t("customPanel.namePlaceholder")} value={customName} onChange={(event) => setCustomName(event.target.value)} className="myb-name-field 
-                  w-full
-                  h-[34px]
-                  bg-zinc-950
-                  border
-                  border-zinc-800
-                  rounded-md
-                  px-3
-                  text-[10px]
-                  outline-none
-                  focus:border-zinc-600
-                "/></label>
-                    <div className="flex min-w-0 flex-col gap-1 text-[10px] font-medium">
-                        <span className="myb-field-heading">{t("customPanel.jackLocations")}</span>
-                        <div ref={jackMenuRef} className="relative h-[34px]" onKeyDown={event => {
-                            if (event.key === "Escape") {
-                                event.preventDefault();
-                                setJackMenuOpen(false);
-                                jackMenuRef.current?.querySelector<HTMLButtonElement>("button")?.focus();
-                            }
-                        }}>
-                            <button type="button" aria-label={t("customPanel.jackLocations")}
-                                aria-expanded={jackMenuOpen} aria-controls={jackMenuId}
-                                onClick={() => { const next = !jackMenuOpen; closeAllMenus(); setJackMenuOpen(next); }}
-                                className="flex h-[34px] w-full min-w-0 items-center justify-between rounded-md border border-zinc-800 bg-zinc-950 px-3 text-left text-[10px]">
-                                <span className="truncate">{LOCATION_OPTIONS.filter(option => jackLocations.includes(option.value)).map(option => option.label).join(", ") || "—"}</span>
-                                <ChevronDown size={14} className="ml-2 shrink-0 text-zinc-500" style={{ transform: jackMenuOpen ? "rotate(180deg)" : undefined }} />
-                            </button>
-                            {jackMenuOpen && <div id={jackMenuId} role="group" aria-label={t("customPanel.jackLocations")}
-                                className="myb-jack-menu absolute left-0 top-full z-50 mt-1 w-full overflow-hidden rounded-lg border border-zinc-800 bg-zinc-950 shadow-2xl">
-                                {LOCATION_OPTIONS.map(option => <label key={option.value} className="myb-jack-option myb-menu-option hover:bg-canvas">
-                                    <input type="checkbox" className="myb-jack-input"
-                                        checked={jackLocations.includes(option.value)}
-                                        onChange={event => {
-                                            const checked = event.target.checked;
-                                            setJackLocations(current => checked
-                                                ? current.includes(option.value) ? current : [...current, option.value]
-                                                : current.filter(location => location !== option.value));
-                                        }} />
-                                    <span className="myb-jack-checkbox" aria-hidden="true">
-                                        {jackLocations.includes(option.value) && <Check size={10} strokeWidth={3} />}
-                                    </span>
-                                    <span>{option.label}</span>
-                                </label>)}
-                            </div>}
-                        </div>
-                    </div>
-                </div>
-                {/* TENSION + CONSOMMATION */}
-                <div className="min-w-0" style={{ display: "grid", gridTemplateColumns: "repeat(2,minmax(0,1fr))", gap: 8 }}>
-
-                    <VoltageDropdown label={t("customPanel.voltage")} values={customVoltage} setValues={setCustomVoltage} open={customVoltageOpen} setOpen={setCustomVoltageOpen} onOpen={closeAllMenus} />
-                    <CurrentField label={t("customPanel.current")} min={0} value={customDraw} onChange={(event) => setCustomDraw(event.target.value)} />
-                </div>
-                {/* APERÇU PÉDALE */}
-                <div className="myb-preview-section flex flex-col gap-2 mt-0">
-                    <div className="myb-field-heading text-[11px] font-medium">
-                        {t("export.preview")}
-                    </div>
-                    <div ref={previewAreaRef} className="myb-pedal-preview-box
+                <div className="myb-configurator-card">
+                    <div className="myb-configurator-grid">
+                        {/* APERÇU PÉDALE */}
+                        <div className="myb-preview-section flex flex-col gap-2 mt-0">
+                            <div className="myb-field-heading text-[11px] font-medium">
+                                {t("export.preview")}
+                            </div>
+                            <div ref={previewAreaRef} className="myb-pedal-preview-box
                   min-h-[120px]
                   rounded-lg
                   border
@@ -707,66 +600,221 @@ function CustomBuilder({ customType, customName, setCustomName, customWidth, set
                   justify-center
                   overflow-hidden
                 ">
-                        <div className="myb-pedal-preview-stage">
-                            <CustomPedalVisual widthMm={previewWidthMm} depthMm={previewDepthMm} scale={previewScale}
-                                customColor={customColor} customName={customName} jackLocations={jackLocations} layout={effectiveLayout} />
+                                <div className="myb-pedal-preview-stage">
+                                    <CustomPedalVisual widthMm={previewWidthMm} depthMm={previewDepthMm} scale={previewScale}
+                                        customColor={customColor} customName={customName} jackLocations={jackLocations} layout={effectiveLayout} />
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
-                {/* AJOUTER LA PÉDALE */}
-                <button type="button" disabled={!isPedalValid} onClick={() => {
-                    addCustomItem({
-                        name: customName.trim(),
-                        customLayout: effectiveLayout,
-                        color: customColor ||
-                            undefined,
-                        ...customVoltageData(customVoltage, customDraw.trim() ? Number(customDraw) || 0 : 100),
-                        draw: customDraw.trim() ? Number(customDraw) || 0 : 100,
-                        jacksLocation: jackLocations.join(", "),
-                        powerLocation: "top",
-                    });
-                    resetPedalFields();
-                }} className={`
-                w-full
-                h-[34px]
-                mt-2
+                        <div className="myb-configurator-fields">
+                            {/* COULEUR */}
+                            <div className="myb-configurator-group flex min-w-0 flex-col gap-2">
+
+                                <div className="flex w-full min-w-0 flex-col gap-1 text-[12px] font-medium">
+                                    <span className="myb-field-heading">{t("customPanel.color")}</span>
+                                    <div role="group" aria-label={t("customPanel.color")} className="myb-color-row">
+                                        {PRESET_COLORS.map(color => (
+                                            <button key={color.value || "aluminium"} type="button"
+                                                aria-label={color.label} title={color.label}
+                                                aria-pressed={hasSelectedColor && customColor === color.value}
+                                                onClick={() => {
+                                                    closeAllMenus();
+                                                    setCustomColor(color.value);
+                                                    setHasSelectedColor(true);
+                                                }}
+                                                className="myb-color-swatch"
+                                                style={{
+                                                    background: color.value || "linear-gradient(135deg, #eeeeee, #999999, #eeeeee)"
+                                                }}
+                                            >
+                                                {hasSelectedColor && customColor === color.value && <Check size={14} strokeWidth={3} aria-hidden="true" style={{ color: ["#111111", "#b91c1c", "#1e3a8a", "#065f46"].includes(color.value) ? "#ffffff" : "#111111" }} />}
+                                            </button>
+                                        ))}
+                                        <label className="myb-color-swatch myb-custom-color" title={customColorLabel}>
+                                            <input type="color" aria-label={customColorLabel}
+                                                value={isCustomColorSelected ? customColor : pickedColor}
+                                                onChange={event => {
+                                                    closeAllMenus();
+                                                    setPickedColor(event.target.value);
+                                                    setCustomColor(event.target.value);
+                                                    setHasSelectedColor(true);
+                                                }} />
+                                            {isCustomColorSelected && <Check size={14} strokeWidth={3} aria-hidden="true" style={{ color: "#111111", pointerEvents: "none" }} />}
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            {/* DIMENSIONS */}
+                            <DimensionsGroup title={t("customPanel.enterDimensions").replace(/\s*\([^)]*\)\s*$/, "")}>
+                                <div className="min-w-0" style={{ display: "grid", gridTemplateColumns: "repeat(2,minmax(0,1fr))", gap: 8 }}>
+                                    <DimensionField label={t("customPanel.width")} unit={units === "metric" ? "mm" : "in"} min={minValue} max={maxValue} step={units === "metric"
+                                        ? 1
+                                        : 0.1} value={customWidth} onChange={(event) => setCustomWidth(event.target.value)} />
+                                    <DimensionField label={(t("customPanel.height") === "customPanel.height" ? t("customPanel.depth") : t("customPanel.height"))} unit={units === "metric" ? "mm" : "in"} min={minValue} max={maxValue} step={units === "metric"
+                                        ? 1
+                                        : 0.1} value={customDepth} onChange={(event) => setCustomDepth(event.target.value)} />
+                                </div>
+                                <p className="myb-image-hint text-[9px] leading-relaxed" style={{ margin: "-4px 0 0" }}>
+                                    {t("customPanel.enclosureDimensions")
+                                        .replaceAll("{min}", String(displayMin))
+                                        .replaceAll("{max}", String(displayMax))
+                                        .replaceAll("{unit}", unitLabel)}
+                                </p>
+                            </DimensionsGroup>
+                            {/* NOM + POSITION DES JACKS */}
+                            <div style={{ display: "grid", gridTemplateColumns: "repeat(2,minmax(0,1fr))", gap: 8, alignItems: "start" }}>
+                                <label className="flex min-w-0 flex-col gap-1 text-[12px] font-medium"><span className="myb-field-heading">{t("customPanel.namePlaceholder")}</span><input type="text" placeholder={getNameExample(t)} aria-label={t("customPanel.namePlaceholder")} value={customName} onChange={(event) => setCustomName(event.target.value)} className="myb-name-field 
+                  w-full
+                  h-[40px]
+                  bg-zinc-950
+                  border
+                  border-zinc-800
+                  rounded-md
+                  px-3
+                  text-[12px]
+                  outline-none
+                  focus:border-zinc-600
+                "/></label>
+                                <div className="flex min-w-0 flex-col gap-1 text-[12px] font-medium">
+                                    <span className="myb-field-heading">{t("customPanel.jackLocations")}</span>
+                                    <div ref={jackMenuRef} className="relative h-[40px]" onKeyDown={event => {
+                                        if (event.key === "Escape") {
+                                            event.preventDefault();
+                                            setJackMenuOpen(false);
+                                            jackMenuRef.current?.querySelector<HTMLButtonElement>("button")?.focus();
+                                        }
+                                    }}>
+                                        <button type="button" aria-label={t("customPanel.jackLocations")}
+                                            aria-expanded={jackMenuOpen} aria-controls={jackMenuId}
+                                            onClick={() => { const next = !jackMenuOpen; closeAllMenus(); setJackMenuOpen(next); }}
+                                            className="flex h-[40px] w-full min-w-0 items-center justify-between rounded-md border border-zinc-800 bg-zinc-950 px-3 text-left text-[12px]">
+                                            <span className="truncate">{LOCATION_OPTIONS.filter(option => jackLocations.includes(option.value)).map(option => option.label).join(", ") || "—"}</span>
+                                            <ChevronDown size={14} className="ml-2 shrink-0 text-zinc-500" style={{ transform: jackMenuOpen ? "rotate(180deg)" : undefined }} />
+                                        </button>
+                                        {jackMenuOpen && <div id={jackMenuId} role="group" aria-label={t("customPanel.jackLocations")}
+                                            className="myb-jack-menu absolute left-0 top-full z-50 mt-1 w-full overflow-hidden rounded-lg border border-zinc-800 bg-zinc-950 shadow-2xl">
+                                            {LOCATION_OPTIONS.map(option => <label key={option.value} className="myb-jack-option myb-menu-option hover:bg-canvas">
+                                                <input type="checkbox" className="myb-jack-input"
+                                                    checked={jackLocations.includes(option.value)}
+                                                    onChange={event => {
+                                                        const checked = event.target.checked;
+                                                        setJackLocations(current => checked
+                                                            ? current.includes(option.value) ? current : [...current, option.value]
+                                                            : current.filter(location => location !== option.value));
+                                                    }} />
+                                                <span className="myb-jack-checkbox" aria-hidden="true">
+                                                    {jackLocations.includes(option.value) && <Check size={10} strokeWidth={3} />}
+                                                </span>
+                                                <span>{option.label}</span>
+                                            </label>)}
+                                        </div>}
+                                    </div>
+                                </div>
+                            </div>
+                            {/* TENSION + CONSOMMATION */}
+                            <div className="min-w-0" style={{ display: "grid", gridTemplateColumns: "repeat(2,minmax(0,1fr))", gap: 8 }}>
+
+                                <VoltageDropdown label={t("customPanel.voltage")} values={customVoltage} setValues={setCustomVoltage} open={customVoltageOpen} setOpen={setCustomVoltageOpen} onOpen={closeAllMenus} />
+                                <CurrentField label={t("customPanel.current")} min={0} value={customDraw} onChange={(event) => setCustomDraw(event.target.value)} />
+                            </div>
+                            <button type="button" disabled={!isPedalValid} onClick={() => {
+                                addCustomItem({
+                                    name: customName.trim(),
+                                    customLayout: effectiveLayout,
+                                    color: customColor ||
+                                        undefined,
+                                    ...customVoltageData(customVoltage, customDraw.trim() ? Number(customDraw) || 0 : 100),
+                                    draw: customDraw.trim() ? Number(customDraw) || 0 : 100,
+                                    jacksLocation: jackLocations.join(", "),
+                                    powerLocation: "top",
+                                });
+                                resetPedalFields();
+                            }} className={`
+                myb-configurator-add
+                h-[40px]
                 rounded-md
-myb-add-button bg-blue-600
+bg-blue-600
 hover:bg-blue-500
                 !text-white
-                text-[10px]
-                font-black
-                uppercase
+                text-[12px]
+                font-semibold
                 transition-all
                 duration-150
                 ${isPedalValid
-                        ? "cursor-pointer"
-                        : "cursor-not-allowed"}
+                                    ? "cursor-pointer"
+                                    : "cursor-not-allowed"}
               `}>
-                    {t("customPanel.add")}
-                </button>
+                                <Plus size={15} aria-hidden="true" />
+                                {t("customPanel.addToBoard")}
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
             </div>)}
             {/* FORMULAIRE BOARD */}
-            {customType === "board" && (<div className="flex flex-col gap-2 mt-2">
-                {/* DIMENSIONS */}
-                <div className="myb-field-group">
-                    <div className="myb-field-heading text-[11px] font-medium">{t("customPanel.boardDimensions") === "customPanel.boardDimensions" ? "Dimensions" : t("customPanel.boardDimensions")}</div>
-                    <div className="min-w-0" style={{ display: "grid", gridTemplateColumns: "repeat(2,minmax(0,1fr))", gap: 8 }}>
-                        <DimensionField label={t("customPanel.width")} unit={units === "metric" ? "mm" : "in"} min={minValue} max={maxValue} step={units === "metric"
-                            ? 1
-                            : 0.1} value={customWidth} onChange={(event) => setCustomWidth(event.target.value)} />
-                        <DimensionField label={(t("customPanel.height") === "customPanel.height" ? t("customPanel.depth") : t("customPanel.height"))} unit={units === "metric" ? "mm" : "in"} min={minValue} max={maxValue} step={units === "metric"
-                            ? 1
-                            : 0.1} value={customDepth} onChange={(event) => setCustomDepth(event.target.value)} />
+            {customType === "board" && (<div className="myb-custom-pedal-form flex flex-col mt-2">
+                <div className="myb-configurator-card"><div className="myb-configurator-grid myb-configurator-grid-board">
+                    {/* APERÇU BOARD */}
+                    <div className="myb-preview-section flex flex-col gap-2 mt-0">
+                        <div className="myb-field-heading text-[11px] font-medium">
+                            {t("export.preview")}
+                        </div>
+                        <div ref={previewAreaRef} className="myb-board-preview-stage
+    rounded-lg
+    border
+    border-zinc-800
+    bg-zinc-950
+    px-5
+    py-4
+    flex
+    items-center
+    justify-center
+    overflow-hidden
+  ">
+                            <div className="
+                    relative
+                    shrink-0
+                    overflow-hidden
+                    rounded-[6px]
+                    shadow-lg
+                    transition-all
+                    duration-200
+                  " style={{
+                                    width: `${previewWidthPx}px`,
+                                    height: `${previewHeightPx}px`,
+                                }}>
+                                <img src={selectedBoardTexture.image} alt={`Board ${selectedBoardTexture.label}`} draggable={false} className="
+                      absolute
+                      inset-0
+                      w-full
+                      h-full
+                      object-fill
+                      pointer-events-none
+                    "/>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                {/* MENU DÉROULANT TYPE DE BOARD */}
-                <div className="flex min-w-0 flex-col gap-1 text-[10px] font-medium"><span className="myb-field-heading">{t("customPanel.boardFinish")}</span><div ref={boardTextureRef} className="relative h-[40px]">
-                    <button type="button" onClick={() => {
-                        const nextOpen = !boardTextureOpen;
-                        closeAllMenus();
-                        setBoardTextureOpen(nextOpen);
-                    }} className="
+                    <div className="myb-configurator-fields">
+                        {/* DIMENSIONS */}
+                        <div className="myb-field-group">
+                            <div className="myb-field-heading text-[11px] font-medium">{t("customPanel.boardDimensions") === "customPanel.boardDimensions" ? "Dimensions" : t("customPanel.boardDimensions")}</div>
+                            <div className="min-w-0" style={{ display: "grid", gridTemplateColumns: "repeat(2,minmax(0,1fr))", gap: 8 }}>
+                                <DimensionField label={t("customPanel.width")} unit={units === "metric" ? "mm" : "in"} min={minValue} max={maxValue} step={units === "metric"
+                                    ? 1
+                                    : 0.1} value={customWidth} onChange={(event) => setCustomWidth(event.target.value)} />
+                                <DimensionField label={(t("customPanel.height") === "customPanel.height" ? t("customPanel.depth") : t("customPanel.height"))} unit={units === "metric" ? "mm" : "in"} min={minValue} max={maxValue} step={units === "metric"
+                                    ? 1
+                                    : 0.1} value={customDepth} onChange={(event) => setCustomDepth(event.target.value)} />
+                            </div>
+                        </div>
+                        {/* MENU DÉROULANT TYPE DE BOARD */}
+                        <div className="flex min-w-0 flex-col gap-1 text-[12px] font-medium"><span className="myb-field-heading">{t("customPanel.boardFinish")}</span><div ref={boardTextureRef} className="relative h-[40px]">
+                            <button type="button" onClick={() => {
+                                const nextOpen = !boardTextureOpen;
+                                closeAllMenus();
+                                setBoardTextureOpen(nextOpen);
+                            }} className="
                   w-full
                   h-[40px]
                   px-3
@@ -774,7 +822,7 @@ hover:bg-blue-500
                   border
                   border-zinc-800
                   rounded-md
-                  text-[10px]
+                  text-[12px]
                   text-left
                   flex
                   items-center
@@ -782,8 +830,8 @@ hover:bg-blue-500
                   hover:border-zinc-600
                   transition-colors
                 ">
-                        <div className="flex items-center gap-3 min-w-0">
-                            <div className="
+                                <div className="flex items-center gap-3 min-w-0">
+                                    <div className="
                       w-[48px]
                       h-[24px]
                       rounded-[4px]
@@ -793,29 +841,29 @@ hover:bg-blue-500
                       shrink-0
                       bg-zinc-900
                     ">
-                                <img src={selectedBoardTexture.image} alt="" draggable={false} className="
+                                        <img src={selectedBoardTexture.image} alt="" draggable={false} className="
                         block
                         w-full
                         h-full
                         object-cover
                         pointer-events-none
                       "/>
-                            </div>
-                            <span className="truncate font-bold">
-                                {selectedBoardTexture.label}
-                            </span>
-                        </div>
-                        <ChevronDown size={14} className={`
+                                    </div>
+                                    <span className="truncate font-bold">
+                                        {selectedBoardTexture.label}
+                                    </span>
+                                </div>
+                                <ChevronDown size={14} className={`
                     ml-3
                     shrink-0
                     text-zinc-500
                     transition-transform
                     ${boardTextureOpen
-                                ? "rotate-180"
-                                : ""}
+                                        ? "rotate-180"
+                                        : ""}
                   `} />
-                    </button>
-                    {boardTextureOpen && (<div className="
+                            </button>
+                            {boardTextureOpen && (<div className="
                     absolute
                     z-50
                     top-full
@@ -829,13 +877,13 @@ hover:bg-blue-500
                     overflow-hidden
                     shadow-2xl
                   ">
-                        {BOARD_TEXTURES.map((texture) => {
-                            const active = boardTexture ===
-                                texture.value;
-                            return (<button key={texture.value} type="button" onClick={() => {
-                                setBoardTexture(texture.value);
-                                setBoardTextureOpen(false);
-                            }} className={`
+                                {BOARD_TEXTURES.map((texture) => {
+                                    const active = boardTexture ===
+                                        texture.value;
+                                    return (<button key={texture.value} type="button" onClick={() => {
+                                        setBoardTexture(texture.value);
+                                        setBoardTextureOpen(false);
+                                    }} className={`
                             w-full
                             h-[42px]
                             px-3
@@ -843,15 +891,15 @@ hover:bg-blue-500
                             items-center
                             justify-between
                             text-left
-                            text-[10px]
+                            text-[12px]
                             hover:bg-canvas
                             transition-colors
                             ${active
-                                    ? "font-black"
-                                    : "font-normal"}
+                                            ? "font-black"
+                                            : "font-normal"}
                           `}>
-                                <div className="flex items-center gap-3 min-w-0">
-                                    <div className="
+                                        <div className="flex items-center gap-3 min-w-0">
+                                            <div className="
                                 w-[48px]
                                 h-[24px]
                                 rounded-[4px]
@@ -861,19 +909,19 @@ hover:bg-blue-500
                                 shrink-0
                                 bg-zinc-900
                               ">
-                                        <img src={texture.image} alt="" draggable={false} className="
+                                                <img src={texture.image} alt="" draggable={false} className="
                                   block
                                   w-full
                                   h-full
                                   object-cover
                                   pointer-events-none
                                 "/>
-                                    </div>
-                                    <span className="truncate">
-                                        {texture.label}
-                                    </span>
-                                </div>
-                                <span className={`
+                                            </div>
+                                            <span className="truncate">
+                                                {texture.label}
+                                            </span>
+                                        </div>
+                                        <span className={`
                               w-[16px]
                               h-[16px]
                               rounded-full
@@ -883,90 +931,35 @@ hover:bg-blue-500
                               justify-center
                               shrink-0
                               ${active
-                                        ? "border-blue-500 bg-blue-500"
-                                        : "border-zinc-500 bg-transparent"}
+                                                ? "border-blue-500 bg-blue-500"
+                                                : "border-zinc-500 bg-transparent"}
                             `}>
-                                    {active && (<Check size={11} strokeWidth={3} className="text-white" />)}
-                                </span>
-                            </button>);
-                        })}
-                    </div>)}
+                                            {active && (<Check size={11} strokeWidth={3} className="text-white" />)}
+                                        </span>
+                                    </button>);
+                                })}
+                            </div>)}
+                        </div></div>
+                        <button type="button" disabled={!isBoardValid} onClick={() => {
+                            addCustomItem({
+                                name: customName.trim() ||
+                                    "Custom Board",
+                                image: selectedBoardTexture.image,
+                                image_url: selectedBoardTexture.image,
+                                photo: selectedBoardTexture.image,
+                                boardTexture: selectedBoardTexture.value,
+                            });
+                            resetBoardFields();
+                        }} className="myb-configurator-add bg-blue-600 hover:bg-blue-500 !text-white disabled:cursor-not-allowed">
+                            <Plus size={16} /> {t("customPanel.addToBoard")}
+                        </button>
+                    </div>
                 </div></div>
-                {/* APERÇU BOARD */}
-                <div className="myb-preview-section flex flex-col gap-2 mt-0">
-                    <div className="myb-field-heading text-[11px] font-medium">
-                        {t("export.preview")}
-                    </div>
-                    <div className="
-    rounded-lg
-    border
-    border-zinc-800
-    bg-zinc-950
-    px-5
-    py-4
-    flex
-    items-center
-    justify-center
-    overflow-hidden
-  ">
-                        <div className="
-                    relative
-                    shrink-0
-                    overflow-hidden
-                    rounded-[6px]
-                    shadow-lg
-                    transition-all
-                    duration-200
-                  " style={{
-                                width: `${previewWidthPx}px`,
-                                height: `${previewHeightPx}px`,
-                            }}>
-                            <img src={selectedBoardTexture.image} alt={`Board ${selectedBoardTexture.label}`} draggable={false} className="
-                      absolute
-                      inset-0
-                      w-full
-                      h-full
-                      object-fill
-                      pointer-events-none
-                    "/>
-                        </div>
-                    </div>
-                </div>
-                {/* AJOUTER LE BOARD */}
-                <button type="button" disabled={!isBoardValid} onClick={() => {
-                    addCustomItem({
-                        name: customName.trim() ||
-                            "Custom Board",
-                        image: selectedBoardTexture.image,
-                        image_url: selectedBoardTexture.image,
-                        photo: selectedBoardTexture.image,
-                        boardTexture: selectedBoardTexture.value,
-                    });
-                    resetBoardFields();
-                }} className={`
-                w-full
-                h-[34px]
-                mt-2
-                rounded-md
-myb-add-button bg-blue-600
-hover:bg-blue-500
-                !text-white
-                text-[10px]
-                font-black
-                uppercase
-                transition-all
-                duration-150
-                ${isBoardValid
-                        ? "cursor-pointer"
-                        : "cursor-not-allowed"}
-              `}>
-                    {t("customPanel.add")}
-                </button>
             </div>)}
         </div>
     </div>);
 }
-type CustomPanelProps = CustomBuilderProps & ImportBuilderProps;
+type CustomPanelProps = CustomBuilderProps & ImportBuilderProps & { onBack?: () => void; embeddedCatalog?: boolean };
 export default function CustomPanel(props: CustomPanelProps) {
     const [mode, setMode] = useState<"custom" | "import">("custom");
     const [visited, setVisited] = useState({ custom: true, import: false });
@@ -979,13 +972,70 @@ export default function CustomPanel(props: CustomPanelProps) {
         setVisited(current => ({ ...current, [value]: true }));
         setMode(value);
     };
-    return (<section className="myb-custom-panel mt-4 flex flex-1 min-h-0 flex-col">
+    return (<section className="myb-custom-panel myb-custom-redesign flex min-h-0 flex-col">
         <style>{`
-        .myb-custom-panel { flex: 1 1 0%; min-height: 0; overflow: hidden; }
+.myb-custom-panel {
+  flex: none;
+  min-height: 0;
+  overflow: visible;
+  width: 100%;
+  max-width: 900px;
+  margin-inline: auto;
+  color: var(--foreground);
+}
+         .myb-custom-panel .myb-custom-pedal-form { gap: 18px; }
+        .myb-custom-panel .myb-configurator-card {
+          padding: 0; border: 0; background: transparent; min-width: 0; display: flex; flex-direction: column;
+          width: 100%; box-sizing: border-box;
+          container-type: inline-size;
+        }
+        .myb-custom-panel .myb-configurator-grid {
+          display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+          gap: 16px; align-items: stretch; min-width: 0;
+        }
+        .myb-custom-panel .myb-configurator-fields {
+          display: flex; flex-direction: column; justify-content: space-between; gap: 12px; min-width: 0;
+        }
+        @media (min-width: 1024px) {
+          .myb-custom-panel .myb-configurator-grid-board {
+            grid-template-columns: minmax(0, calc((100% - 16px) * 2 / 3 + 8px)) minmax(0, 1fr);
+          }
+        }
+        .myb-custom-panel .myb-configurator-group { min-width: 0; }
+        .myb-custom-panel .myb-configurator-group .myb-color-row {
+          border: 1px solid var(--zinc-700); border-radius: 14px;
+          padding: 12px; background: var(--zinc-950); box-sizing: border-box;
+        }
+        .myb-custom-panel .myb-configurator-grid > .myb-preview-section {
+          min-width: 0; gap: 4px;
+        }
+        .myb-custom-panel .myb-configurator-grid .myb-pedal-preview-box {
+          flex: 1; height: auto !important; min-height: 270px !important;
+          max-height: none !important; border: 1px solid var(--zinc-700);
+          border-radius: 16px; background: var(--zinc-950);
+          padding: 14px !important; display: grid !important; place-items: center;
+        }
+        .myb-custom-panel .myb-configurator-add {
+          display: flex; align-items: center; justify-content: center; gap: 8px;
+          margin: 18px 0 0; flex-shrink: 0; width: 100%; padding: 0 14px; border-radius: 9px; font-size: 13px; font-weight: 650;
+          text-transform: none; height: 34px !important; min-height: 34px !important; max-height: 34px !important; white-space: nowrap;
+        }
+        .myb-custom-panel .myb-format-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 4px; }
+        .myb-custom-panel .myb-configurator-add:disabled { opacity: .5; }
+        @container (max-width: 620px) {
+          .myb-custom-panel .myb-configurator-grid,
+          .myb-custom-panel .myb-configurator-grid-board { grid-template-columns: minmax(0, 1fr); }
+          .myb-custom-panel .myb-configurator-grid > .myb-preview-section { min-height: 240px; }
+          .myb-custom-panel .myb-configurator-grid .myb-pedal-preview-box { min-height: 270px !important; }
+        }
+        .myb-custom-panel .myb-custom-settings {
+          width: 100%; max-width: 720px; margin-inline: auto;
+          display: flex; flex-direction: column; gap: 14px;
+          border: 0;
+          padding-top: 0;
+        }
         .myb-custom-panel .myb-custom-scroll {
-          min-height: 0; flex: 1 1 0%; overflow-y: auto;
-          padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
-          scroll-padding-bottom: 20px; overscroll-behavior-y: contain;
+          min-height: 0; flex: none; overflow: visible; padding-bottom: 0;
         }
         .myb-custom-panel .myb-add-button { flex-shrink: 0 !important; }
         .myb-custom-panel .myb-jack-menu .myb-jack-option {
@@ -995,16 +1045,13 @@ export default function CustomPanel(props: CustomPanelProps) {
         .myb-custom-panel .myb-jack-menu .myb-jack-option > span:not(.myb-jack-checkbox) { order: 1; }
         .myb-custom-panel .myb-menu-option:hover { background-color: var(--canvas, var(--color-canvas, var(--zinc-700, #3f3f46))) !important; }
         .light .myb-custom-panel .myb-menu-option:hover { background-color: var(--zinc-700, #e5e7eb) !important; }
-        .myb-custom-panel .myb-carousel-arrow { transition: background-color 140ms ease; }
-        .myb-custom-panel .myb-carousel-arrow:hover,
-        .myb-custom-panel .myb-carousel-arrow:focus-visible { background: color-mix(in srgb, currentColor 24%, transparent) !important; }
-        .myb-custom-panel .myb-custom-title { margin: 0 0 8px !important; }
+        .myb-custom-panel .myb-custom-title { margin: 0 !important; font-size: 30px !important; line-height: 1.15; font-weight: 750 !important; }
         .myb-custom-panel .myb-name-field::placeholder { color: #a1a1aa !important; opacity: 1 !important; }
         .light .myb-custom-panel .myb-name-field::placeholder { color: #626975 !important; }
         .myb-custom-panel .myb-name-field:focus::placeholder { color: transparent !important; }
         .myb-custom-panel .myb-name-field,
         .myb-custom-panel .myb-add-button {
-          height: 34px !important; min-height: 34px !important; max-height: 34px !important;
+          height: 40px !important; min-height: 40px !important; max-height: 40px !important;
           box-sizing: border-box; padding-top: 0 !important; padding-bottom: 0 !important;
         }
         .myb-custom-panel .myb-upload-slot { position: relative; width: 100%; }
@@ -1031,30 +1078,21 @@ export default function CustomPanel(props: CustomPanelProps) {
         .myb-custom-panel .myb-image-hint { margin: -8px 0 0; font-style: italic; }
         .myb-custom-panel .myb-formats-carousel { position: relative; min-width: 0; margin-bottom: 0; }
         .myb-custom-panel .myb-formats-track {
-          display: grid; grid-auto-flow: column; grid-auto-columns: calc((100% - 16px) / 3); gap: 8px;
-          overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scrollbar-width: none;
+          display: grid; gap: 12px;
         }
         .myb-custom-panel .myb-formats-track::-webkit-scrollbar { display: none; }
-        .myb-custom-panel .myb-carousel-arrow {
-          position: absolute; top: 50%; transform: translateY(-50%); z-index: 1;
-          display: flex; align-items: center; justify-content: center; width: 20px; height: 26px;
-          padding: 0; border: 0; border-radius: 5px; color: inherit !important;
-          background: color-mix(in srgb, currentColor 12%, transparent) !important; cursor: pointer;
-        }
-        .myb-custom-panel .myb-carousel-previous { left: -5px; }
-        .myb-custom-panel .myb-carousel-next { right: -5px; }
         .myb-custom-panel .myb-format-choice {
           scroll-snap-align: start;
-          width: 100%; height: 88px !important; min-height: 88px !important; max-height: 88px !important;
+          width: 100%; height: 124px !important; min-height: 124px !important; max-height: 124px !important;
           aspect-ratio: auto; box-sizing: border-box; padding: 7px !important;
         }
-        .myb-custom-panel .myb-format-stage { height: 46px; width: 100%; display: flex; align-items: flex-end; justify-content: center; padding: 4px 0; box-sizing: border-box; }
-        .myb-custom-panel .myb-format-caption { font-size: 11px; line-height: 1.2; font-weight: 700; }
-        .myb-custom-panel .myb-format-dimensions { font-size: 9px; line-height: 1.2; white-space: nowrap; }
+        .myb-custom-panel .myb-format-stage { height: 76px; width: 100%; display: flex; align-items: center; justify-content: center; padding: 4px 0; box-sizing: border-box; }
+        .myb-custom-panel .myb-format-caption { font-size: 13px; line-height: 1.2; font-weight: 700; }
+        .myb-custom-panel .myb-format-dimensions { font-size: 11px; line-height: 1.2; white-space: nowrap; }
         .myb-custom-panel .myb-format-choice { gap: 3px !important; }
         .myb-custom-panel .myb-pedal-preview-box {
-          display: block !important; height: 140px !important; min-height: 140px !important;
-          max-height: 140px !important; overflow: hidden !important; padding: 12px !important;
+          display: block !important; height: 208px !important; min-height: 208px !important;
+          max-height: 208px !important; overflow: hidden !important; padding: 12px !important;
         }
         .myb-custom-panel .myb-pedal-preview-stage {
           display: grid; place-items: center;
@@ -1077,7 +1115,7 @@ export default function CustomPanel(props: CustomPanelProps) {
         .myb-custom-panel .myb-field-heading {
           text-transform: none !important;
           font-weight: 700 !important;
-          font-size: 11px !important;
+          font-size: 13px !important;
           letter-spacing: normal !important;
           margin-top: 4px;
           margin-bottom: 0 !important;
@@ -1089,42 +1127,69 @@ export default function CustomPanel(props: CustomPanelProps) {
           display: flex; flex-direction: column; gap: 4px !important; margin-top: 0 !important;
         }
         .myb-custom-panel .myb-custom-tabs {
-          height: 30px !important; min-height: 30px !important; max-height: 30px !important;
-          box-sizing: border-box; padding: 2px !important; background: #ffffff !important;
+          height: 48px !important; min-height: 48px !important; max-height: 48px !important;
+          box-sizing: border-box; padding: 0 !important; background: transparent;
         }
         .myb-custom-panel .myb-custom-tabs .myb-type-choice {
-          height: 26px !important; min-height: 0 !important; max-height: 26px !important;
-          padding-top: 0 !important; padding-bottom: 0 !important; color: #111111;
+          height: 48px !important; min-height: 0 !important; max-height: 48px !important;
+          padding-top: 0 !important; padding-bottom: 0 !important; color: var(--foreground);
+          background: var(--zinc-800); border-radius: 12px; font-size: 13px;
+          display: flex; align-items: center; justify-content: center; gap: 8px;
         }
         .myb-custom-panel .myb-custom-tabs .myb-type-choice[aria-pressed="true"],
         .light .myb-custom-panel .myb-custom-tabs .myb-type-choice[aria-pressed="true"] {
-          color: #111111 !important;
-          background: #e5e7eb !important;
+          color: white !important;
+          background: #2563eb !important;
           border-color: transparent !important;
         }
+        .myb-custom-panel .myb-tab-icon {
+          display: block; width: 18px; height: 18px; object-fit: contain;
+          flex: 0 0 18px; pointer-events: none;
+        }
+        .myb-custom-panel .myb-tab-icon-dark { display: none; }
+        .light .myb-custom-panel .myb-type-choice:not([aria-pressed="true"]) .myb-tab-icon-light { display: none; }
+        .light .myb-custom-panel .myb-type-choice:not([aria-pressed="true"]) .myb-tab-icon-dark { display: block; }
         .myb-custom-panel .myb-type-choice,
         .myb-custom-panel .myb-format-choice { border: 1px solid transparent !important; box-shadow: none !important; }
-        .myb-custom-panel .myb-type-choice[aria-pressed="true"] { border-color: #111111 !important; }
+        .myb-custom-panel .myb-type-choice[aria-pressed="true"] { border-color: transparent !important; }
         .light .myb-custom-panel .myb-type-choice[aria-pressed="true"] {
-          border-color: var(--color-canvas, var(--canvas, #adb5bd)) !important;
+          border-color: transparent !important;
         }
         .myb-custom-panel .myb-format-choice,
         .myb-custom-panel .myb-jack-option { position: relative; }
+        .myb-custom-panel .myb-format-choice {
+          border: 1px solid var(--zinc-700) !important;
+          border-radius: 14px;
+        }
+        .myb-custom-panel .myb-format-choice[aria-pressed="true"] {
+          border-color: #3b82f6 !important;
+          box-shadow: inset 0 0 0 1px #3b82f6 !important;
+        }
+        .myb-custom-panel .myb-format-choice:hover { border-color: var(--zinc-500) !important; }
         .myb-custom-panel .myb-selection-check {
           position: absolute; top: 4px; right: 4px; color: inherit; pointer-events: none;
         }
         .myb-custom-panel .myb-color-row { display: flex; flex-wrap: nowrap; align-items: center; justify-content: space-between; gap: 4px; width: 100%; }
         .myb-custom-panel .myb-color-swatch {
           display: inline-flex !important; align-items: center; justify-content: center;
-          width: 24px !important; height: 24px !important;
+          width: 28px !important; height: 28px !important;
           min-width: 0 !important; min-height: 0 !important;
-          flex: 0 1 24px !important; aspect-ratio: 1;
+          flex: 0 1 28px !important; aspect-ratio: 1;
           padding: 0 !important; border: 0 !important; border-radius: 50% !important;
           box-shadow: none !important; cursor: pointer; appearance: none;
+          transition: transform 150ms ease, outline-color 150ms ease;
+          outline: 2px solid transparent; outline-offset: 3px;
         }
+        @media (hover: hover) {
+          .myb-custom-panel .myb-color-swatch:hover {
+            transform: scale(1.12); outline-color: var(--zinc-400);
+          }
+        }
+        .myb-custom-panel .myb-color-swatch:focus-visible,
+        .myb-custom-panel .myb-custom-color:focus-within { outline-color: #3b82f6; }
         .myb-custom-panel .myb-inline-field {
           display: flex; align-items: center; gap: 6px; width: 100%; min-width: 0;
-          height: 34px; padding: 0 10px; box-sizing: border-box;
+          height: 40px; padding: 0 12px; box-sizing: border-box;
           background: var(--zinc-950, #09090b); border: 1px solid var(--zinc-800, #27272a); border-radius: 6px;
           font-size: 10px;
         }
@@ -1136,12 +1201,11 @@ export default function CustomPanel(props: CustomPanelProps) {
         .myb-custom-panel .myb-inline-field input::-webkit-inner-spin-button,
         .myb-custom-panel .myb-inline-field input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         .myb-custom-panel .myb-field-label { flex-shrink: 0; }
-        .myb-custom-panel .myb-field-label,
-        .myb-custom-panel .myb-image-hint { color: #a1a1aa !important; }
+        .myb-custom-panel .myb-field-label { color: #a1a1aa !important; }
+        .myb-custom-panel .myb-image-hint { color: inherit !important; }
         .myb-custom-panel .myb-field-unit { flex-shrink: 0; color: #a1a1aa; }
         .light .myb-custom-panel .myb-field-label,
-        .light .myb-custom-panel .myb-field-unit,
-        .light .myb-custom-panel .myb-image-hint {
+        .light .myb-custom-panel .myb-field-unit {
           color: #626975 !important;
         }
         .myb-custom-panel .myb-custom-color {
@@ -1202,19 +1266,51 @@ export default function CustomPanel(props: CustomPanelProps) {
           box-shadow: none !important;
           border-color: var(--zinc-800, #27272a) !important;
         }
+        .myb-custom-panel .myb-custom-back {
+          display: inline-flex; align-items: center; justify-content: center;
+          width: 36px; height: 36px; padding: 0; border: 0; border-radius: 50%;
+          background: var(--zinc-900); color: inherit; cursor: pointer;
+        }
+        .myb-custom-panel .myb-custom-back:hover { background: var(--zinc-700); }
+       .myb-custom-panel .myb-board-preview-stage {
+  flex: 1;
+  min-height: 240px;
+  border: 1px solid var(--zinc-700);
+  border-radius: 16px;
+  padding: 14px;
+  background: var(--zinc-950);
+}
+        .myb-custom-panel .myb-import-image-card {
+          display: flex; flex-direction: column; flex: 1; min-height: 270px;
+          border: 1px solid var(--zinc-700); border-radius: 16px; padding: 14px;
+          background: var(--zinc-950); box-sizing: border-box;
+        }
+        .myb-custom-panel .myb-import-preview .myb-upload-slot { flex: 1; display: flex; align-items: stretch; }
+        .myb-custom-panel .myb-import-preview .myb-upload-button {
+          height: 100% !important; min-height: 200px !important; background: transparent;
+        }
+        .myb-custom-panel .myb-import-preview .myb-upload-thumbnail { height: 200px; max-width: 100%; object-fit: contain; }
+        .myb-custom-panel .myb-configurator-add:hover:not(:disabled) { background: #3b82f6; }
       `}</style>
-        <h2 className="myb-custom-title mb-1 shrink-0 text-[11px] font-black uppercase tracking-wide">
-            {t("customPanel.title")}
-        </h2>
+        {!props.embeddedCatalog && (
+            <div className="flex shrink-0 items-center justify-between gap-3 mb-3">
+                <h2 className="myb-custom-title mb-1 shrink-0 text-[30px] font-bold tracking-tight">
+                    {t("customPanel.title")}
+                </h2>
+                {props.onBack && <button type="button" onClick={props.onBack} aria-label={t("common.back") === "common.back" ? "Back" : t("common.back")} title={t("common.back") === "common.back" ? "Back" : t("common.back")} className="myb-custom-back inline-flex shrink-0 items-center justify-center bg-zinc-900 transition-colors hover:bg-zinc-700"><X size={20} aria-hidden="true" /></button>}
+            </div>
+        )}
         <div className="myb-custom-scroll flex-1 min-h-0 overflow-y-auto no-scrollbar">
             <div role="group" aria-label={t("customPanel.itemType")}
                 className="myb-custom-tabs rounded-md"
-                style={{ display: "grid", gridTemplateColumns: "repeat(3,minmax(0,1fr))", gap: 4, marginBottom: 20 }}>
+                style={{ display: "grid", gridTemplateColumns: "repeat(3,minmax(0,1fr))", gap: 8, marginBottom: 14 }}>
                 {(["pedal", "board", "import"] as const).map(tab => {
                     const selected = tab === "import" ? mode === "import" : mode === "custom" && props.customType === tab;
                     const label = t(tab === "import" ? "customPanel.modeImport" : tab === "pedal" ? "customPanel.pedal" : "customPanel.board");
+                    const iconBase = tab === "pedal" ? "tab-pedal2" : tab === "board" ? "tab-board" : "tab-import";
+                    const iconSuffix = tab === "import" ? "-v3" : "";
                     return <button key={tab} type="button" aria-pressed={selected}
-                        className={`myb-type-choice h-[34px] rounded-md text-[11px] font-bold ${selected ? "bg-canvas" : "bg-transparent"}`}
+                        className={`myb-type-choice h-[40px] rounded-md text-[11px] font-bold ${selected ? "bg-canvas" : "bg-transparent"}`}
                         onClick={() => {
                             if (tab === "import") {
                                 toggle("import");
@@ -1225,7 +1321,11 @@ export default function CustomPanel(props: CustomPanelProps) {
                                 props.setCustomDepth("");
                                 toggle("custom");
                             }
-                        }}>{label}</button>;
+                        }}>
+                        <img src={`/images/${iconBase}-light${iconSuffix}.webp`} alt="" aria-hidden="true" draggable={false} className="myb-tab-icon myb-tab-icon-light" />
+                        <img src={`/images/${iconBase}-dark${iconSuffix}.webp`} alt="" aria-hidden="true" draggable={false} className="myb-tab-icon myb-tab-icon-dark" />
+                        {label}
+                    </button>;
                 })}
             </div>
             <div hidden={mode !== "custom"} style={{ display: mode === "custom" ? "block" : "none" }}>

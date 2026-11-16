@@ -1,0 +1,64 @@
+[
+  {
+    "table": "pedals",
+    "items": [
+      {
+        "id": 23971,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/poly-hugo-v2.webp",
+        "thumbnail": null,
+        "width": 337,
+        "depth": 261
+      },
+      {
+        "id": 23972,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/gigahearts-soviet-sparrow-v2.webp",
+        "thumbnail": null,
+        "width": 145,
+        "depth": 121
+      },
+      {
+        "id": 23973,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/raingerfx-microphone-fuzz-v2.webp",
+        "thumbnail": null,
+        "width": 102,
+        "depth": 119
+      },
+      {
+        "id": 23974,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/westminster-dominion-v2.webp",
+        "thumbnail": null,
+        "width": 66,
+        "depth": 122
+      },
+      {
+        "id": 23975,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/lusithand-codex-bass-preamp-v2.webp",
+        "thumbnail": null,
+        "width": 66,
+        "depth": 122
+      },
+      {
+        "id": 23976,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/browne-unit13-v2.webp",
+        "thumbnail": null,
+        "width": 119,
+        "depth": 94
+      },
+      {
+        "id": 23977,
+        "image": "https://vvnzdxvjfexagllltueu.supabase.co/storage/v1/object/public/pedals/toneking-royce-v2.webp",
+        "thumbnail": null,
+        "width": 183,
+        "depth": 145
+      }
+    ]
+  },
+  {
+    "table": "power",
+    "items": []
+  },
+  {
+    "table": "boards",
+    "items": []
+  }
+]

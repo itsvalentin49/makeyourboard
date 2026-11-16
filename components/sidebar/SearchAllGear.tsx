@@ -1,200 +1,249 @@
+
 "use client";
 
-import React, { useDeferredValue, useMemo, useState } from "react";
-import { ArrowLeft, BatteryCharging, LayoutPanelTop, Plus, Search, SlidersHorizontal, WandSparkles, X } from "lucide-react";
-import SearchBoards from "@/components/sidebar/SearchBoards";
-import SearchPower from "@/components/sidebar/SearchPower";
+import { useMemo, useRef, useState, type ReactNode } from "react";
+import { ArrowLeft, BookOpen, LoaderCircle, Plus, Search, WandSparkles, X } from "lucide-react";
+import SearchBoards from "./SearchBoards";
+import SearchPower from "./SearchPower";
+import { compareGearRelease, gearEntries, gearKey, gearSearchScore, normalizeGear, type GearCategory, type GearKind } from "@/utils/gearCatalog"; import { isPowerSupply, isPowerUnderBoard, physicalPedals } from "@/utils/boardFinder";
 import type { CatalogStatus } from "@/hooks/useLibrary";
+import type { AnyRow } from "@/types/project";
+import styles from "./GearCatalog.module.css";
 
-type AnyRow = Record<string, any>;
-type Category = "all" | "pedals" | "boards" | "power";
-type View = "catalog" | "boardFinder" | "powerFinder" | "custom";
 
 type Props = {
-    pedalsLibrary: AnyRow[];
-    boardsLibrary: AnyRow[];
-    powerLibrary: AnyRow[];
-    newPedals: AnyRow[];
-    newPedalsLoading: boolean;
-    libraryLoading: boolean;
-    libraryError: string | null;
-    boardsStatus: CatalogStatus;
-    powerStatus: CatalogStatus;
-    finderPedals: AnyRow[];
-    existingBoards: AnyRow[];
-    powerFinderBoards: AnyRow[];
-    selectSuggestedBoard?: (board: AnyRow) => boolean;
-    addPedal: (pedal: AnyRow) => void;
-    selectBoard: (board: AnyRow) => void;
-    addPower: (power: AnyRow) => void;
-    customPanel: React.ReactNode;
-    onOpenGear: () => void;
-    t: (key: string) => string;
-    units: "metric" | "imperial";
-    groupItems: (items: AnyRow[], filter: string) => Record<string, AnyRow[]>;
+  pedalsLibrary: AnyRow[];
+  boardsLibrary: AnyRow[];
+  powerLibrary: AnyRow[];
+  newPedals: AnyRow[];
+  newBoards: AnyRow[];
+  newPower: AnyRow[];
+  newGearLoading: boolean;
+  libraryLoading: boolean;
+  libraryError: string | null;
+  boardsStatus: CatalogStatus;
+  powerStatus: CatalogStatus;
+  finderPedals: AnyRow[];
+  existingBoards: AnyRow[];
+  powerFinderBoards: AnyRow[];
+  selectSuggestedBoard?: (board: AnyRow, allowRearrangement?: boolean, powerUnderBoard?: boolean) => boolean;
+  addItem: (kind: GearKind, item: AnyRow) => void;
+  customPanel: ReactNode;
+  onOpenGear: (query: string, category: GearCategory) => void;
+  t: (key: string) => string;
+  units: "metric" | "imperial";
+  groupItems: (items: AnyRow[], filter: string) => Record<string, AnyRow[]>;
 };
 
-function dateKey(value: unknown): number | null {
-    const match = String(value ?? "").match(/^(\d{4})-(\d{2})-(\d{2})$/);
-    if (!match) return null;
-    const year = +match[1], month = +match[2], day = +match[3];
-    const date = new Date(year, month - 1, day);
-    if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) return null;
-    return date.getTime();
-}
+const PAGE_SIZE = 24;
+const ignore = () => { };
 
-function normalized(value: unknown) {
-    return String(value ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-}
-
-function rank(row: AnyRow, query: string): number {
-    const brand = normalized(row.brand), name = normalized(row.name), type = normalized(row.type);
-    if (brand === query) return 0;
-    if (name === query) return 1;
-    if (brand.startsWith(query)) return 2;
-    if (name.startsWith(query)) return 3;
-    if (brand.includes(query)) return 4;
-    if (name.includes(query)) return 5;
-    if (type.includes(query)) return 6;
-    return 7;
-}
+const compareStableGearRelease = (
+  a: ReturnType<typeof gearEntries>[number],
+  b: ReturnType<typeof gearEntries>[number]
+) => {
+  const releaseOrder = compareGearRelease(a, b);
+  if (releaseOrder !== 0) return releaseOrder;
+  return gearKey(a).localeCompare(gearKey(b));
+};
 
 export default function SearchAllGear({
-    pedalsLibrary, boardsLibrary, powerLibrary, newPedals, newPedalsLoading,
-    libraryLoading, libraryError, boardsStatus, powerStatus, finderPedals,
-    existingBoards, powerFinderBoards, selectSuggestedBoard, addPedal,
-    selectBoard, addPower, customPanel, onOpenGear, t, units, groupItems,
+  pedalsLibrary, boardsLibrary, powerLibrary, newPedals, newBoards, newPower, newGearLoading,
+  libraryLoading, libraryError, boardsStatus, powerStatus, finderPedals, existingBoards,
+  powerFinderBoards, selectSuggestedBoard, addItem, customPanel, onOpenGear, t, units, groupItems,
 }: Props) {
-    const [category, setCategory] = useState<Category>("all");
-    const [view, setView] = useState<View>("catalog");
-    const [query, setQuery] = useState("");
-    const [finderMenuOpen, setFinderMenuOpen] = useState(false);
-    const [boardSearch, setBoardSearch] = useState("");
-    const [powerSearch, setPowerSearch] = useState("");
-    const [showBoardResults, setShowBoardResults] = useState(false);
-    const [showPedalResults, setShowPedalResults] = useState(false);
-    const [showPowerResults, setShowPowerResults] = useState(false);
-    const boardInputRef = React.useRef<HTMLInputElement>(null);
-    const powerInputRef = React.useRef<HTMLInputElement>(null);
-    const powerDropdownRef = React.useRef<HTMLDivElement>(null);
-    const deferredQuery = useDeferredValue(query);
-    const search = normalized(deferredQuery.trim());
-    const searching = query.trim().length > 0;
+  const [category, setCategory] = useState<GearCategory>("all");
+  const [view, setView] = useState<"catalog" | "boardFinder" | "powerFinder" | "custom">("catalog");
+  const [allowRearrangement, setAllowRearrangement] = useState(false);
+  const [powerUnderBoard, setPowerUnderBoard] = useState<boolean>();
+  const [query, setQuery] = useState("");
+  const [limit, setLimit] = useState(PAGE_SIZE);
+  const list = useRef<HTMLDivElement>(null);
+  const input = useRef<HTMLInputElement>(null);
+  const finderInput = useRef<HTMLInputElement>(null);
+  const finderDropdown = useRef<HTMLDivElement>(null);
+  const deferredQuery = query;
+  const hasQuery = query.trim().length > 0;
 
-    const entries = useMemo(() => {
-        const all: { kind: Exclude<Category, "all">; item: AnyRow }[] = [];
-        const add = (kind: Exclude<Category, "all">, rows: AnyRow[]) => {
-            if (category === "all" || category === kind) rows.forEach(item => all.push({ kind, item }));
-        };
-        if (searching) {
-            add("pedals", pedalsLibrary);
-            add("boards", boardsLibrary);
-            add("power", powerLibrary);
-            const terms = search.split(/\s+/).filter(Boolean);
-            return all.filter(({ item, kind }) => {
-                const type = kind === "pedals" ? t(`pedal.type.${item.type ?? ""}`) : "";
-                const haystack = normalized(`${item.brand ?? ""} ${item.name ?? ""} ${item.type ?? ""} ${type}`);
-                return terms.every(term => haystack.includes(term));
-            }).sort((a, b) => rank(a.item, search) - rank(b.item, search) ||
-                String(a.item.brand ?? "").localeCompare(String(b.item.brand ?? "")) ||
-                String(a.item.name ?? "").localeCompare(String(b.item.name ?? "")));
-        }
-        const now = new Date(); now.setHours(23, 59, 59, 999);
-        const days = (kind: Exclude<Category, "all">) => kind === "pedals" ? 30 : 365;
-        const recent = (kind: Exclude<Category, "all">, rows: AnyRow[]) => rows
-            .filter(item => normalized(item.status ?? "active") === "active")
-            .filter(item => { const time = dateKey(item.year); return time !== null && time <= now.getTime() && time >= now.getTime() - days(kind) * 86400000; })
-            .sort((a, b) => (dateKey(b.year) ?? 0) - (dateKey(a.year) ?? 0))
-            .slice(0, 20);
-        add("pedals", newPedals.length ? newPedals : recent("pedals", pedalsLibrary));
-        add("boards", recent("boards", boardsLibrary));
-        add("power", recent("power", powerLibrary));
-        return all.sort((a, b) => (dateKey(b.item.year) ?? 0) - (dateKey(a.item.year) ?? 0)).slice(0, 30);
-    }, [category, search, searching, pedalsLibrary, boardsLibrary, powerLibrary, newPedals, t]);
+  const status = { pedals: libraryLoading ? "loading" : libraryError ? "error" : "ready", boards: boardsStatus, power: powerStatus };
+  const relevantStatuses = category === "all" ? Object.values(status) : [status[category]];
+  const loading = relevantStatuses.includes("loading");
+  const failed = relevantStatuses.includes("error");
+  const allCatalogsSettled = !libraryLoading && boardsStatus !== "loading" && powerStatus !== "loading";
 
-    const goBack = () => { setView("catalog"); setFinderMenuOpen(false); };
-    const chooseCategory = (next: Category) => { setCategory(next); setView("catalog"); setFinderMenuOpen(false); };
-    const openFinder = (next: "boardFinder" | "powerFinder") => {
-        setFinderMenuOpen(false);
-        setBoardSearch(""); setPowerSearch("");
-        setView(next);
-    };
-    const categories: { id: Category; label: string }[] = [
-        { id: "all", label: "All" }, { id: "pedals", label: t("sidebar.pedals") },
-        { id: "boards", label: t("sidebar.boards") }, { id: "power", label: t("sidebar.power") },
-    ];
-    const finderButton = (kind: "boardFinder" | "powerFinder", label: string) => (
-        <button type="button" onClick={() => openFinder(kind)}
-            className="flex items-center gap-1.5 rounded-md bg-blue-600 px-2.5 py-2 text-[11px] font-bold text-white hover:bg-blue-500">
-            <WandSparkles size={15} />{label}
-        </button>
+
+  const entries = useMemo(() =>
+    gearEntries({ pedals: pedalsLibrary, boards: boardsLibrary, power: powerLibrary }, t).sort(compareStableGearRelease),
+    [pedalsLibrary, boardsLibrary, powerLibrary, t]);
+
+  const newEntries = useMemo(() =>
+    gearEntries({ pedals: newPedals, boards: newBoards, power: newPower }, t).sort(compareStableGearRelease),
+    [newPedals, newBoards, newPower, t]);
+
+
+  const displayEntries = useMemo(() => {
+    if (hasQuery) return entries;
+    if (!allCatalogsSettled) return newGearLoading ? [] : newEntries;
+
+    const merged = new Map<string, (typeof entries)[number]>();
+    for (const entry of entries) merged.set(gearKey(entry), entry);
+    for (const entry of newEntries) {
+      const key = gearKey(entry);
+      if (!merged.has(key)) merged.set(key, entry);
+    }
+    return Array.from(merged.values()).sort(compareStableGearRelease)
+  }, [hasQuery, entries, newEntries, newGearLoading, allCatalogsSettled]);
+
+
+  const results = useMemo(() => {
+    const terms = normalizeGear(deferredQuery).trim().split(/\s+/).filter(Boolean);
+
+    const filtered = displayEntries.filter(
+      (entry) =>
+        (category === "all" || entry.kind === category) &&
+        terms.every((term) => entry.searchText.includes(term))
     );
 
-    return <div className="mt-4 flex h-full min-h-0 flex-col gap-3">
-        <div className="flex shrink-0 items-center justify-between gap-2">
-            <span className="text-[11px] font-black uppercase tracking-wide">{view === "catalog" ? "Add Gear" : view === "custom" ? t("sidebar.custom") : view === "boardFinder" ? "Board Finder" : "Power Finder"}</span>
-            {view !== "catalog" && <button type="button" onClick={goBack} className="flex items-center gap-1 text-[11px] font-bold"><ArrowLeft size={14} />Back</button>}
+    if (!terms.length) return filtered;
+
+    return filtered.sort((a, b) => {
+      const scoreA = gearSearchScore(a, deferredQuery);
+      const scoreB = gearSearchScore(b, deferredQuery);
+
+      if (scoreA !== scoreB) return scoreB - scoreA;
+
+      return compareStableGearRelease(a, b);
+    });
+  }, [category, deferredQuery, displayEntries]);
+
+
+  const showResults = hasQuery || !newGearLoading || allCatalogsSettled;
+  const canFind = physicalPedals(finderPedals).length >= 2;
+  const isBoardFinder = view === "boardFinder";
+  const isPowerFinder = view === "powerFinder";
+  const isFinder = isBoardFinder || isPowerFinder;
+  const powerSupplies = finderPedals.filter(isPowerSupply);
+  const allPowerUnderBoard = powerSupplies.length > 0 &&
+    powerSupplies.every((supply) => isPowerUnderBoard(supply, existingBoards));
+  const back = () => setView("catalog");
+  const updateQuery = (value: string) => {
+    if (isFinder) back();
+    setQuery(value);
+    setLimit(PAGE_SIZE);
+    list.current?.scrollTo(0, 0);
+  };
+
+  if (view === "custom") return (
+    <div className="flex min-h-0 flex-1 flex-col gap-2">
+      <button type="button" onClick={back} className={styles.sidebarUtility}><ArrowLeft size={15} />{t("gear.allGear")}</button>
+      <div className="min-h-0 flex-1 overflow-y-auto">{customPanel}</div>
+    </div>
+  );
+
+  return (
+    <div className={styles.sidebarLibrary}>
+      <h2 className="text-[11px] font-black uppercase tracking-wide">{t("gear.allGear")}</h2>
+      <div className={styles.sidebarSearchRow}>
+        <div className={styles.sidebarSearch}>
+          <Search size={15} aria-hidden="true" />
+          <input ref={input} type="search" value={query} autoComplete="off" spellCheck={false}
+            aria-label={t("gear.searchAll")} placeholder={t("gear.searchAll")}
+            onChange={(event) => updateQuery(event.target.value)} />
+          {query && <button type="button" onClick={() => { updateQuery(""); input.current?.focus(); }}
+            aria-label={t("powerMenu.clearSearch")}><X size={16} /></button>}
         </div>
+        <button type="button" className={styles.shortcut}
+          onClick={() => isFinder ? back() : onOpenGear(query, category)}
+          aria-label={t(isFinder ? "sidebar.back" : "gear.openAll")}
+          title={t(isFinder ? "sidebar.back" : "gear.openAll")}>
+          {isFinder ? <ArrowLeft size={20} aria-hidden="true" /> : <BookOpen size={20} aria-hidden="true" />}
+        </button>
+      </div>
 
-        {view === "catalog" && <>
-            <div className="relative shrink-0">
-                <Search size={15} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
-                <input value={query} onChange={e => setQuery(e.target.value)} type="search" autoComplete="off" spellCheck={false}
-                    placeholder="Search pedals, boards, power..."
-                    className="h-9 w-full rounded-md bg-white pl-9 pr-9 text-[12px] font-bold text-black outline-none placeholder:text-zinc-500" />
-                {query && <button type="button" onClick={() => setQuery("")} aria-label="Clear search" className="absolute right-2 top-1/2 -translate-y-1/2 text-zinc-500"><X size={16} /></button>}
-            </div>
-            <div className="grid shrink-0 grid-cols-4 gap-1">
-                {categories.map(tab => <button key={tab.id} type="button" onClick={() => chooseCategory(tab.id)} aria-pressed={category === tab.id}
-                    className={`min-w-0 rounded-md px-1 py-2 text-[10px] font-bold transition-colors ${category === tab.id ? "bg-blue-600 text-white" : "bg-zinc-800 text-zinc-200 hover:bg-zinc-700"}`}>{tab.label}</button>)}
-            </div>
-            <div className="flex shrink-0 items-center justify-between gap-2">
-                <span className="text-[11px] font-bold">{searching ? `${entries.length} results` : "New releases"}</span>
-                {category === "boards" ? finderButton("boardFinder", "Board Finder") : category === "power" ? finderButton("powerFinder", "Power Finder") :
-                    category === "all" ? <div className="relative"><button type="button" onClick={() => setFinderMenuOpen(value => !value)} aria-expanded={finderMenuOpen}
-                        className="flex items-center gap-1.5 rounded-md bg-blue-600 px-2.5 py-2 text-[11px] font-bold text-white"><WandSparkles size={15} />Finders</button>
-                        {finderMenuOpen && <div className="absolute right-0 top-full z-30 mt-1 flex w-40 flex-col gap-1 rounded-md border border-zinc-700 bg-zinc-900 p-1 shadow-xl">
-                            <button type="button" onClick={() => openFinder("boardFinder")} className="rounded p-2 text-left text-[11px] hover:bg-zinc-700">Board Finder</button>
-                            <button type="button" onClick={() => openFinder("powerFinder")} className="rounded p-2 text-left text-[11px] hover:bg-zinc-700">Power Finder</button>
-                        </div>}</div> : null}
-            </div>
-            <div className="min-h-0 flex-1 overflow-y-auto no-scrollbar pb-5">
-                {(libraryLoading || newPedalsLoading) && !entries.length && <p className="p-3 text-[11px]">Loading...</p>}
-                {libraryError && searching && <p className="p-3 text-[11px] text-red-400">{libraryError}</p>}
-                {!entries.length && !libraryLoading && !newPedalsLoading && <p className="p-3 text-[11px] text-zinc-400">No results</p>}
-                <div className="flex flex-col gap-1">
-                    {entries.map(({ kind, item }, index) => {
-                        const icon = kind === "pedals" ? <SlidersHorizontal size={19} /> : kind === "boards" ? <LayoutPanelTop size={19} /> : <BatteryCharging size={19} />;
-                        const image = item.thumbnail || item.image_url || item.image || null;
-                        return <button type="button" key={`${kind}-${item.id ?? `${item.brand}-${item.name}`}-${index}`}
-                            onClick={() => kind === "pedals" ? addPedal(item) : kind === "boards" ? selectBoard(item) : addPower(item)}
-                            className="flex min-h-[50px] w-full items-center gap-2 rounded-lg bg-zinc-800 p-1.5 text-left hover:bg-zinc-700">
-                            <span className="flex h-[40px] w-[58px] shrink-0 items-center justify-center overflow-hidden text-zinc-400">
-                                {image ? <img src={String(image)} alt="" loading="lazy" className="max-h-[38px] max-w-[56px] object-contain" /> : icon}
-                            </span>
-                            <span className="min-w-0 flex-1"><span className="block truncate text-[12px] font-black">{item.brand}</span>
-                                <span className="block truncate text-[10px] font-bold text-zinc-300">{item.name}</span></span>
-                            <span className="shrink-0 rounded bg-zinc-700 px-1.5 py-1 text-[9px] font-bold uppercase text-zinc-300">{kind === "pedals" ? "Pedal" : kind === "boards" ? "Board" : "Power"}</span>
-                        </button>;
-                    })}
-                </div>
-                <button type="button" onClick={() => setView("custom")} className="mt-3 flex w-full items-center gap-2 rounded-lg border border-dashed border-zinc-600 px-3 py-3 text-left text-[11px] font-bold hover:bg-zinc-800"><Plus size={16} />{t("sidebar.custom")}</button>
-                <button type="button" onClick={onOpenGear} className="mt-2 w-full text-left text-[10px] font-bold text-zinc-400 hover:text-white">Open gear catalog</button>
-            </div>
-        </>}
+      {isBoardFinder ? (
+        <div className={styles.sidebarFinders}>
+          <label className={styles.sidebarRearrange}>
+            <input type="checkbox" checked={allowRearrangement} className="accent-blue-600"
+              onChange={(event) => setAllowRearrangement(event.target.checked)} />
+            {t("boardFinder.allowRearrangement")}
+          </label>
+          {powerSupplies.length > 0 && (
+            <label className={styles.sidebarRearrange}>
+              <input type="checkbox" checked={powerUnderBoard ?? allPowerUnderBoard} className="accent-blue-600"
+                onChange={(event) => setPowerUnderBoard(event.target.checked)} />
+              {t("boardFinder.powerUnderBoard")}
+            </label>
+          )}
+        </div>
+      ) : isPowerFinder ? (
+        <div className={styles.sidebarFinderSpacer} aria-hidden="true" />
+      ) : canFind && (
+        <div className={styles.sidebarFinders}>
+          <button type="button" className={styles.sidebarUtility} disabled={!selectSuggestedBoard || boardsStatus !== "ready"}
+            onClick={() => {
+              setAllowRearrangement(false);
+              setPowerUnderBoard(undefined);
+              setView("boardFinder");
+            }}><WandSparkles size={14} />{t("boardFinder.button")}</button>
+          <button type="button" className={styles.sidebarUtility} disabled={libraryLoading || powerStatus !== "ready"}
+            onClick={() => setView("powerFinder")}><WandSparkles size={14} />{t("gear.powerFinder")}</button>
+        </div>
+      )}
 
-        {view === "custom" && <div className="min-h-0 flex-1 overflow-y-auto">{customPanel}</div>}
-        {view === "boardFinder" && <div className="min-h-0 flex-1"><SearchBoards
-            boardsLibrary={boardsLibrary} catalogStatus={boardsStatus} boardSearch={boardSearch} setBoardSearch={setBoardSearch}
-            showBoardResults={showBoardResults} setShowBoardResults={setShowBoardResults} setShowPedalResults={setShowPedalResults}
-            selectBoard={selectBoard} selectSuggestedBoard={selectSuggestedBoard} finderPedals={finderPedals}
-            existingBoards={existingBoards} units={units} boardInputRef={boardInputRef} t={t} groupItems={groupItems} /></div>}
-        {view === "powerFinder" && <div className="min-h-0 flex-1"><SearchPower
-            catalogStatus={powerStatus} pedalsLoading={libraryLoading} finderPedals={finderPedals}
-            existingBoards={powerFinderBoards} pedalsLibrary={pedalsLibrary} powerLibrary={powerLibrary}
-            powerSearch={powerSearch} setPowerSearch={setPowerSearch} showPowerResults={showPowerResults}
-            setShowPowerResults={setShowPowerResults} setShowPedalResults={setShowPedalResults}
-            setShowBoardResults={setShowBoardResults} addPower={addPower} powerInputRef={powerInputRef}
-            powerDropdownRef={powerDropdownRef} t={t} groupItems={groupItems} /></div>}
-    </div>;
+      {isBoardFinder ? (
+        <SearchBoards boardsLibrary={boardsLibrary} catalogStatus={boardsStatus}
+          boardSearch="" setBoardSearch={ignore} showBoardResults={false} setShowBoardResults={ignore}
+          setShowPedalResults={ignore} selectBoard={ignore} selectSuggestedBoard={selectSuggestedBoard}
+          finderPedals={finderPedals} existingBoards={existingBoards} units={units}
+          boardInputRef={finderInput} t={t} groupItems={groupItems}
+          finderRearrangement={allowRearrangement} powerUnderBoard={powerUnderBoard} />
+      ) : isPowerFinder ? (
+        <SearchPower catalogStatus={powerStatus} pedalsLoading={libraryLoading} finderPedals={finderPedals}
+          existingBoards={powerFinderBoards} pedalsLibrary={pedalsLibrary} powerLibrary={powerLibrary}
+          powerSearch="" setPowerSearch={ignore} showPowerResults={false} setShowPowerResults={ignore}
+          setShowPedalResults={ignore} setShowBoardResults={ignore} addPower={(item) => addItem("power", item)}
+          powerInputRef={finderInput} powerDropdownRef={finderDropdown} t={t} groupItems={groupItems}
+          embeddedFinder />
+      ) : (
+        <>
+          <div ref={list} className={`${styles.sidebarResults} mt-4`}>
+            {!hasQuery && <p className="mb-2 text-[11px] font-bold">{t("gear.newestFirst")}</p>}
+
+            {loading && hasQuery && (
+              <p className={`${styles.loading} text-[11px] font-bold`} role="status">
+                <LoaderCircle size={16} className="animate-spin" />
+                {t("gear.loadingAll")}
+              </p>
+            )}
+            {failed && hasQuery && <p className={`${styles.status} text-[11px] font-bold`} role="status">{t("gear.loadError")}</p>}
+            {hasQuery && !loading && !failed && !results.length &&
+              <p className={`${styles.status} text-[11px] font-bold`} role="status">{t("gear.emptyAll")}</p>}
+
+            {showResults && results.slice(0, limit).map((entry) => {
+              const { item, kind } = entry;
+              const source = [item.thumbnail, item.image, item.image_url, item.photo]
+                .find((value) => typeof value === "string" && value.trim() && value.trim().toUpperCase() !== "N/A");
+              return (
+                <button type="button" key={gearKey(entry)} className={styles.sidebarCard} onClick={() => addItem(kind, item)}>
+                  <span className={styles.sidebarPhoto} onContextMenu={(event) => event.preventDefault()}>
+                    {source && <img src={source} alt="" loading="lazy" draggable={false} />}
+                  </span>
+                  <span className={styles.sidebarCardText}>
+                    <strong>{item.name}</strong>
+                    <span>{entry.brand}</span>
+                  </span>
+                  <Plus size={15} aria-hidden="true" className={styles.sidebarAddIcon} />
+                </button>
+              );
+            })}
+            {showResults && results.length > limit &&
+              <button type="button" className={styles.more} onClick={() => setLimit(limit + PAGE_SIZE)}>{t("gear.moreAll")}</button>}
+          </div>
+          <button type="button" className={styles.sidebarCustom} onClick={() => setView("custom")}>
+            <Plus size={16} aria-hidden="true" />{t("sidebar.custom")}
+          </button>
+        </>
+      )}
+    </div>
+  );
 }

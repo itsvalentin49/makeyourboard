@@ -1,8 +1,9 @@
 "use client";
 
 import React from "react";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, Plus } from "lucide-react";
 import { mmToIn, formatWeight } from "@/utils/units";
+import gearStyles from "./GearCatalog.module.css";
 import type { Language } from "@/utils/i18n";
 
 type Output = {
@@ -13,6 +14,8 @@ type Output = {
 };
 
 type Props = {
+  embedded?: boolean;
+  onAddToBoard?: (item: any) => void;
   selectedPower: any;
 
   units: "metric" | "imperial";
@@ -20,16 +23,16 @@ type Props = {
 
   t: (key: string) => string;
 
-  isUSA: boolean;
-  isEurope: boolean;
+  isUSA?: boolean;
+  isEurope?: boolean;
 
   buildThomannUrl: (slug: string) => string;
 
-  selectedInstanceId: number | null;
-  rotatePedal: (id: number) => void;
-  movePedalFront: (id: number) => void;
-  movePedalBack: (id: number) => void;
-  deletePedal: (id: number) => void;
+  selectedInstanceId?: number | null;
+  rotatePedal?: (id: number) => void;
+  movePedalFront?: (id: number) => void;
+  movePedalBack?: (id: number) => void;
+  deletePedal?: (id: number) => void;
 };
 
 /* =========================
@@ -237,32 +240,46 @@ function extractOutputs(details: string): Output[] {
 }
 
 /* =========================
-   FORMAT D'UNE SORTIE
+   VOLTAGE COLORS
    ========================= */
 
-function formatOutputLine(
-  output: Output,
-  t: (key: string) => string
-) {
-  if (
-    output.voltages.length === 0 ||
-    output.currents.length === 0
-  ) {
-    return "";
+function getVoltageColor(voltage: string) {
+  switch (Number(voltage)) {
+    case 9:
+      return "text-green-500";
+
+    case 12:
+      return "text-blue-500";
+
+    case 18:
+      return "text-yellow-500";
+
+    default:
+      return "text-zinc-300";
   }
+}
 
-  const voltages =
-    output.voltages.join("-");
+function OutputValue({
+  voltage,
+  current,
+}: {
+  voltage: string;
+  current?: number;
+}) {
+  return (
+    <>
+      <span className={getVoltageColor(voltage)}>
+        {voltage}V
+      </span>
 
-  const currents =
-    output.currents.join("-");
-
-  const outputLabel =
-    output.count === 1
-      ? t("powerSetup.output")
-      : t("powerSetup.outputs");
-
-  return `${output.count}x ${outputLabel} ${voltages}V DC / ${currents} mA`;
+      {current !== undefined && (
+        <span className="text-zinc-300">
+          {" / "}
+          {current} mA
+        </span>
+      )}
+    </>
+  );
 }
 
 /* =========================
@@ -287,15 +304,90 @@ function SpecRow({
 
   return (
     <div className="flex items-center py-[1px]">
-      <span className="text-[12px]">
+      <span className="text-[14px]">
         {label}
       </span>
 
       <div className="flex-1 border-b border-dotted border-zinc-600 mx-2 translate-y-[3.5px]" />
 
-      <span className="text-[12px] leading-relaxed font-normal text-zinc-300 whitespace-nowrap">
+      <span className="text-[14px] leading-relaxed font-normal text-zinc-300 whitespace-nowrap">
         {value}
       </span>
+    </div>
+  );
+}
+
+/* =========================
+   OUTPUTS
+   ========================= */
+
+function OutputRows({
+  outputs,
+  t,
+}: {
+  outputs: Output[];
+  t: (key: string) => string;
+}) {
+  const individualOutputs = outputs.flatMap(
+    (output) =>
+      Array.from(
+        { length: output.count },
+        () => output
+      )
+  );
+
+  return (
+    <div className="w-full min-w-0">
+      {individualOutputs.map((output, index) => {
+        const values = output.voltages.map(
+          (voltage, voltageIndex) => {
+            const current =
+              output.currents.length === 1
+                ? output.currents[0]
+                : output.currents[voltageIndex];
+
+            return {
+              voltage,
+              current,
+            };
+          }
+        );
+
+        if (values.length === 0) {
+          return null;
+        }
+
+        return (
+          <div
+            key={index}
+            className="w-full min-w-0"
+          >
+            <SpecRow
+              label={`${t("powerSetup.output")} ${index + 1}`}
+              value={
+                <OutputValue
+                  voltage={values[0].voltage}
+                  current={values[0].current}
+                />
+              }
+            />
+
+            {values.slice(1).map((value, valueIndex) => (
+              <div
+                key={valueIndex}
+                className="flex items-center justify-end py-[1px]"
+              >
+                <span className="text-[14px] leading-relaxed font-normal text-zinc-300 whitespace-nowrap">
+                  <OutputValue
+                    voltage={value.voltage}
+                    current={value.current}
+                  />
+                </span>
+              </div>
+            ))}
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -368,53 +460,37 @@ function StoreLogos({
   });
 
   return (
-    <div className="flex items-center gap-3 flex-wrap">
-      {stores.map(
-        (store) => (
-          <a
-            key={
-              store.key
-            }
-            href={
-              store.url
-            }
-            target="_blank"
-            rel="noopener noreferrer"
-            title={
-              store.label
-            }
-            aria-label={
-              store.label
-            }
-            className="
-              inline-flex
-              items-center
-              justify-center
-              transition-transform
-              duration-150
-              hover:scale-110
-              active:scale-95
-            "
-          >
-            <img
-              src={
-                store.logo
-              }
-              alt={
-                store.label
-              }
-              className="
-                w-7
-                h-7
-                rounded-full
-                object-contain
-              "
-              loading="lazy"
-              decoding="async"
-            />
-          </a>
-        )
-      )}
+    <div className={gearStyles.storeList}>
+      {stores.map((store) => (
+        <a
+          key={store.key}
+          href={store.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={gearStyles.storeLink}
+        >
+          <img
+            src={store.logo}
+            alt=""
+            loading="lazy"
+            decoding="async"
+            style={{
+              width: 28,
+              height: 28,
+              borderRadius: "50%",
+              objectFit: "contain",
+            }}
+          />
+
+          <span>{store.label}</span>
+
+          <ExternalLink
+            size={13}
+            color="#3b82f6"
+            aria-hidden="true"
+          />
+        </a>
+      ))}
     </div>
   );
 }
@@ -425,6 +501,8 @@ function StoreLogos({
 
 export default function SpecsPower({
   selectedPower,
+  embedded = false,
+  onAddToBoard,
   units,
   language,
   t,
@@ -493,15 +571,28 @@ export default function SpecsPower({
         selectedPower.depth,
         selectedPower.height,
       ]
-        .filter((value) => value !== null && value !== undefined && value !== "")
+        .filter(
+          (value) =>
+            value !== null &&
+            value !== undefined &&
+            value !== ""
+        )
         .join(" x ") + " mm"
       : [
         selectedPower.width,
         selectedPower.depth,
         selectedPower.height,
       ]
-        .filter((value) => value !== null && value !== undefined && value !== "")
-        .map((value) => mmToIn(Number(value)).toFixed(2))
+        .filter(
+          (value) =>
+            value !== null &&
+            value !== undefined &&
+            value !== ""
+        )
+        .map(
+          (value) =>
+            mmToIn(Number(value)).toFixed(2)
+        )
         .join(" x ") + " in";
 
   const weight =
@@ -529,151 +620,153 @@ export default function SpecsPower({
           ? selectedPower.isolated
           : null;
 
+  const sidebarCardStyle: React.CSSProperties = {
+    background: "var(--zinc-950)",
+    border: "none",
+    borderRadius: 26,
+    padding: 24,
+    boxSizing: "border-box",
+    minWidth: 0,
+    width: "100%",
+    display: "flex",
+    flexDirection: "column",
+    gap: 12,
+    flexShrink: 0,
+  };
+
   return (
     <div
-      className="
-        h-full
-        min-h-0
-        overflow-y-auto
-        overflow-x-hidden
-        flex
-        flex-col
-        gap-5
-        px-1
-        pb-8
-
-        [scrollbar-width:thin]
-        [scrollbar-color:#3f3f46_transparent]
-
-        [&::-webkit-scrollbar]:w-1.5
-        [&::-webkit-scrollbar-track]:bg-transparent
-        [&::-webkit-scrollbar-thumb]:bg-zinc-700
-        [&::-webkit-scrollbar-thumb]:rounded-full
-        hover:[&::-webkit-scrollbar-thumb]:bg-zinc-600
-      "
+      className="w-full min-w-0"
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 20,
+        background: "transparent",
+        paddingInline: embedded ? 0 : 4,
+      }}
     >
+
       {/* =========================
           HERO PRODUIT
           ========================= */}
 
-      <div className="shrink-0 flex flex-col items-center pt-1">
-        <div className="w-full h-[170px] shrink-0 flex items-center justify-center mb-4">
-          {image && (
-            <img
-              key={image}
-              src={image}
-              alt={`${brand} ${name}`}
-              className="!block !h-[135px] !w-[180px] object-contain"
-              style={{ width: 180, height: 135, objectFit: "contain" }}
-              loading="eager"
-              fetchPriority="high"
-              decoding="sync"
-              draggable={false}
-            />
-          )}
-        </div>
-
-        <div className="w-full min-w-0">
-          {/* MARQUE + BADGE */}
-
-          <div
-            className="
-              flex
-              items-center
-              justify-between
-              gap-3
-              min-w-0
-            "
+      <div
+        style={{
+          display: "flex",
+          alignItems: "flex-start",
+          justifyContent: "space-between",
+          gap: 12,
+          minWidth: 0,
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            flex: "1 1 0",
+            flexDirection: "column",
+            alignItems: "flex-start",
+            minWidth: 0,
+          }}
+        >
+          <p
+            style={{
+              margin: 0,
+              fontSize: 12,
+              fontWeight: 700,
+              textTransform: "uppercase",
+              letterSpacing: "0.1em",
+              lineHeight: 1.5,
+            }}
           >
-            <div
-              className="
-                text-[15px]
-                font-black
-                truncate
-                min-w-0
-              "
-            >
-              {brand}
-            </div>
+            {brand}
+          </p>
 
-            <span
-              className="
-                shrink-0
-                px-2.5
-                py-1
-                rounded-full
-                bg-white
-                text-zinc-950
-                text-[9px]
-                font-black
-                leading-none
-                whitespace-nowrap
-              "
-            >
-              {t(
-                "pedal.type.Power Supply"
-              )}
-            </span>
-          </div>
-
-          {/* NOM */}
-
-          <div
-            className="
-              text-[12px]
-              truncate
-              mt-0.5
-            "
+          <h2
+            style={{
+              margin: "4px 0 0",
+              fontSize: 34,
+              fontWeight: 900,
+              lineHeight: 1.08,
+              letterSpacing: "-0.035em",
+              overflowWrap: "anywhere",
+            }}
           >
             {name}
-          </div>
+          </h2>
 
-          {/* =========================
-              SORTIES
-              ========================= */}
+          <span
+            style={{
+              display: "inline-flex",
+              marginTop: 12,
+              padding: "3px 10px",
+              borderRadius: 9999,
+              backgroundColor: "#fff",
+              color: "#09090b",
+              fontSize: 11,
+              fontWeight: 900,
+              lineHeight: 1.2,
+            }}
+          >
+            {t("pedal.type.Power Supply")}
+          </span>
 
-          {outputs.length > 0 && (
-            <div
-              className="
-                mt-1
-                flex
-                flex-col
-                gap-0.5
-                text-[12px]
-                leading-[1.3]
-              "
+          {onAddToBoard && (
+            <button
+              type="button"
+              className={gearStyles.addToBoardHover}
+              onClick={() => onAddToBoard(selectedPower)}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                minHeight: 34,
+                marginTop: 12,
+                padding: "7px 11px",
+                border: 0,
+                borderRadius: 9,
+                color: "white",
+                fontSize: 12,
+                fontWeight: 700,
+                lineHeight: "20px",
+                cursor: "pointer",
+              }}
             >
-              {outputs.map(
-                (output, index) => (
-                  <div
-                    key={index}
-                    className="
-                      flex
-                      items-start
-                      gap-1.5
-                    "
-                  >
-                    <span
-                      className="
-                        shrink-0
-                        leading-[1.3]
-                      "
-                    >
-                      •
-                    </span>
+              <Plus
+                size={15}
+                strokeWidth={2.5}
+                aria-hidden="true"
+              />
 
-                    <span>
-                      {formatOutputLine(
-                        output,
-                        t
-                      )}
-                    </span>
-                  </div>
-                )
-              )}
-            </div>
+              {t("customPanel.addToBoard")}
+            </button>
           )}
         </div>
+
+        {!embedded && image && (
+          <div
+            style={{
+              width: 140,
+              maxWidth: "38%",
+              flexShrink: 0,
+              display: "flex",
+              justifyContent: "flex-end",
+              background: "transparent",
+            }}
+          >
+            <img
+              src={image}
+              alt={`${brand} ${name}`}
+              draggable={false}
+              style={{
+                display: "block",
+                width: "100%",
+                height: "auto",
+                maxHeight: 160,
+                objectFit: "contain",
+              }}
+            />
+          </div>
+        )}
       </div>
 
       {/* =========================
@@ -681,34 +774,23 @@ export default function SpecsPower({
           ========================= */}
 
       {hasValue(overview) && (
-        <div
-          className="
-      shrink-0
-      flex
-      flex-col
-      gap-2
-      w-full
-      max-w-none
-    "
-        >
+        <div style={sidebarCardStyle}>
           <div
             className="
-        text-[15px]
-        font-black
-      "
+              text-[18px]
+              font-black
+            "
           >
-            {t(
-              "pedal.description"
-            )}
+            {t("pedal.description")}
           </div>
 
           <p
             className="
-        w-full
-        max-w-none
-        text-[12px]
-        leading-relaxed
-      "
+              w-full
+              max-w-none
+              text-[14px]
+              leading-relaxed
+            "
           >
             {overview}
           </p>
@@ -716,34 +798,43 @@ export default function SpecsPower({
       )}
 
       {/* =========================
+          OUTPUTS
+          ========================= */}
+
+      {outputs.length > 0 && (
+        <div style={sidebarCardStyle}>
+          <div className="text-[18px] font-black">
+            {t("powerSetup.outputs")}
+          </div>
+
+          <OutputRows
+            outputs={outputs}
+            t={t}
+          />
+        </div>
+      )}
+
+      {/* =========================
           CARACTÉRISTIQUES
           ========================= */}
 
-      <div
-        className="
-          shrink-0
-          flex
-          flex-col
-          gap-2
-        "
-      >
+      <div style={sidebarCardStyle}>
         <div
           className="
-            text-[15px]
+            text-[18px]
             font-black
           "
         >
-          {t(
-            "power.features"
-          )}
+          {t("power.features")}
         </div>
 
         <div>
+
           {/* STATUT */}
 
           {status && (
             <div className="flex items-center py-[1px]">
-              <span className="text-[12px]">
+              <span className="text-[14px]">
                 {t(
                   "power.status.label"
                 )}
@@ -797,30 +888,13 @@ export default function SpecsPower({
             }
           />
 
-          {/* NOMBRE DE SORTIES */}
-
-          <SpecRow
-            label={t(
-              "power.outputs"
-            )}
-            value={
-              hasValue(
-                selectedPower.outputs
-              )
-                ? selectedPower.outputs
-                : null
-            }
-          />
-
           {/* SORTIES ISOLÉES */}
 
           <SpecRow
             label={t(
               "power.isolated"
             )}
-            value={
-              isolated
-            }
+            value={isolated}
           />
 
           {/* DIMENSIONS */}
@@ -866,7 +940,7 @@ export default function SpecsPower({
             selectedPower.manual
           ) && (
               <div className="flex items-center py-[1px]">
-                <span className="text-[12px]">
+                <span className="text-[14px]">
                   {t(
                     "power.manual"
                   )}
@@ -880,17 +954,7 @@ export default function SpecsPower({
                   }
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="
-                  text-[12px]
-                  leading-relaxed
-                  font-bold
-                  text-blue-400
-                  hover:text-blue-300
-                  transition-colors
-                  flex
-                  items-center
-                  gap-1
-                "
+                  className={gearStyles.pdfLink}
                 >
                   PDF
 
@@ -907,17 +971,10 @@ export default function SpecsPower({
           ACHETER EN LIGNE
           ========================= */}
 
-      <div
-        className="
-          shrink-0
-          flex
-          flex-col
-          gap-2
-        "
-      >
+      <div style={sidebarCardStyle}>
         <div
           className="
-            text-[15px]
+            text-[18px]
             font-black
           "
         >

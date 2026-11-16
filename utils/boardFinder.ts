@@ -695,16 +695,16 @@ function getPackingOptions(
 
 export function getFinderLayout(
     items: AnyRow[],
-    existingBoards: AnyRow[] = []
+    existingBoards: AnyRow[] = [],
+    powerUnderBoard?: boolean,
 ): FinderLayout {
     const pedals = physicalPedals(items);
 
     const pedalCount = pedals.length;
 
-    const surfaceItems = finderSurfaceItems(
-        items,
-        existingBoards
-    );
+    const surfaceItems = powerUnderBoard === undefined
+        ? finderSurfaceItems(items, existingBoards)
+        : powerUnderBoard ? pedals : items;
 
     const powerCount = surfaceItems.filter(
         isPowerSupply
@@ -1423,4 +1423,163 @@ export function findCompatibleBoards(
             );
         }
     );
+}
+
+type FinderPlacement = { x: number; y: number };
+type CanvasBoardFit = {
+    centerX: number;
+    centerY: number;
+    placements: Map<number, FinderPlacement> | null;
+};
+
+// Allow room for two standard pedals with their jacks, plus a small perimeter margin.
+const EXTRA_PEDAL_WIDTH_MM = 100;
+const EXTRA_PEDAL_DEPTH_MM = 125;
+const BOARD_EDGE_ALLOWANCE_MM = 20;
+
+function isCloseBoardSize(board: AnyRow, width: number, depth: number): boolean {
+    const boardWidth = Number(board.width);
+    const boardDepth = Number(board.depth);
+    const extraArea = boardWidth * boardDepth -
+        (width + BOARD_EDGE_ALLOWANCE_MM) * (depth + BOARD_EDGE_ALLOWANCE_MM);
+
+    return extraArea <= 2 * EXTRA_PEDAL_WIDTH_MM * EXTRA_PEDAL_DEPTH_MM &&
+        boardWidth - width <= 2 * EXTRA_PEDAL_WIDTH_MM + BOARD_EDGE_ALLOWANCE_MM &&
+        boardDepth - depth <= EXTRA_PEDAL_DEPTH_MM + BOARD_EDGE_ALLOWANCE_MM;
+}
+
+export function getCanvasBoardFit(
+    layout: FinderLayout,
+    board: AnyRow,
+    allowRearrangement: boolean,
+): CanvasBoardFit | null {
+    if (layout.status !== "ready" || !isValidBoard(board)) return null;
+
+    const centerX = (layout.minX + layout.maxX) / 2;
+    const centerY = (layout.minY + layout.maxY) / 2;
+    if (currentArrangementFits({ ...layout, centerX, centerY }, board)) {
+        return isCloseBoardSize(board, layout.maxX - layout.minX, layout.maxY - layout.minY)
+            ? { centerX, centerY, placements: null }
+            : null;
+    }
+    if (!allowRearrangement) return null;
+
+    const width = Number(board.width);
+    const depth = Number(board.depth);
+    const items = (layout.surfaceItems ?? []).flatMap((item) => {
+        const bounds = pedalBounds({ ...item, x: 0, y: 0 }, true);
+        return bounds ? [{ id: item.instanceId, bounds, width: boundsWidth(bounds), depth: boundsDepth(bounds) }] : [];
+    });
+    if (items.length !== layout.surfaceItems?.length || items.some((item) => item.width > width + EPSILON_MM || item.depth > depth + EPSILON_MM)) {
+        return null;
+    }
+
+    const byDepth = [...items].sort((a, b) => b.depth - a.depth);
+    const byWidth = [...items].sort((a, b) => b.width - a.width);
+    for (const order of [byDepth, byWidth, items]) {
+        const rows: { width: number; depth: number; items: typeof items }[] = [];
+        for (const item of order) {
+            const row = rows.find((candidate) => candidate.width + MIN_GAP_MM + item.width <= width + EPSILON_MM);
+            if (row) {
+                row.width += MIN_GAP_MM + item.width;
+                row.depth = Math.max(row.depth, item.depth);
+                row.items.push(item);
+            } else {
+                rows.push({ width: item.width, depth: item.depth, items: [item] });
+            }
+        }
+
+        const packedDepth = rows.reduce((sum, row) => sum + row.depth, 0) + (rows.length - 1) * MIN_GAP_MM;
+        const packedWidth = Math.max(...rows.map((row) => row.width));
+        if (packedDepth > depth + EPSILON_MM || !isCloseBoardSize(board, packedWidth, packedDepth)) continue;
+
+        const placements = new Map<number, FinderPlacement>();
+        let top = centerY - packedDepth / 2;
+        for (const row of rows) {
+            let left = centerX - row.width / 2;
+            for (const item of row.items) {
+                placements.set(item.id, {
+                    x: left - item.bounds.minX,
+                    y: top + (row.depth - item.depth) / 2 - item.bounds.minY,
+                });
+                left += item.width + MIN_GAP_MM;
+            }
+            top += row.depth + MIN_GAP_MM;
+        }
+        return { centerX, centerY, placements };
+    }
+
+    return null;
+}
+
+const PREFERRED_BOARD_BRANDS = new Set(["pedaltrain", "rockboard", "templeaudio"]);
+const NEUTRAL_BOARD_FINISH = /^(?:matte black|flat black|black|noir|schwarz|gunmetal(?: gr[ae]y)?|gr[ae]y|anthracite|gm)$/i;
+
+function boardModel(board: AnyRow) {
+    const brand = String(board.brand ?? "").toLowerCase().replace(/[^a-z0-9]/g, "");
+    const name = String(board.name ?? "").trim();
+    const templeFinish = brand === "templeaudio" ? "|gm|rd|vw" : "";
+    const finishPattern = new RegExp(
+        String.raw`(?:\s*[-–—/]\s*|\s+|\s*\()((?:matte |flat )?black|noir|schwarz|gunmetal(?: gr[ae]y)?|gr[ae]y|anthracite|vintage white|white|blanc|red|rouge|blue|bleu|green|vert|yellow|jaune|orange|pink|purple|silver|gold${templeFinish})\)?$`,
+        "i",
+    );
+    const finish = name.match(finishPattern);
+    const model = name.slice(0, finish?.index ?? name.length).trim().toLowerCase().replace(/\s+/g, " ");
+
+    return {
+        key: JSON.stringify([brand, model, Number(board.width), Number(board.depth)]),
+        brand,
+        preferredBrand: PREFERRED_BOARD_BRANDS.has(brand),
+        finishRank: finish ? (NEUTRAL_BOARD_FINISH.test(finish[1]) ? 0 : 2) : 1,
+    };
+}
+
+export function findCanvasCompatibleBoards(
+    layout: FinderLayout,
+    boards: AnyRow[],
+    allowRearrangement: boolean,
+): FinderMatch[] {
+    const models = new Map<string, { match: FinderMatch; brand: string; preferredBrand: boolean; finishRank: number }>();
+
+    for (const board of boards) {
+        const fit = getCanvasBoardFit(layout, board, allowRearrangement);
+        if (!fit) continue;
+
+        const { key, brand, preferredBrand, finishRank } = boardModel(board);
+        const previous = models.get(key);
+        if (previous && previous.finishRank <= finishRank) continue;
+
+        models.set(key, {
+            match: {
+                board,
+                freeArea: Number(board.width) * Number(board.depth) - layout.totalPedalArea,
+                requiresRearrangement: fit.placements !== null,
+                layoutMode: fit.placements ? "optimized" : "current",
+            },
+            brand,
+            preferredBrand,
+            finishRank,
+        });
+    }
+
+    const ranked = [...models.values()]
+        .sort((a, b) =>
+            Number(a.match.requiresRearrangement) - Number(b.match.requiresRearrangement) ||
+            Number(b.preferredBrand) - Number(a.preferredBrand) ||
+            a.match.freeArea - b.match.freeArea ||
+            String(a.match.board.name ?? "").localeCompare(String(b.match.board.name ?? "")),
+        );
+    const countsByBrand = new Map<string, number>();
+    const matches: FinderMatch[] = [];
+
+    for (const { match, brand } of ranked) {
+        const brandCount = countsByBrand.get(brand) ?? 0;
+        if (brandCount >= 2) continue;
+
+        countsByBrand.set(brand, brandCount + 1);
+        matches.push(match);
+        if (matches.length === 10) break;
+    }
+
+    return matches;
 }

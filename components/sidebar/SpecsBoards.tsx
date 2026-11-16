@@ -1,12 +1,17 @@
 "use client";
 
 import React from "react";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, Plus } from "lucide-react";
 import { mmToIn, formatWeight } from "@/utils/units";
+import gearStyles from "./GearCatalog.module.css";
 import type { Language } from "@/utils/i18n";
 
 type Props = {
+  embedded?: boolean;
+  onAddToBoard?: (item: any) => void;
   selectedBoardDetails: any;
+  boardsLibrary?: any[];
+  onSelectBoard?: (board: any) => void;
 
   units: "metric" | "imperial";
   language: Language;
@@ -16,16 +21,16 @@ type Props = {
   isCustomBoard: boolean;
 
   buildThomannUrl: (slug: string) => string;
-  getStoresForCountry: () => string[];
+  getStoresForCountry?: () => string[];
 
-  hasBoardCommercialLinks: boolean;
-  selectedBoardInstanceId: number | null;
-  rotateBoard: (id: number) => void;
-  moveBoardFront: (id: number) => void;
-  moveBoardBack: (id: number) => void;
-  deleteBoard: (id: number) => void;
-  isUSA: boolean;
-  isEurope: boolean;
+  hasBoardCommercialLinks?: boolean;
+  selectedBoardInstanceId?: number | null;
+  rotateBoard?: (id: number) => void;
+  moveBoardFront?: (id: number) => void;
+  moveBoardBack?: (id: number) => void;
+  deleteBoard?: (id: number) => void;
+  isUSA?: boolean;
+  isEurope?: boolean;
 };
 
 function hasValue(value: any) {
@@ -123,13 +128,13 @@ function SpecRow({
 
   return (
     <div className="flex items-center py-[1px]">
-      <span className="text-[12px]">
+      <span className="text-[14px]">
         {label}
       </span>
 
       <div className="flex-1 border-b border-dotted border-zinc-600 mx-2 translate-y-[3.5px]" />
 
-      <span className="text-[12px] leading-relaxed font-normal text-zinc-300 whitespace-nowrap">
+      <span className="text-[14px] leading-relaxed font-normal text-zinc-300 whitespace-nowrap">
         {value}
       </span>
     </div>
@@ -190,37 +195,14 @@ function StoreLogos({
   });
 
   return (
-    <div className="flex items-center gap-3 flex-wrap">
+    <div className={gearStyles.storeList}>
       {stores.map((store) => (
-        <a
-          key={store.key}
-          href={store.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          title={store.label}
-          aria-label={store.label}
-          className="
-            inline-flex
-            items-center
-            justify-center
-            transition-transform
-            duration-150
-            hover:scale-110
-            active:scale-95
-          "
-        >
-          <img
-            src={store.logo}
-            alt={store.label}
-            className="
-              w-7
-              h-7
-              rounded-full
-              object-contain
-            "
-            loading="lazy"
-            decoding="async"
-          />
+        <a key={store.key} href={store.url} target="_blank" rel="noopener noreferrer"
+          className={gearStyles.storeLink}>
+          <img src={store.logo} alt="" loading="lazy" decoding="async"
+            style={{ width: 28, height: 28, borderRadius: "50%", objectFit: "contain" }} />
+          <span>{store.label}</span>
+          <ExternalLink size={13} color="#3b82f6" aria-hidden="true" />
         </a>
       ))}
     </div>
@@ -229,6 +211,10 @@ function StoreLogos({
 
 export default function BoardSpecs({
   selectedBoardDetails,
+  boardsLibrary = [],
+  onSelectBoard,
+  embedded = false,
+  onAddToBoard,
   units,
   language,
   t,
@@ -332,133 +318,97 @@ export default function BoardSpecs({
     ? selectedBoardDetails.type
     : "Pedalboard";
 
+  const normalizeBrand = (value: unknown) =>
+    String(value ?? "").trim().toLowerCase();
+
+  const selectedBrand = normalizeBrand(brand);
+  const similarBoards = Number.isFinite(width) && Number.isFinite(depth) &&
+    width > 0 && depth > 0 && selectedBrand
+    ? boardsLibrary
+      .filter((board) => {
+        const candidateBrand = normalizeBrand(board.brand);
+        const w = Number(board.width);
+        const d = Number(board.depth);
+        return candidateBrand && candidateBrand !== "custom" &&
+          candidateBrand !== selectedBrand &&
+          Number.isFinite(w) && Number.isFinite(d) &&
+          w > 0 && d > 0 &&
+          Math.abs(w - width) / width <= 0.2 &&
+          Math.abs(d - depth) / depth <= 0.2;
+      })
+      .map((board) => ({
+        board,
+        score: Math.abs(Number(board.width) - width) / width +
+          Math.abs(Number(board.depth) - depth) / depth,
+      }))
+      .sort((a, b) => a.score - b.score)
+      .slice(0, 6)
+      .map(({ board }) => board)
+    : [];
+
+  const sidebarCardStyle: React.CSSProperties = {
+    backgroundColor: "var(--zinc-950)",
+    border: "none",
+    borderRadius: 26,
+    padding: 24,
+    boxSizing: "border-box",
+    minWidth: 0,
+    width: "100%",
+    display: "flex",
+    flexDirection: "column",
+    gap: 12,
+    flexShrink: 0,
+  };
   return (
-    <div
-      className="
-        h-full
-        min-h-0
-        overflow-y-auto
-        overflow-x-hidden
-        flex
-        flex-col
-        gap-5
-        px-1
-        pb-8
-
-        [scrollbar-width:thin]
-        [scrollbar-color:#3f3f46_transparent]
-
-        [&::-webkit-scrollbar]:w-1.5
-        [&::-webkit-scrollbar-track]:bg-transparent
-        [&::-webkit-scrollbar-thumb]:bg-zinc-700
-        [&::-webkit-scrollbar-thumb]:rounded-full
-        hover:[&::-webkit-scrollbar-thumb]:bg-zinc-600
-      "
-    >
-      {/* HERO BOARD */}
-
-      <div className="shrink-0 flex flex-col items-center pt-1">
-        <div className="w-full h-[170px] shrink-0 flex items-center justify-center mb-4">
-          {image && (
-            <div
-              className="flex items-center justify-center rounded-lg"
-              style={{ width: 250, height: 150, backgroundColor: "#e5e7eb" }}
-            >
-              <img
-                key={image}
-                src={image}
-                alt={`${brand} ${name}`}
-                className="!block !h-[110px] !w-[200px] object-contain"
-                style={{ width: 200, height: 110, objectFit: "contain" }}
-                loading="eager"
-                fetchPriority="high"
-                decoding="sync"
-                draggable={false}
-              />
-            </div>
+    <div className="w-full min-w-0" style={{ display: "flex", flexDirection: "column", gap: 20, background: "transparent", paddingInline: embedded ? 0 : 4 }}>
+      <div style={{
+        display: "flex",
+        alignItems: "flex-start",
+        justifyContent: "space-between",
+        gap: 12,
+        minWidth: 0,
+      }}>
+        <div style={{ display: "flex", flex: "1 1 0", flexDirection: "column", alignItems: "flex-start", minWidth: 0 }}>
+          <p style={{ margin: 0, fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", lineHeight: 1.5 }}>{brand}</p>
+          <h2 style={{ margin: "4px 0 0", fontSize: 34, fontWeight: 900, lineHeight: 1.08, letterSpacing: "-0.035em", overflowWrap: "anywhere" }}>{name}</h2>
+          <span style={{ display: "inline-flex", marginTop: 12, padding: "3px 10px", borderRadius: 9999, backgroundColor: "#fff", color: "#09090b", fontSize: 11, fontWeight: 900, lineHeight: 1.2 }}>{boardType}</span>
+          {onAddToBoard && (
+            <button type="button" className={gearStyles.addToBoardHover} onClick={() => onAddToBoard(selectedBoardDetails)}
+              style={{ display: "inline-flex", alignItems: "center", gap: 6, minHeight: 34, marginTop: 12, padding: "7px 11px", border: 0, borderRadius: 9, color: "white", fontSize: 12, fontWeight: 700, lineHeight: "20px", cursor: "pointer" }}>
+              <Plus size={15} strokeWidth={2.5} aria-hidden="true" />
+              {t("customPanel.addToBoard")}
+            </button>
           )}
         </div>
-
-        <div className="w-full min-w-0">
-          {/* MARQUE + BADGE */}
-          <div
-            className="
-      flex
-      items-center
-      justify-between
-      gap-3
-      min-w-0
-    "
-          >
-            {brand && (
-              <div
-                className="
-          text-[15px]
-          font-black
-          truncate
-          min-w-0
-        "
-              >
-                {brand}
-              </div>
-            )}
-
-            <span
-              className="
-        shrink-0
-        px-2.5
-        py-1
-        rounded-full
-        bg-white
-        text-zinc-950
-        text-[9px]
-        font-black
-        leading-none
-        whitespace-nowrap
-      "
-            >
-              {boardType}
-            </span>
+        {!embedded && image && (
+          <div style={{ width: 140, maxWidth: "38%", flexShrink: 0, display: "flex", justifyContent: "flex-end", background: "transparent" }}>
+            <img src={image} alt={`${brand} ${name}`} draggable={false}
+              style={{ display: "block", width: "100%", height: "auto", maxHeight: 160, objectFit: "contain" }} />
           </div>
-
-          {/* NOM DU BOARD */}
-          {name && (
-            <div
-              className="
-        text-[12px]
-        truncate
-        mt-0.5
-      "
-            >
-              {name}
-            </div>
-          )}
-        </div>
+        )}
       </div>
-
-      {/* DESCRIPTION */}
       {hasValue(overview) && (
-        <div className="w-full min-w-0 shrink-0 flex flex-col gap-2">
-          <div className="text-[15px] font-black">
+        <div style={sidebarCardStyle}>
+          <div className="text-[18px] font-black">
             {t("pedal.description")}
           </div>
 
-          <p className="w-full max-w-none text-[12px] leading-relaxed whitespace-normal break-words">
+          <p className="w-full max-w-none text-[14px] leading-relaxed whitespace-normal break-words">
             {overview}
           </p>
         </div>
       )}
 
       {/* CARACTÉRISTIQUES */}
-      <div className="shrink-0 flex flex-col gap-2">
-        <div className="text-[15px] font-black">
+      <div style={sidebarCardStyle}>
+        <div className="text-[18px] font-black">
           {t("pedal.features")}
         </div>
 
         <div>
           {status && (
             <div className="flex items-center py-[1px]">
-              <span className="text-[12px]">
+              <span className="text-[14px]">
                 {t("board.status.label")}
               </span>
 
@@ -529,7 +479,7 @@ export default function BoardSpecs({
             selectedBoardDetails.manual
           ) && (
               <div className="flex items-center py-[1px]">
-                <span className="text-[12px]">
+                <span className="text-[14px]">
                   {t("pedal.manual")}
                 </span>
 
@@ -541,17 +491,7 @@ export default function BoardSpecs({
                   }
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="
-                  text-[12px]
-                  leading-relaxed
-                  font-bold
-                  text-blue-400
-                  hover:text-blue-300
-                  transition-colors
-                  flex
-                  items-center
-                  gap-1
-                "
+                  className={gearStyles.pdfLink}
                 >
                   PDF
                   <ExternalLink size={10} />
@@ -562,8 +502,8 @@ export default function BoardSpecs({
       </div>
 
       {/* ACHETER EN LIGNE */}
-      <div className="shrink-0 flex flex-col gap-2">
-        <div className="text-[15px] font-black">
+      <div style={sidebarCardStyle}>
+        <div className="text-[18px] font-black">
           {t("sidebar.buyOnline")}
         </div>
 
@@ -576,6 +516,63 @@ export default function BoardSpecs({
           }
         />
       </div>
+
+
+      {/* SIMILAR PEDALBOARDS */}
+      {similarBoards.length > 0 && (
+        <div style={sidebarCardStyle}>
+          <div className="text-[18px] font-black">
+            {t("board.similarBoards")}
+          </div>
+
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+            gap: 10,
+          }}>
+            {similarBoards.map((board) => {
+              const boardImage = [
+                board.image, board.image_url, board.photo, board.thumbnail,
+              ].find((value) => typeof value === "string" && hasValue(value));
+              const boardDimensions = units === "metric"
+                ? `${Number(board.width)} × ${Number(board.depth)} mm`
+                : `${mmToIn(Number(board.width)).toFixed(2)} × ${mmToIn(Number(board.depth)).toFixed(2)} in`;
+
+              return (
+                <button
+                  key={board.id ?? `${board.brand}-${board.name}`}
+                  type="button"
+                  className={`${gearStyles.card} ${gearStyles.similarBoardCard}`}
+                  onClick={() => onSelectBoard?.(board)}
+                  disabled={!onSelectBoard}
+                  style={{ width: "100%" }}
+                >
+                  <div
+                    className={gearStyles.cardImage}
+                    style={{
+                      height: 100,
+                      padding: 14,
+                      background: "var(--zinc-300)",
+                    }}
+                  >
+                    {boardImage && (
+                      <img src={boardImage} alt="" draggable={false}
+                        loading="lazy" decoding="async" />
+                    )}
+                  </div>
+                  <div className={gearStyles.cardText} style={{ width: "100%", minWidth: 0 }}>
+                    <span className={gearStyles.brand}>{board.brand}</span>
+                    <strong>{board.name}</strong>
+                    <span className="text-[11px] text-zinc-400">
+                      {boardDimensions}
+                    </span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

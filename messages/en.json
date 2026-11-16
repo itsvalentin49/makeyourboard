@@ -12,11 +12,19 @@
     "cancel": "Cancel",
     "confirm": "Confirm replacement"
   },
-  "gearTu3": {
-    "officialDemo": "Official Demo",
-    "artists": "Artists who use the TU-3"
-  },
   "gear": {
+    "allGear": "All Gear",
+    "subtitleAll": "Explore pedals, pedalboards and power supplies for your setup.",
+    "searchAll": "Search…",
+    "openAll": "Open the gear library",
+    "category": "Category",
+    "allCategories": "All",
+    "loadingAll": "Loading the gear library…",
+    "loadError": "Some gear could not be loaded.",
+    "emptyAll": "No gear matches your search.",
+    "label": "Gear",
+    "moreAll": "Show more...",
+    "powerFinder": "Power Finder",
     "showList": "Show as list",
     "showGrid": "Show as grid",
     "resultOne": "{count} result",
@@ -25,7 +33,7 @@
     "anyValue": "Any",
     "open": "Open the pedal library",
     "returnToBoard": "Back to board",
-    "closeDetails": "Close pedal details",
+    "closeDetails": "Close details",
     "title": "Pedal Library",
     "subtitle": "Explore effects and add your discoveries to your board.",
     "search": "Search pedals, brands or effects…",
@@ -35,10 +43,15 @@
     "allTypes": "All types",
     "sort": "Sort by",
     "alphabetical": "Brand A–Z",
-    "newestFirst": "Newest first",
+    "newestFirst": "New Releases",
     "reset": "Clear filters",
     "empty": "No pedals match your search.",
-    "more": "Show more pedals"
+    "more": "Show more pedals",
+    "moreTypeFromBrand": "More {type} Pedals from {brand}",
+    "moreFromBrand": "More from {brand}",
+    "moreTypeFromOtherBrands": "More {type} Pedals from Other Brands",
+    "didYouMean": "Did you mean",
+    "moreResults": "Show more results"
   },
   "sidebar": {
     "searchPedal": "Search for a pedal",
@@ -215,7 +228,8 @@
     },
     "dimensions": "Dimensions",
     "weight": "Weight",
-    "origin": "Origin"
+    "origin": "Origin",
+    "similarBoards": "Similar Pedalboards"
   },
   "settings": {
     "title": "Settings",
@@ -257,7 +271,9 @@
     "confirmDelete": "Are you sure you want to delete “{name}”?",
     "confirmDeletePrompt": "Are you sure you want to delete:",
     "yes": "Yes",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "projectNameShort": "Name",
+    "duplicateProject": "Duplicate"
   },
   "contact": {
     "title": "Contact",
@@ -283,15 +299,15 @@
   "export": {
     "singlePedal": "Add another pedal to download an image.",
     "button": "Export",
-    "title": "Export pedalboard",
-    "name": "Pedalboard name",
+    "title": "Export",
+    "name": "Name",
     "preview": "Preview",
-    "downloadTitle": "Download image",
+    "downloadTitle": "Download Image",
     "canvas": "Canvas (PNG)",
     "transparent": "Transparent (PNG)",
     "white": "White (JPG)",
     "download": "Download",
-    "shareTitle": "Share project",
+    "shareTitle": "Share Project",
     "shareDescription": "The link opens an editable copy of this pedalboard in MakeYourBoard.",
     "createLink": "Generate link",
     "ready": "Your pedalboard is ready to share.",
@@ -413,15 +429,21 @@
     "power": "Power Supply"
   },
   "cables": {
+    "showSignalCables": "Show signal cables",
     "title": "Cables",
-    "clearance": "Cable clearance",
-    "signalPath": "Signal path",
+    "clearance": "Cable Clearance",
+    "signalPath": "Signal Path",
     "clearanceDescription": "Check the space available for cables.",
-    "signalChain": "Signal chain",
+    "signalChain": "Signal Chain",
     "signalChainDescription": "A recommended order to get you started. Feel free to adjust it and experiment to find your sound.",
-    "recommendedOrder": "Recommended order",
+    "recommendedOrder": "Recommended Order",
     "reset": "Reset",
-    "empty": "Add pedals to the pedalboard to display the signal chain."
+    "empty": "Add pedals to the pedalboard to display the signal chain.",
+    "pedalOrder": "Pedal Order",
+    "signalRouting": "Signal Routing",
+    "enoughSpace": "Enough space",
+    "tooClose": "Too close",
+    "signalRoutingDescription": "Visualize the audio signal path between your pedals."
   },
   "help": {
     "title": "Quick guide",
@@ -436,7 +458,7 @@
     "shareTitle": "Download your pedalboard",
     "shareText": "Export your pedalboard as a PNG to save or share it.",
     "ok": "OK",
-    "documentation": "Documentation",
+    "documentation": "Docs",
     "dontShowAgain": "Don’t show again",
     "welcomeTitle": "Welcome to MakeYourBoard!",
     "welcomeText": "MakeYourBoard is a free tool for designing your ideal pedalboard. Add your board, pedals and power supply, arrange your setup the way you like and see the result in just a few clicks. Built for pedal enthusiasts, I hope you find it useful and fun to use.",
@@ -469,6 +491,8 @@
     "aluminium": "Aluminium"
   },
   "boardFinder": {
+    "powerUnderBoard": "Power supply under the board",
+    "allowRearrangement": "Allow pedals to be rearranged",
     "button": "Pedalboard Finder",
     "subtitle": "Find your ideal pedalboard.",
     "back": "Back",
@@ -610,5 +634,43 @@
     "limited": "Search limit reached: this plan may be improved.",
     "success": "Your pedals are fully powered. Let’s Rock!",
     "failure": "Use a more powerful supply or one with more outputs, or add a second supply."
+  },
+  "onboarding": {
+    "label": "MakeYourBoard tutorial",
+    "replay": "Show tutorial again",
+    "skip": "Skip",
+    "back": "Back",
+    "next": "Next",
+    "start": "Show me around",
+    "finish": "Start building!",
+    "close": "Close",
+    "welcome": {
+      "title": "Welcome to MakeYourBoard 2.0!",
+      "description": "A new design. A smoother experience. Everything you need to build, organise and share your perfect pedalboard."
+    },
+    "catalogue": {
+      "title": "Explore Gear",
+      "description": "Discover pedals, pedalboards and power supplies. Search the catalogue or create your own custom gear."
+    },
+    "canvas": {
+      "title": "Build Your Board",
+      "description": "Drag your gear to arrange your pedalboard. Select any item to view its specifications, rotate, duplicate or remove it."
+    },
+    "boards": {
+      "title": "Manage Your Pedalboards",
+      "description": "Create multiple pedalboards, rename them, duplicate them and easily switch between them."
+    },
+    "cables": {
+      "title": "Plan Your Connections",
+      "description": "Check cable clearance, organise your signal chain and visualise how your pedals connect."
+    },
+    "power": {
+      "title": "Power Your Pedals",
+      "description": "Check voltage and current requirements, find out how to power each pedal and make sure your power supply is suitable."
+    },
+    "share": {
+      "title": "Export & Share",
+      "description": "Export your pedalboard as an image or share an editable copy of your project with a link."
+    }
   }
 }
