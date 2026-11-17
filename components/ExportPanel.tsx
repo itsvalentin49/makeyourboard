@@ -2449,8 +2449,8 @@ export default function ExportPanel({ isLightTheme, isMobile = false, boardPedal
     { value: "white", key: "export.white" },
   ] as const;
   const fieldClass = `min-w-0 w-full rounded-lg px-3 py-2 text-inherit text-[12px] font-normal ${isLightTheme
-      ? "bg-zinc-200"
-      : "bg-zinc-700"
+    ? "bg-zinc-200"
+    : "bg-zinc-700"
     }`;
   const actionClass = "flex min-w-0 items-center justify-center gap-2 rounded-lg border-0 bg-blue-600 px-2 py-2.5 text-[12px] font-medium text-white transition-colors hover:bg-blue-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-500 disabled:cursor-not-allowed disabled:opacity-40";
 

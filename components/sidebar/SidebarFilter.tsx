@@ -120,21 +120,28 @@ export default function SidebarFilter({
                 <div ref={detailsScrollerRef} className="min-h-0 min-w-0 flex-1 overflow-y-auto overflow-x-hidden break-words px-5 py-5 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
                     {selectedPedal &&
                         (selectedPedal.type === "power" || selectedPedal.capacity) ? (
-                        <SpecsPower
-                            selectedPower={selectedPedal}
-                            onAddToBoard={onAddToBoard}
-                            units={units}
-                            language={language}
-                            t={t}
-                            isUSA={isUSA}
-                            isEurope={isEurope}
-                            buildThomannUrl={buildThomannUrl}
-                            selectedInstanceId={selectedInstanceId}
-                            rotatePedal={rotatePedal}
-                            movePedalFront={movePedalFront}
-                            movePedalBack={movePedalBack}
-                            deletePedal={deletePedal}
-                        />
+                        <>
+                            <SpecsPower
+                                selectedPower={selectedPedal}
+                                onAddToBoard={onAddToBoard}
+                                units={units}
+                                language={language}
+                                t={t}
+                                isUSA={isUSA}
+                                isEurope={isEurope}
+                                buildThomannUrl={buildThomannUrl}
+                                selectedInstanceId={selectedInstanceId}
+                                rotatePedal={rotatePedal}
+                                movePedalFront={movePedalFront}
+                                movePedalBack={movePedalBack}
+                                deletePedal={deletePedal}
+                            />
+
+                            <div
+                                ref={onRecommendationsHostChange}
+                                className="mt-6 min-w-0"
+                            />
+                        </>
                     ) : selectedPedal ? (
                         <>
                             <SpecsPedal

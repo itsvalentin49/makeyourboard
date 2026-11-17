@@ -47,9 +47,10 @@
     "reset": "Cancella filtri",
     "empty": "Nessun pedale corrisponde alla ricerca.",
     "more": "Mostra altri pedali",
-    "moreTypeFromBrand": "Altri pedali {type} di {brand}",
+    "moreTypeFromBrand": "{type} di {brand}",
     "moreFromBrand": "Altri pedali di {brand}",
-    "moreTypeFromOtherBrands": "Altri pedali {type} di altre marche",
+    "moreTypeFromOtherBrands": "{type} di altri marchi",
+    "morePowerFromBrand": "Altri alimentatori di {brand}",
     "didYouMean": "Intendevi",
     "moreResults": "Mostra altri risultati"
   },

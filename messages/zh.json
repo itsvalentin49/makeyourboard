@@ -47,9 +47,10 @@
     "reset": "清除筛选",
     "empty": "没有找到符合条件的效果器。",
     "more": "显示更多效果器",
-    "moreTypeFromBrand": "更多来自 {brand} 的{type}效果器",
-    "moreFromBrand": "更多来自 {brand} 的效果器",
-    "moreTypeFromOtherBrands": "更多其他品牌的{type}效果器",
+    "moreTypeFromBrand": "{brand} 的 {type}",
+    "moreFromBrand": "{brand} 的其他效果器",
+    "moreTypeFromOtherBrands": "其他品牌的 {type}",
+    "morePowerFromBrand": "{brand} 的其他电源",
     "didYouMean": "您是不是想搜索",
     "moreResults": "显示更多结果"
   },

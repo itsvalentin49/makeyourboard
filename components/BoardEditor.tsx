@@ -1814,49 +1814,55 @@ export default function BoardEditor({
                   />
                 </div>
 
-                {catalogOpen && (
-                  <div
-                    className="absolute top-0 bottom-0 z-[120] min-h-0 min-w-0 overflow-hidden"
-                    style={{
-                      left: 0,
-                      right: 0,
-                      visibility: catalogOpen ? "visible" : "hidden",
-                      pointerEvents: catalogOpen ? "auto" : "none",
+                <div
+                  className="absolute top-0 bottom-0 z-[120] min-h-0 min-w-0 overflow-hidden"
+                  style={{
+                    left: 0,
+                    right: 0,
+                    visibility: catalogOpen ? "visible" : "hidden",
+                    pointerEvents: catalogOpen ? "auto" : "none",
+                  }}
+                >
+                  <GearCatalog
+                    compactPedalDetails
+                    desktopSidebarMode
+                    catalogVisible={catalogOpen}
+                    relatedSidebarHost={catalogRecommendationsHost}
+                    sidebarRecommendationPedal={sidebarPedal ?? null}
+                    onCatalogPedalChange={(pedal, kind) => {
+                      if (pedal) {
+                        handleCatalogSelection(pedal, kind ?? "pedals");
+                      }
                     }}
-                  >
-                    <GearCatalog
-                      compactPedalDetails
-                      desktopSidebarMode
-                      catalogVisible={catalogOpen}
-                      embedded
-                      pedals={pedalsLibrary}
-                      boards={boardsLibrary}
-                      power={powerLibrary}
-                      newPedals={newPedals}
-                      newBoards={newBoards}
-                      newPower={newPower}
-                      newGearLoading={newGearLoading}
-                      boardsStatus={boardsStatus}
-                      powerStatus={powerStatus}
-                      loading={libraryLoading}
-                      error={libraryError}
-                      initialCategory="all"
-                      initialQuery={replacementQuery}
-                      replacement={replacementCatalog}
-                      language={language}
-                      units={units}
-                      isUSA={isUSA}
-                      isEurope={isEurope}
-                      buildThomannUrl={buildThomannUrl}
-                      t={t}
-                      onClose={closeDesktopCatalog}
-                      onOpenCustom={() => setCustomCatalogOpen(open => !open)}
-                      customOpen={customCatalogOpen}
-                      customPanel={customCatalogOpen ? customCatalogPanel(false) : undefined}
-                      onAdd={addCatalogItem}
-                    />
-                  </div>
-                )}
+                    embedded
+                    pedals={pedalsLibrary}
+                    boards={boardsLibrary}
+                    power={powerLibrary}
+                    newPedals={newPedals}
+                    newBoards={newBoards}
+                    newPower={newPower}
+                    newGearLoading={newGearLoading}
+                    boardsStatus={boardsStatus}
+                    powerStatus={powerStatus}
+                    loading={libraryLoading}
+                    error={libraryError}
+                    initialCategory="all"
+                    initialQuery={replacementQuery}
+                    replacement={replacementCatalog}
+                    language={language}
+                    units={units}
+                    isUSA={isUSA}
+                    isEurope={isEurope}
+                    buildThomannUrl={buildThomannUrl}
+                    t={t}
+                    onClose={closeDesktopCatalog}
+                    onOpenCustom={() => setCustomCatalogOpen(open => !open)}
+                    customOpen={customCatalogOpen}
+                    customPanel={customCatalogOpen ? customCatalogPanel(false) : undefined}
+                    onAdd={addCatalogItem}
+                  />
+                </div>
+
                 {!catalogOpen && desktopInfoOpen && (sidebarPedal || sidebarBoard) && (
                   <aside
                     className="absolute top-0 left-0 bottom-0 z-[130] isolate overflow-hidden bg-transparent"

@@ -47,9 +47,10 @@
     "reset": "Limpar filtros",
     "empty": "Nenhum pedal corresponde à pesquisa.",
     "more": "Mostrar mais pedais",
-    "moreTypeFromBrand": "Mais pedais de {type} da {brand}",
-    "moreFromBrand": "Mais pedais da {brand}",
-    "moreTypeFromOtherBrands": "Mais pedais de {type} de outras marcas",
+    "moreTypeFromBrand": "{type} da {brand}",
+    "moreFromBrand": "Mais da {brand}",
+    "moreTypeFromOtherBrands": "{type} de outras marcas",
+    "morePowerFromBrand": "Outras fontes de alimentação de {brand}",
     "didYouMean": "Você quis dizer",
     "moreResults": "Mostrar mais resultados"
   },

@@ -47,9 +47,10 @@
     "reset": "Clear filters",
     "empty": "No pedals match your search.",
     "more": "Show more pedals",
-    "moreTypeFromBrand": "More {type} Pedals from {brand}",
+    "moreTypeFromBrand": "{type} from {brand}",
     "moreFromBrand": "More from {brand}",
-    "moreTypeFromOtherBrands": "More {type} Pedals from Other Brands",
+    "moreTypeFromOtherBrands": "{type} from Other Brands",
+    "morePowerFromBrand": "More power supplies from {brand}",
     "didYouMean": "Did you mean",
     "moreResults": "Show more results"
   },

@@ -10,7 +10,9 @@ export const CONNECTOR_TYPES = [
     "return",
     "direct_output",
     "balanced_output",
+    "xlr_output",
     "headphones",
+    "aux_input",
     "expression_input",
     "expression_output",
     "footswitch",
@@ -44,6 +46,8 @@ export const CONNECTOR_FORMATS = [
     "XLR",
     "XLR_TRS_COMBO",
     "DIN_5",
+    "MIDI_TRS_35_A",
+    "MIDI_TRS_35_B",
     "USB_A",
     "USB_B",
     "USB_C",
@@ -107,9 +111,11 @@ export const CONNECTOR_LABELS: Record<
     return: "Return",
     direct_output: "Direct Out",
     balanced_output: "Balanced Out",
+    xlr_output: "XLR Out",
     headphones: "Phones",
-    expression_input: "EXP In",
-    expression_output: "EXP Out",
+    aux_input: "AUX In",
+    expression_input: "EXP",
+    expression_output: "EXP",
     footswitch: "FS",
     tap_tempo: "Tap",
     control_input: "CTL In",
@@ -120,7 +126,7 @@ export const CONNECTOR_LABELS: Record<
     usb: "USB",
     spdif_input: "S/PDIF In",
     spdif_output: "S/PDIF Out",
-    power_input: "Power In",
+    power_input: "Power",
     power_output: "Power Out",
     other: "Other",
 };
@@ -147,7 +153,9 @@ export function getConnectorFamily(
         case "return":
         case "direct_output":
         case "balanced_output":
+        case "xlr_output":
         case "headphones":
+        case "aux_input":
             return "audio";
 
         case "expression_input":
@@ -187,12 +195,14 @@ export function getConnectorColor(
     switch (type) {
         case "input":
         case "return":
+        case "aux_input":
             return "var(--color-blue-500)";
 
         case "output":
         case "send":
         case "direct_output":
         case "balanced_output":
+        case "xlr_output":
         case "headphones":
             return "var(--color-green-500)";
 
@@ -241,8 +251,10 @@ export function getDefaultConnectorFormat(
         case "control_output":
         case "headphones":
             return "TRS_635";
-
+        case "aux_input":
+            return "TRS_35";
         case "balanced_output":
+        case "xlr_output":
             return "XLR";
 
         case "midi_input":
@@ -273,7 +285,8 @@ export function getDefaultConnectorFormat(
 export function getConnectorLabel(
     type: ConnectorType,
     channel: ConnectorChannel | null = null,
-    loop?: number
+    loop?: number,
+    alternateTypes: ConnectorType[] = []
 ): string {
     const label = CONNECTOR_LABELS[type];
 
@@ -289,7 +302,17 @@ export function getConnectorLabel(
                 ? " Stereo"
                 : "";
 
-    return `${label}${loopLabel}${channelLabel}`;
+    const mainLabel = `${label}${loopLabel}${channelLabel}`;
+
+    const additionalLabels = [
+        ...new Set(
+            alternateTypes
+                .filter(alternateType => alternateType !== type)
+                .map(alternateType => CONNECTOR_LABELS[alternateType])
+        ),
+    ].filter(alternateLabel => alternateLabel !== label);
+
+    return [mainLabel, ...additionalLabels].join(" / ");
 }
 
 /* =========================================================

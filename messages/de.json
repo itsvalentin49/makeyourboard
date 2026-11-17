@@ -47,9 +47,10 @@
     "reset": "Filter zurücksetzen",
     "empty": "Keine Pedale entsprechen deiner Suche.",
     "more": "Weitere Pedale anzeigen",
-    "moreTypeFromBrand": "Weitere {type}-Pedale von {brand}",
-    "moreFromBrand": "Weitere Pedale von {brand}",
-    "moreTypeFromOtherBrands": "Weitere {type}-Pedale anderer Marken",
+    "moreTypeFromBrand": "{type} von {brand}",
+    "moreFromBrand": "Mehr von {brand}",
+    "moreTypeFromOtherBrands": "{type} anderer Marken",
+    "morePowerFromBrand": "Weitere Netzteile von {brand}",
     "didYouMean": "Meintest du",
     "moreResults": "Mehr Ergebnisse anzeigen"
   },

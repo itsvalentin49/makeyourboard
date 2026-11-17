@@ -17,6 +17,7 @@ import {
     Sun,
     Moon,
     Layers,
+    Check,
     X,
 } from "lucide-react";
 
@@ -114,7 +115,32 @@ export default function JackPositionEditor({
 
     const [saving, setSaving] = useState(false);
     const [dirty, setDirty] = useState(false);
+    const [linkInOut, setLinkInOut] = useState(false);
     const [message, setMessage] = useState("");
+    const [copyFeedback, setCopyFeedback] = useState(false);
+    const [pasteFeedback, setPasteFeedback] = useState(false);
+
+    useEffect(() => {
+        if (!copyFeedback) return;
+
+        const timer = window.setTimeout(
+            () => setCopyFeedback(false),
+            1500
+        );
+
+        return () => window.clearTimeout(timer);
+    }, [copyFeedback]);
+
+    useEffect(() => {
+        if (!pasteFeedback) return;
+
+        const timer = window.setTimeout(
+            () => setPasteFeedback(false),
+            1500
+        );
+
+        return () => window.clearTimeout(timer);
+    }, [pasteFeedback]);
 
     const [darkMode, setDarkMode] = useState(true);
 
@@ -193,6 +219,7 @@ export default function JackPositionEditor({
         setActiveId(data[0]?.id ?? null);
         setDirty(false);
         setMessage("");
+        setLinkInOut(false);
     }
 
     function selectPedal(pedal: CalibrationPedal) {
@@ -224,16 +251,102 @@ export default function JackPositionEditor({
         id: string,
         changes: Partial<PedalConnector>
     ) {
-        setConnectors(previous =>
-            previous.map(connector =>
-                connector.id === id
-                    ? { ...connector, ...changes }
-                    : connector
-            )
-        );
+        setConnectors(previous => {
+            const current = previous.find(
+                connector => connector.id === id
+            );
+
+            if (!current) return previous;
+
+            const updated: PedalConnector = {
+                ...current,
+                ...changes,
+            };
+
+            if (
+                changes.type !== undefined ||
+                changes.channel !== undefined ||
+                changes.loop !== undefined ||
+                changes.alternateTypes !== undefined
+            ) {
+                updated.alternateTypes = [
+                    ...new Set(updated.alternateTypes ?? []),
+                ].filter(type =>
+                    type !== updated.type &&
+                    CONNECTOR_LABELS[type] !== CONNECTOR_LABELS[updated.type]
+                );
+
+                updated.label = getConnectorLabel(
+                    updated.type,
+                    updated.channel,
+                    updated.loop,
+                    updated.alternateTypes
+                );
+            }
+
+            const inputs = previous.filter(
+                connector => connector.type === "input"
+            );
+
+            const outputs = previous.filter(
+                connector => connector.type === "output"
+            );
+
+            const linkedConnector =
+                current.type === "input"
+                    ? outputs[0]
+                    : current.type === "output"
+                        ? inputs[0]
+                        : undefined;
+
+            const canLink =
+                linkInOut &&
+                (
+                    changes.position !== undefined ||
+                    changes.side !== undefined
+                ) &&
+                updated.type === current.type &&
+                updated.channel === "mono" &&
+                linkedConnector?.channel === "mono" &&
+                inputs.length === 1 &&
+                outputs.length === 1;
+
+            return previous.map(connector => {
+                if (connector.id === id) {
+                    return updated;
+                }
+
+                if (
+                    canLink &&
+                    linkedConnector &&
+                    connector.id === linkedConnector.id
+                ) {
+                    // Mono : jacks latéraux opposés.
+                    if (updated.side === "L" || updated.side === "R") {
+                        return {
+                            ...connector,
+                            side: updated.side === "L" ? "R" as const : "L" as const,
+                            position: updated.position,
+                        };
+                    }
+
+                    // Top Mono : jacks symétriques.
+                    if (updated.side === "Top" || updated.side === "Down") {
+                        return {
+                            ...connector,
+                            side: updated.side,
+                            position: Math.round(
+                                (100 - updated.position) * 10
+                            ) / 10,
+                        };
+                    }
+                }
+
+                return connector;
+            });
+        });
 
         setDirty(true);
-
     }
 
     /* =========================================================
@@ -286,9 +399,8 @@ export default function JackPositionEditor({
        ========================================================= */
 
     function applyPreset(
-        preset: "mono" | "stereo" | "top" | "trs"
+        preset: "mono" | "stereo" | "top" | "top_stereo"
     ) {
-
         let next: PedalConnector[] = [];
 
         switch (preset) {
@@ -315,18 +427,28 @@ export default function JackPositionEditor({
                 ];
                 break;
 
-            case "trs":
+            case "top_stereo":
                 next = [
-                    createConnector("input", "R", 50, "stereo"),
-                    createConnector("output", "L", 50, "stereo"),
+                    createConnector("output", "Top", 10, "R"),
+                    createConnector("output", "Top", 30, "L"),
+                    createConnector("power_input", "Top", 50, null),
+                    createConnector("input", "Top", 70, "R"),
+                    createConnector("input", "Top", 90, "L"),
                 ];
                 break;
         }
 
+        if (preset !== "top_stereo") {
+            next.push(
+                createConnector("power_input", "Top", 50, null)
+            );
+        }
+
+        setLinkInOut(preset === "mono");
+
         setConnectors(next);
         setActiveId(next[0]?.id ?? null);
         setDirty(true);
-
     }
 
     /* =========================================================
@@ -460,15 +582,17 @@ export default function JackPositionEditor({
             structuredClone(connectors)
         );
 
+        setMessage("");
+
         try {
             await navigator.clipboard.writeText(
                 JSON.stringify(connectors, null, 2)
             );
-
-            setMessage("Connectors copied.");
         } catch {
-            setMessage("Connectors copied internally.");
+            // Internal clipboard fallback
         }
+
+        setCopyFeedback(true);
     }
 
     async function pasteConnectors() {
@@ -503,10 +627,12 @@ export default function JackPositionEditor({
             })
         );
 
+        setLinkInOut(false);
         setConnectors(next);
         setActiveId(next[0]?.id ?? null);
         setDirty(true);
-        setMessage("Connectors pasted.");
+        setMessage("");
+        setPasteFeedback(true);
     }
 
     /* =========================================================
@@ -917,14 +1043,14 @@ export default function JackPositionEditor({
                                         disabled={saving}
                                         onClick={() => applyPreset("top")}
                                     >
-                                        Top jacks
+                                        Top Mono
                                     </button>
 
                                     <button
                                         disabled={saving}
-                                        onClick={() => applyPreset("trs")}
+                                        onClick={() => applyPreset("top_stereo")}
                                     >
-                                        Stereo TRS
+                                        Top Stereo
                                     </button>
                                 </div>
                             </section>
@@ -938,14 +1064,35 @@ export default function JackPositionEditor({
                                         Connectors ({connectors.length})
                                     </h3>
 
-                                    <button
-                                        className={styles.addButton}
-                                        disabled={saving}
-                                        onClick={() => addConnector()}
-                                    >
-                                        <Plus size={16} />
-                                        Add
-                                    </button>
+                                    <div className={styles.connectorHeaderActions}>
+                                        <label className={styles.linkToggle}>
+                                            <input
+                                                type="checkbox"
+                                                checked={linkInOut}
+                                                disabled={
+                                                    saving ||
+                                                    connectors.filter(c => c.type === "input").length !== 1 ||
+                                                    connectors.filter(c => c.type === "output").length !== 1 ||
+                                                    !connectors.some(c => c.type === "input" && c.channel === "mono") ||
+                                                    !connectors.some(c => c.type === "output" && c.channel === "mono")
+                                                }
+                                                onChange={event =>
+                                                    setLinkInOut(event.target.checked)
+                                                }
+                                            />
+
+                                            Link In/Out
+                                        </label>
+
+                                        <button
+                                            className={styles.addButton}
+                                            disabled={saving}
+                                            onClick={() => addConnector()}
+                                        >
+                                            <Plus size={16} />
+                                            Add
+                                        </button>
+                                    </div>
                                 </div>
 
                                 <div className={styles.connectorList}>
@@ -1020,7 +1167,9 @@ export default function JackPositionEditor({
                                                             type,
                                                             label: getConnectorLabel(
                                                                 type,
-                                                                activeConnector.channel,
+                                                                type === "power_input" || type === "power_output"
+                                                                    ? null
+                                                                    : activeConnector.channel,
                                                                 activeConnector.loop
                                                             ),
                                                             format:
@@ -1028,15 +1177,38 @@ export default function JackPositionEditor({
                                                                     getDefaultConnectorFormat(type) === "TS_635"
                                                                     ? "TRS_635"
                                                                     : getDefaultConnectorFormat(type),
+
+                                                            side:
+                                                                type === "power_input" || type === "power_output"
+                                                                    ? "Top"
+                                                                    : activeConnector.side,
+                                                            channel:
+                                                                type === "power_input" || type === "power_output"
+                                                                    ? null
+                                                                    : activeConnector.channel,
                                                         }
                                                     );
                                                 }}
                                             >
-                                                {CONNECTOR_TYPES.map(type => (
-                                                    <option key={type} value={type}>
-                                                        {CONNECTOR_LABELS[type]}
-                                                    </option>
-                                                ))}
+                                                {CONNECTOR_TYPES
+                                                    .filter(type =>
+                                                        type !== "balanced_output" &&
+                                                        type !== "other" ||
+                                                        type === activeConnector.type
+                                                    )
+                                                    .filter(type =>
+                                                        type !== "expression_output" ||
+                                                        activeConnector.type === "expression_output"
+                                                    )
+                                                    .filter(type =>
+                                                        type !== "expression_input" ||
+                                                        activeConnector.type !== "expression_output"
+                                                    )
+                                                    .map(type => (
+                                                        <option key={type} value={type}>
+                                                            {CONNECTOR_LABELS[type]}
+                                                        </option>
+                                                    ))}
                                             </select>
                                         </label>
 
@@ -1065,6 +1237,78 @@ export default function JackPositionEditor({
                                                 ))}
                                             </select>
                                         </label>
+
+                                        <div className={styles.additionalFunctions}>
+                                            <span className={styles.additionalFunctionsLabel}>
+                                                Additional functions
+                                            </span>
+
+                                            <div className={styles.additionalFunctionsRow}>
+                                                {(activeConnector.alternateTypes ?? []).map(type => (
+                                                    <button
+                                                        key={type}
+                                                        type="button"
+                                                        className={styles.functionChip}
+                                                        disabled={saving}
+                                                        title={`Remove ${CONNECTOR_LABELS[type]}`}
+                                                        onClick={() =>
+                                                            updateConnector(activeConnector.id, {
+                                                                alternateTypes:
+                                                                    (activeConnector.alternateTypes ?? [])
+                                                                        .filter(item => item !== type),
+                                                            })
+                                                        }
+                                                    >
+                                                        {CONNECTOR_LABELS[type]}
+                                                        <X size={12} />
+                                                    </button>
+                                                ))}
+
+                                                <select
+                                                    className={styles.addFunctionSelect}
+                                                    aria-label="Add additional function"
+                                                    value=""
+                                                    disabled={saving}
+                                                    onChange={event => {
+                                                        if (!event.target.value) return;
+
+                                                        const type =
+                                                            event.target.value as ConnectorType;
+
+                                                        updateConnector(activeConnector.id, {
+                                                            alternateTypes: [
+                                                                ...(activeConnector.alternateTypes ?? []),
+                                                                type,
+                                                            ],
+                                                        });
+                                                    }}
+                                                >
+                                                    <option value="">
+                                                        + Add function
+                                                    </option>
+
+                                                    {CONNECTOR_TYPES
+                                                        .filter(type =>
+                                                            type !== "balanced_output" &&
+                                                            type !== "other" &&
+                                                            type !== "expression_output" &&
+                                                            type !== activeConnector.type &&
+                                                            CONNECTOR_LABELS[type] !==
+                                                            CONNECTOR_LABELS[activeConnector.type] &&
+                                                            !(activeConnector.alternateTypes ?? [])
+                                                                .some(item =>
+                                                                    CONNECTOR_LABELS[item] ===
+                                                                    CONNECTOR_LABELS[type]
+                                                                )
+                                                        )
+                                                        .map(type => (
+                                                            <option key={type} value={type}>
+                                                                {CONNECTOR_LABELS[type]}
+                                                            </option>
+                                                        ))}
+                                                </select>
+                                            </div>
+                                        </div>
 
                                         <label>
                                             Channel
@@ -1159,21 +1403,36 @@ export default function JackPositionEditor({
                                             <Layers size={16} />
                                             Apply to multiple pedals
                                         </button>
+
                                         <button
+                                            type="button"
                                             className={styles.secondaryButton}
+                                            data-success={copyFeedback}
                                             onClick={copyConnectors}
                                         >
-                                            <Copy size={16} />
-                                            Copy
+                                            {copyFeedback ? (
+                                                <Check size={16} />
+                                            ) : (
+                                                <Copy size={16} />
+                                            )}
+
+                                            {copyFeedback ? "Copied" : "Copy"}
                                         </button>
 
                                         <button
+                                            type="button"
                                             className={styles.secondaryButton}
+                                            data-success={pasteFeedback}
                                             disabled={saving}
                                             onClick={pasteConnectors}
                                         >
-                                            <ClipboardPaste size={16} />
-                                            Paste
+                                            {pasteFeedback ? (
+                                                <Check size={16} />
+                                            ) : (
+                                                <ClipboardPaste size={16} />
+                                            )}
+
+                                            {pasteFeedback ? "Pasted" : "Paste"}
                                         </button>
                                     </div>
 

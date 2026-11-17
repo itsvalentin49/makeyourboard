@@ -420,6 +420,16 @@ export default function GearCatalog({
   }, [embedded]);
 
   useLayoutEffect(() => {
+    if (!desktopSidebarMode || !catalogVisible) return;
+
+    const frame = window.requestAnimationFrame(() => {
+      search.current?.focus({ preventScroll: true });
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [desktopSidebarMode, catalogVisible]);
+
+  useLayoutEffect(() => {
     const scroller = content.current;
     if (!scroller || desktopSidebarMode) return;
 
@@ -604,7 +614,10 @@ export default function GearCatalog({
     const slug = normalize(String(target.slug ?? ""));
     const brand = normalize(String(target.brand ?? ""));
     const name = normalize(String(target.name ?? ""));
-    return catalog.find((entry) => entry.kind === "pedals" &&
+    const targetKind =
+      target.type === "power" ? "power" : "pedals";
+
+    return catalog.find((entry) => entry.kind === targetKind &&
       ((slug && normalize(String(entry.item.slug ?? "")) === slug && normalize(entry.brand) === brand) ||
         (normalize(entry.brand) === brand && normalize(String(entry.item.name ?? "")) === name))) ?? null;
   }, [desktopSidebarMode, sidebarRecommendationPedal, selection, catalog]);
@@ -615,6 +628,24 @@ export default function GearCatalog({
   }, [recommendationSelection]);
 
   const relatedPedals = useMemo(() => {
+    if (recommendationSelection?.kind === "power") {
+      const selectedKey = gearKey(recommendationSelection);
+      const brand = normalize(recommendationSelection.brand);
+
+      return {
+        sameBrand: catalog
+          .filter(entry =>
+            entry.kind === "power" &&
+            gearKey(entry) !== selectedKey &&
+            normalize(entry.brand) === brand
+          )
+          .sort(compareGearRelease),
+
+        sameType: [],
+        hasSameBrandAndType: false,
+        typeLabel: "",
+      };
+    }
     if (!recommendationSelection || recommendationSelection.kind !== "pedals") {
       return {
         sameBrand: [],
@@ -970,75 +1001,88 @@ export default function GearCatalog({
   }
 
 
-  const relatedContent = recommendationSelection?.kind === "pedals" && !replacement ? (
-    <div className={styles.relatedSections} data-sidebar-recommendations={desktopSidebarMode ? "" : undefined}>
-      {relatedPedals.sameBrand.length > 0 && (
-        <section className={styles.relatedSection}>
-          <h3 className={styles.relatedTitle}>
-            {relatedPedals.hasSameBrandAndType
-              ? t("gear.moreTypeFromBrand")
-                .replace("{type}", relatedPedals.typeLabel)
-                .replace("{brand}", recommendationSelection.brand)
-              : t("gear.moreFromBrand")
-                .replace("{brand}", recommendationSelection.brand)}
-          </h3>
+  const relatedContent =
+    (
+      recommendationSelection?.kind === "pedals" ||
+      recommendationSelection?.kind === "power"
+    ) && !replacement ? (
+      <div className={styles.relatedSections} data-sidebar-recommendations={desktopSidebarMode ? "" : undefined}>
+        {relatedPedals.sameBrand.length > 0 && (
+          <section className={styles.relatedSection}>
+            <h3 className={styles.relatedTitle}>
+              {recommendationSelection.kind === "power"
+                ? t("gear.morePowerFromBrand")
+                  .replace("{brand}", recommendationSelection.brand)
+                : relatedPedals.hasSameBrandAndType
+                  ? t("gear.moreTypeFromBrand")
+                    .replace("{type}", relatedPedals.typeLabel)
+                    .replace("{brand}", recommendationSelection.brand)
+                  : t("gear.moreFromBrand")
+                    .replace("{brand}", recommendationSelection.brand)}
+            </h3>
 
-          <div ref={sameBrandGrid} className={styles.grid} data-view="grid">
-            {relatedPedals.sameBrand.slice(0, visibleSameBrand).map(card)}
+            <div ref={sameBrandGrid} className={styles.grid} data-view="grid">
+              {relatedPedals.sameBrand.slice(0, visibleSameBrand).map(card)}
 
-            {relatedPedals.sameBrand.length > visibleSameBrand && (
-              <button
-                type="button"
-                className={`${styles.card} ${styles.moreCard}`}
-                onClick={() => setSameBrandRows((value) => value + 2)}
-              >
-                <span className={styles.moreCardImage}>
-                  <Plus size={48} strokeWidth={1.8} aria-hidden="true" />
-                </span>
+              {relatedPedals.sameBrand.length > visibleSameBrand && (
+                <button
+                  type="button"
+                  className={`${styles.card} ${styles.moreCard}`}
+                  onClick={() => setSameBrandRows((value) => value + 2)}
+                >
+                  <span className={styles.moreCardImage}>
+                    <Plus size={48} strokeWidth={1.8} aria-hidden="true" />
+                  </span>
 
-                <span className={styles.cardText}>
-                  <span className={styles.brand}>{t("gear.label")}</span>
-                  <strong>{t("gear.moreAll")}</strong>
-                </span>
-              </button>
-            )}
-          </div>
+                  <span className={styles.cardText}>
+                    <span className={styles.brand}>{t("gear.label")}</span>
+                    <strong>{t("gear.moreAll")}</strong>
+                  </span>
+                </button>
+              )}
+            </div>
 
-        </section>
-      )}
+          </section>
+        )}
 
-      {relatedPedals.sameType.length > 0 && (
-        <section className={styles.relatedSection}>
-          <h3 className={styles.relatedTitle}>
-            {t("gear.moreTypeFromOtherBrands")
-              .replace("{type}", relatedPedals.typeLabel)}
-          </h3>
+        {relatedPedals.sameType.length > 0 && (
+          <section className={styles.relatedSection}>
+            <h3 className={styles.relatedTitle}>
+              {t("gear.moreTypeFromOtherBrands")
+                .replace("{type}", relatedPedals.typeLabel)}
+            </h3>
 
-          <div ref={sameTypeGrid} className={styles.grid} data-view="grid">
-            {relatedPedals.sameType.slice(0, visibleSameType).map(card)}
+            <div ref={sameTypeGrid} className={styles.grid} data-view="grid">
+              {relatedPedals.sameType.slice(0, visibleSameType).map(card)}
 
-            {relatedPedals.sameType.length > visibleSameType && (
-              <button
-                type="button"
-                className={`${styles.card} ${styles.moreCard}`}
-                onClick={() => setSameTypeRows((value) => value + 4)}
-              >
-                <span className={styles.moreCardImage}>
-                  <Plus size={48} strokeWidth={1.8} aria-hidden="true" />
-                </span>
+              {relatedPedals.sameType.length > visibleSameType && (
+                <button
+                  type="button"
+                  className={`${styles.card} ${styles.moreCard}`}
+                  onClick={() => setSameTypeRows((value) => value + 4)}
+                >
+                  <span className={styles.moreCardImage}>
+                    <Plus size={48} strokeWidth={1.8} aria-hidden="true" />
+                  </span>
 
-                <span className={styles.cardText}>
-                  <span className={styles.brand}>{t("gear.label")}</span>
-                  <strong>{t("gear.moreAll")}</strong>
-                </span>
-              </button>
-            )}
-          </div>
+                  <span className={styles.cardText}>
+                    <span className={styles.brand}>{t("gear.label")}</span>
+                    <strong>{t("gear.moreAll")}</strong>
+                  </span>
+                </button>
+              )}
+            </div>
 
-        </section>
-      )}
-    </div>
-  ) : null;
+          </section>
+        )}
+      </div>
+    ) : null;
+
+  if (desktopSidebarMode && !catalogVisible) {
+    return relatedSidebarHost && relatedContent
+      ? createPortal(relatedContent, relatedSidebarHost)
+      : null;
+  }
 
   return (
     <dialog
@@ -1353,7 +1397,10 @@ export default function GearCatalog({
                   )}
                 </div>
               )}
-              {selection?.kind === "pedals" && !replacement && !desktopSidebarMode ? (
+              {(
+                selection?.kind === "pedals" ||
+                selection?.kind === "power"
+              ) && !replacement && !desktopSidebarMode ? (
                 relatedContent
               ) : selected && !desktopSidebarMode && !replacement ? null : (
                 <div className={styles.resultList}>

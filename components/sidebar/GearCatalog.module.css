@@ -576,32 +576,18 @@
 }
 
 .moreCardImage {
-
   display: flex;
-
   flex: 1;
-
   min-height: clamp(118px, 13vw, 168px);
-
   align-items: center;
-
   justify-content: center;
-
-  background: var(--zinc-900);
-
-}
-
-.moreCardImage svg {
-
-  flex-shrink: 0;
-
+  background: var(--zinc-950);
 }
 
 .moreCard .cardText {
-
-  background: var(--zinc-950);
-
+  background: var(--zinc-800);
 }
+
 
 .cardImage,
 

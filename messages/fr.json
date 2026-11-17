@@ -47,9 +47,10 @@
     "reset": "Effacer les filtres",
     "empty": "Aucune pédale ne correspond à ta recherche.",
     "more": "Afficher plus de pédales",
-    "moreTypeFromBrand": "Autres pédales {type} de {brand}",
-    "moreFromBrand": "Autres pédales de {brand}",
-    "moreTypeFromOtherBrands": "Autres pédales {type} d'autres marques",
+    "moreTypeFromBrand": "{type} de {brand}",
+    "moreFromBrand": "Autres de {brand}",
+    "moreTypeFromOtherBrands": "{type} d'autres marques",
+    "morePowerFromBrand": "Autres alimentations de {brand}",
     "didYouMean": "Vouliez-vous dire",
     "moreResults": "Afficher plus de résultats"
   },
