@@ -210,7 +210,8 @@
   padding: 0;
 }
 
-@media (max-width: 1023px) {
+@media (max-width: 1023px),
+(pointer: coarse) {
 
   :global(html):has(.editorViewport),
   :global(body):has(.editorViewport) {
@@ -220,10 +221,17 @@
 
   .editorViewport {
     position: fixed;
-    inset: 0 0 auto;
-    height: 100vh;
-    height: 100dvh;
-    padding-bottom: env(safe-area-inset-bottom);
+    top: var(--editor-top, 0px);
+    left: 0;
+    right: 0;
+    bottom: auto;
+    width: 100%;
+    height: var(--editor-height, 100dvh);
+    max-height: var(--editor-height, 100dvh);
+    min-height: 0;
+    box-sizing: border-box;
+    overflow: hidden;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
   }
 }
 

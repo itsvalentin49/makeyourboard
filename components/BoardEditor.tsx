@@ -152,6 +152,39 @@ export default function BoardEditor({
   const mobileCanvasRef = useRef<HTMLDivElement | null>(null);
   const canvasContainerRef = useRef<HTMLDivElement | null>(null);
 
+  const editorViewportRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    const viewport = window.visualViewport;
+
+    const updateViewport = () => {
+      const element = editorViewportRef.current;
+      if (!element) return;
+
+      element.style.setProperty(
+        "--editor-height",
+        `${viewport?.height ?? window.innerHeight}px`
+      );
+
+      element.style.setProperty(
+        "--editor-top",
+        `${viewport?.offsetTop ?? 0}px`
+      );
+    };
+
+    updateViewport();
+
+    window.addEventListener("resize", updateViewport);
+    viewport?.addEventListener("resize", updateViewport);
+    viewport?.addEventListener("scroll", updateViewport);
+
+    return () => {
+      window.removeEventListener("resize", updateViewport);
+      viewport?.removeEventListener("resize", updateViewport);
+      viewport?.removeEventListener("scroll", updateViewport);
+    };
+  }, []);
+
   const {
     pedalsLibrary,
     boardsLibrary,
@@ -1677,7 +1710,8 @@ export default function BoardEditor({
 
   return (
     <div
-      className={`${pedalActions.editorViewport} bg-[var(--background)] text-[var(--foreground)] font-sans select-none overflow-hidden h-screen`}
+      ref={editorViewportRef}
+      className={`${pedalActions.editorViewport} bg-[var(--background)] text-[var(--foreground)] font-sans select-none overflow-hidden h-dvh`}
       onClick={closeSearchMenus}
     >
 
