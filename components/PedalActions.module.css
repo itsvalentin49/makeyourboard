@@ -179,7 +179,7 @@
 
 .mobileRail:global(.myb-tool-rail) {
   position: absolute;
-  inset: auto 0 12px;
+  inset: auto 0 16px;
   width: calc(100% - 32px);
   max-width: 420px;
   height: 54px;

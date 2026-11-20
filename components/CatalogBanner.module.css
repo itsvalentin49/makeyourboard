@@ -88,10 +88,28 @@
     }
 }
 
-/* Tablet and mobile — Landscape */
+/* Mobile and tablet — Portrait and landscape */
 
-@media (orientation: landscape) and (pointer: coarse) {
+@media (max-width: 1023px),
+(pointer: coarse) {
     .logo {
-        zoom: 0.48;
+        zoom: 1;
+        margin-left: 14px;
+    }
+
+    .logo :global(.myb-sidebar-logo) {
+        -webkit-text-size-adjust: 100%;
+        text-size-adjust: 100%;
+    }
+
+    .logo :global(.myb-logo-title) {
+        font-size: 20px;
+        line-height: 1;
+        white-space: nowrap;
+    }
+
+    .logo :global(.myb-logo-subtitle) {
+        font-size: 6px !important;
+        margin-top: 3px;
     }
 }

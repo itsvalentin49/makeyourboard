@@ -8,12 +8,18 @@ export default function SidebarLogo({ compact = false }: Props) {
   const subtitle = "GUITAR PEDALBOARD PLANNER";
 
   return (
-    <div className="px-1 select-none inline-flex flex-col w-fit">
+    <div
+      className="myb-sidebar-logo px-1 select-none inline-flex flex-col w-fit"
+      style={{
+        WebkitTextSizeAdjust: "100%",
+        textSizeAdjust: "100%",
+      }}
+    >
       <div
         className={
           compact
-            ? "relative text-[22px] font-black tracking-tight leading-none"
-            : "relative text-[34px] font-black tracking-tight leading-none"
+            ? "myb-logo-title relative text-[22px] font-black tracking-tight leading-none"
+            : "myb-logo-title relative text-[34px] font-black tracking-tight leading-none"
         }
         style={{ overflow: "visible" }}
       >
@@ -39,7 +45,7 @@ export default function SidebarLogo({ compact = false }: Props) {
 
       <div
         aria-label={subtitle}
-        className="flex w-full justify-between font-medium"
+        className="myb-logo-subtitle flex w-full justify-between font-medium"
         style={{
           fontSize: compact ? 7 : 10,
           lineHeight: 1,
