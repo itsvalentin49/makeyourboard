@@ -87,3 +87,11 @@
         margin-right: 14px;
     }
 }
+
+/* Tablet and mobile — Landscape */
+
+@media (orientation: landscape) and (pointer: coarse) {
+    .logo {
+        zoom: 0.55;
+    }
+}

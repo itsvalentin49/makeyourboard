@@ -441,7 +441,7 @@
     "pedalOrder": "Ordre des pédales",
     "signalRouting": "Routage du signal",
     "enoughSpace": "Espace suffisant",
-    "tooClose": "Trop proches",
+    "tooClose": "Trop proche",
     "signalRoutingDescription": "Visualisez le trajet du signal audio entre vos pédales.",
     "empty": "Ajoutez des pédales au pedalboard pour afficher la chaîne du signal."
   },

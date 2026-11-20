@@ -996,10 +996,15 @@ COMPACT FULLSCREEN LAYOUT
 }
 
 .connectorList {
-    flex-shrink: 0;
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: none;
     gap: 4px;
-    max-height: 170px;
     overflow-y: auto;
+}
+
+.connectorRow {
+    flex-shrink: 0;
 }
 
 .connectorRow {

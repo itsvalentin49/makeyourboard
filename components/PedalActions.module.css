@@ -177,8 +177,8 @@
   min-height: 36px;
 }
 
-
 .mobileRail:global(.myb-tool-rail) {
+  position: absolute;
   inset: auto 0 12px;
   width: calc(100% - 32px);
   max-width: 420px;
@@ -188,7 +188,13 @@
   padding: 4px 6px;
   transform: none;
   z-index: 70;
+  box-sizing: border-box;
+  border: 1px solid var(--zinc-700);
+  border-radius: 14px;
   background: var(--zinc-950);
+  color: var(--foreground);
+  box-shadow: 0 6px 22px rgb(0 0 0 / 14%);
+  pointer-events: auto;
 }
 
 

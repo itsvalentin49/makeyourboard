@@ -146,6 +146,19 @@ export default function PowerSetup({
             </p>
           )}
 
+          {!powerUnits.length && plan.unsupported.length > 0 && (
+            <p className={`m-0 text-[11px] ${ko}`}>
+              {tr("unsupported")}{" "}
+              {plan.unsupported.map(label).join(", ")}
+            </p>
+          )}
+
+          {!powerUnits.length && plan.searchLimited && (
+            <p className={`m-0 text-[11px] ${muted}`}>
+              {tr("limited")}
+            </p>
+          )}
+
           {powerUnits.map((s, si) => {
 
             const outputs = plan.outlets.filter(
@@ -227,6 +240,81 @@ export default function PowerSetup({
                     )}
 
                   </div>
+
+                  {/* GENERAL RECOMMENDATIONS */}
+
+                  {si === 0 && (
+                    <div className="flex w-full min-w-0 flex-col gap-2 pt-2">
+
+                      {plan.unpowered.length > 0 && (
+                        <div className="flex flex-col gap-1">
+                          {plan.unpowered.map((p, i) => (
+                            <div
+                              key={i}
+                              className="flex min-w-0 items-center gap-2 text-[11px]"
+                            >
+                              <CircleX
+                                size={12}
+                                strokeWidth={2}
+                                className="shrink-0 text-red-500"
+                              />
+
+                              <span className="min-w-0 break-words">
+                                {pedalName(p)}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {plan.unsupported.length > 0 && (
+                        <div className={`flex items-start gap-2 text-[11px] ${ko}`}>
+                          <Info
+                            size={13}
+                            className="mt-[2px] shrink-0"
+                          />
+
+                          <span className="min-w-0 break-words">
+                            {tr("unsupported")}{" "}
+                            {plan.unsupported.map(label).join(", ")}
+                          </span>
+                        </div>
+                      )}
+
+                      {plan.searchLimited && (
+                        <p className={`m-0 text-center text-[11px] ${muted}`}>
+                          {tr("limited")}
+                        </p>
+                      )}
+
+                      <div
+                        role="status"
+                        className={`
+        flex
+        flex-col
+        text-center
+        text-[12px]
+        leading-relaxed
+        ${plan.complete ? ok : ko}
+      `}
+                      >
+                        {plan.complete ? (
+                          <>
+                            <span>
+                              {tr("success")
+                                .replace(/Let[’']s Rock\s*!?/i, "")
+                                .trim()}
+                            </span>
+
+                            <span>Let's Rock! 🤟</span>
+                          </>
+                        ) : (
+                          <span>{tr("failure")}</span>
+                        )}
+                      </div>
+
+                    </div>
+                  )}
 
                 </div>
 
@@ -508,105 +596,6 @@ export default function PowerSetup({
               </div>
             );
           })}
-
-
-
-          {/* UNSUPPORTED PEDALS */}
-
-          {plan.unsupported.length > 0 && (
-            <div className={`${cardClass} ${ko}`}>
-
-              <div
-                className="
-                  flex
-                  items-start
-                  gap-2
-                  text-[11px]
-                "
-              >
-
-                <Info
-                  size={13}
-                  className="mt-[2px] shrink-0"
-                />
-
-                <span className="min-w-0 break-words">
-                  {tr("unsupported")}{" "}
-                  {plan.unsupported.map(label).join(", ")}
-                </span>
-
-              </div>
-
-            </div>
-          )}
-
-          {/* SEARCH LIMIT */}
-
-          {plan.searchLimited && (
-            <p className={`m-0 text-[11px] ${muted}`}>
-              {tr("limited")}
-            </p>
-          )}
-
-          {/* FINAL STATUS */}
-
-          {powerUnits.length > 0 && (
-            <div className={cardClass}>
-
-              <h3 className="m-0 text-[14px] font-semibold">
-                {t("powerSetup.sections.recommendation")}
-              </h3>
-
-              {plan.unpowered.length > 0 && (
-                <div className="flex flex-col gap-1">
-
-                  {plan.unpowered.map((p, i) => (
-                    <div
-                      key={i}
-                      className="flex min-w-0 items-center gap-2 text-[11px]"
-                    >
-                      <CircleX
-                        size={12}
-                        strokeWidth={2}
-                        className="shrink-0 text-red-500"
-                      />
-
-                      <span className="min-w-0 break-words">
-                        {pedalName(p)}
-                      </span>
-                    </div>
-                  ))}
-
-                </div>
-              )}
-
-              <div
-                role="status"
-                className={`
-        flex
-        flex-col
-        text-[12px]
-        leading-relaxed
-        ${plan.complete ? ok : ko}
-      `}
-              >
-                {plan.complete ? (
-                  <>
-                    <span>
-                      {tr("success")
-                        .replace(/Let[’']s Rock\s*!?/i, "")
-                        .trim()}
-                    </span>
-
-                    <span>Let's Rock! 🤟</span>
-                  </>
-                ) : (
-                  <span>{tr("failure")}</span>
-                )}
-              </div>
-
-            </div>
-          )}
         </>
       )}
 

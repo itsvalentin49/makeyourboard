@@ -14,6 +14,9 @@ import BoardSpecs from "./SpecsBoards";
 import PowerSpecs from "./SpecsPower";
 import type { CatalogStatus } from "@/hooks/useLibrary";
 import { compareGearRelease, gearEntries, gearKey, gearKinds, normalizeGear as normalize, type GearCategory, type GearEntry, type GearKind } from "@/utils/gearCatalog";
+import {
+  getOtherBrandRecommendations,
+} from "@/utils/pedalRecommendations";
 
 type Props = {
   pedals: AnyRow[];
@@ -312,6 +315,9 @@ export default function GearCatalog({
   const [limit, setLimit] = useState(PAGE_SIZE);
   const [sameBrandRows, setSameBrandRows] = useState(2);
   const [sameTypeRows, setSameTypeRows] = useState(4);
+  const [recommendationSeed] = useState(
+    () => Math.random().toString(36).slice(2)
+  );
   const sameBrandGrid = useRef<HTMLDivElement>(null);
   const sameTypeGrid = useRef<HTMLDivElement>(null);
   const [relatedColumns, setRelatedColumns] = useState({ sameBrand: 8, sameType: 8 });
@@ -683,21 +689,15 @@ export default function GearCatalog({
       ? sameBrandAndType
       : brandPedals;
 
-    // Other brands: recommend one pedal per brand (newest first).
-    const seenBrands = new Set<string>();
-    const sameType = primaryType
-      ? candidates.filter((entry) => {
-        const candidateBrand = normalize(entry.brand);
-        if (
-          !candidateBrand ||
-          candidateBrand === brand ||
-          seenBrands.has(candidateBrand) ||
-          !entry.tags.some((tag) => normalize(tag) === primaryType)
-        ) return false;
-        seenBrands.add(candidateBrand);
-        return true;
-      })
-      : [];
+    // Other brands: featured pedals first,
+    // followed by random discovery recommendations.
+
+    const sameType = getOtherBrandRecommendations(
+      catalog,
+      recommendationSelection,
+      primaryType,
+      recommendationSeed
+    );
 
     return {
       sameBrand,
@@ -709,7 +709,13 @@ export default function GearCatalog({
         )
         : "",
     };
-  }, [recommendationSelection, catalog, language, t]);
+  }, [
+    recommendationSelection,
+    catalog,
+    language,
+    t,
+    recommendationSeed,
+  ]);
 
   // Each related gallery reserves its last cell for the "Show more" card.
   // Detect each grid separately so responsive layouts remain aligned.
