@@ -92,6 +92,10 @@
 
 @media (max-width: 1023px),
 (pointer: coarse) {
+    .banner {
+        height: 40px;
+    }
+
     .logo {
         zoom: 1;
         margin-left: 14px;

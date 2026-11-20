@@ -1711,7 +1711,7 @@ export default function BoardEditor({
   return (
     <div
       ref={editorViewportRef}
-      className={`${pedalActions.editorViewport} bg-[var(--background)] text-[var(--foreground)] font-sans select-none overflow-hidden h-dvh`}
+      className={`${pedalActions.editorViewport} bg-[var(--background)] text-[var(--foreground)] font-sans select-none overflow-hidden h-screen`}
       onClick={closeSearchMenus}
     >
 
